@@ -5,6 +5,8 @@ import { ThemeProvider } from 'next-themes';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import type { ReactNode } from 'react';
 
+import { OfflineGuard } from '@/features/network-status';
+
 import { getQueryClient } from './query-client';
 
 /**
@@ -15,7 +17,9 @@ export function Providers({ children }: { children: ReactNode }) {
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
       <QueryClientProvider client={getQueryClient()}>
-        <NuqsAdapter>{children}</NuqsAdapter>
+        <NuqsAdapter>
+          <OfflineGuard>{children}</OfflineGuard>
+        </NuqsAdapter>
       </QueryClientProvider>
     </ThemeProvider>
   );

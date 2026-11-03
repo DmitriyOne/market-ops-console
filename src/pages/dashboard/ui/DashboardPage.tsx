@@ -5,6 +5,8 @@ import { useTranslations } from 'next-intl';
 import { Suspense } from 'react';
 
 import { datasetQueryOptions } from '@/entities/performance';
+import { LocaleSwitch } from '@/features/switch-locale';
+import { ThemeSwitch } from '@/features/switch-theme';
 
 // Placeholder proving the prefetched dataset hydrates; replaced in Plan 3.
 function MarketCount() {
@@ -15,10 +17,20 @@ function MarketCount() {
 
 export function DashboardPage() {
   return (
-    <main id="main">
-      <Suspense>
-        <MarketCount />
-      </Suspense>
-    </main>
+    <>
+      {/* Temporary header until the design pass. */}
+      <header className="flex justify-end gap-1 p-2">
+        {/* Reads search params, which static HTML does not have. */}
+        <Suspense>
+          <LocaleSwitch />
+        </Suspense>
+        <ThemeSwitch />
+      </header>
+      <main id="main">
+        <Suspense>
+          <MarketCount />
+        </Suspense>
+      </main>
+    </>
   );
 }

@@ -2,7 +2,7 @@
 
 // Last resort when the root layout fails: no providers exist here, so the
 // English dictionary is imported directly.
-import en from '@/shared/config/i18n/messages/en.json';
+import { enMessages as en } from '@/shared/config';
 
 type Props = { error: Error & { digest?: string }; reset: () => void };
 

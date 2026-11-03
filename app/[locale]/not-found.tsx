@@ -1,6 +1,6 @@
 import { getTranslations } from 'next-intl/server';
 
-import { Link } from '@/shared/config/i18n';
+import { Link } from '@/shared/config';
 
 export default async function NotFound() {
   const t = await getTranslations('notFound');

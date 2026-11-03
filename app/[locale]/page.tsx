@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import { hasLocale } from 'next-intl';
 
-import { redirect, routing } from '@/shared/config/i18n';
+import { redirect, routing } from '@/shared/config';
 
 type Props = { params: Promise<{ locale: string }> };
 

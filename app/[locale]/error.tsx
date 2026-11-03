@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 
-import { Link } from '@/shared/config/i18n';
+import { Link } from '@/shared/config';
 
 type Props = { error: Error & { digest?: string }; reset: () => void };
 

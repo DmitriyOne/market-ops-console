@@ -5,7 +5,7 @@ import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import type { ReactNode } from 'react';
 
 import { Providers } from '@/app/providers';
-import { routing } from '@/shared/config/i18n';
+import { routing } from '@/shared/config';
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));

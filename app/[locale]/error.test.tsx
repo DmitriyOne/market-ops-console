@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { NextIntlClientProvider } from 'next-intl';
 import { describe, expect, it, vi } from 'vitest';
 
-import en from '@/shared/config/i18n/messages/en.json';
+import { enMessages as en } from '@/shared/config';
 
 import ErrorPage from './error';
 
