@@ -27,4 +27,5 @@ Format: **Item**: what is wrong (file). Why it can wait. Where it goes.
 ## From the design pass (2026-11-03)
 
 - **Fallback checkpoint, dashboard D → A** (ADR 0014): when Plan 2 (assistant) is done, compare the days left to the D estimate. Not enough time means build dashboard A. **Before Plan 3** starts.
-- **Undrawn D screens**: Analyst mode (radar, heat map, markets table), phone, empty/loading/error states of the dashboard widgets. **Design pass**, before Plan 3.
+- **D screens drawn on the canvas (2026-11-03)**: Analyst, phone (Overview / Assistant / Alerts), widget and assistant states. Builder calls to confirm in Plan 3: phone map has no labels (Top risks below carries the facts); heat-map cells show whole percent, one decimal on focus; heat map is calculated from the series, so it can differ from stored KPIs by a few tenths and says so; radar uses 4 token colours + 4 dash patterns, scaled worst-to-best across 13 markets; in Analyst the assistant is shown collapsed with a badge.
+- **Not drawn yet**: tablet, Alerts as a desktop sheet, evidence card on a source chip, product drill-down. **Plan 3**, from the drawn screens and the tokens.
