@@ -10,6 +10,7 @@ import { fontVariables } from '@/app/fonts';
 import { siteMetadata } from '@/app/metadata';
 import { Providers } from '@/app/providers';
 import { routing } from '@/shared/config';
+import { PANEL_COLLAPSED_SCRIPT } from '@/widgets/app-shell';
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -28,6 +29,10 @@ export default async function LocaleLayout({ children, params }: Props) {
 
   return (
     <html lang={locale} className={fontVariables} suppressHydrationWarning>
+      <head>
+        {/* Applies the remembered collapsed assistant before first paint. */}
+        <script dangerouslySetInnerHTML={{ __html: PANEL_COLLAPSED_SCRIPT }} />
+      </head>
       <body>
         <NextIntlClientProvider>
           <ThemeProvider

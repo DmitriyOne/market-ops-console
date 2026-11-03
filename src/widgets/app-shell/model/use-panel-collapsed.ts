@@ -3,6 +3,7 @@
 import { useCallback, useSyncExternalStore } from 'react';
 
 const KEY = 'mo:assistant-collapsed';
+const ATTR = 'data-assistant-collapsed';
 const listeners = new Set<() => void>();
 // Used only when localStorage throws (private mode, blocked storage).
 let memory = false;
@@ -24,13 +25,17 @@ function subscribe(onChange: () => void) {
   };
 }
 
-// Static HTML has no localStorage: the server render is always open.
+// Static HTML has no localStorage; the look comes from the <html> attribute.
 const getServerSnapshot = () => false;
 
-/** Whether the desktop assistant panel is collapsed, remembered per browser. */
+/**
+ * Whether the desktop assistant panel is collapsed, remembered per browser.
+ * The layout reads the <html> attribute (CSS); this state drives behaviour.
+ */
 export function usePanelCollapsed(): [boolean, (collapsed: boolean) => void] {
   const collapsed = useSyncExternalStore(subscribe, read, getServerSnapshot);
   const update = useCallback((next: boolean) => {
+    document.documentElement.toggleAttribute(ATTR, next);
     try {
       localStorage.setItem(KEY, next ? '1' : '0');
     } catch {

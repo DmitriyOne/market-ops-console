@@ -2,7 +2,7 @@
 
 import { BanIcon, SparklesIcon, SquareIcon, TriangleAlertIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useMemo } from 'react';
+import { type ReactNode, useMemo } from 'react';
 
 import type { ResolvedCitation } from '@/entities/performance';
 import type { ChatMessage } from '@/features/ask-question';
@@ -71,23 +71,35 @@ function ConfidenceLine({ confidence }: { confidence: Confidence }) {
   );
 }
 
+/**
+ * `ai`: a finished answer on the AI surface. `neutral`: still streaming; the
+ * kind (answer or "can't answer") is known only at `done`, so no AI colour yet.
+ */
 function AiSurface({
   label,
   dashed,
+  tone = 'ai',
   children,
 }: {
   label: string;
   dashed?: boolean;
-  children: React.ReactNode;
+  tone?: 'ai' | 'neutral';
+  children: ReactNode;
 }) {
   return (
     <div
       className={cn(
-        'flex flex-col gap-2 rounded-xl border border-surface-ai-border bg-surface-ai p-3 text-sm',
+        'flex flex-col gap-2 rounded-xl border p-3 text-sm',
+        tone === 'ai' ? 'border-surface-ai-border bg-surface-ai' : 'border-border bg-card',
         dashed && 'border-dashed',
       )}
     >
-      <p className="flex items-center gap-1.5 text-xs font-semibold text-surface-ai-label">
+      <p
+        className={cn(
+          'flex items-center gap-1.5 text-xs font-semibold',
+          tone === 'ai' ? 'text-surface-ai-label' : 'text-muted-foreground',
+        )}
+      >
         <SparklesIcon aria-hidden className="size-3.5" />
         {label}
       </p>
@@ -128,7 +140,7 @@ export function AnswerMessage({
 
   if (status === 'streaming') {
     return (
-      <AiSurface label={t('answer.writing')}>
+      <AiSurface label={t('answer.writing')} tone="neutral">
         <Paragraphs text={text} caret />
         <p className="text-xs text-muted-foreground">{t('answer.pending')}</p>
       </AiSurface>

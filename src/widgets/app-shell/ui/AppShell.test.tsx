@@ -52,6 +52,7 @@ const assistantPane = () => screen.getByRole('complementary', { name: t.assistan
 describe('AppShell', () => {
   beforeEach(() => {
     localStorage.clear();
+    document.documentElement.removeAttribute('data-assistant-collapsed');
   });
   afterEach(() => {
     vi.unstubAllGlobals();
@@ -72,10 +73,10 @@ describe('AppShell', () => {
     viewport(true);
     const { user, unmount, ui } = setup();
     await user.click(screen.getByRole('button', { name: t.collapse }));
-    expect(screen.getByRole('button', { name: t.expand })).toBeInTheDocument();
+    expect(document.documentElement).toHaveAttribute('data-assistant-collapsed');
     unmount();
     render(ui);
-    expect(await screen.findByRole('button', { name: t.expand })).toBeInTheDocument();
+    expect(document.documentElement).toHaveAttribute('data-assistant-collapsed');
   });
 
   it('desktop: a broken localStorage leaves the panel open without crashing', () => {
@@ -87,7 +88,7 @@ describe('AppShell', () => {
       throw new Error('denied');
     });
     setup();
-    expect(screen.getByRole('button', { name: t.collapse })).toBeInTheDocument();
+    expect(document.documentElement).not.toHaveAttribute('data-assistant-collapsed');
     expect(screen.getByText('Assistant content')).toBeInTheDocument();
   });
 

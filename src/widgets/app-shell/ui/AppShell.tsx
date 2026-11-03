@@ -25,6 +25,10 @@ type AppShellProps = {
   assistant: (api: AssistantApi) => ReactNode;
 };
 
+const FRAME = 'flex h-dvh flex-col bg-background';
+const ASIDE =
+  'flex min-h-0 flex-col border-border max-lg:flex-1 lg:w-96 lg:border-l lg:assistant-collapsed:w-14';
+
 // Tailwind `lg`. Layout is CSS; this is only for behaviour.
 const DESKTOP = '(min-width: 64rem)';
 
@@ -81,7 +85,7 @@ export function AppShell({ header, main, assistant }: AppShellProps) {
   const badge = unread > 0 ? t('newAnswers', { count: unread }) : null;
 
   return (
-    <div className="flex h-dvh flex-col bg-background">
+    <div className={FRAME}>
       <a
         href="#main"
         className="sr-only rounded-md bg-primary px-3 py-2 text-primary-foreground focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50"
@@ -101,36 +105,52 @@ export function AppShell({ header, main, assistant }: AppShellProps) {
         </main>
         <aside
           aria-label={t('assistant')}
-          className={cn(
-            'flex min-h-0 flex-col border-border max-lg:flex-1 lg:border-l',
-            collapsed ? 'lg:w-14' : 'lg:w-96',
-            section !== 'assistant' && 'max-lg:hidden',
-          )}
+          className={cn(ASIDE, section !== 'assistant' && 'max-lg:hidden')}
         >
-          {collapsed ? (
-            <div className="hidden flex-col items-center gap-2 p-2 lg:flex">
-              <Button
-                type="button"
-                variant="ghost"
-                className="relative size-11"
-                aria-label={badge ? `${t('expand')} · ${badge}` : t('expand')}
-                onClick={expand}
-              >
-                <PanelRightOpenIcon aria-hidden />
-                {badge ? (
-                  <span
-                    aria-hidden
-                    className="absolute top-1.5 right-1.5 size-2.5 rounded-full bg-surface-ai-label"
-                  />
-                ) : null}
-              </Button>
-            </div>
-          ) : null}
-          <div className={cn('min-h-0 flex-1', collapsed && 'lg:hidden')}>{assistant(api)}</div>
+          {/* Rail and panel are both rendered; CSS picks one from the <html>
+              attribute, so the remembered state shows from the first paint. */}
+          <div className="hidden flex-col items-center gap-2 p-2 lg:assistant-collapsed:flex">
+            <Button
+              type="button"
+              variant="ghost"
+              className="relative size-11"
+              aria-label={badge ? `${t('expand')} · ${badge}` : t('expand')}
+              onClick={expand}
+            >
+              <PanelRightOpenIcon aria-hidden />
+              {badge ? (
+                <span
+                  aria-hidden
+                  className="absolute top-1.5 right-1.5 size-2.5 rounded-full bg-surface-ai-label"
+                />
+              ) : null}
+            </Button>
+          </div>
+          <div className="min-h-0 flex-1 lg:assistant-collapsed:hidden">{assistant(api)}</div>
         </aside>
       </div>
       <div className="lg:hidden">
         <SectionTabBar section={section} onChange={changeSection} badge={unread} />
+      </div>
+    </div>
+  );
+}
+
+/**
+ * The static frame shown before the URL is readable (Suspense fallback):
+ * same header, dashboard and an empty panel of the right width, so nothing
+ * jumps when the live shell takes over.
+ */
+export function AppShellFallback({ header, main }: Pick<AppShellProps, 'header' | 'main'>) {
+  const t = useTranslations('shell');
+  return (
+    <div className={FRAME}>
+      <header className="border-b border-border">{header}</header>
+      <div className="flex min-h-0 flex-1">
+        <main id="main" className="min-w-0 flex-1 overflow-y-auto">
+          {main}
+        </main>
+        <aside aria-label={t('assistant')} className={cn(ASIDE, 'max-lg:hidden')} />
       </div>
     </div>
   );

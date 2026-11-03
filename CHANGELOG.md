@@ -21,8 +21,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 - Page title and description per locale; `noindex, nofollow` (internal console).
 - Pointer cursor on clickable controls; hover cards keep 15px from the screen edge; the evidence chart fills the card.
 
+- A streaming answer starts in a neutral frame; the AI or "can't answer" style is applied when it finishes (its kind arrives only at `done`).
+- `AGENTS.md` (entry point for coding agents, keeps the `next dev` block) and `DESIGN.md` (tokens, type, spacing, inventory, checklist).
+
 ### Fixed
 - Screen-reader-only text inside the chat log no longer stretches the page with an empty scroll area.
+- A collapsed assistant no longer flashes open on reload: the state is applied in `<head>` before the first paint.
 
 ### Fixed
 - Chat route validates the request before reading fixtures, so a bad request is always a 400.

@@ -7,7 +7,7 @@ import { Suspense } from 'react';
 import { datasetQueryOptions } from '@/entities/performance';
 import { LocaleSwitch } from '@/features/switch-locale';
 import { ThemeSwitch } from '@/features/switch-theme';
-import { AppShell } from '@/widgets/app-shell';
+import { AppShell, AppShellFallback } from '@/widgets/app-shell';
 import { AssistantPanel } from '@/widgets/assistant-panel';
 
 // Placeholder proving the prefetched dataset hydrates; replaced in Plan 3.
@@ -41,18 +41,7 @@ export function DashboardPage() {
   return (
     // The shell reads the URL (tab, focus), which static HTML does not have:
     // the static page shows header and dashboard, the assistant joins on hydration.
-    <Suspense
-      fallback={
-        <div className="flex h-dvh flex-col bg-background">
-          <header className="border-b border-border">
-            <Header />
-          </header>
-          <main id="main" className="min-h-0 flex-1 overflow-y-auto">
-            <Main />
-          </main>
-        </div>
-      }
-    >
+    <Suspense fallback={<AppShellFallback header={<Header />} main={<Main />} />}>
       <AppShell
         header={<Header />}
         main={<Main />}
