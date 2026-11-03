@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import type { ReactNode } from 'react';
 
+import { fontVariables } from '@/app/fonts';
 import { Providers } from '@/app/providers';
 import { routing } from '@/shared/config';
 
@@ -19,7 +20,7 @@ export default async function LocaleLayout({ children, params }: Props) {
   if (!hasLocale(routing.locales, locale)) notFound();
 
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <html lang={locale} className={fontVariables} suppressHydrationWarning>
       <body>
         <NextIntlClientProvider>
           <ThemeProvider
