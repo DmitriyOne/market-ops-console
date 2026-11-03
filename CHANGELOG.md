@@ -10,3 +10,4 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 - Architecture decision records in `docs/decisions/`.
 - Feature-Sliced Design folder skeleton.
 - Decisions on theming/dark mode (ADR 0009), i18n with static locale routing (ADR 0010), linting and formatting (ADR 0011).
+- Product design spec: `docs/specs/2026-11-03-market-ops-console-design.md`.
