@@ -41,5 +41,24 @@
   },
   "dashboard": {
     "marketCount": "{count, plural, one {# market} other {# markets}}"
+  },
+  "assistant": {
+    "composer": {
+      "label": "Ask about the data",
+      "placeholder": "Ask about markets, products or periods…",
+      "send": "Send",
+      "stop": "Stop answer",
+      "blankReason": "Type a question to send it.",
+      "tooLongReason": "Questions can be up to {max} characters.",
+      "counter": "{count} / {max}",
+      "englishOnly": "The assistant understands English only."
+    },
+    "suggestions": {
+      "title": "Try asking",
+      "risks": "Which markets are at risk?",
+      "germany": "Why did Germany dip?",
+      "apacEurope": "Compare APAC and Europe",
+      "forecastMiss": "What drives the forecast miss?"
+    }
   }
 }

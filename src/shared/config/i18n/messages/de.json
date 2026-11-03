@@ -41,5 +41,24 @@
   },
   "dashboard": {
     "marketCount": "{count, plural, one {# Markt} other {# Märkte}}"
+  },
+  "assistant": {
+    "composer": {
+      "label": "Frage zu den Daten",
+      "placeholder": "Fragen Sie nach Märkten, Produkten oder Zeiträumen…",
+      "send": "Senden",
+      "stop": "Antwort stoppen",
+      "blankReason": "Geben Sie eine Frage ein, um sie zu senden.",
+      "tooLongReason": "Fragen dürfen höchstens {max} Zeichen lang sein.",
+      "counter": "{count} / {max}",
+      "englishOnly": "Der Assistent versteht nur Englisch."
+    },
+    "suggestions": {
+      "title": "Beispielfragen",
+      "risks": "Welche Märkte sind gefährdet?",
+      "germany": "Warum ist Deutschland eingebrochen?",
+      "apacEurope": "APAC und Europa vergleichen",
+      "forecastMiss": "Was treibt die Prognoseabweichung?"
+    }
   }
 }
