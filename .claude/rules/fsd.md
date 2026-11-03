@@ -10,12 +10,12 @@ paths:
 
 | Layer | Holds | Example here |
 | --- | --- | --- |
-| `src/app` | Providers, global styles, tokens | `QueryClientProvider`, `NuqsAdapter`, locale provider |
+| `src/app` | Providers, global styles, tokens | `QueryClientProvider`, `NuqsAdapter`, `OfflineGuard` |
 | `src/pages` | Page composition only | `dashboard`, `assistant` |
 | `src/widgets` | Self-contained screen blocks | map panel, radar panel, chat panel, health summary |
 | `src/features` | User actions with business value | drill-down, select period, ask question, stop generation, configure alerts |
 | `src/entities` | Business entities: types, schemas, selectors, small UI | market, region, product, citation, chat-message |
-| `src/shared` | Business-agnostic code | `ui` (shadcn), `lib` (format, sse), `api`, `config` (env, tokens) |
+| `src/shared` | Business-agnostic code | `ui` (shadcn, error boundaries), `lib` (`cn`, errors), `api` (HTTP client, SSE, contracts), `config` (env, API routes, i18n) |
 
 `processes` is deprecated in FSD v2.1 and not used.
 
@@ -43,5 +43,5 @@ Import boundaries are checked by Steiger (`steiger` + `@feature-sliced/steiger-p
 2. **Server state** (dataset, alert rules): TanStack Query, query keys and hooks in the entity `api/`.
 3. **Local stream state** (chat): `useReducer` in `features/ask-question/model`.
 4. **React Context**: only for dependency-style values, not for app state.
-   - App-wide (QueryClient, nuqs adapter, `NextIntlClientProvider`, theme): provider in `src/app/providers`, hook exported from `shared` or the owning entity.
+   - App-wide client providers (QueryClient, nuqs adapter, offline guard): `src/app/providers`. `NextIntlClientProvider` and the theme provider are server components and sit in the root layout `app/[locale]/layout.tsx` (ADR 0009, 0010). Hooks are exported from `shared` or the owning entity.
    - Slice-scoped (e.g. a chat session): context + provider in that slice's `model/`, exported via its `index.ts`, mounted by the widget that owns it.

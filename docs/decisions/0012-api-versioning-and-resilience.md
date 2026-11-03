@@ -4,7 +4,7 @@
 
 **Decision.**
 - All route handlers under `/api/v1/*`; paths defined once in `src/shared/config/api-routes.ts`.
-- One shared fetch client in `src/shared/api`: caller signal + timeout via `AbortSignal.any`/`AbortSignal.timeout`; typed errors (`TimeoutError`, `NetworkError`, `HttpError`, `ParseError`) mapped to translated messages.
+- One shared fetch client in `src/shared/api`: caller signal + timeout via `AbortSignal.any`/`AbortSignal.timeout` (the chat stream's idle gap uses `setTimeout`, because it restarts on every event); typed errors (`TimeoutError`, `NetworkError`, `HttpError`, `ParseError`) mapped to translated messages.
 - Timeouts: 8 s for JSON requests; for the chat stream 10 s to first event and 15 s idle gap, no total cap.
 - Query retries once on network/timeout only; mutations never retry.
 - Offline guard (`features/network-status`): `navigator.onLine` + events, full-screen overlay that keeps the app mounted.

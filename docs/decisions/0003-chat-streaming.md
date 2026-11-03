@@ -1,6 +1,6 @@
 # 0003. Chat streaming
 
-**Context.** Contract: `POST /api/chat` → SSE with `token`, `done` (kind, citations, confidence) and `error` events (`docs/CONTRACT.md`). Native `EventSource` is GET-only.
+**Context.** Contract: `POST /api/chat` → SSE with `token`, `done` (kind, citations, confidence) and `error` events (`docs/CONTRACT.md`); served at `/api/v1/chat` (ADR 0012). Native `EventSource` is GET-only.
 
 **Decision.** `fetch` + `ReadableStream`, parsed by `eventsource-parser`; each event validated with a zod discriminated union; state in an own `useChatStream` hook (`useReducer`); stop via `AbortController`. The reference route is fixed to stop enqueuing when the client aborts.
 

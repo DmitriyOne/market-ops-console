@@ -1,0 +1,45 @@
+{
+  "common": {
+    "appName": "Market Ops Console",
+    "skipToContent": "Zum Inhalt springen"
+  },
+  "errors": {
+    "timeout": "Die Anfrage hat zu lange gedauert. Bitte versuchen Sie es erneut.",
+    "network": "Der Server ist nicht erreichbar. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+    "server": "Der Server konnte die Anfrage nicht abschließen.",
+    "invalidData": "Die empfangenen Daten haben ein unerwartetes Format.",
+    "unknown": "Etwas ist schiefgelaufen.",
+    "sectionTitle": "Dieser Bereich konnte nicht geladen werden.",
+    "retry": "Erneut versuchen"
+  },
+  "offline": {
+    "title": "Sie sind offline",
+    "body": "Wir verbinden uns automatisch neu. Alles auf dieser Seite bleibt erhalten."
+  },
+  "notFound": {
+    "title": "Seite nicht gefunden",
+    "body": "Die gesuchte Seite existiert nicht oder wurde verschoben.",
+    "home": "Zurück zum Dashboard"
+  },
+  "errorPage": {
+    "title": "Etwas ist schiefgelaufen",
+    "body": "Diese Seite konnte nicht angezeigt werden. Versuchen Sie es erneut oder kehren Sie zum Dashboard zurück.",
+    "home": "Zurück zum Dashboard"
+  },
+  "theme": {
+    "label": "Design",
+    "light": "Hell",
+    "dark": "Dunkel",
+    "system": "System"
+  },
+  "locale": {
+    "label": "Sprache",
+    "en-GB": "English (UK)",
+    "en-US": "English (US)",
+    "de-DE": "Deutsch",
+    "ru-RU": "Русский"
+  },
+  "dashboard": {
+    "marketCount": "{count, plural, one {# Markt} other {# Märkte}}"
+  }
+}

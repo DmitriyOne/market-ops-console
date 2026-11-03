@@ -1,0 +1,13 @@
+export { datasetQueryOptions } from './api/dataset-query';
+export { ISO3_TO_NUMERIC } from './model/iso-numeric';
+export { computeKpis, type KpiName, type Kpis, type KpiSource, type KpiValue } from './model/kpis';
+export { getMarket, getProduct, getRegion } from './model/reference';
+export {
+  isLatestSnapshot,
+  marketsInScope,
+  periodsInRange,
+  type Range,
+  type Scope,
+} from './model/scope';
+export { marketsAtRiskCount, nonOnTrackMarkets, statusFor } from './model/status';
+export { anomaliesInScope, type ScopedAnomaly, type TrendPoint, trendSeries } from './model/trend';

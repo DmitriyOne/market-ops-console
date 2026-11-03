@@ -7,3 +7,7 @@
 **Alternatives.** Flat `components/ hooks/ lib/`: fast to start, unclear ownership later. Feature folders without layers: no import direction.
 
 **Consequences.** Clear import direction and public APIs. Some overhead for a small app, kept low by pages-first. Import boundaries are linted with Steiger (`steiger` 0.9 + `@feature-sliced/steiger-plugin`), run in `pnpm lint` and CI.
+
+**Steiger exceptions (owner decisions, 2026-11-03).** Rules are switched off only with the owner's approval, each with a comment in `steiger.config.ts`:
+- `fsd/insignificant-slice`: off globally. Pages-first keeps single-consumer slices on purpose.
+- `fsd/segments-by-purpose`: off for `src/app/providers/**` only. `providers` is the agreed name for app-wide providers (`.claude/rules/fsd.md`).

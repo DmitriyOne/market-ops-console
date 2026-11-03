@@ -35,7 +35,7 @@ Detailed rules: `.claude/rules/fsd.md` (auto-loads for `src/**`). Decision: `doc
 
 ## Stack (fixed, see `docs/decisions/0002-stack.md`)
 
-Next.js 16 App Router · React 19 · TypeScript 6 strict · Tailwind v4 + shadcn/ui · next-themes · TanStack Query · nuqs · zod · react-hook-form · next-intl (`as-needed` routing, static pages) · `@t3-oss/env-nextjs` · `eventsource-parser` · shadcn charts (Recharts) · react-simple-maps · Vitest + Testing Library + MSW · Playwright (one local E2E) · Prettier + ESLint 10 + Steiger · Vercel.
+Next.js 16 App Router · React 19 · TypeScript 6 strict · Tailwind v4 + shadcn/ui · `@wrksz/themes` · TanStack Query · nuqs · zod · react-hook-form · next-intl (`as-needed` routing, static pages) · `@t3-oss/env-nextjs` · `eventsource-parser` · shadcn charts (Recharts) · react-simple-maps · Vitest + Testing Library + MSW · Playwright (one local E2E) · Prettier + ESLint 10 + Steiger · Vercel.
 
 ## Code rules
 
@@ -45,14 +45,15 @@ Next.js 16 App Router · React 19 · TypeScript 6 strict · Tailwind v4 + shadcn
 - Format numbers, currency, percentages and dates only through next-intl global formats (`src/shared/config/i18n/formats.ts`). No ad-hoc `Intl.*` or `toFixed` for display.
 - Render model output as text. Never `dangerouslySetInnerHTML`.
 - Every network call goes through the shared client in `src/shared/api` (timeouts, typed errors). API paths only from `src/shared/config/api-routes.ts` (`/api/v1/*`).
+- Errors (ADR 0013): route handlers are wrapped in `withErrorHandling`; throw `AppError` subclasses, not bare `Error`. Wrap each widget in `WidgetBoundary`. Show failures via `useErrorMessage()`. Log only through `logError`. No empty `catch`.
 - Colours, spacing, radii come from design tokens. No raw hex or arbitrary Tailwind values. Every colour token has a light (`:root`) and dark (`.dark`) value.
 - Every chart ships with an accessible alternative (table), keyboard access, and a non-colour signal.
 
 ## Git
 
-Flow: `feature/*` → `release/X.Y.Z` → `develop` → `master`. Only `release/*` merges into `develop`, only `develop` into `master`.
+Flow: `feature/X.Y.Z/NAME` (or `fix/X.Y.Z/NAME`) → `release/X.Y.Z` → `develop` → `master`. Only `release/*` merges into `develop`, only `develop` into `master`.
 
-**Never commit directly to `release/*`, `develop` or `master`.** Release branches only receive merges. All work happens on a `feature/*` branch created from the current `release/X.Y.Z`; the owner merges it back. Before the first commit of a task, check the current branch (`git branch --show-current`) and ask which feature branch to use if unsure. Version in `package.json` = top entry of `CHANGELOG.md` = release branch number. Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:`, `test:`, `refactor:`).
+**Never commit directly to `release/*`, `develop` or `master`.** Release branches only receive merges. All work happens on a `feature/X.Y.Z/NAME` (or `fix/X.Y.Z/NAME`) branch created from `release/X.Y.Z`, where `X.Y.Z` is that release (e.g. `feature/0.2.0/foundation`); the owner merges it back. Never use `release/X.Y.Z/...`: git cannot hold `release/0.2.0` and `release/0.2.0/x` at once, and CI treats every `release/*` head as a release. Before the first commit of a task, check the current branch (`git branch --show-current`) and ask which feature branch to use if unsure. Version in `package.json` = top entry of `CHANGELOG.md` = release branch number. Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:`, `test:`, `refactor:`).
 
 ## Where context lives
 
@@ -61,16 +62,30 @@ Flow: `feature/*` → `release/X.Y.Z` → `develop` → `master`. Only `release/
 | Decisions and their reasons (ADR) | `docs/decisions/` |
 | Specs (what we build) | `docs/specs/` |
 | Implementation plans | `docs/plans/` |
+| Deferred review findings | `docs/plans/backlog.md` |
 | Scoped rules, loaded by path | `.claude/rules/` |
 | Change history | `CHANGELOG.md` |
 
 Update the relevant doc in the same commit as the change. A new decision gets a new ADR.
 
+A review finding that is not fixed in its branch goes into `docs/plans/backlog.md` in the same branch, with the plan that picks it up. Never leave it only in a chat report.
+
 ## Commands
 
-To be added after scaffolding (`dev`, `build`, `format`, `format:check`, `lint`, `typecheck`, `test`, `e2e`). Run `format`, `lint`, `typecheck` and `test` before every commit; there are no git hooks.
+```bash
+pnpm dev            # http://localhost:3000
+pnpm build          # production build; check routes stay static
+pnpm format         # Prettier (code only; *.md is hand-written)
+pnpm format:check
+pnpm lint           # next typegen + ESLint + Steiger
+pnpm typecheck      # next typegen + tsc
+pnpm test           # Vitest, single run
+```
+
+Run `format`, `lint`, `typecheck` and `test` before every commit; there are no git hooks.
 
 ## Do not
 
 - Write the README sections that ask for the owner's own reasoning (approach, decisions, AI usage, "what I'd do differently"). Draft structure only; the owner writes them.
 - Add Storybook, Redux/Zustand, Vercel AI SDK, husky, or a real backend.
+- Switch off or relax a lint rule (ESLint, Steiger, TypeScript) on your own. Fix the code, or ask the owner; approved exceptions are listed in the ADR.
