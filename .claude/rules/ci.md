@@ -7,6 +7,6 @@ paths:
 
 - Workflows run only on PRs into `develop` and `master`. Nothing on push, nothing on feature branches.
 - One job per workflow (each job is billed rounded up to a minute). `timeout-minutes` set. `concurrency` with `cancel-in-progress`.
-- PR → `develop`: head must match `release/*` (else comment + auto-close); versions must match (`package.json` = top of `CHANGELOG.md` = branch number); typecheck, lint, unit tests with pnpm cache.
+- PR → `develop`: head must match `release/*` (else comment + auto-close); versions must match (`package.json` = top of `CHANGELOG.md` = branch number); format:check, lint (ESLint + Steiger), typecheck, unit tests with pnpm cache.
 - PR → `master`: head must be `develop` (else comment + auto-close); version check only, no dependency install.
 - Use the `github-actions-efficiency` skill before adding or changing a workflow.

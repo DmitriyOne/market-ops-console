@@ -35,7 +35,7 @@ Detailed rules: `.claude/rules/fsd.md` (auto-loads for `src/**`). Decision: `doc
 
 ## Stack (fixed, see `docs/decisions/0002-stack.md`)
 
-Next.js 16 App Router · React 19 · TypeScript 6 strict · Tailwind v4 + shadcn/ui · next-themes · TanStack Query · nuqs · zod · react-hook-form · next-intl · `@t3-oss/env-nextjs` · `eventsource-parser` · shadcn charts (Recharts) · react-simple-maps · Vitest + Testing Library + MSW · Playwright (one local E2E) · Vercel.
+Next.js 16 App Router · React 19 · TypeScript 6 strict · Tailwind v4 + shadcn/ui · next-themes · TanStack Query · nuqs · zod · react-hook-form · next-intl (`as-needed` routing, static pages) · `@t3-oss/env-nextjs` · `eventsource-parser` · shadcn charts (Recharts) · react-simple-maps · Vitest + Testing Library + MSW · Playwright (one local E2E) · Prettier + ESLint 10 + Steiger · Vercel.
 
 ## Code rules
 
@@ -67,7 +67,7 @@ Update the relevant doc in the same commit as the change. A new decision gets a 
 
 ## Commands
 
-To be added after scaffolding (`dev`, `build`, `typecheck`, `lint`, `test`, `e2e`).
+To be added after scaffolding (`dev`, `build`, `format`, `format:check`, `lint`, `typecheck`, `test`, `e2e`). Run `format`, `lint`, `typecheck` and `test` before every commit; there are no git hooks.
 
 ## Do not
 

@@ -13,4 +13,5 @@ One file per decision: context, decision, alternatives, consequences. Status is 
 | [0007](0007-git-flow-and-ci.md) | Git flow and CI on GitHub Free | 2026-11-03 |
 | [0008](0008-testing-scope.md) | Testing scope | 2026-11-03 |
 | [0009](0009-theming-dark-mode.md) | Theming and dark mode: next-themes + shadcn tokens | 2026-11-03 |
-| [0010](0010-i18n-and-locale.md) | i18n: next-intl, cookie locale, en-GB/en-US/de-DE/ru-RU | 2026-11-03 |
+| [0010](0010-i18n-and-locale.md) | i18n: next-intl, `as-needed` locale routing, static pages | 2026-11-03 |
+| [0011](0011-linting-and-formatting.md) | Prettier + ESLint + Steiger | 2026-11-03 |

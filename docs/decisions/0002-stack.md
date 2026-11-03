@@ -11,7 +11,8 @@
 | Validation | zod | One schema → runtime check + TS type | — |
 | Forms | react-hook-form + zod resolver | Type-safe, field arrays for alert rules | Formik: less maintained |
 | Env | `@t3-oss/env-nextjs` | Validates env with zod at build, typed access | Raw `process.env` |
-| i18n + formatting | next-intl 4 (cookie locale, no routing) | Typed keys, ICU plurals, one formatter for server and client (ADR 0010) | `Intl` only, react-i18next, numeral/date-fns |
+| i18n + formatting | next-intl 4, `as-needed` locale routing, static pages | Typed keys, ICU plurals, one formatter for server and client (ADR 0010) | `Intl` only, react-i18next, numeral/date-fns |
+| Lint / format | Prettier + ESLint 10 + Steiger | ADR 0011 | ESLint-only `@stylistic`, Biome |
 | Tables | TanStack Table (+ Virtual if stretch) | Headless, works with shadcn table | AG Grid: heavy |
 | Tests | Vitest + Testing Library + MSW; Playwright (1 E2E, local) | See ADR 0008 | Jest: slower with ESM |
 | Hosting | Vercel | Native Next.js, free previews | — |

@@ -1,17 +1,23 @@
 # 0010. Internationalisation and locale
 
-**Context.** The brief asks for currencies, large numbers, percentages and dates formatted for a multi-market audience. The owner also wants the UI translated. Locales: `en-GB` (default), `en-US`, `de-DE`, `ru-RU`. Pattern follows the owner's ministry-app (`shared/config/i18n`, next-intl without i18n routing, typed keys).
+**Context.** The brief asks for currencies, large numbers, percentages and dates formatted for a multi-market audience. The owner wants the UI translated and **pages statically rendered**. Locales: `en-GB` (default), `en-US`, `de-DE`, `ru-RU`. Conventions follow the owner's ministry-app (`shared/config/i18n`, typed keys, no literals in markup).
 
 **Decision.**
-- **next-intl 4**, no i18n routing (no `/[locale]/` segment). `createNextIntlPlugin('./src/shared/config/i18n/request.ts')` in `next.config.ts`.
-- **Locale in a cookie** (`locale`). `request.ts` reads it with `cookies()`, validates against the supported list, falls back to `en-GB`, and loads `messages/<lang>.json`. The cookie is written by a Server Action in `features/switch-locale/api`; the switcher UI lives in `features/switch-locale/ui`.
-- **Files** in `src/shared/config/i18n/`: `locale.ts` (supported locales, default, type), `request.ts`, `formats.ts` (global formats), `types.ts` (`AppConfig` augmentation: `Locale`, `Messages`, `Formats` → keys and format names checked by `tsc`), `messages/{en,de,ru}.json`.
-- **Formatting through next-intl only** (`useFormatter` / `getFormatter`, `createFormatter` outside React): global formats `currency`, `compact` (1.2M), `percent`, `signedPercent`, `period` (month/year). One source of truth for every number on screen, server and client. No ad-hoc `Intl.NumberFormat` calls.
-- **Currency is data, locale is presentation**: amounts stay USD (`meta.currency`); the locale changes separators and symbols placement only, never converts.
-- **No string literals in UI**: all visible text, `aria-label`, `alt`, `title`, `placeholder` and zod error messages come from messages.
+- **next-intl 4 with locale-based routing, `localePrefix: 'as-needed'`**: `/dashboard` = `en-GB`, `/de-DE/dashboard`, `/en-US/dashboard`, `/ru-RU/dashboard`.
+- **Static rendering**: routes live under `app/[locale]/`; `generateStaticParams` in `app/[locale]/layout.tsx` returns all locales, so every page is prebuilt in 4 versions. `request.ts` reads the locale from `next/root-params` (default in Next 16.3+; `setRequestLocale` is legacy and not used) and validates it with `hasLocale`, else `notFound()`.
+- **`proxy.ts`** (Next 16 name for middleware) = `createMiddleware(routing)`: locale negotiation (prefix → `NEXT_LOCALE` cookie → `Accept-Language` → default) and redirects. Matcher excludes `api`, `_next`, `_vercel` and files with a dot.
+- **Files** in `src/shared/config/i18n/`: `routing.ts` (`defineRouting`: locales, default, prefix, cookie `maxAge` 1 year), `navigation.ts` (`createNavigation(routing)`: locale-aware `Link`, `useRouter`, `usePathname`), `request.ts`, `formats.ts`, `types.ts` (`AppConfig`: `Locale`, `Messages`, `Formats` → keys and format names checked by `tsc`), `messages/{en,de,ru}.json`. `en-GB` and `en-US` share `en.json`; they differ only in formats.
+- **Locale switcher** in `features/switch-locale`: `router.replace` from `navigation.ts` with the target locale, **keeping the current search params** (the shareable dashboard state).
+- **Formatting only through next-intl** global formats (`currency`, `compact`, `percent`, `signedPercent`, `period`) via `useFormatter` / `getFormatter` / `createFormatter`. No ad-hoc `Intl.*`. Amounts stay USD (`meta.currency`); locale changes presentation only.
+- **No string literals in markup**, enforced by `i18next/no-literal-string` (ADR 0011).
 
 **Out of scope.** Assistant answers and market/product names come from `data/` and stay English; the chat labels them as such.
 
-**Alternatives.** `Intl` only, no translations (smaller, but owner wants translated UI). react-i18next (no App Router/RSC integration). Locale in URL (locale is a personal setting, not part of a shared view).
+**Alternatives.**
+- Cookie only, no routing: simplest, but `cookies()` makes every page dynamic.
+- `localePrefix: 'never'`: static with clean URLs, but a shared link opens in the recipient's language and alternate links are disabled. Owner chose `as-needed` so the locale is part of the link.
 
-**Consequences.** +1 dependency, three message files to keep in sync (typed keys catch missing ones in `en`; `de`/`ru` checked by a small test). Pages read the locale on the server, so the cookie makes them dynamic; acceptable for this app.
+**Consequences.**
+- +1 dependency; three message files kept in sync (typed keys catch missing keys in `en`; `de`/`ru` completeness checked by a test).
+- Static HTML is built without search params. URL state (nuqs) is read on the client, so URL-dependent widgets render inside `Suspense` with a skeleton to avoid flashing the default view on shared links.
+- Root `app/` contains `[locale]/` and `api/`; `proxy.ts` sits next to it.

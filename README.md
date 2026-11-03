@@ -20,6 +20,9 @@ To be added after scaffolding. Planned:
 ```bash
 pnpm install
 pnpm dev          # http://localhost:3000
+pnpm format       # Prettier
+pnpm lint         # ESLint + Steiger (FSD boundaries)
+pnpm typecheck
 pnpm test         # unit + component tests
 pnpm e2e          # one Playwright happy path (local only)
 ```
