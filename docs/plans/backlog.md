@@ -23,3 +23,9 @@ Format: **Item**: what is wrong (file). Why it can wait. Where it goes.
 - **Client error logs say `code: 'unknown'`** for `ApiError` (`src/shared/lib/errors/log-error.ts`). The error object is still attached. **Plan 2**: fall back to `error.name`.
 - **TanStack `CancelledError` would be logged as a failure** (`src/app/providers/query-client.ts`). No `cancelQueries` in the code yet. **Plan 2**, if the assistant cancels queries; add a test.
 - **One data failure, many alerts**: every widget's fallback is a `role="alert"` with an identically named "Try again" button (`src/shared/ui/widget-boundary.tsx`). **Plan 3**: a widget label in the button name, one page-level announcement.
+
+## From the design pass (2026-11-03)
+
+- **Fallback checkpoint, dashboard D → A** (ADR 0014): when Plan 2 (assistant) is done, compare the days left to the D estimate. Not enough time means build dashboard A. **Before Plan 3** starts.
+- **D screens drawn on the canvas (2026-11-03)**: Analyst, phone (Overview / Assistant / Alerts), widget and assistant states. Builder calls to confirm in Plan 3: phone map has no labels (Top risks below carries the facts); heat-map cells show whole percent, one decimal on focus; heat map is calculated from the series, so it can differ from stored KPIs by a few tenths and says so; radar uses 4 token colours + 4 dash patterns, scaled worst-to-best across 13 markets; in Analyst the assistant is shown collapsed with a badge.
+- **Not drawn yet**: tablet, Alerts as a desktop sheet, evidence card on a source chip, product drill-down. **Plan 3**, from the drawn screens and the tokens.
