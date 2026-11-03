@@ -1,8 +1,8 @@
 'use client';
 
+import { useTheme } from '@wrksz/themes/client';
 import { MonitorIcon, MoonIcon, SunIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useTheme } from 'next-themes';
 
 import {
   Button,
@@ -21,18 +21,30 @@ const THEMES = [
 
 export function ThemeSwitch() {
   const t = useTranslations('theme');
-  const { theme, setTheme } = useTheme();
+  // Both are undefined on the server and in the first client render (library docs).
+  const { theme, resolvedTheme, forcedTheme, setTheme } = useTheme();
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" aria-label={t('label')}>
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label={t('label')}
+          disabled={!resolvedTheme || Boolean(forcedTheme)}
+        >
           <SunIcon aria-hidden className="dark:hidden" />
           <MoonIcon aria-hidden className="hidden dark:block" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuRadioGroup value={theme ?? 'system'} onValueChange={setTheme}>
+        <DropdownMenuRadioGroup
+          value={theme ?? 'system'}
+          onValueChange={(value) => {
+            const choice = THEMES.find((t) => t.value === value);
+            if (choice) setTheme(choice.value);
+          }}
+        >
           {THEMES.map(({ value, Icon }) => (
             <DropdownMenuRadioItem key={value} value={value}>
               <Icon aria-hidden />

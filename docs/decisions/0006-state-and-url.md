@@ -6,7 +6,7 @@
 | Drill path, period, selection, mode (shareable) | nuqs (URL) | parsers in entity/feature `model/` |
 | Chat stream (local, transient) | `useReducer` in `useChatStream` | `features/ask-question/model` |
 | Ephemeral UI (open panel, hover) | `useState` | component |
-| Theme | next-themes (localStorage) | provider in `src/app/providers` |
+| Theme | `@wrksz/themes` (localStorage) | provider in the root layout `app/[locale]/layout.tsx` (ADR 0009) |
 | Locale | URL prefix (`as-needed`) + `NEXT_LOCALE` cookie | next-intl routing, ADR 0010 |
 | Dependency-style values (QueryClient, intl messages) | React Context | `src/app/providers` |
 

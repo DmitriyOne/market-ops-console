@@ -5,7 +5,7 @@
 | Framework | Next.js 16 App Router | Required by brief; reference chat route drops in as a route handler; Vercel deploy | Remix, TanStack Start: no gain, route must be rewritten |
 | Language | TypeScript 6, `strict`, `noUncheckedIndexedAccess` | Brief requires end-to-end types, no `any` | TS 7 (July 2026, Go compiler): parts of the toolchain still catching up |
 | UI | Tailwind v4 + shadcn/ui (Radix), class merging with shadcn's `cn` package | Token-based design system, accessible primitives, source in repo; generated components import `cn` as-is | MUI/Chakra: heavier, harder to own tokens; own `clsx` + `tailwind-merge` helper (every `shadcn add` needed a manual import fix) |
-| Theme | next-themes | Official shadcn dark-mode approach, no flash on load (ADR 0009) | Own provider |
+| Theme | `@wrksz/themes` | Drop-in for the shadcn `next-themes` approach, no flash on load, no React 19 script warning (ADR 0009) | `next-themes` (React 19 warning, unmaintained); own provider |
 | Server state | TanStack Query | Caching, optimistic update + rollback | SWR: weaker mutation story |
 | URL state | nuqs | Typed search params as `useState`, back/forward works | Hand-rolled `useSearchParams` parsing |
 | Validation | zod | One schema → runtime check + TS type | — |

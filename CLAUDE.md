@@ -35,7 +35,7 @@ Detailed rules: `.claude/rules/fsd.md` (auto-loads for `src/**`). Decision: `doc
 
 ## Stack (fixed, see `docs/decisions/0002-stack.md`)
 
-Next.js 16 App Router · React 19 · TypeScript 6 strict · Tailwind v4 + shadcn/ui · next-themes · TanStack Query · nuqs · zod · react-hook-form · next-intl (`as-needed` routing, static pages) · `@t3-oss/env-nextjs` · `eventsource-parser` · shadcn charts (Recharts) · react-simple-maps · Vitest + Testing Library + MSW · Playwright (one local E2E) · Prettier + ESLint 10 + Steiger · Vercel.
+Next.js 16 App Router · React 19 · TypeScript 6 strict · Tailwind v4 + shadcn/ui · `@wrksz/themes` · TanStack Query · nuqs · zod · react-hook-form · next-intl (`as-needed` routing, static pages) · `@t3-oss/env-nextjs` · `eventsource-parser` · shadcn charts (Recharts) · react-simple-maps · Vitest + Testing Library + MSW · Playwright (one local E2E) · Prettier + ESLint 10 + Steiger · Vercel.
 
 ## Code rules
 
@@ -45,6 +45,7 @@ Next.js 16 App Router · React 19 · TypeScript 6 strict · Tailwind v4 + shadcn
 - Format numbers, currency, percentages and dates only through next-intl global formats (`src/shared/config/i18n/formats.ts`). No ad-hoc `Intl.*` or `toFixed` for display.
 - Render model output as text. Never `dangerouslySetInnerHTML`.
 - Every network call goes through the shared client in `src/shared/api` (timeouts, typed errors). API paths only from `src/shared/config/api-routes.ts` (`/api/v1/*`).
+- Errors (ADR 0013): route handlers are wrapped in `withErrorHandling`; throw `AppError` subclasses, not bare `Error`. Wrap each widget in `WidgetBoundary`. Show failures via `useErrorMessage()`. Log only through `logError`. No empty `catch`.
 - Colours, spacing, radii come from design tokens. No raw hex or arbitrary Tailwind values. Every colour token has a light (`:root`) and dark (`.dark`) value.
 - Every chart ships with an accessible alternative (table), keyboard access, and a non-colour signal.
 
