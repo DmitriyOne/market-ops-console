@@ -26,4 +26,13 @@ describe('logError', () => {
     logError('boom', { scope: 'ui' });
     expect(spy).toHaveBeenCalledWith('[ui]', { code: 'unknown', message: 'boom', error: 'boom' });
   });
+
+  it('logs the same error object only once, wherever it is caught', () => {
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const error = new Error('query failed');
+    logError(error, { scope: 'query' });
+    logError(error, { scope: 'ui' });
+    expect(spy).toHaveBeenCalledOnce();
+    expect(spy).toHaveBeenCalledWith('[query]', expect.objectContaining({ error }));
+  });
 });

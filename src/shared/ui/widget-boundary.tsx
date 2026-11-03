@@ -11,11 +11,11 @@ import { ErrorBoundary } from './error-boundary';
 
 function WidgetError({ error, onRetry }: { error: unknown; onRetry: () => void }) {
   const t = useTranslations('errors');
-  const message = useErrorMessage();
+  const message = useErrorMessage()(error);
   return (
     <div role="alert" className="flex flex-col items-start gap-2 p-4">
       <p className="font-medium">{t('sectionTitle')}</p>
-      <p className="text-sm text-muted-foreground">{message(error)}</p>
+      {message && <p className="text-sm text-muted-foreground">{message}</p>}
       <Button variant="outline" size="sm" onClick={onRetry}>
         {t('retry')}
       </Button>

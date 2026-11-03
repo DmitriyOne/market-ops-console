@@ -13,8 +13,8 @@
 Rules:
 - **Server responses.** `withErrorHandling` answers expected errors (`expose: true`) with `{ error: { code, message } }`. Server faults are logged and answered with a generic 500 (`internal` or `data_integrity`) that leaks no internals. Once a stream has started, failures become the contract's SSE `error` event.
 - **Source data.** `data.json` and `fixtures.json` are parsed lazily with `parseSourceData`; a mismatch is a `DataIntegrityError` naming the file and the first broken path, with the `ZodError` as `cause`.
-- **Logging.** One function, `logError(error, { scope, ...context })`, logs once, where the error is handled: route handlers, `ErrorBoundary`, and the QueryClient's query/mutation caches. User aborts are not logged. A reporting service (Sentry) would plug in there.
-- **User-facing copy.** Every failure the UI shows goes through `useErrorMessage()` (→ `errorMessageKey` → `errors.*` messages). A user's own Stop is shown as "Stopped", never as an error.
+- **Logging.** One function, `logError(error, { scope, ...context })`, called where errors are handled: route handlers, `ErrorBoundary`, `app/[locale]/error.tsx`, `app/global-error.tsx`, and the QueryClient's query/mutation caches. It remembers logged error objects (`WeakSet`), so a failed query that the cache logs and an error boundary then catches is logged once. User aborts are not logged. A reporting service (Sentry) would plug in there.
+- **User-facing copy.** Every failure the UI shows goes through `useErrorMessage()` (→ `errorMessageKey` → `errors.*` messages). For a request the user stopped (`AbortedError`) it returns `null`: the UI shows its "Stopped" state, never an error.
 - **User actions** (ask, save alert). They are TanStack mutations or the chat stream. Each catches its error, shows `useErrorMessage(error)` with a Retry, and rolls back optimistic state (Plans 2 and 4).
 - No empty `catch`, no catch-and-rethrow-with-log (one log per error), no `try/catch` around code that cannot fail.
 
