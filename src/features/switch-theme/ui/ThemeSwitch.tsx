@@ -21,12 +21,18 @@ const THEMES = [
 
 export function ThemeSwitch() {
   const t = useTranslations('theme');
-  const { theme, setTheme } = useTheme();
+  // Both are undefined on the server and in the first client render (library docs).
+  const { theme, resolvedTheme, forcedTheme, setTheme } = useTheme();
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" aria-label={t('label')}>
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label={t('label')}
+          disabled={!resolvedTheme || Boolean(forcedTheme)}
+        >
           <SunIcon aria-hidden className="dark:hidden" />
           <MoonIcon aria-hidden className="hidden dark:block" />
         </Button>
