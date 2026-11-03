@@ -1,5 +1,6 @@
 import '@/app/styles/globals.css';
 
+import { ThemeProvider } from '@wrksz/themes/next';
 import { notFound } from 'next/navigation';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import type { ReactNode } from 'react';
@@ -21,7 +22,14 @@ export default async function LocaleLayout({ children, params }: Props) {
     <html lang={locale} suppressHydrationWarning>
       <body>
         <NextIntlClientProvider>
-          <Providers>{children}</Providers>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <Providers>{children}</Providers>
+          </ThemeProvider>
         </NextIntlClientProvider>
       </body>
     </html>
