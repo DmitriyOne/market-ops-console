@@ -23,3 +23,11 @@ Format: **Item**: what is wrong (file). Why it can wait. Where it goes.
 - **Fallback checkpoint, dashboard D → A** (ADR 0014): when Plan 2 (assistant) is done, compare the days left to the D estimate. Not enough time means build dashboard A. **Before Plan 3** starts.
 - **D screens drawn on the canvas (2026-11-03)**: Analyst, phone (Overview / Assistant / Alerts), widget and assistant states. Builder calls to confirm in Plan 3: phone map has no labels (Top risks below carries the facts); heat-map cells show whole percent, one decimal on focus; heat map is calculated from the series, so it can differ from stored KPIs by a few tenths and says so; radar uses 4 token colours + 4 dash patterns, scaled worst-to-best across 13 markets; in Analyst the assistant is shown collapsed with a badge.
 - **Not drawn yet**: tablet, Alerts as a desktop sheet, evidence card on a source chip, product drill-down. **Plan 3**, from the drawn screens and the tokens.
+
+## From Plan 2 (assistant, 2026-11-03)
+
+- **Percent precision jumps**: `percent` drops a trailing `.0`, so the data check shows `92%` next to `92.2%` (`src/shared/config/i18n/formats.ts`). Changing it affects every number. **Plan 3**, with the KPI cards: decide `minimumFractionDigits: 1` for KPI percents.
+- **No live accessibility audit yet**: the Plan 2 audit was by code and contrast tests; no rendered axe/Lighthouse run or screen-reader pass of the panel (streaming announcements, `aria-busy` log). **Plan 5**, accessibility pass.
+- **`summary-long` scroll behaviour tested only at hook level** (`use-stick-to-bottom.test.tsx`); no test scrolls the real panel while it streams. **Plan 5**, in the Playwright happy path or manually.
+- **Source clicks on desktop write the URL but nothing reads it yet** (`region`, `market`, `period`, `markets`). **Plan 3**, dashboard reads `dashboardSearchParams`.
+- **`AGENTS.md` is re-created by `next dev`** (Next.js agent rules). Untracked; the owner decides whether to commit or ignore it.
