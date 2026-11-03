@@ -84,3 +84,4 @@ Run `format`, `lint`, `typecheck` and `test` before every commit; there are no g
 
 - Write the README sections that ask for the owner's own reasoning (approach, decisions, AI usage, "what I'd do differently"). Draft structure only; the owner writes them.
 - Add Storybook, Redux/Zustand, Vercel AI SDK, husky, or a real backend.
+- Switch off or relax a lint rule (ESLint, Steiger, TypeScript) on your own. Fix the code, or ask the owner; approved exceptions are listed in the ADR.

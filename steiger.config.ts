@@ -11,8 +11,8 @@ export default defineConfig([
     },
   },
   {
-    // `src/app/providers` is the agreed home of app-wide providers
-    // (.claude/rules/fsd.md); the name is the convention, not a smell.
+    // Owner decision (ADR 0005): `src/app/providers` is the agreed home of
+    // app-wide providers (.claude/rules/fsd.md).
     files: ['./src/app/providers/**'],
     rules: {
       'fsd/segments-by-purpose': 'off',
