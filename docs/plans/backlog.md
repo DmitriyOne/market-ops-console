@@ -30,3 +30,8 @@ Format: **Item**: what is wrong (file). Why it can wait. Where it goes.
 - **`summary-long` scroll behaviour tested only at hook level** (`use-stick-to-bottom.test.tsx`); no test scrolls the real panel while it streams. **Plan 5**, in the Playwright happy path or manually.
 - **Source clicks on desktop write the URL but nothing reads it yet** (`region`, `market`, `period`, `markets`). **Plan 3**, dashboard reads `dashboardSearchParams`.
 - **`AGENTS.md` is re-created by `next dev`** (Next.js agent rules). Untracked; the owner decides whether to commit or ignore it.
+
+## From the owner review of 0.4.0 (2026-11-03)
+
+- **Phone bottom tab bar look** (`SectionTabBar`): the owner likes it for now but may want it tuned once the dashboard sections land. **Plan 3**, with the D phone screens (Overview / Assistant / Alerts).
+- **Phone `?tab=assistant` deep link paints Overview first** until hydration. Same fix as the panel (ADR 0015). **Plan 3**, with the phone layout.

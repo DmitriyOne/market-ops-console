@@ -110,7 +110,7 @@ Rules:
   (`w-14`) with a dot badge for unseen answers. The collapsed state is
   remembered (`localStorage` `mo:assistant-collapsed`) and applied before
   first paint through `data-assistant-collapsed` on `<html>`, so the panel
-  never flashes open.
+  never flashes open (ADR 0015).
 - **Phone (< `lg`):** one section at a time, Overview or Assistant
   (`?tab=`), with the bottom tab bar (`SectionTabBar`, labels always
   shown). Switching sections is CSS (`max-lg:hidden`), so the assistant is
