@@ -125,5 +125,16 @@
     "noStatus": "—",
     "reasonGrowth": "Wachstum {value} ggü. Vorjahr",
     "reasonAttainment": "{value} des Plans"
+  },
+  "shell": {
+    "assistant": "Assistent",
+    "sections": "Bereiche",
+    "tabs": {
+      "overview": "Übersicht",
+      "assistant": "Assistent"
+    },
+    "collapse": "Assistent ausblenden",
+    "expand": "Assistent einblenden",
+    "newAnswers": "{count, plural, one {# neue Antwort} other {# neue Antworten}}"
   }
 }

@@ -125,5 +125,16 @@
     "noStatus": "—",
     "reasonGrowth": "Рост {value} г/г",
     "reasonAttainment": "{value} плана"
+  },
+  "shell": {
+    "assistant": "Ассистент",
+    "sections": "Разделы",
+    "tabs": {
+      "overview": "Обзор",
+      "assistant": "Ассистент"
+    },
+    "collapse": "Скрыть ассистента",
+    "expand": "Показать ассистента",
+    "newAnswers": "{count, plural, one {# новый ответ} few {# новых ответа} many {# новых ответов} other {# новых ответа}}"
   }
 }

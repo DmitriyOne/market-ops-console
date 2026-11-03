@@ -4,6 +4,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 
 ## [0.4.0] - Unreleased
 
+### Added
+- Assistant (ADR 0014, variant A): streamed answers with Stop, Retry, confidence and one source button per citation; hover, focus or tap shows an evidence card with the real numbers; clicking focuses the dashboard through the URL.
+- "What the data shows" block under each answer: portfolio row, cited rows and two deterministic gap rules ("Not mentioned" markets, region gaps), expanded when a gap is found; "Show on dashboard" highlights the listed markets.
+- Composer with Enter / Shift+Enter / Esc, a 500-character limit with counter, four suggested questions (translated label, English question) and an "English only" notice for non-English text.
+- App shell: assistant as a right panel on desktop (collapsible, remembered, badge for unseen answers), Overview / Assistant tabs on phones.
+- MSW test harness for the SSE chat stream and the data route.
+
 ### Fixed
 - Chat route validates the request before reading fixtures, so a bad request is always a 400.
 - A failing write in the chat stream can no longer throw out of the stream's error fallback.

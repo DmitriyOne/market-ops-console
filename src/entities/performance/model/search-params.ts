@@ -1,4 +1,4 @@
-import { parseAsArrayOf, parseAsString, parseAsStringLiteral } from 'nuqs';
+import { parseAsArrayOf, parseAsString, parseAsStringLiteral } from 'nuqs/server';
 
 import type { Range } from './scope';
 
