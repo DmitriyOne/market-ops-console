@@ -12,3 +12,4 @@ One file per decision: context, decision, alternatives, consequences. Status is 
 | [0006](0006-state-and-url.md) | State split: Query / URL / local / Context | 2026-11-03 |
 | [0007](0007-git-flow-and-ci.md) | Git flow and CI on GitHub Free | 2026-11-03 |
 | [0008](0008-testing-scope.md) | Testing scope | 2026-11-03 |
+| [0009](0009-theming-dark-mode.md) | Theming and dark mode: next-themes + shadcn tokens | 2026-11-03 |

@@ -28,7 +28,9 @@ paths:
 
 ## Pages contain no logic
 
-`src/pages/*` may only import widgets/features and lay them out. No `useState`/`useEffect` with behaviour, no data fetching, no calculations, no formatting. Those live in features/entities/shared.
+`src/pages/*` imports widgets/features and lays them out. Allowed: reading URL params (via the owning slice's nuqs hook) and passing them down, simple conditional layout (e.g. executive vs analyst). Not allowed: data fetching, calculations, formatting, effects with behaviour, anything more than a few lines. When in doubt, it belongs in a feature.
+
+Import boundaries are checked by Steiger (`steiger` + `@feature-sliced/steiger-plugin`).
 
 ## Next.js App Router
 
