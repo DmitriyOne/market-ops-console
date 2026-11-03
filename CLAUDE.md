@@ -73,8 +73,8 @@ pnpm dev            # http://localhost:3000
 pnpm build          # production build; check routes stay static
 pnpm format         # Prettier (code only; *.md is hand-written)
 pnpm format:check
-pnpm lint           # ESLint + Steiger
-pnpm typecheck
+pnpm lint           # next typegen + ESLint + Steiger
+pnpm typecheck      # next typegen + tsc
 pnpm test           # Vitest, single run
 ```
 

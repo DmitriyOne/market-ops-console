@@ -13,10 +13,11 @@
     "start": "next start",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "lint": "eslint . && steiger src",
-    "typecheck": "tsc --noEmit",
+    "lint": "next typegen && eslint . && steiger src",
+    "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "typegen": "next typegen"
   },
   "dependencies": {
     "@t3-oss/env-nextjs": "~0.13.11",
