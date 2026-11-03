@@ -1,6 +1,9 @@
 import { AppError } from './app-error';
 
-export type LogContext = { scope: 'api' | 'ui' | 'query' | 'mutation'; [key: string]: unknown };
+export type LogContext = {
+  scope: 'api' | 'ui' | 'query' | 'mutation' | 'chat';
+  [key: string]: unknown;
+};
 
 // The same error can surface twice: a failed query is logged by the query
 // cache and then thrown into an error boundary. Remember what was logged.

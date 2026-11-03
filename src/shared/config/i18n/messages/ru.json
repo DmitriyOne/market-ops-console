@@ -128,8 +128,8 @@
     "noStatus": "—",
     "reasonGrowth": "Рост {value} г/г",
     "latestOnly": "только за последний месяц",
-    "attention": "Внимания требуют {needAttention} из {markets} рынков; в ответе названо {named}.",
-    "attentionRegion": "Внимания требуют {needAttention} из {markets} рынков региона {region}; в ответе названо {named}.",
+    "attention": "{needAttention, plural, one {Внимания требует #} other {Внимания требуют #}} из {markets} рынков; в ответе названо {named}.",
+    "attentionRegion": "{needAttention, plural, one {Внимания требует #} other {Внимания требуют #}} из {markets} рынков региона {region}; в ответе названо {named}.",
     "gapNote": "{count, plural, one {# рынок не упомянут} few {# рынка не упомянуты} many {# рынков не упомянуты} other {# рынка не упомянуты}}"
   },
   "shell": {

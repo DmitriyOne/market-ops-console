@@ -93,6 +93,7 @@ export function AssistantPanel({
               onSource={onSource}
               onHighlight={onHighlight}
               showSuggestions={message.id === last?.id && streak >= SUGGEST_AFTER}
+              busy={chat.isStreaming}
             />
           )}
         />

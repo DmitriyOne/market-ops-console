@@ -44,12 +44,15 @@ export function SourceButton({ citation, ds, onSelect }: SourceButtonProps) {
     <p className="text-sm text-muted-foreground">{t('loading')}</p>
   );
   const select = () => {
-    if (resolved?.known) onSelect(resolved);
+    if (!resolved?.known) return;
+    // Phones hide the panel next; an open card would stay over the dashboard.
+    setOpen(false);
+    onSelect(resolved);
   };
 
   if (coarse) {
     return (
-      <Popover>
+      <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button type="button" variant="outline" className={TRIGGER}>
             {label}

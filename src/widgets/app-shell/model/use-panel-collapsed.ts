@@ -5,33 +5,30 @@ import { useCallback, useSyncExternalStore } from 'react';
 const KEY = 'mo:assistant-collapsed';
 const ATTR = 'data-assistant-collapsed';
 const listeners = new Set<() => void>();
-// Used only when localStorage throws (private mode, blocked storage).
-let memory = false;
 
-function read(): boolean {
-  try {
-    return localStorage.getItem(KEY) === '1';
-  } catch {
-    return memory;
-  }
-}
+// The <html> attribute is the state: the pre-paint script sets it (ADR 0015),
+// CSS lays the panel out from it, and this hook reads and writes it.
+const read = () => document.documentElement.hasAttribute(ATTR);
 
 function subscribe(onChange: () => void) {
+  // Another tab changed the choice (`key` is null when storage was cleared).
+  const onStorage = (event: StorageEvent) => {
+    if (event.key !== KEY && event.key !== null) return;
+    document.documentElement.toggleAttribute(ATTR, event.newValue === '1');
+    onChange();
+  };
   listeners.add(onChange);
-  window.addEventListener('storage', onChange);
+  window.addEventListener('storage', onStorage);
   return () => {
     listeners.delete(onChange);
-    window.removeEventListener('storage', onChange);
+    window.removeEventListener('storage', onStorage);
   };
 }
 
-// Static HTML has no localStorage; the look comes from the <html> attribute.
+// Static HTML is rendered open; the attribute may differ only after the script.
 const getServerSnapshot = () => false;
 
-/**
- * Whether the desktop assistant panel is collapsed, remembered per browser.
- * The layout reads the <html> attribute (CSS); this state drives behaviour.
- */
+/** Whether the desktop assistant panel is collapsed, remembered per browser. */
 export function usePanelCollapsed(): [boolean, (collapsed: boolean) => void] {
   const collapsed = useSyncExternalStore(subscribe, read, getServerSnapshot);
   const update = useCallback((next: boolean) => {
@@ -39,8 +36,7 @@ export function usePanelCollapsed(): [boolean, (collapsed: boolean) => void] {
     try {
       localStorage.setItem(KEY, next ? '1' : '0');
     } catch {
-      // Not remembered across reloads; the panel still works.
-      memory = next;
+      // Blocked or full storage: not remembered across reloads, works for now.
     }
     for (const listener of listeners) listener();
   }, []);

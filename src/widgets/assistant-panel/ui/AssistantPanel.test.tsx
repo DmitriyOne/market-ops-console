@@ -166,17 +166,50 @@ describe('AssistantPanel', () => {
     expect(content).toHaveTextContent('Off track');
   });
 
-  it('force error shows the error and Retry asks again', async () => {
+  it('force error shows a translated error, not the server text, and Retry asks again', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
     server.use(chatFromFixture('error'));
     const { user } = setup();
     await ask(user, 'force error');
-    const alert = await screen.findByRole('alert');
+    expect(await screen.findByText(en.errors.server)).toBeInTheDocument();
     const event = fixtureEvents('error')[0];
-    expect(alert).toHaveTextContent(event?.type === 'error' ? event.message : '');
+    expect(
+      screen.queryByText(event?.type === 'error' ? event.message : ''),
+    ).not.toBeInTheDocument();
+    // Announced once, by the log; no nested alert.
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     server.use(chatFromFixture('germany-dip'));
-    await user.click(within(alert).getByRole('button', { name: t.error.retry }));
+    await user.click(screen.getByRole('button', { name: t.error.retry }));
     await answerDone();
     expect(screen.getAllByText('force error')).toHaveLength(2);
+  });
+
+  it('keyboard: after a suggested question, focus stays in the composer', async () => {
+    server.use(chatFromFixture('at-risk'));
+    const { user } = setup();
+    await user.click(screen.getByRole('button', { name: t.suggestions.risks }));
+    expect(screen.getByRole('textbox', { name: t.composer.label })).toHaveFocus();
+  });
+
+  it('keyboard: Stop returns focus to the field instead of a disabled Send', async () => {
+    server.use(chatFromFixture('at-risk', { stallAfter: 3 }));
+    const { user } = setup();
+    await ask(user, 'Which markets are at risk?');
+    await user.click(await screen.findByRole('button', { name: t.composer.stop }));
+    expect(screen.getByRole('textbox', { name: t.composer.label })).toHaveFocus();
+  });
+
+  it('while an answer streams, Retry on an earlier error is disabled', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    server.use(chatFromFixture('error'));
+    const { user } = setup();
+    await ask(user, 'force error');
+    const retry = await screen.findByRole('button', { name: t.error.retry });
+    server.use(chatFromFixture('at-risk', { stallAfter: 3 }));
+    await ask(user, 'Which markets are at risk?');
+    await waitFor(() => {
+      expect(retry).toBeDisabled();
+    });
   });
 
   it('stop mid-stream shows the stopped state and no sources', async () => {

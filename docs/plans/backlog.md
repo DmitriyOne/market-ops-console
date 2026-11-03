@@ -35,3 +35,4 @@ Format: **Item**: what is wrong (file). Why it can wait. Where it goes.
 
 - **Phone bottom tab bar look** (`SectionTabBar`): the owner likes it for now but may want it tuned once the dashboard sections land. **Plan 3**, with the D phone screens (Overview / Assistant / Alerts).
 - **Phone `?tab=assistant` deep link paints Overview first** until hydration. Same fix as the panel (ADR 0015). **Plan 3**, with the phone layout.
+- **"Show on dashboard" keeps an earlier region/market filter** (`src/entities/performance/model/use-dashboard-focus.ts`, `highlight`): highlighted markets can fall outside the filtered scope. Nothing reads the URL yet, and whether to reset the scope is a dashboard decision. **Plan 3**, ask the owner when the dashboard reads `markets`.

@@ -1,3 +1,4 @@
+import { createTranslator } from 'next-intl';
 import { describe, expect, it } from 'vitest';
 
 import de from './messages/de.json';
@@ -30,5 +31,17 @@ describe('messages', () => {
     for (const [key, value] of Object.entries(flatten(messages))) {
       expect(typeof value === 'string' && value.trim().length > 0, key).toBe(true);
     }
+  });
+
+  it.each([
+    ['en-GB' as const, en, '1 of 2 markets needs attention', '1 of 2 markets in X needs attention'],
+    ['de-DE' as const, de, '1 von 2 Märkten braucht', '1 von 2 Märkten in X braucht'],
+    ['ru-RU' as const, ru, 'Внимания требует 1 из 2 рынков', 'Внимания требует 1 из 2 рынков региона X'],
+  ])('%s: the attention lines agree with one market', (locale, messages, all, region) => {
+    const t = createTranslator({ locale, messages, namespace: 'dataCheck' });
+    expect(t('attention', { needAttention: 1, markets: 2, named: 0 })).toContain(all);
+    expect(t('attentionRegion', { needAttention: 1, markets: 2, named: 0, region: 'X' })).toContain(
+      region,
+    );
   });
 });

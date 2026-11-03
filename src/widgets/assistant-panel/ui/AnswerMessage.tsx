@@ -117,6 +117,8 @@ type AnswerMessageProps = {
   onHighlight: (marketIds: string[]) => void;
   /** Offer the suggested questions (after repeated "can't answer"). */
   showSuggestions?: boolean;
+  /** Another answer is streaming: Retry and Ask again would be ignored. */
+  busy?: boolean;
 };
 
 export function AnswerMessage({
@@ -127,6 +129,7 @@ export function AnswerMessage({
   onSource,
   onHighlight,
   showSuggestions = false,
+  busy = false,
 }: AnswerMessageProps) {
   const t = useTranslations('assistant');
   const tRoot = useTranslations();
@@ -163,6 +166,7 @@ export function AnswerMessage({
           type="button"
           variant="outline"
           className="min-h-11"
+          disabled={busy}
           onClick={() => {
             onRetry(message.id);
           }}
@@ -181,21 +185,18 @@ export function AnswerMessage({
             <Paragraphs text={text} />
           </AiSurface>
         ) : null}
-        <div
-          role="alert"
-          className="flex flex-col items-start gap-2 rounded-xl bg-status-off-track-muted p-3 text-sm text-status-off-track"
-        >
+        {/* No role="alert": the surrounding log already announces it once. */}
+        <div className="flex flex-col items-start gap-2 rounded-xl bg-status-off-track-muted p-3 text-sm text-status-off-track">
           <p className="flex items-center gap-1.5 font-semibold">
             <TriangleAlertIcon aria-hidden className="size-4" />
             {t('error.title')}
           </p>
-          <p className="text-foreground">
-            {error && 'message' in error ? error.message : tRoot(error?.key ?? 'errors.unknown')}
-          </p>
+          <p className="text-foreground">{tRoot(error?.key ?? 'errors.unknown')}</p>
           <Button
             type="button"
             variant="outline"
             className="min-h-11"
+            disabled={busy}
             onClick={() => {
               onRetry(message.id);
             }}

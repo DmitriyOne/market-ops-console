@@ -17,25 +17,25 @@ function check(id: string) {
 }
 
 type Expected = null | {
-  expanded: boolean;
+  gaps: number;
   notMentioned: string[];
   regionGaps: [string, string[]][];
 };
 
 const EXPECTED: Record<string, Expected> = {
-  'at-risk': { expanded: true, notMentioned: ['es', 'gb', 'fr'], regionGaps: [] },
-  'forecast-miss': { expanded: true, notMentioned: ['es', 'gb', 'fr'], regionGaps: [] },
+  'at-risk': { gaps: 3, notMentioned: ['es', 'gb', 'fr'], regionGaps: [] },
+  'forecast-miss': { gaps: 3, notMentioned: ['es', 'gb', 'fr'], regionGaps: [] },
   'apac-vs-europe': {
-    expanded: true,
+    gaps: 5,
     notMentioned: [],
     regionGaps: [['eu', ['de', 'es', 'it', 'gb', 'fr']]],
   },
   'summary-long': {
-    expanded: true,
+    gaps: 4,
     notMentioned: [],
     regionGaps: [['eu', ['es', 'it', 'gb', 'fr']]],
   },
-  'germany-dip': { expanded: false, notMentioned: [], regionGaps: [] },
+  'germany-dip': { gaps: 0, notMentioned: [], regionGaps: [] },
   'next-year': null,
   error: null,
   default: null,
@@ -53,10 +53,24 @@ describe('buildDataCheck', () => {
       return;
     }
     expect(result).not.toBeNull();
-    expect(result?.expanded).toBe(expected.expanded);
+    expect(result?.gaps).toBe(expected.gaps);
     expect(result?.notMentioned.map((m) => m.id)).toEqual(expected.notMentioned);
     expect(result?.regionGaps.map((g) => [g.regionId, g.markets.map((m) => m.id)])).toEqual(
       expected.regionGaps,
+    );
+  });
+
+  it('lists a market once when both gap rules find it', () => {
+    // Two non-on-track markets cited (market-list rule) plus their region (region rule).
+    const result = buildDataCheck(ds, [{ marketId: 'de' }, { marketId: 'it' }, { regionId: 'eu' }]);
+    const listed = [
+      ...(result?.notMentioned ?? []),
+      ...(result?.regionGaps.flatMap((g) => g.markets) ?? []),
+    ].map((m) => m.id);
+    expect(new Set(listed).size).toBe(listed.length);
+    expect(result?.gaps).toBe(listed.length);
+    expect(result?.notMentioned.map((m) => m.id)).toEqual(
+      expect.arrayContaining(['es', 'gb', 'fr']),
     );
   });
 
@@ -108,6 +122,6 @@ describe('buildDataCheck', () => {
   it('skips unknown citations but keeps the block', () => {
     const result = buildDataCheck(ds, [{ marketId: 'xx', label: 'Atlantis' }]);
     expect(result?.rows).toEqual([]);
-    expect(result?.expanded).toBe(false);
+    expect(result?.gaps).toBe(0);
   });
 });

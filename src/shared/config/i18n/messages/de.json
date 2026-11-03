@@ -128,8 +128,8 @@
     "noStatus": "—",
     "reasonGrowth": "Wachstum {value} ggü. Vorjahr",
     "latestOnly": "nur aktuell",
-    "attention": "{needAttention} von {markets} Märkten brauchen Aufmerksamkeit; die Antwort nennt {named}.",
-    "attentionRegion": "{needAttention} von {markets} Märkten in {region} brauchen Aufmerksamkeit; die Antwort nennt {named}.",
+    "attention": "{needAttention, plural, one {# von {markets} Märkten braucht} other {# von {markets} Märkten brauchen}} Aufmerksamkeit; die Antwort nennt {named}.",
+    "attentionRegion": "{needAttention, plural, one {# von {markets} Märkten in {region} braucht} other {# von {markets} Märkten in {region} brauchen}} Aufmerksamkeit; die Antwort nennt {named}.",
     "gapNote": "{count, plural, one {# Markt nicht erwähnt} other {# Märkte nicht erwähnt}}"
   },
   "shell": {

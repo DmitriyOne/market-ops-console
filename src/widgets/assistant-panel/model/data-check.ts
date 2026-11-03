@@ -23,7 +23,7 @@ export type DataCheck = {
   rows: CheckRow[];
   /** Non-on-track markets the answer did not cite (market-list rule). */
   notMentioned: Market[];
-  /** Per cited region, its non-on-track markets the answer did not cite. */
+  /** Per cited region, its non-on-track markets the answer did not cite and `notMentioned` does not list. */
   regionGaps: { regionId: string; markets: Market[] }[];
   /** Per gap: how many markets need attention and how many of them the answer cites. */
   attention: { regionId: string | null; needAttention: number; markets: number; named: number }[];
@@ -31,7 +31,8 @@ export type DataCheck = {
   reasons: Record<string, CheckRow['reason']>;
   /** Every market the block lists, non-on-track first: what "Show on dashboard" highlights. */
   highlightIds: string[];
-  expanded: boolean;
+  /** How many markets the two rules list; each market counts once. */
+  gaps: number;
 };
 
 /** Below plan, or above plan but shrinking (the Spain case). */
@@ -88,11 +89,14 @@ export function buildDataCheck(ds: Dataset, citations: Citation[]): DataCheck | 
   const marketListApplies =
     citedMarkets.size >= 2 && [...citedMarkets].every((id) => nonOnTrackIds.has(id));
   const notMentioned = marketListApplies ? notCited(allNonOnTrack) : [];
+  const inList = new Set(notMentioned.map((m) => m.id));
 
   const regionGaps = [...citedRegions]
     .map((regionId) => ({
       regionId,
-      markets: notCited(nonOnTrackMarkets(ds, latest, '1m', { regionId })),
+      markets: notCited(nonOnTrackMarkets(ds, latest, '1m', { regionId })).filter(
+        (m) => !inList.has(m.id),
+      ),
     }))
     .filter((gap) => gap.markets.length > 0);
 
@@ -143,6 +147,6 @@ export function buildDataCheck(ds: Dataset, citations: Citation[]): DataCheck | 
     notMentioned,
     regionGaps,
     highlightIds,
-    expanded: notMentioned.length > 0 || regionGaps.length > 0,
+    gaps: notMentioned.length + regionGaps.reduce((n, g) => n + g.markets.length, 0),
   };
 }

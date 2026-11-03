@@ -2,7 +2,7 @@
 
 import { PanelRightCloseIcon, PanelRightOpenIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { type ReactNode, useCallback, useMemo, useState } from 'react';
+import { type ReactNode, useCallback, useMemo, useRef, useState } from 'react';
 
 import { SectionTabBar, useSection } from '@/features/switch-section';
 import { cn, useMediaQuery } from '@/shared/lib';
@@ -44,8 +44,17 @@ export function AppShell({ header, main, assistant }: AppShellProps) {
   const [section, setSection] = useSection();
   const [collapsed, setCollapsed] = usePanelCollapsed();
   const [unread, setUnread] = useState(0);
+  // Focus moves to whichever of the two buttons is shown next.
+  const collapseRef = useRef<HTMLButtonElement>(null);
+  const expandRef = useRef<HTMLButtonElement>(null);
 
   const hidden = desktop ? collapsed : section !== 'assistant';
+  // Seen again, however it happened (expand, tab bar, Back): clear the badge.
+  const [wasHidden, setWasHidden] = useState(hidden);
+  if (hidden !== wasHidden) {
+    setWasHidden(hidden);
+    if (!hidden) setUnread(0);
+  }
 
   const notifyAnswer = useCallback(() => {
     if (hidden) setUnread((n) => n + 1);
@@ -56,12 +65,14 @@ export function AppShell({ header, main, assistant }: AppShellProps) {
   const headerAction = useMemo(
     () => (
       <Button
+        ref={collapseRef}
         type="button"
         variant="ghost"
         className="hidden size-11 lg:inline-flex"
         aria-label={t('collapse')}
         onClick={() => {
           setCollapsed(true);
+          expandRef.current?.focus();
         }}
       >
         <PanelRightCloseIcon aria-hidden />
@@ -76,11 +87,7 @@ export function AppShell({ header, main, assistant }: AppShellProps) {
 
   const expand = () => {
     setCollapsed(false);
-    setUnread(0);
-  };
-  const changeSection = (s: typeof section) => {
-    setSection(s);
-    if (s === 'assistant') setUnread(0);
+    collapseRef.current?.focus();
   };
   const badge = unread > 0 ? t('newAnswers', { count: unread }) : null;
 
@@ -111,6 +118,7 @@ export function AppShell({ header, main, assistant }: AppShellProps) {
               attribute, so the remembered state shows from the first paint. */}
           <div className="hidden flex-col items-center gap-2 p-2 lg:assistant-collapsed:flex">
             <Button
+              ref={expandRef}
               type="button"
               variant="ghost"
               className="relative size-11"
@@ -130,7 +138,7 @@ export function AppShell({ header, main, assistant }: AppShellProps) {
         </aside>
       </div>
       <div className="lg:hidden">
-        <SectionTabBar section={section} onChange={changeSection} badge={unread} />
+        <SectionTabBar section={section} onChange={setSection} badge={unread} />
       </div>
     </div>
   );

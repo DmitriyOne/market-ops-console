@@ -10,8 +10,8 @@ export type ChatMessage = {
   kind: AnswerKind | null;
   citations: Citation[];
   confidence: Confidence | null;
-  /** `message`: text the server sent in an `error` event; `key`: a client-side cause. */
-  error: { message: string } | { key: ErrorMessageKey } | null;
+  /** Why the answer failed, as a translated message; the details go to the log. */
+  error: { key: ErrorMessageKey } | null;
   /** A reply made on the client instead of asking the assistant. */
   notice: ChatNotice | null;
 };

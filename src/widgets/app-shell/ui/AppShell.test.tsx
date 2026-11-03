@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { enMessages as en } from '@/shared/config';
 
+import { applyPanelCollapsed } from '../model/panel-collapsed-script';
 import { AppShell, type AssistantApi } from './AppShell';
 
 const t = en.shell;
@@ -24,9 +25,9 @@ function viewport(desktop: boolean) {
 function setup(searchParams = '') {
   const onUrlUpdate = vi.fn<(event: UrlUpdateEvent) => void>();
   const api: { current: AssistantApi | null } = { current: null };
-  const ui = (
+  const withUrl = (search: string) => (
     <NextIntlClientProvider locale="en-GB" messages={en}>
-      <NuqsTestingAdapter searchParams={searchParams} onUrlUpdate={onUrlUpdate} hasMemory>
+      <NuqsTestingAdapter searchParams={search} onUrlUpdate={onUrlUpdate} hasMemory>
         <AppShell
           header={<span>Header</span>}
           main={<p>Main content</p>}
@@ -43,8 +44,9 @@ function setup(searchParams = '') {
       </NuqsTestingAdapter>
     </NextIntlClientProvider>
   );
+  const ui = withUrl(searchParams);
   const view = render(ui);
-  return { ...view, ui, api, onUrlUpdate, user: userEvent.setup() };
+  return { ...view, ui, withUrl, api, onUrlUpdate, user: userEvent.setup() };
 }
 
 const assistantPane = () => screen.getByRole('complementary', { name: t.assistant });
@@ -69,14 +71,53 @@ describe('AppShell', () => {
     expect(screen.getByRole('main')).toHaveAttribute('id', 'main');
   });
 
-  it('desktop: collapsing the panel persists across remounts', async () => {
+  it('desktop: a collapse is remembered for the next page load', async () => {
     viewport(true);
     const { user, unmount, ui } = setup();
     await user.click(screen.getByRole('button', { name: t.collapse }));
-    expect(document.documentElement).toHaveAttribute('data-assistant-collapsed');
     unmount();
-    render(ui);
+    // A reload starts from a fresh <html>; only localStorage carries the choice.
+    document.documentElement.removeAttribute('data-assistant-collapsed');
+    applyPanelCollapsed();
     expect(document.documentElement).toHaveAttribute('data-assistant-collapsed');
+    render(ui);
+    expect(screen.getByRole('button', { name: t.expand })).toBeInTheDocument();
+  });
+
+  it('desktop: keyboard focus follows collapse and expand', async () => {
+    viewport(true);
+    const { user } = setup();
+    await user.click(screen.getByRole('button', { name: t.collapse }));
+    expect(screen.getByRole('button', { name: t.expand })).toHaveFocus();
+    await user.click(screen.getByRole('button', { name: t.expand }));
+    expect(screen.getByRole('button', { name: t.collapse })).toHaveFocus();
+  });
+
+  it('desktop: a collapse in another tab applies here too', () => {
+    viewport(true);
+    setup();
+    localStorage.setItem('mo:assistant-collapsed', '1');
+    act(() => {
+      window.dispatchEvent(
+        new StorageEvent('storage', { key: 'mo:assistant-collapsed', newValue: '1' }),
+      );
+    });
+    expect(document.documentElement).toHaveAttribute('data-assistant-collapsed');
+  });
+
+  it('desktop: when storage is full the panel still collapses and badges answers', async () => {
+    viewport(true);
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('QuotaExceededError');
+    });
+    const { user, api } = setup();
+    await user.click(screen.getByRole('button', { name: t.collapse }));
+    act(() => {
+      api.current?.notifyAnswer();
+    });
+    expect(
+      await screen.findByRole('button', { name: `${t.expand} · 1 new answer` }),
+    ).toBeInTheDocument();
   });
 
   it('desktop: a broken localStorage leaves the panel open without crashing', () => {
@@ -152,6 +193,20 @@ describe('AppShell', () => {
     });
     expect(await screen.findByText('1 new answer')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: new RegExp(t.tabs.assistant) }));
+    await waitFor(() => {
+      expect(screen.queryByText('1 new answer')).not.toBeInTheDocument();
+    });
+  });
+
+  it('phone: coming back to the assistant with Back clears the badge', async () => {
+    viewport(false);
+    const { api, rerender, withUrl } = setup('?tab=overview');
+    act(() => {
+      api.current?.notifyAnswer();
+    });
+    expect(await screen.findByText('1 new answer')).toBeInTheDocument();
+    // Back/forward changes the URL without a tab-bar click.
+    rerender(withUrl('?tab=assistant'));
     await waitFor(() => {
       expect(screen.queryByText('1 new answer')).not.toBeInTheDocument();
     });

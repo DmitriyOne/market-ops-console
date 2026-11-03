@@ -2,7 +2,7 @@
 
 import { ArrowUpIcon, SquareIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { type KeyboardEvent, type SubmitEvent, useId, useState } from 'react';
+import { type KeyboardEvent, type SubmitEvent, useEffect, useId, useRef, useState } from 'react';
 
 import { CHAT_QUESTION_MAX_LENGTH } from '@/shared/api';
 import { cn } from '@/shared/lib';
@@ -20,6 +20,25 @@ export function Composer({ isStreaming, onAsk, onStop }: ComposerProps) {
   const t = useTranslations('assistant.composer');
   const [value, setValue] = useState('');
   const reasonId = useId();
+  const fieldRef = useRef<HTMLTextAreaElement>(null);
+  const wasStreaming = useRef(isStreaming);
+
+  // Starting or ending a stream can pull the focused control away: the clicked
+  // suggestion unmounts, Stop turns into a disabled Send, Retry is disabled.
+  // Keyboard focus then lands here instead of on <body>. Not on touch, where
+  // focusing the field would open the on-screen keyboard.
+  useEffect(() => {
+    if (wasStreaming.current === isStreaming) return;
+    wasStreaming.current = isStreaming;
+    if (typeof window.matchMedia === 'function' && window.matchMedia('(pointer: coarse)').matches)
+      return;
+    const active = document.activeElement;
+    const lost =
+      active === null ||
+      active === document.body ||
+      (active instanceof HTMLButtonElement && active.disabled);
+    if (lost) fieldRef.current?.focus();
+  }, [isStreaming]);
 
   const question = value.trim();
   const tooLong = question.length > CHAT_QUESTION_MAX_LENGTH;
@@ -59,6 +78,7 @@ export function Composer({ isStreaming, onAsk, onStop }: ComposerProps) {
       </label>
       <div className="flex items-end gap-2">
         <Textarea
+          ref={fieldRef}
           id={`${reasonId}-field`}
           value={value}
           placeholder={t('placeholder')}

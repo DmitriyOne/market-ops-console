@@ -11,6 +11,7 @@ import {
   streamSse,
 } from '@/shared/api';
 import { API_ROUTES } from '@/shared/config';
+import { logError } from '@/shared/lib';
 
 import { type ChatMessage, chatReducer } from './chat-reducer';
 import { isEnglish } from './language';
@@ -43,6 +44,13 @@ export function useChatStream(): ChatStream {
   const run = useCallback(async (id: string, question: string, controller: AbortController) => {
     // A box, not a `let`: it is set inside onData, which TS flow analysis can't see.
     const stream = { settled: false };
+    // `done` or `error` is the last event: free the composer and close the
+    // connection now, even if the server keeps it open.
+    const settle = () => {
+      stream.settled = true;
+      if (active.current?.id === id) active.current = null;
+      controller.abort();
+    };
     try {
       await streamSse(
         API_ROUTES.chat,
@@ -56,22 +64,29 @@ export function useChatStream(): ChatStream {
             if (event.type === 'token') {
               dispatch({ type: 'token', id, value: event.value });
             } else if (event.type === 'done') {
-              stream.settled = true;
               const { kind, citations, confidence } = event;
               dispatch({ type: 'done', id, kind, citations, confidence });
+              settle();
             } else {
-              stream.settled = true;
-              dispatch({ type: 'failed', id, error: { message: event.message } });
+              // The server's text is for the log; the user gets a translated message.
+              logError(new Error(event.message), { scope: 'chat', event: 'error' });
+              dispatch({ type: 'failed', id, error: { key: 'errors.server' } });
+              settle();
             }
           },
         },
       );
       // The stream closed without `done` or `error`: the connection dropped.
-      if (!stream.settled) dispatch({ type: 'failed', id, error: { key: 'errors.network' } });
+      if (!stream.settled) {
+        logError(new Error('Chat stream closed without done'), { scope: 'chat' });
+        dispatch({ type: 'failed', id, error: { key: 'errors.network' } });
+      }
     } catch (error) {
+      if (stream.settled) return;
       if (error instanceof AbortedError) {
         dispatch({ type: 'stopped', id });
       } else {
+        logError(error, { scope: 'chat' });
         dispatch({ type: 'failed', id, error: { key: errorMessageKey(error) } });
       }
     } finally {

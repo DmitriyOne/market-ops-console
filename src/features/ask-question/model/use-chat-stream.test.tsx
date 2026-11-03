@@ -1,7 +1,8 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { http } from 'msw';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { STREAM_FIRST_EVENT_TIMEOUT_MS } from '@/shared/api';
 import { chatFromFixture, chatStream, fixtureEvents, server } from '@/shared/lib/test';
 
 import { useChatStream } from './use-chat-stream';
@@ -14,7 +15,17 @@ function setup() {
   return renderHook(() => useChatStream());
 }
 
+// Chat failures are logged; keep the test output clean and assert on it.
+function consoleErrors() {
+  return vi.spyOn(console, 'error').mockImplementation(() => undefined);
+}
+
 describe('useChatStream', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.useRealTimers();
+  });
+
   it('streams at-risk to done', async () => {
     server.use(chatFromFixture('at-risk'));
     const { result } = setup();
@@ -33,7 +44,8 @@ describe('useChatStream', () => {
     expect(result.current.isStreaming).toBe(false);
   });
 
-  it('error fixture ends in error with the event message', async () => {
+  it('an error event shows the translated server error and logs the server text', async () => {
+    const errors = consoleErrors();
     server.use(chatFromFixture('error'));
     const { result } = setup();
     act(() => {
@@ -42,13 +54,16 @@ describe('useChatStream', () => {
     await waitFor(() => {
       expect(result.current.messages[0]?.status).toBe('error');
     });
+    expect(result.current.messages[0]?.error).toEqual({ key: 'errors.server' });
     const event = fixtureEvents('error')[0];
-    expect(result.current.messages[0]?.error).toEqual({
-      message: event?.type === 'error' ? event.message : '',
-    });
+    expect(errors).toHaveBeenCalledWith(
+      '[chat]',
+      expect.objectContaining({ message: event?.type === 'error' ? event.message : '' }),
+    );
   });
 
-  it('HTTP 500 ends in error with key errors.server', async () => {
+  it('HTTP 500 ends in error with key errors.server and is logged once', async () => {
+    const errors = consoleErrors();
     server.use(chatStream([], { status: 500 }));
     const { result } = setup();
     act(() => {
@@ -57,9 +72,12 @@ describe('useChatStream', () => {
     await waitFor(() => {
       expect(result.current.messages[0]?.error).toEqual({ key: 'errors.server' });
     });
+    expect(errors).toHaveBeenCalledTimes(1);
+    expect(errors.mock.calls[0]?.[0]).toBe('[chat]');
   });
 
   it('invalid event ends in error with key errors.invalidData', async () => {
+    consoleErrors();
     // @ts-expect-error -- deliberately not a ChatEvent
     server.use(chatStream([{ type: 'nope' }]));
     const { result } = setup();
@@ -72,6 +90,7 @@ describe('useChatStream', () => {
   });
 
   it('data that is not JSON ends in error with key errors.invalidData', async () => {
+    consoleErrors();
     server.use(
       http.post(
         '*/api/v1/chat',
@@ -88,6 +107,7 @@ describe('useChatStream', () => {
   });
 
   it('a stream that ends without done ends in error with key errors.network', async () => {
+    consoleErrors();
     server.use(chatStream([{ type: 'token', value: 'Half ' }]));
     const { result } = setup();
     act(() => {
@@ -99,6 +119,71 @@ describe('useChatStream', () => {
     expect(result.current.messages[0]).toMatchObject({
       text: 'Half ',
       error: { key: 'errors.network' },
+    });
+  });
+
+  it('a server that stays open after done does not block the next question', async () => {
+    // Everything up to `done` is sent; the connection then stays open.
+    const events = fixtureEvents('germany-dip');
+    server.use(
+      chatStream([...events, { type: 'token', value: 'never sent' }], {
+        stallAfter: events.length,
+      }),
+    );
+    const { result } = setup();
+    act(() => {
+      result.current.ask('Why Germany?');
+    });
+    await waitFor(() => {
+      expect(result.current.messages[0]?.status).toBe('done');
+    });
+    server.use(chatFromFixture('at-risk'));
+    act(() => {
+      result.current.ask('Which markets are at risk?');
+    });
+    expect(result.current.messages).toHaveLength(2);
+    await waitFor(() => {
+      expect(result.current.messages[1]?.status).toBe('done');
+    });
+    expect(result.current.messages[0]?.status).toBe('done');
+  });
+
+  it('no first event in time ends in error with key errors.timeout', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    consoleErrors();
+    server.use(chatFromFixture('germany-dip', { stallAfter: 0 }));
+    const { result } = setup();
+    act(() => {
+      result.current.ask('Why Germany?');
+    });
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(STREAM_FIRST_EVENT_TIMEOUT_MS + 1);
+    });
+    await waitFor(() => {
+      expect(result.current.messages[0]?.error).toEqual({ key: 'errors.timeout' });
+    });
+  });
+
+  it('unmounting mid-stream aborts the request', async () => {
+    let signal: AbortSignal | undefined;
+    server.use(
+      http.post('*/api/v1/chat', ({ request }) => {
+        signal = request.signal;
+        return new Response(new ReadableStream({ start: () => undefined }), {
+          headers: { 'Content-Type': 'text/event-stream' },
+        });
+      }),
+    );
+    const { result, unmount } = setup();
+    act(() => {
+      result.current.ask('Why Germany?');
+    });
+    await waitFor(() => {
+      expect(signal).toBeDefined();
+    });
+    unmount();
+    await waitFor(() => {
+      expect(signal?.aborted).toBe(true);
     });
   });
 
@@ -160,6 +245,7 @@ describe('useChatStream', () => {
   });
 
   it('retry adds a new message with the same question', async () => {
+    consoleErrors();
     server.use(chatFromFixture('error'));
     const { result } = setup();
     act(() => {
