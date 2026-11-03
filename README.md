@@ -48,7 +48,7 @@ reference/           reference mock SSE route from the starter pack
 
 ## Git flow
 
-`feature/*` → `release/X.Y.Z` → `develop` → `master`. Only `release/*` merges into `develop`, only `develop` into `master`. The version in `package.json`, the top of `CHANGELOG.md` and the release branch must match. Details: `docs/decisions/0007-git-flow-and-ci.md`.
+`feature/*` → `release/X.Y.Z` → `develop` → `master`. Work happens on `feature/*` branched from the current release; nobody commits to `release/*`, `develop` or `master` directly. Only `release/*` merges into `develop`, only `develop` into `master`. The version in `package.json`, the top of `CHANGELOG.md` and the release branch must match. Details: `docs/decisions/0007-git-flow-and-ci.md`.
 
 ## Working with AI agents
 

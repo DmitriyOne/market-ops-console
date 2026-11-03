@@ -49,7 +49,9 @@ Next.js 16 App Router · React 19 · TypeScript 6 strict · Tailwind v4 + shadcn
 
 ## Git
 
-Flow: `feature/*` → `release/X.Y.Z` → `develop` → `master`. Only `release/*` merges into `develop`, only `develop` into `master`. Version in `package.json` = top entry of `CHANGELOG.md` = release branch number. Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:`, `test:`, `refactor:`).
+Flow: `feature/*` → `release/X.Y.Z` → `develop` → `master`. Only `release/*` merges into `develop`, only `develop` into `master`.
+
+**Never commit directly to `release/*`, `develop` or `master`.** Release branches only receive merges. All work happens on a `feature/*` branch created from the current `release/X.Y.Z`; the owner merges it back. Before the first commit of a task, check the current branch (`git branch --show-current`) and ask which feature branch to use if unsure. Version in `package.json` = top entry of `CHANGELOG.md` = release branch number. Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:`, `test:`, `refactor:`).
 
 ## Where context lives
 
