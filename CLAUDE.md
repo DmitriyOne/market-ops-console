@@ -68,7 +68,17 @@ Update the relevant doc in the same commit as the change. A new decision gets a 
 
 ## Commands
 
-To be added after scaffolding (`dev`, `build`, `format`, `format:check`, `lint`, `typecheck`, `test`, `e2e`). Run `format`, `lint`, `typecheck` and `test` before every commit; there are no git hooks.
+```bash
+pnpm dev            # http://localhost:3000
+pnpm build          # production build; check routes stay static
+pnpm format         # Prettier (code only; *.md is hand-written)
+pnpm format:check
+pnpm lint           # ESLint + Steiger
+pnpm typecheck
+pnpm test           # Vitest, single run
+```
+
+Run `format`, `lint`, `typecheck` and `test` before every commit; there are no git hooks.
 
 ## Do not
 
