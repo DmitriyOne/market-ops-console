@@ -128,6 +128,31 @@ describe('streamSse', () => {
     expect(await result).toBeInstanceOf(AbortedError);
   });
 
+  it('passes a consumer error through unchanged and closes the body', async () => {
+    let cancelled = false;
+    const body = new ReadableStream<Uint8Array>({
+      start(c) {
+        c.enqueue(encoder.encode('data: bad\n\n'));
+      },
+      cancel() {
+        cancelled = true;
+      },
+    });
+    stubFetchWith(body);
+    const consumerError = new Error('invalid event');
+    const error: unknown = await streamSse(
+      '/x',
+      {},
+      {
+        onData: () => {
+          throw consumerError;
+        },
+      },
+    ).catch((e: unknown) => e);
+    expect(error).toBe(consumerError);
+    expect(cancelled).toBe(true);
+  });
+
   it('turns a 503 into HttpError', async () => {
     stubFetchWith(bodyOf([]), 503);
     const error: unknown = await streamSse('/x', {}, { onData: vi.fn() }).catch((e: unknown) => e);

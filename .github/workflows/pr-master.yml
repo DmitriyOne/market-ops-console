@@ -8,7 +8,9 @@ on:
     types: [opened, synchronize, reopened, edited]
 
 concurrency:
-  group: pr-${{ github.event.number }}
+  # Per workflow and PR. A title/body edit gets its own group so it cannot
+  # cancel a running check (its job is skipped anyway).
+  group: ${{ github.workflow }}-${{ github.event.number }}-${{ github.event.action == 'edited' && github.event.changes.base == null && 'edit' || 'run' }}
   cancel-in-progress: true
 
 permissions:

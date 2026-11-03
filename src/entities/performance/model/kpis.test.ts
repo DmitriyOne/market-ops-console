@@ -63,9 +63,19 @@ describe('computeKpis', () => {
     });
   });
 
-  it('marks ratios unavailable when the scope has no rows', () => {
-    const k = computeKpis(ds, { marketId: 'zz' }, '2026-05', '1m');
-    expect(k.attainmentPct).toEqual({ value: null, source: 'unavailable' });
-    expect(k.growthPct).toEqual({ value: null, source: 'unavailable' });
+  it('invents nothing when the scope has no rows', () => {
+    const unavailable = { value: null, source: 'unavailable' };
+    for (const k of [
+      computeKpis(ds, { marketId: 'zz' }, '2026-05', '1m'),
+      computeKpis(ds, {}, '2030-01', '1m'),
+    ]) {
+      expect(k).toEqual({
+        revenue: unavailable,
+        growthPct: unavailable,
+        attainmentPct: unavailable,
+        sharePct: unavailable,
+        units: unavailable,
+      });
+    }
   });
 });

@@ -37,7 +37,18 @@ function weightedShare(ds: Dataset, scope: Scope): KpiValue {
  * per product.
  */
 export function computeKpis(ds: Dataset, scope: Scope, period: Period, range: Range): Kpis {
-  const totals = sumRows(rowsInScope(ds, scope, periodsInRange(ds.meta.periods, period, range)));
+  const rows = rowsInScope(ds, scope, periodsInRange(ds.meta.periods, period, range));
+  // Unknown scope or period: report nothing rather than an invented zero.
+  if (rows.length === 0) {
+    return {
+      revenue: UNAVAILABLE,
+      growthPct: UNAVAILABLE,
+      attainmentPct: UNAVAILABLE,
+      sharePct: UNAVAILABLE,
+      units: UNAVAILABLE,
+    };
+  }
+  const totals = sumRows(rows);
   const latest = isLatestSnapshot(ds, period, range);
   const units = calculated(totals.units);
 

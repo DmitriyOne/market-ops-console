@@ -39,14 +39,23 @@ export async function streamSse(
     }, ms);
   };
 
+  // An error thrown by onData (e.g. an invalid event) is the caller's, not the network's.
+  // A box, not a `let`: it is set inside the parser callback, which TS flow analysis can't see.
+  const consumer = { failed: false };
   const parser = createParser({
     onEvent(event) {
       arm(idleTimeoutMs);
-      onData(event.data);
+      try {
+        onData(event.data);
+      } catch (error) {
+        consumer.failed = true;
+        throw error;
+      }
     },
   });
 
   let reader: ReadableStreamDefaultReader<Uint8Array> | undefined;
+  let finished = false;
   const cancelRead = () => {
     void reader?.cancel(signal.reason);
   };
@@ -71,10 +80,14 @@ export async function streamSse(
       parser.feed(decoder.decode(value, { stream: true }));
     }
     parser.feed(decoder.decode());
+    finished = true;
   } catch (error) {
+    if (consumer.failed) throw error;
     throw toApiError(error, signal);
   } finally {
     clearTimeout(timer);
     signal.removeEventListener('abort', cancelRead);
+    // Release the connection whenever we stop reading early.
+    if (!finished) void reader?.cancel();
   }
 }

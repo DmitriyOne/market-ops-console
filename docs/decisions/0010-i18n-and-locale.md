@@ -21,3 +21,4 @@
 - +1 dependency; three message files kept in sync (typed keys catch missing keys in `en`; `de`/`ru` completeness checked by a test).
 - Static HTML is built without search params. URL state (nuqs) is read on the client, so URL-dependent widgets render inside `Suspense` with a skeleton to avoid flashing the default view on shared links.
 - Root `app/` contains `[locale]/` and `api/`; `proxy.ts` sits next to it.
+- Unknown paths: with `as-needed`, the proxy treats an unknown prefix as a path under the default (or negotiated) locale, e.g. `/xx/dashboard` → `/en-GB/xx/dashboard`. The `app/[locale]/[...rest]` catch-all turns it into a 404. Because the root layout sits in a dynamic segment, Next 16 serves that 404 as an error shell whose translated text renders after hydration; the experimental `globalNotFound` flag would change this (open owner decision, 2026-11-03).

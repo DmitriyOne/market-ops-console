@@ -1,8 +1,9 @@
 'use client';
 
 // Last resort when the root layout fails: no providers exist here, so the
-// English dictionary is imported directly.
-import { enMessages as en } from '@/shared/config';
+// English dictionary is imported directly (not via the config barrel, so a
+// failing env or i18n module cannot take this page down too).
+import en from '@/shared/config/i18n/messages/en.json';
 
 type Props = { error: Error & { digest?: string }; reset: () => void };
 
