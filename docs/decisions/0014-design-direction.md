@@ -15,4 +15,6 @@
 - The heat map (ADR 0004) stays, in Analyst mode only.
 - The fallback decision point is recorded in `docs/plans/backlog.md` so it is checked, not forgotten.
 
-**Open (owner to decide).** Font family for the whole app: Inter (A) or Space Grotesk + JetBrains Mono (D).
+**Fonts** (owner decision, 2026-11-03): Space Grotesk for text, JetBrains Mono for numbers (KPIs, tables, axes). Both are SIL Open Font License 1.1 (checked in `google/fonts` `OFL.txt`, 2026-11-03): free for commercial use, self-hosted through `next/font/google`, no attribution in the UI required.
+
+**Open (owner to decide).** Space Grotesk has no Cyrillic (subsets: latin, latin-ext, vietnamese), so `ru-RU` text needs a Cyrillic fallback font in the stack; JetBrains Mono has Cyrillic.
