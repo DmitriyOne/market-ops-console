@@ -1,0 +1,125 @@
+'use client';
+
+import { useCallback, useEffect, useReducer, useRef } from 'react';
+
+import {
+  AbortedError,
+  CHAT_QUESTION_MAX_LENGTH,
+  chatEventSchema,
+  errorMessageKey,
+  ParseError,
+  streamSse,
+} from '@/shared/api';
+import { API_ROUTES } from '@/shared/config';
+
+import { type ChatMessage, chatReducer } from './chat-reducer';
+
+export type ChatStream = {
+  messages: ChatMessage[];
+  isStreaming: boolean;
+  ask(question: string): void;
+  stop(): void;
+  retry(id: string): void;
+};
+
+type Active = { id: string; controller: AbortController };
+
+// Not JSON is invalid data too; `undefined` then fails the schema.
+function parseJson(data: string): unknown {
+  try {
+    return JSON.parse(data);
+  } catch {
+    return undefined;
+  }
+}
+
+/** The assistant conversation: one streamed answer at a time (ADR 0003, 0006). */
+export function useChatStream(): ChatStream {
+  const [messages, dispatch] = useReducer(chatReducer, []);
+  // A ref, not state: `ask` must see a stream started in the same tick.
+  const active = useRef<Active | null>(null);
+
+  const run = useCallback(async (id: string, question: string, controller: AbortController) => {
+    // A box, not a `let`: it is set inside onData, which TS flow analysis can't see.
+    const stream = { settled: false };
+    try {
+      await streamSse(
+        API_ROUTES.chat,
+        { question },
+        {
+          signal: controller.signal,
+          onData: (data) => {
+            const parsed = chatEventSchema.safeParse(parseJson(data));
+            if (!parsed.success) throw new ParseError(parsed.error.issues);
+            const event = parsed.data;
+            if (event.type === 'token') {
+              dispatch({ type: 'token', id, value: event.value });
+            } else if (event.type === 'done') {
+              stream.settled = true;
+              const { kind, citations, confidence } = event;
+              dispatch({ type: 'done', id, kind, citations, confidence });
+            } else {
+              stream.settled = true;
+              dispatch({ type: 'failed', id, error: { message: event.message } });
+            }
+          },
+        },
+      );
+      // The stream closed without `done` or `error`: the connection dropped.
+      if (!stream.settled) dispatch({ type: 'failed', id, error: { key: 'errors.network' } });
+    } catch (error) {
+      if (error instanceof AbortedError) {
+        dispatch({ type: 'stopped', id });
+      } else {
+        dispatch({ type: 'failed', id, error: { key: errorMessageKey(error) } });
+      }
+    } finally {
+      if (active.current?.id === id) active.current = null;
+    }
+  }, []);
+
+  const ask = useCallback(
+    (raw: string) => {
+      const question = raw.trim();
+      if (active.current || !question || question.length > CHAT_QUESTION_MAX_LENGTH) return;
+      const id = crypto.randomUUID();
+      const controller = new AbortController();
+      active.current = { id, controller };
+      dispatch({ type: 'started', id, question });
+      void run(id, question, controller);
+    },
+    [run],
+  );
+
+  const stop = useCallback(() => {
+    const current = active.current;
+    if (!current) return;
+    active.current = null;
+    // Stopped right away; whatever the aborted stream still delivers is stale.
+    dispatch({ type: 'stopped', id: current.id });
+    current.controller.abort();
+  }, []);
+
+  const retry = useCallback(
+    (id: string) => {
+      const message = messages.find((m) => m.id === id);
+      if (message) ask(message.question);
+    },
+    [messages, ask],
+  );
+
+  useEffect(
+    () => () => {
+      active.current?.controller.abort();
+    },
+    [],
+  );
+
+  return {
+    messages,
+    isStreaming: messages.some((m) => m.status === 'streaming'),
+    ask,
+    stop,
+    retry,
+  };
+}
