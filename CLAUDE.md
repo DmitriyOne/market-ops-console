@@ -44,6 +44,7 @@ Next.js 16 App Router · React 19 · TypeScript 6 strict · Tailwind v4 + shadcn
 - No string literals in UI: visible text, `aria-label`, `alt`, `title`, `placeholder`, zod messages come from `src/shared/config/i18n/messages`.
 - Format numbers, currency, percentages and dates only through next-intl global formats (`src/shared/config/i18n/formats.ts`). No ad-hoc `Intl.*` or `toFixed` for display.
 - Render model output as text. Never `dangerouslySetInnerHTML`.
+- Every network call goes through the shared client in `src/shared/api` (timeouts, typed errors). API paths only from `src/shared/config/api-routes.ts` (`/api/v1/*`).
 - Colours, spacing, radii come from design tokens. No raw hex or arbitrary Tailwind values. Every colour token has a light (`:root`) and dark (`.dark`) value.
 - Every chart ships with an accessible alternative (table), keyboard access, and a non-colour signal.
 
