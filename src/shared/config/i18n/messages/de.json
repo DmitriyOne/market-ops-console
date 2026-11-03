@@ -1,7 +1,8 @@
 {
   "common": {
     "appName": "Market Ops Console",
-    "skipToContent": "Zum Inhalt springen"
+    "skipToContent": "Zum Inhalt springen",
+    "description": "Vertriebsleistung nach Markt, Produkt und Zeitraum, mit einem KI-Assistenten, der seine Quellen zeigt."
   },
   "errors": {
     "timeout": "Die Anfrage hat zu lange gedauert. Bitte versuchen Sie es erneut.",
@@ -128,7 +129,8 @@
     "reasonGrowth": "Wachstum {value} ggü. Vorjahr",
     "latestOnly": "nur aktuell",
     "attention": "{needAttention} von {markets} Märkten brauchen Aufmerksamkeit; die Antwort nennt {named}.",
-    "attentionRegion": "{needAttention} von {markets} Märkten in {region} brauchen Aufmerksamkeit; die Antwort nennt {named}."
+    "attentionRegion": "{needAttention} von {markets} Märkten in {region} brauchen Aufmerksamkeit; die Antwort nennt {named}.",
+    "gapNote": "{count, plural, one {# Markt nicht erwähnt} other {# Märkte nicht erwähnt}}"
   },
   "shell": {
     "assistant": "Assistent",

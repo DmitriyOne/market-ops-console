@@ -76,7 +76,7 @@ export function AssistantPanel({
         {headerAction}
       </header>
       {chat.messages.length === 0 ? (
-        <div className="flex flex-1 flex-col gap-3 overflow-y-auto p-4">
+        <div className="relative flex flex-1 flex-col gap-3 overflow-y-auto p-4">
           <h3 className="text-lg font-semibold">{t('empty.title')}</h3>
           <p className="text-sm text-muted-foreground">{t('empty.body')}</p>
           <SuggestedQuestions onAsk={chat.ask} />

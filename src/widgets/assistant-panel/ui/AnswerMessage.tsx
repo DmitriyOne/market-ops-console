@@ -1,6 +1,6 @@
 'use client';
 
-import { CircleSlashIcon, SparklesIcon, SquareIcon, TriangleAlertIcon } from 'lucide-react';
+import { BanIcon, SparklesIcon, SquareIcon, TriangleAlertIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useMemo } from 'react';
 
@@ -16,11 +16,7 @@ import { DataCheckBlock } from './DataCheckBlock';
 import { SourceButton } from './SourceButton';
 import { useKpiFormat } from './use-kpi-format';
 
-const CONFIDENCE = {
-  high: { bars: 3, className: 'text-confidence-high' },
-  medium: { bars: 2, className: 'text-confidence-medium' },
-  low: { bars: 1, className: 'text-confidence-low' },
-} as const;
+const CONFIDENCE_BARS = { high: 3, medium: 2, low: 1 } as const;
 
 /** Three equal bars, `filled` of them solid: the level is the count, not a staircase. */
 function ConfidenceMeter({ filled }: { filled: number }) {
@@ -61,13 +57,15 @@ function Paragraphs({ text, caret }: { text: string; caret?: boolean }) {
 
 function ConfidenceLine({ confidence }: { confidence: Confidence }) {
   const t = useTranslations('assistant.answer');
-  const { bars, className } = CONFIDENCE[confidence];
+  // Neutral text, bars in the AI accent; only Low adds a warning colour.
   return (
-    <p className={cn('flex items-center gap-2 text-sm font-semibold', className)}>
-      <ConfidenceMeter filled={bars} />
-      {t('confidence', { level: t(confidence) })}
+    <p className="flex flex-wrap items-center gap-2 text-sm">
+      <span className="text-surface-ai-label">
+        <ConfidenceMeter filled={CONFIDENCE_BARS[confidence]} />
+      </span>
+      <span className="font-semibold">{t('confidence', { level: t(confidence) })}</span>
       {confidence === 'low' ? (
-        <span className="font-normal text-muted-foreground">· {t('directional')}</span>
+        <span className="font-medium text-status-at-risk">· {t('directional')}</span>
       ) : null}
     </p>
   );
@@ -202,7 +200,7 @@ export function AnswerMessage({
     return (
       <div className="flex flex-col gap-2 rounded-xl border border-dashed border-border bg-muted p-3 text-sm">
         <p className="flex items-center gap-1.5 font-semibold">
-          <CircleSlashIcon aria-hidden className="size-4" />
+          <BanIcon aria-hidden className="size-4" />
           {message.notice ? t(`declined.${message.notice}`) : t('abstain.title')}
         </p>
         {text ? <Paragraphs text={text} /> : null}

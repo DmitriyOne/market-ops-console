@@ -1,7 +1,8 @@
 {
   "common": {
     "appName": "Market Ops Console",
-    "skipToContent": "Skip to content"
+    "skipToContent": "Skip to content",
+    "description": "Sales performance by market, product and period, with an AI assistant that shows its sources."
   },
   "errors": {
     "timeout": "The request took too long. Please try again.",
@@ -128,7 +129,8 @@
     "reasonGrowth": "Growth {value} YoY",
     "latestOnly": "latest only",
     "attention": "{needAttention} of {markets} markets need attention; the answer names {named}.",
-    "attentionRegion": "{needAttention} of {markets} markets in {region} need attention; the answer names {named}."
+    "attentionRegion": "{needAttention} of {markets} markets in {region} need attention; the answer names {named}.",
+    "gapNote": "{count, plural, one {# market not mentioned} other {# markets not mentioned}}"
   },
   "shell": {
     "assistant": "Assistant",

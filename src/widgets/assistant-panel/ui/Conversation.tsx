@@ -31,7 +31,9 @@ export function Conversation({ messages, renderAnswer }: ConversationProps) {
         role="log"
         aria-live="polite"
         aria-relevant="additions text"
-        className="flex h-full flex-col gap-4 overflow-y-auto p-4"
+        // `relative`: sr-only children are absolutely positioned and would otherwise
+        // escape this scroll box and stretch the page.
+        className="relative flex h-full flex-col gap-4 overflow-y-auto p-4"
       >
         {messages.map((message) => (
           <article

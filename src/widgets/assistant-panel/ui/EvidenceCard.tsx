@@ -8,9 +8,10 @@ import type { Dataset } from '@/shared/api';
 import { StatusChip } from './StatusChip';
 import { useKpiFormat } from './use-kpi-format';
 
-const SPARK_W = 240;
+// Card content width (w-72 minus p-2.5), so the chart fills it edge to edge.
+const SPARK_W = 268;
 const SPARK_H = 56;
-const PAD = 4;
+const PAD = 5;
 
 type SparkPoint = { value: number; marked: boolean };
 

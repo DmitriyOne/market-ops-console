@@ -164,8 +164,8 @@ Rules: drill-down params are hierarchical (setting `market` sets its `region`; c
      - verified against fixtures: `at-risk` and `forecast-miss` expand (+ ES, FR, GB); `apac-vs-europe` expands (all 5 EU markets non-on-track); `summary-long` expands (ES, FR, GB, IT); `germany-dip`, `next-year`, `error`, `default` stay collapsed;
    - Spain-type rows show the reason next to the status (e.g. "Growth −4.6% YoY") [call];
    - button "Show on dashboard" highlights the listed markets on the map and table **[owner]**.
-   - Collapsed by default; **expanded automatically when either rule finds a gap** **[owner]**. Hidden when the answer has no citations (e.g. `default`).
-5. **Abstain** (`kind: abstain`): distinct style, "I can't answer this from the data", suggestion of answerable questions.
+   - Collapsed by default, also when a rule finds a gap; the header then shows "N markets not mentioned" **[owner, revised 2026-11-03]**. Hidden when the answer has no citations (e.g. `default`).
+5. **Can't answer** (`kind: abstain`, an answer with `low_confidence` and no citations, or a non-English question answered on the client with "I only understand English"): distinct style with the ⊘ icon, "I can't answer this from the data"; the suggested questions appear after two such replies in a row **[owner, revised 2026-11-03]**. The kind is known only at `done`, so while streaming the answer uses the normal AI style.
 6. **Error** (`error` event or network failure): error style, message, Retry.
 
 ### Empty state [call]

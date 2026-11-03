@@ -83,7 +83,10 @@ export function DataCheckBlock({ check, ds, onHighlight }: DataCheckBlockProps) 
   const t = useTranslations('dataCheck');
   const format = useFormatter();
   const f = useKpiFormat();
-  const [open, setOpen] = useState(check.expanded);
+  // Closed by default (owner, 2026-11-03); the header notes any gap found.
+  const [open, setOpen] = useState(false);
+  const gaps =
+    check.notMentioned.length + check.regionGaps.reduce((n, g) => n + g.markets.length, 0);
   const latest = ds.meta.latestPeriod;
   const updated = format.dateTime(new Date(`${ds.meta.generatedAt}T00:00:00Z`), 'day');
   const regionName = (id: string) => getRegion(ds, id)?.name ?? id;
@@ -104,9 +107,14 @@ export function DataCheckBlock({ check, ds, onHighlight }: DataCheckBlockProps) 
       className="overflow-hidden rounded-xl border border-border bg-surface-data"
     >
       <div className="px-3 pt-2 pb-2">
-        <CollapsibleTrigger className="flex min-h-11 w-full items-center gap-2 rounded-md text-left text-sm font-semibold focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none">
+        <CollapsibleTrigger className="flex min-h-11 w-full cursor-pointer items-center gap-2 rounded-md text-left text-sm font-semibold focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none">
           <SquareSquareIcon aria-hidden className="size-4" />
           <span className="flex-1">{t('title')}</span>
+          {gaps > 0 ? (
+            <span className="rounded-full bg-status-at-risk-muted px-2 py-0.5 text-xs font-semibold text-status-at-risk">
+              {t('gapNote', { count: gaps })}
+            </span>
+          ) : null}
           <ChevronDownIcon
             aria-hidden
             className="size-4 transition-transform in-data-[state=open]:rotate-180 motion-reduce:transition-none"

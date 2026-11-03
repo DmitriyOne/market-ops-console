@@ -17,7 +17,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 - Answers without matching data read as "I can't answer this from the data"; the suggested questions appear after two such replies in a row.
 - Confidence shown as three equal bars; percents always with one decimal.
 - Evidence card: latest status for a past month, the month's anomaly, a marked trend with period labels.
-- "What the data shows" is a table like the design reference, with "Not mentioned in the answer" and an attention summary.
+- "What the data shows" is a table like the design reference, with "Not mentioned in the answer" and an attention summary; closed by default, the header notes gaps.
+- Page title and description per locale; `noindex, nofollow` (internal console).
+- Pointer cursor on clickable controls; hover cards keep 15px from the screen edge; the evidence chart fills the card.
+
+### Fixed
+- Screen-reader-only text inside the chat log no longer stretches the page with an empty scroll area.
 
 ### Fixed
 - Chat route validates the request before reading fixtures, so a bad request is always a 400.

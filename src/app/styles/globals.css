@@ -229,4 +229,14 @@
   html {
     @apply font-sans;
   }
+  /* Tailwind v4 resets buttons to the default cursor; clickable things show a hand. */
+  button:not(:disabled),
+  [role='button']:not([aria-disabled='true']),
+  summary {
+    cursor: pointer;
+  }
+  button:disabled,
+  [aria-disabled='true'] {
+    cursor: not-allowed;
+  }
 }

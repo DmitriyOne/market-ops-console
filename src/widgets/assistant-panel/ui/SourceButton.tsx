@@ -55,7 +55,7 @@ export function SourceButton({ citation, ds, onSelect }: SourceButtonProps) {
             {label}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="flex w-72 flex-col gap-3">
+        <PopoverContent collisionPadding={15} className="flex w-72 flex-col gap-3">
           {card}
           {resolved?.known ? (
             <Button type="button" className="min-h-11" onClick={select}>
@@ -85,7 +85,7 @@ export function SourceButton({ citation, ds, onSelect }: SourceButtonProps) {
           {label}
         </Button>
       </HoverCardTrigger>
-      <HoverCardContent className="flex w-72 flex-col gap-2">
+      <HoverCardContent collisionPadding={15} className="flex w-72 flex-col gap-2">
         {card}
         {resolved?.known ? <p className="text-xs text-muted-foreground">{t('clickHint')}</p> : null}
       </HoverCardContent>

@@ -1,11 +1,13 @@
 import '@/app/styles/globals.css';
 
 import { ThemeProvider } from '@wrksz/themes/next';
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import type { ReactNode } from 'react';
 
 import { fontVariables } from '@/app/fonts';
+import { siteMetadata } from '@/app/metadata';
 import { Providers } from '@/app/providers';
 import { routing } from '@/shared/config';
 
@@ -14,6 +16,11 @@ export function generateStaticParams() {
 }
 
 type Props = { children: ReactNode; params: Promise<{ locale: string }> };
+
+export async function generateMetadata({ params }: Omit<Props, 'children'>): Promise<Metadata> {
+  const { locale } = await params;
+  return hasLocale(routing.locales, locale) ? siteMetadata(locale) : {};
+}
 
 export default async function LocaleLayout({ children, params }: Props) {
   const { locale } = await params;

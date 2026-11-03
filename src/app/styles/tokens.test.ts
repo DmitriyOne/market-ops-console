@@ -73,6 +73,7 @@ const pairs: [string, string, number][] = [
   ['confidence-low', 'surface-ai', 4.5],
   ['surface-ai-label', 'background', 4.5],
   ['foreground', 'status-off-track-muted', 4.5],
+  ['status-at-risk', 'surface-ai', 4.5],
   ...statuses.flatMap((s): [string, string, number][] => [
     [`status-${s}`, `status-${s}-muted`, 4.5],
     [`status-${s}`, 'card', 4.5],

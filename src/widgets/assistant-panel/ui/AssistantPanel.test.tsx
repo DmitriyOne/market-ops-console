@@ -65,7 +65,7 @@ describe('AssistantPanel', () => {
     }
   });
 
-  it('a suggestion streams at-risk with confidence, sources and an open data check', async () => {
+  it('a suggestion streams at-risk with confidence, sources and a data check that notes the gaps', async () => {
     server.use(chatFromFixture('at-risk'));
     const { user, onAnswerDone } = setup();
     await user.click(screen.getByRole('button', { name: t.suggestions.risks }));
@@ -82,8 +82,11 @@ describe('AssistantPanel', () => {
     ]);
 
     await waitFor(() => {
-      expect(dataCheckToggle()).toHaveAttribute('aria-expanded', 'true');
+      expect(dataCheckToggle()).toHaveAttribute('aria-expanded', 'false');
     });
+    // Closed by default (owner, 2026-11-03), but the header says gaps were found.
+    expect(dataCheckToggle()).toHaveTextContent('3 markets not mentioned');
+    await user.click(dataCheckToggle() ?? document.body);
     const table = within(screen.getByRole('table'));
     const notMentioned = table
       .getAllByRole('row')
@@ -100,7 +103,7 @@ describe('AssistantPanel', () => {
     expect(onAnswerDone).toHaveBeenCalledOnce();
   });
 
-  it('germany-dip keeps the data check collapsed', async () => {
+  it('germany-dip has a closed data check with no gap note', async () => {
     server.use(chatFromFixture('germany-dip'));
     const { user } = setup();
     await ask(user, 'Why did Germany dip?');
@@ -108,6 +111,7 @@ describe('AssistantPanel', () => {
     await waitFor(() => {
       expect(dataCheckToggle()).toHaveAttribute('aria-expanded', 'false');
     });
+    expect(dataCheckToggle()).not.toHaveTextContent(/not mentioned/);
   });
 
   it('next-year abstains and has no data check', async () => {
@@ -206,6 +210,7 @@ describe('AssistantPanel', () => {
     const { user, onUrlUpdate } = setup();
     await ask(user, 'Which markets are at risk?');
     await answerDone();
+    await user.click(await screen.findByRole('button', { name: new RegExp(en.dataCheck.title) }));
     await user.click(await screen.findByRole('button', { name: en.dataCheck.showOnDashboard }));
     await waitFor(() => {
       expect(onUrlUpdate.mock.calls.at(-1)?.[0].searchParams.get('markets')).toBe(

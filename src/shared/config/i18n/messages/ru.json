@@ -1,7 +1,8 @@
 {
   "common": {
     "appName": "Market Ops Console",
-    "skipToContent": "Перейти к содержимому"
+    "skipToContent": "Перейти к содержимому",
+    "description": "Продажи по рынкам, продуктам и периодам и ИИ-ассистент, который показывает источники."
   },
   "errors": {
     "timeout": "Запрос выполнялся слишком долго. Попробуйте ещё раз.",
@@ -128,7 +129,8 @@
     "reasonGrowth": "Рост {value} г/г",
     "latestOnly": "только за последний месяц",
     "attention": "Внимания требуют {needAttention} из {markets} рынков; в ответе названо {named}.",
-    "attentionRegion": "Внимания требуют {needAttention} из {markets} рынков региона {region}; в ответе названо {named}."
+    "attentionRegion": "Внимания требуют {needAttention} из {markets} рынков региона {region}; в ответе названо {named}.",
+    "gapNote": "{count, plural, one {# рынок не упомянут} few {# рынка не упомянуты} many {# рынков не упомянуты} other {# рынка не упомянуты}}"
   },
   "shell": {
     "assistant": "Ассистент",
