@@ -23,3 +23,8 @@ Format: **Item**: what is wrong (file). Why it can wait. Where it goes.
 - **Client error logs say `code: 'unknown'`** for `ApiError` (`src/shared/lib/errors/log-error.ts`). The error object is still attached. **Plan 2**: fall back to `error.name`.
 - **TanStack `CancelledError` would be logged as a failure** (`src/app/providers/query-client.ts`). No `cancelQueries` in the code yet. **Plan 2**, if the assistant cancels queries; add a test.
 - **One data failure, many alerts**: every widget's fallback is a `role="alert"` with an identically named "Try again" button (`src/shared/ui/widget-boundary.tsx`). **Plan 3**: a widget label in the button name, one page-level announcement.
+
+## From the design pass (2026-11-03)
+
+- **Fallback checkpoint, dashboard D → A** (ADR 0014): when Plan 2 (assistant) is done, compare the days left to the D estimate. Not enough time means build dashboard A. **Before Plan 3** starts.
+- **Undrawn D screens**: Analyst mode (radar, heat map, markets table), phone, empty/loading/error states of the dashboard widgets. **Design pass**, before Plan 3.
