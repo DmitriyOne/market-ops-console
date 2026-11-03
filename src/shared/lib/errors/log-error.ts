@@ -17,7 +17,7 @@ export function logError(error: unknown, { scope, ...context }: LogContext): voi
   }
   console.error(`[${scope}]`, {
     ...context,
-    code: error instanceof AppError ? error.code : 'unknown',
+    code: error instanceof AppError ? error.code : error instanceof Error ? error.name : 'unknown',
     message: error instanceof Error ? error.message : String(error),
     error,
   });

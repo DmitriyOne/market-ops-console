@@ -21,6 +21,14 @@ describe('logError', () => {
     });
   });
 
+  it('logs an error that is not an AppError with its name as code', () => {
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const error = new Error('timed out');
+    error.name = 'TimeoutError';
+    logError(error, { scope: 'query' });
+    expect(spy).toHaveBeenCalledWith('[query]', expect.objectContaining({ code: 'TimeoutError' }));
+  });
+
   it('logs non-Error values too', () => {
     const spy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     logError('boom', { scope: 'ui' });

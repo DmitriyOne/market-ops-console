@@ -73,26 +73,46 @@ describe('POST /api/v1/chat', () => {
     },
   );
 
-  it('turns a failure mid-stream into an error event and logs it once', async () => {
-    const { POST } = await loadRoute();
-    const log = vi.mocked(console.error).mockImplementation(() => undefined);
-    const request = chatRequest({ question: 'germany' });
-    // Fail the second write (the second token), as a broken stream would.
+  // Fails the chosen SSE writes (1-based, counting only `data: ` frames), as a
+  // broken socket would. `send` encodes each frame right before enqueuing it.
+  function failWrites(shouldFail: (write: number) => boolean) {
     let writes = 0;
     vi.spyOn(TextEncoder.prototype, 'encode').mockImplementation((input?: string) => {
-      writes += 1;
-      if (writes === 2) throw new Error('socket hang up');
+      if (input?.startsWith('data: ')) {
+        writes += 1;
+        if (shouldFail(writes)) throw new Error('socket hang up');
+      }
       // Not TextEncoder itself: its prototype is the one being spied on.
       return new Uint8Array(Buffer.from(input ?? '', 'utf8'));
     });
+  }
 
-    const events = parseEvents(await (await POST(request)).text());
+  it('uses a fixture with more than one token for the mid-stream tests', () => {
+    const text = fixtures.fixtures.find((f) => f.id === 'germany-dip')?.answer.text ?? '';
+    expect(text.match(/\S+\s*/g)?.length).toBeGreaterThan(1);
+  });
+
+  it('sends an error event when a write fails mid-stream', async () => {
+    const { POST } = await loadRoute();
+    const log = vi.mocked(console.error).mockImplementation(() => undefined);
+    failWrites((write) => write === 2);
+
+    const events = parseEvents(await (await POST(chatRequest({ question: 'germany' }))).text());
     expect(events.map((e) => e.type)).toEqual(['token', 'error']);
     expect(log).toHaveBeenCalledOnce();
     expect(log).toHaveBeenCalledWith(
       '[api]',
       expect.objectContaining({ route: '/api/v1/chat', phase: 'stream' }),
     );
+  });
+
+  it('closes the stream when the error fallback cannot be written either', async () => {
+    const { POST } = await loadRoute();
+    vi.mocked(console.error).mockImplementation(() => undefined);
+    failWrites((write) => write >= 2);
+
+    const events = parseEvents(await (await POST(chatRequest({ question: 'germany' }))).text());
+    expect(events.map((e) => e.type)).toEqual(['token']);
   });
 
   it('stops streaming when the client aborts', async () => {

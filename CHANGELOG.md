@@ -2,6 +2,16 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/). The top version must match `package.json` and the `release/X.Y.Z` branch.
 
+## [0.4.0] - Unreleased
+
+### Fixed
+- Chat route validates the request before reading fixtures, so a bad request is always a 400.
+- A failing write in the chat stream can no longer throw out of the stream's error fallback.
+- Error logs use the error name (e.g. `TimeoutError`) as `code` for errors that are not `AppError`.
+
+### Changed
+- `withErrorHandling` is exported only from `@/shared/api/server`.
+
 ## [0.3.0] - Unreleased
 
 ### Added

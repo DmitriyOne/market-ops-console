@@ -1,5 +1,4 @@
-import { withErrorHandling } from '@/shared/api';
-import { loadDataset } from '@/shared/api/server';
+import { loadDataset, withErrorHandling } from '@/shared/api/server';
 
 export const GET = withErrorHandling('/api/v1/data', () =>
   Response.json(loadDataset(), {

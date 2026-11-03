@@ -51,7 +51,8 @@ describe('fetchJson', () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse({ count: 'many' })));
     const error: unknown = await fetchJson('/x', schema).catch((e: unknown) => e);
     expect(error).toBeInstanceOf(ParseError);
-    expect((error as ParseError).issues.length).toBeGreaterThan(0);
+    if (!(error instanceof ParseError)) return;
+    expect(error.issues.length).toBeGreaterThan(0);
   });
 
   it('times out when the server never answers', async () => {
