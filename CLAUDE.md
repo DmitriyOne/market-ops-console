@@ -35,12 +35,14 @@ Detailed rules: `.claude/rules/fsd.md` (auto-loads for `src/**`). Decision: `doc
 
 ## Stack (fixed, see `docs/decisions/0002-stack.md`)
 
-Next.js 16 App Router · React 19 · TypeScript 6 strict · Tailwind v4 + shadcn/ui · next-themes · TanStack Query · nuqs · zod · react-hook-form · `@t3-oss/env-nextjs` · `eventsource-parser` · shadcn charts (Recharts) · react-simple-maps · Vitest + Testing Library + MSW · Playwright (one local E2E) · Vercel.
+Next.js 16 App Router · React 19 · TypeScript 6 strict · Tailwind v4 + shadcn/ui · next-themes · TanStack Query · nuqs · zod · react-hook-form · next-intl · `@t3-oss/env-nextjs` · `eventsource-parser` · shadcn charts (Recharts) · react-simple-maps · Vitest + Testing Library + MSW · Playwright (one local E2E) · Vercel.
 
 ## Code rules
 
 - No `any`, no `as` casts to silence errors. Validate external data with zod at the boundary; infer types from schemas.
 - Env vars only through `src/shared/config/env.ts` (`@t3-oss/env-nextjs`). Never read `process.env` directly.
+- No string literals in UI: visible text, `aria-label`, `alt`, `title`, `placeholder`, zod messages come from `src/shared/config/i18n/messages`.
+- Format numbers, currency, percentages and dates only through next-intl global formats (`src/shared/config/i18n/formats.ts`). No ad-hoc `Intl.*` or `toFixed` for display.
 - Render model output as text. Never `dangerouslySetInnerHTML`.
 - Colours, spacing, radii come from design tokens. No raw hex or arbitrary Tailwind values. Every colour token has a light (`:root`) and dark (`.dark`) value.
 - Every chart ships with an accessible alternative (table), keyboard access, and a non-colour signal.

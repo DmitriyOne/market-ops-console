@@ -43,5 +43,5 @@ Import boundaries are checked by Steiger (`steiger` + `@feature-sliced/steiger-p
 2. **Server state** (dataset, alert rules): TanStack Query, query keys and hooks in the entity `api/`.
 3. **Local stream state** (chat): `useReducer` in `features/ask-question/model`.
 4. **React Context**: only for dependency-style values, not for app state.
-   - App-wide (QueryClient, nuqs adapter, locale/format settings): provider in `src/app/providers`, hook exported from `shared` or the owning entity.
+   - App-wide (QueryClient, nuqs adapter, `NextIntlClientProvider`, theme): provider in `src/app/providers`, hook exported from `shared` or the owning entity.
    - Slice-scoped (e.g. a chat session): context + provider in that slice's `model/`, exported via its `index.ts`, mounted by the widget that owns it.

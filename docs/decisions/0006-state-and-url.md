@@ -6,7 +6,8 @@
 | Drill path, period, selection, mode (shareable) | nuqs (URL) | parsers in entity/feature `model/` |
 | Chat stream (local, transient) | `useReducer` in `useChatStream` | `features/ask-question/model` |
 | Ephemeral UI (open panel, hover) | `useState` | component |
-| Dependency-style values (locale, QueryClient) | React Context | `src/app/providers` |
+| Theme, locale (personal settings) | next-themes (localStorage), cookie read by next-intl | providers in `src/app/providers` |
+| Dependency-style values (QueryClient, intl messages) | React Context | `src/app/providers` |
 
 React Context is not used for app state. No Redux/Zustand: the three tools above cover every case.
 
