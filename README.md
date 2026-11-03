@@ -4,7 +4,7 @@ A console for a commercial operations team: a **streaming AI assistant** that an
 
 Take-home assignment for the Frontend Engineer role at NewPage Solutions.
 
-> Status: `0.1.0`, architecture and planning. No app code yet.
+> Status: `0.2.0`, foundation: tooling, data layer, mock API, i18n, theming, CI. Dashboard and assistant UI come next.
 
 ## Start here (5 minutes)
 
@@ -15,16 +15,18 @@ Take-home assignment for the Frontend Engineer role at NewPage Solutions.
 
 ## Quick start
 
-To be added after scaffolding. Planned:
+Requires Node 24 (`.nvmrc`) and pnpm 10.
 
 ```bash
 pnpm install
-pnpm dev          # http://localhost:3000
-pnpm format       # Prettier
-pnpm lint         # ESLint + Steiger (FSD boundaries)
+cp .env.example .env.local   # optional; defaults work
+pnpm dev                     # http://localhost:3000 → /dashboard
+pnpm build && pnpm start     # production build; pages are static per locale
+pnpm format                  # Prettier (code only)
+pnpm format:check
+pnpm lint                    # ESLint + Steiger (FSD boundaries)
 pnpm typecheck
-pnpm test         # unit + component tests
-pnpm e2e          # one Playwright happy path (local only)
+pnpm test                    # Vitest
 ```
 
 ## Project structure
@@ -40,18 +42,18 @@ src/
   widgets/           screen blocks: map, radar, time series, heat map, chat panel
   features/          user actions: drill-down, select period, ask, stop, alerts
   entities/          market, region, product, citation, chat message
-  shared/            ui (shadcn), lib (format, sse), api, config (env)
+  shared/            ui (shadcn, error boundaries), lib (cn, errors), api (HTTP client, SSE, contracts), config (env, API routes, i18n)
 data/                data.json, fixtures.json (source of truth)
 docs/
   decisions/         architecture decision records
   specs/             what we build
-  plans/             how we build it, step by step
+  plans/             how we build it, step by step; backlog.md = deferred review findings
 reference/           reference mock SSE route from the starter pack
 ```
 
 ## Git flow
 
-`feature/*` → `release/X.Y.Z` → `develop` → `master`. Work happens on `feature/*` branched from the current release; nobody commits to `release/*`, `develop` or `master` directly. Only `release/*` merges into `develop`, only `develop` into `master`. The version in `package.json`, the top of `CHANGELOG.md` and the release branch must match. Details: `docs/decisions/0007-git-flow-and-ci.md`.
+`feature/X.Y.Z/NAME` (or `fix/X.Y.Z/NAME`) → `release/X.Y.Z` → `develop` → `master`. Work happens on `feature/X.Y.Z/NAME` branched from `release/X.Y.Z`, so the branch name says which release it belongs to; nobody commits to `release/*`, `develop` or `master` directly. Only `release/*` merges into `develop`, only `develop` into `master`. The version in `package.json`, the top of `CHANGELOG.md` and the release branch must match. Details: `docs/decisions/0007-git-flow-and-ci.md`.
 
 ## Working with AI agents
 

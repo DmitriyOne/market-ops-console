@@ -1,0 +1,45 @@
+{
+  "common": {
+    "appName": "Market Ops Console",
+    "skipToContent": "Skip to content"
+  },
+  "errors": {
+    "timeout": "The request took too long. Please try again.",
+    "network": "Can't reach the server. Check your connection and try again.",
+    "server": "The server couldn't complete the request.",
+    "invalidData": "We received data in an unexpected format.",
+    "unknown": "Something went wrong.",
+    "sectionTitle": "This section couldn't load.",
+    "retry": "Try again"
+  },
+  "offline": {
+    "title": "You're offline",
+    "body": "We'll reconnect automatically. Everything on this page is kept."
+  },
+  "notFound": {
+    "title": "Page not found",
+    "body": "The page you're looking for doesn't exist or has moved.",
+    "home": "Back to dashboard"
+  },
+  "errorPage": {
+    "title": "Something went wrong",
+    "body": "This page couldn't be displayed. Try again or go back to the dashboard.",
+    "home": "Back to dashboard"
+  },
+  "theme": {
+    "label": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "locale": {
+    "label": "Language",
+    "en-GB": "English (UK)",
+    "en-US": "English (US)",
+    "de-DE": "Deutsch",
+    "ru-RU": "Русский"
+  },
+  "dashboard": {
+    "marketCount": "{count, plural, one {# market} other {# markets}}"
+  }
+}

@@ -1,0 +1,57 @@
+# PR into develop: only a release branch may merge here (ADR 0007).
+# One job to stay within GitHub Free minutes (.claude/rules/ci.md).
+name: PR → develop
+
+on:
+  pull_request:
+    branches: [develop]
+    # `edited` catches a PR retargeted to develop; title/body edits are skipped below.
+    types: [opened, synchronize, reopened, edited]
+
+concurrency:
+  # Per workflow and PR. A title/body edit gets its own group so it cannot
+  # cancel a running check (its job is skipped anyway).
+  group: ${{ github.workflow }}-${{ github.event.number }}-${{ github.event.action == 'edited' && github.event.changes.base == null && 'edit' || 'run' }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  check:
+    if: github.event.action != 'edited' || github.event.changes.base != null
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Require a release/X.Y.Z head branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_REF: ${{ github.head_ref }}
+          PR: ${{ github.event.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          if [[ ! "$HEAD_REF" =~ ^release/[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            gh pr comment "$PR" --repo "$REPO" --body "Only \`release/X.Y.Z\` branches can be merged into \`develop\` (ADR 0007). Open this PR against its release branch instead."
+            gh pr close "$PR" --repo "$REPO"
+            exit 1
+          fi
+
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Version check
+        # GITHUB_HEAD_REF is set by Actions on pull_request events.
+        run: node scripts/check-version.ts
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm format:check
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
