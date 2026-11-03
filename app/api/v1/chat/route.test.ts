@@ -73,6 +73,28 @@ describe('POST /api/v1/chat', () => {
     },
   );
 
+  it('turns a failure mid-stream into an error event and logs it once', async () => {
+    const { POST } = await loadRoute();
+    const log = vi.mocked(console.error).mockImplementation(() => undefined);
+    const request = chatRequest({ question: 'germany' });
+    // Fail the second write (the second token), as a broken stream would.
+    let writes = 0;
+    vi.spyOn(TextEncoder.prototype, 'encode').mockImplementation((input?: string) => {
+      writes += 1;
+      if (writes === 2) throw new Error('socket hang up');
+      // Not TextEncoder itself: its prototype is the one being spied on.
+      return new Uint8Array(Buffer.from(input ?? '', 'utf8'));
+    });
+
+    const events = parseEvents(await (await POST(request)).text());
+    expect(events.map((e) => e.type)).toEqual(['token', 'error']);
+    expect(log).toHaveBeenCalledOnce();
+    expect(log).toHaveBeenCalledWith(
+      '[api]',
+      expect.objectContaining({ route: '/api/v1/chat', phase: 'stream' }),
+    );
+  });
+
   it('stops streaming when the client aborts', async () => {
     const { POST } = await loadRoute();
     const controller = new AbortController();
