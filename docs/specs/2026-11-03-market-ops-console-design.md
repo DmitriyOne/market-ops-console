@@ -1,8 +1,8 @@
 # Market Ops Console — Design
 
-Status: draft for owner review · 2026-11-03 · Release `0.1.0`
+Status: approved by the owner · 2026-11-03 · Release `0.1.0` · Plan 1 (foundation) built from it in `0.2.0`
 
-Sources: brief (`Frontend Engineer - Assignment v1.docx`, summarised in `docs/STARTER_PACK.md`), contract `docs/CONTRACT.md`, data `data/data.json`, fixtures `data/fixtures.json`, decisions `docs/decisions/0001–0011`.
+Sources: brief (`Frontend Engineer - Assignment v1.docx`, summarised in `docs/STARTER_PACK.md`), contract `docs/CONTRACT.md`, data `data/data.json`, fixtures `data/fixtures.json`, decisions `docs/decisions/0001–0013`.
 
 Marking: **[owner]** = decided by the owner in conversation. **[call]** = Claude's call, open to owner correction. Unmarked = required by the brief or already in an ADR.
 
@@ -66,7 +66,7 @@ The submission is assessed on engineering quality, taste and the reasoning in th
 
 ## 3. Constraints
 
-- Due 2026-11-09. Stack, architecture, git flow and tooling are fixed by ADRs 0001–0011 and `CLAUDE.md`.
+- Due 2026-11-09. Stack, architecture, git flow and tooling are fixed by ADRs 0001–0013 and `CLAUDE.md`.
 - FSD v2.1; `src/pages` composes only (may read URL params and choose layout).
 - Static rendering per locale: `app/[locale]/…`, `generateStaticParams`, `next/root-params` (ADR 0010).
 - No string literals in markup; all formatting through next-intl global formats.
@@ -218,7 +218,7 @@ Four suggested questions (buttons) taken from the brief: risks this quarter, Ger
 ## 10. Data loading and state [call]
 
 - Dataset: `/api/v1/data` returns `data.json` validated by zod; fetched with TanStack Query; prefetched in the server component at build time and hydrated, so static HTML already contains the data. `staleTime: Infinity` (static data).
-- Alert rules: TanStack Query against `/api/alerts`.
+- Alert rules: TanStack Query against `/api/v1/alerts`.
 - Selectors (pure functions in `entities/*/model`) compute every aggregate from the validated dataset; no component computes KPIs inline.
 - Market ↔ map join: `iso3 → numeric ISO` table in `entities/market`.
 

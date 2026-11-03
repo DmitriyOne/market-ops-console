@@ -8,7 +8,7 @@
 | Ephemeral UI (open panel, hover) | `useState` | component |
 | Theme | `@wrksz/themes` (localStorage) | provider in the root layout `app/[locale]/layout.tsx` (ADR 0009) |
 | Locale | URL prefix (`as-needed`) + `NEXT_LOCALE` cookie | next-intl routing, ADR 0010 |
-| Dependency-style values (QueryClient, intl messages) | React Context | `src/app/providers` |
+| Dependency-style values (QueryClient, intl messages) | React Context | QueryClient: `src/app/providers`; `NextIntlClientProvider`: root layout `app/[locale]/layout.tsx` (ADR 0010) |
 
 React Context is not used for app state. No Redux/Zustand: the three tools above cover every case.
 

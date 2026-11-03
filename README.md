@@ -42,12 +42,12 @@ src/
   widgets/           screen blocks: map, radar, time series, heat map, chat panel
   features/          user actions: drill-down, select period, ask, stop, alerts
   entities/          market, region, product, citation, chat message
-  shared/            ui (shadcn), lib (format, sse), api, config (env)
+  shared/            ui (shadcn, error boundaries), lib (cn, errors), api (HTTP client, SSE, contracts), config (env, API routes, i18n)
 data/                data.json, fixtures.json (source of truth)
 docs/
   decisions/         architecture decision records
   specs/             what we build
-  plans/             how we build it, step by step
+  plans/             how we build it, step by step; backlog.md = deferred review findings
 reference/           reference mock SSE route from the starter pack
 ```
 

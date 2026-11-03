@@ -8,7 +8,7 @@
 - **`proxy.ts`** (Next 16 name for middleware) = `createMiddleware(routing)`: locale negotiation (prefix → `NEXT_LOCALE` cookie → `Accept-Language` → default) and redirects. Matcher excludes `api`, `_next`, `_vercel` and files with a dot.
 - **Files** in `src/shared/config/i18n/`: `routing.ts` (`defineRouting`: locales, default, prefix, cookie `maxAge` 1 year), `navigation.ts` (`createNavigation(routing)`: locale-aware `Link`, `useRouter`, `usePathname`), `request.ts`, `formats.ts`, `types.ts` (`AppConfig`: `Locale`, `Messages`, `Formats` → keys and format names checked by `tsc`), `messages/{en,de,ru}.json`. `en-GB` and `en-US` share `en.json`; they differ only in formats.
 - **Locale switcher** in `features/switch-locale`: `router.replace` from `navigation.ts` with the target locale, **keeping the current search params** (the shareable dashboard state).
-- **Formatting only through next-intl** global formats (`currency`, `compact`, `percent`, `signedPercent`, `period`) via `useFormatter` / `getFormatter` / `createFormatter`. No ad-hoc `Intl.*`. Amounts stay USD (`meta.currency`); locale changes presentation only.
+- **Formatting only through next-intl** global formats (`currency`, `compactCurrency`, `compact`, `percent`, `signedPercent`, `period`) via `useFormatter` / `getFormatter` / `createFormatter`. No ad-hoc `Intl.*`. Amounts stay USD (`meta.currency`); locale changes presentation only.
 - **No string literals in markup**, enforced by `i18next/no-literal-string` (ADR 0011).
 
 **Out of scope.** Assistant answers and market/product names come from `data/` and stay English; the chat labels them as such.
