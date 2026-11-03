@@ -1,7 +1,6 @@
 import { createParser } from 'eventsource-parser';
 
-import { HttpError, toApiError } from './errors';
-import { timeoutReason } from './request-signal';
+import { HttpError, timeoutReason, toApiError } from './errors';
 import { STREAM_FIRST_EVENT_TIMEOUT_MS, STREAM_IDLE_TIMEOUT_MS } from './timeouts';
 
 export type StreamSseOptions = {
@@ -15,7 +14,8 @@ export type StreamSseOptions = {
  * POSTs `body` as JSON and reads the response as Server-Sent Events,
  * calling `onData` with each event's data. Resolves when the stream ends.
  * Fails with TimeoutError if the first event is late or a gap between
- * events is too long; the gap timer restarts on every event.
+ * events is too long. The gap timer restarts on every event, which
+ * AbortSignal.timeout cannot do, so this one uses setTimeout.
  */
 export async function streamSse(
   url: string,

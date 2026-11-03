@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';
 
 import { AbortedError, HttpError, NetworkError, ParseError, TimeoutError } from './errors';
@@ -27,13 +27,9 @@ function hangingFetch() {
 }
 
 describe('fetchJson', () => {
-  beforeEach(() => {
-    vi.useFakeTimers();
-  });
-
   afterEach(() => {
-    vi.useRealTimers();
     vi.unstubAllGlobals();
+    vi.restoreAllMocks();
   });
 
   it('returns the parsed body', async () => {
@@ -58,24 +54,25 @@ describe('fetchJson', () => {
     expect((error as ParseError).issues.length).toBeGreaterThan(0);
   });
 
-  it('times out after 8000 ms when the server never answers', async () => {
+  it('times out when the server never answers', async () => {
     vi.stubGlobal('fetch', hangingFetch());
-    let settled = false;
-    const result = fetchJson('/x', schema).catch((e: unknown) => {
-      settled = true;
-      return e;
-    });
-    await vi.advanceTimersByTimeAsync(7999);
-    expect(settled).toBe(false);
-    await vi.advanceTimersByTimeAsync(1);
-    expect(await result).toBeInstanceOf(TimeoutError);
+    const error: unknown = await fetchJson('/x', schema, { timeoutMs: 30 }).catch(
+      (e: unknown) => e,
+    );
+    expect(error).toBeInstanceOf(TimeoutError);
+  });
+
+  it('uses AbortSignal.timeout with 8000 ms by default', async () => {
+    const timeout = vi.spyOn(AbortSignal, 'timeout');
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse({ count: 1 })));
+    await fetchJson('/x', schema);
+    expect(timeout).toHaveBeenCalledWith(8000);
   });
 
   it('reports a caller abort as AbortedError, not TimeoutError', async () => {
     vi.stubGlobal('fetch', hangingFetch());
     const controller = new AbortController();
     const result = fetchJson('/x', schema, { signal: controller.signal }).catch((e: unknown) => e);
-    await vi.advanceTimersByTimeAsync(100);
     controller.abort();
     expect(await result).toBeInstanceOf(AbortedError);
   });

@@ -42,8 +42,23 @@ export class ParseError extends ApiError {
   }
 }
 
-/** DOMException name used for aborts caused by our own timers. */
+/** DOMException name of AbortSignal.timeout() and of our own stream timers. */
 export const TIMEOUT_REASON_NAME = 'TimeoutError';
+
+export function timeoutReason(): DOMException {
+  return new DOMException('The request timed out', TIMEOUT_REASON_NAME);
+}
+
+// Checked by name, not `instanceof DOMException`: test environments (jsdom)
+// and Node each have their own DOMException class.
+function isTimeoutReason(reason: unknown): boolean {
+  return (
+    typeof reason === 'object' &&
+    reason !== null &&
+    'name' in reason &&
+    reason.name === TIMEOUT_REASON_NAME
+  );
+}
 
 /**
  * Maps whatever a fetch/read threw into an ApiError. If our signal is
@@ -52,10 +67,7 @@ export const TIMEOUT_REASON_NAME = 'TimeoutError';
 export function toApiError(error: unknown, signal: AbortSignal): ApiError {
   if (error instanceof ApiError) return error;
   if (signal.aborted) {
-    const reason: unknown = signal.reason;
-    return reason instanceof DOMException && reason.name === TIMEOUT_REASON_NAME
-      ? new TimeoutError()
-      : new AbortedError();
+    return isTimeoutReason(signal.reason) ? new TimeoutError() : new AbortedError();
   }
   if (error instanceof TypeError) return new NetworkError(error.message);
   return new NetworkError(error instanceof Error ? error.message : undefined);
