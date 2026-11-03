@@ -17,9 +17,9 @@ import { type ChatMessage, chatReducer } from './chat-reducer';
 export type ChatStream = {
   messages: ChatMessage[];
   isStreaming: boolean;
-  ask(question: string): void;
-  stop(): void;
-  retry(id: string): void;
+  ask: (question: string) => void;
+  stop: () => void;
+  retry: (id: string) => void;
 };
 
 type Active = { id: string; controller: AbortController };

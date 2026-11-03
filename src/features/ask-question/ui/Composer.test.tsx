@@ -89,6 +89,16 @@ describe('Composer', () => {
     },
   );
 
+  it('describes the field with the English-only notice and the length reason', async () => {
+    const { field, user } = setup();
+    await user.type(field, 'Märkte');
+    expect(field).toHaveAccessibleDescription(en.assistant.composer.englishOnly);
+    await user.clear(field);
+    await user.click(field);
+    await user.paste('a'.repeat(CHAT_QUESTION_MAX_LENGTH + 1));
+    expect(field).toHaveAccessibleDescription(/up to 500 characters/);
+  });
+
   it('shows no English-only notice for English text', async () => {
     const { field, user } = setup();
     await user.type(field, 'Which markets are at risk?');

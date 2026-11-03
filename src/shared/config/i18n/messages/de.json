@@ -59,6 +59,71 @@
       "germany": "Warum ist Deutschland eingebrochen?",
       "apacEurope": "APAC und Europa vergleichen",
       "forecastMiss": "Was treibt die Prognoseabweichung?"
+    },
+    "panel": {
+      "title": "Assistent",
+      "empty": {
+        "title": "Fragen zum Portfolio",
+        "body": "Antworten stammen von der KI und können unvollständig sein. Jede Antwort zeigt ihre Quellen und die passenden Daten, damit Sie sie prüfen können.",
+        "englishNote": "Antworten sind auf Englisch."
+      },
+      "youAsked": "Ihre Frage",
+      "newContent": "Neuer Inhalt"
+    },
+    "answer": {
+      "label": "KI-Antwort · möglicherweise unvollständig",
+      "writing": "KI-Antwort · wird geschrieben…",
+      "pending": "Quellen und Konfidenz erscheinen, wenn die Antwort fertig ist.",
+      "sources": "Quellen",
+      "confidence": "Konfidenz: {level}",
+      "high": "Hoch",
+      "medium": "Mittel",
+      "low": "Niedrig",
+      "directional": "Nur als Richtwert verstehen"
+    },
+    "stopped": {
+      "title": "Gestoppt — Antwort unvollständig.",
+      "body": "Keine Quellen oder Konfidenz für eine Teilantwort.",
+      "askAgain": "Erneut fragen"
+    },
+    "abstain": {
+      "title": "Das kann ich aus den Daten nicht beantworten",
+      "coverage": "Die Daten reichen von {from} bis {to}. Versuchen Sie:"
+    },
+    "error": {
+      "title": "Keine Antwort",
+      "retry": "Erneut versuchen"
+    },
+    "evidence": {
+      "revenue": "Umsatz",
+      "attainment": "Zielerreichung",
+      "growth": "Wachstum ggü. Vorjahr",
+      "units": "Einheiten",
+      "calculated": "Aus Monatsdaten berechnet",
+      "notInDataset": "Nicht im Datensatz",
+      "trend": "Umsatz {name}, letzte 12 Monate",
+      "showOnDashboard": "Im Dashboard zeigen",
+      "clickHint": "Klicken, um im Dashboard zu zeigen",
+      "loading": "Daten werden geladen…"
     }
+  },
+  "dataCheck": {
+    "title": "Was die Daten zeigen",
+    "header": "Marktentwicklung · letzter Zeitraum: {period} · aktualisiert am {updated}",
+    "details": "Details",
+    "portfolio": "Portfolio",
+    "name": "Bereich",
+    "attainment": "Zielerreichung",
+    "growth": "Wachstum ggü. Vorjahr",
+    "status": "Status",
+    "notMentioned": "Nicht erwähnt",
+    "regionGap": "{region}: in der Antwort nicht erwähnt",
+    "showOnDashboard": "Im Dashboard zeigen",
+    "onTrack": "Im Plan",
+    "atRisk": "Gefährdet",
+    "offTrack": "Unter Plan",
+    "noStatus": "—",
+    "reasonGrowth": "Wachstum {value} ggü. Vorjahr",
+    "reasonAttainment": "{value} des Plans"
   }
 }

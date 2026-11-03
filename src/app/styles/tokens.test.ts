@@ -35,12 +35,19 @@ function luminance(value: string): number {
   return 0.2126 * red + 0.7152 * green + 0.0722 * blue;
 }
 
+const root = readTheme(':root');
+
+// A token the theme does not redefine comes from :root; `var(--x)` aliases
+// resolve in the theme, as the browser does on an element inside it.
+function resolve(theme: Map<string, string>, name: string): string {
+  const value = theme.get(name) ?? root.get(name);
+  if (!value) throw new Error(`Token --${name} is missing`);
+  const alias = /^var\(--([\w-]+)\)$/.exec(value);
+  return alias?.[1] ? resolve(theme, alias[1]) : value;
+}
+
 function contrast(theme: Map<string, string>, front: string, back: string): number {
-  const read = (name: string) => {
-    const value = theme.get(name);
-    if (!value) throw new Error(`Token --${name} is missing`);
-    return luminance(value);
-  };
+  const read = (name: string) => luminance(resolve(theme, name));
   const [hi, lo] = [read(front), read(back)].sort((x, y) => y - x) as [number, number];
   return (hi + 0.05) / (lo + 0.05);
 }
@@ -60,6 +67,12 @@ const pairs: [string, string, number][] = [
   ['foreground', 'surface-ai', 4.5],
   ['surface-ai-label', 'surface-ai', 4.5],
   ['muted-foreground', 'surface-ai', 4.5],
+  // Assistant panel: confidence line on the AI surface, source buttons, error text.
+  ['confidence-high', 'surface-ai', 4.5],
+  ['confidence-medium', 'surface-ai', 4.5],
+  ['confidence-low', 'surface-ai', 4.5],
+  ['surface-ai-label', 'background', 4.5],
+  ['foreground', 'status-off-track-muted', 4.5],
   ...statuses.flatMap((s): [string, string, number][] => [
     [`status-${s}`, `status-${s}-muted`, 4.5],
     [`status-${s}`, 'card', 4.5],

@@ -83,6 +83,14 @@ describe('buildDataCheck', () => {
     expect(row?.reason).toBeNull();
   });
 
+  it.each([
+    ['at-risk', ['de', 'es', 'it', 'gb', 'br', 'fr']],
+    ['apac-vs-europe', ['de', 'es', 'it', 'gb', 'fr', 'cn', 'jp']],
+    ['germany-dip', ['de']],
+  ])('%s highlights the listed markets, non-on-track first', (id, ids) => {
+    expect(check(id)?.highlightIds).toEqual(ids);
+  });
+
   it('skips unknown citations but keeps the block', () => {
     const result = buildDataCheck(ds, [{ marketId: 'xx', label: 'Atlantis' }]);
     expect(result?.rows).toEqual([]);

@@ -7,6 +7,7 @@ export {
 } from './model/citation';
 export { ISO3_TO_NUMERIC } from './model/iso-numeric';
 export { computeKpis, type KpiName, type Kpis, type KpiSource, type KpiValue } from './model/kpis';
+export { periodToDate } from './model/period';
 export { getMarket, getProduct, getRegion } from './model/reference';
 export {
   isLatestSnapshot,

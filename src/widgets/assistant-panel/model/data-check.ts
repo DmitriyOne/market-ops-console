@@ -25,6 +25,8 @@ export type DataCheck = {
   notMentioned: Market[];
   /** Per cited region, its non-on-track markets the answer did not cite. */
   regionGaps: { regionId: string; markets: Market[] }[];
+  /** Every market the block lists, non-on-track first: what "Show on dashboard" highlights. */
+  highlightIds: string[];
   expanded: boolean;
 };
 
@@ -86,11 +88,22 @@ export function buildDataCheck(ds: Dataset, citations: Citation[]): DataCheck | 
     }))
     .filter((gap) => gap.markets.length > 0);
 
+  const listed = new Set([
+    ...citedMarkets,
+    ...notMentioned.map((m) => m.id),
+    ...regionGaps.flatMap((g) => g.markets.map((m) => m.id)),
+  ]);
+  const highlightIds = [
+    ...allNonOnTrack.map((m) => m.id).filter((id) => listed.has(id)),
+    ...[...listed].filter((id) => !nonOnTrackIds.has(id)),
+  ];
+
   return {
     portfolio: computeKpis(ds, {}, latest, '1m'),
     rows: [...rows.values()],
     notMentioned,
     regionGaps,
+    highlightIds,
     expanded: notMentioned.length > 0 || regionGaps.length > 0,
   };
 }

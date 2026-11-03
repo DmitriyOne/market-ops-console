@@ -33,6 +33,8 @@ export function Composer({ isStreaming, onAsk, onStop }: ComposerProps) {
         ? t('tooLongReason', { max: CHAT_QUESTION_MAX_LENGTH })
         : null;
 
+  const nonEnglish = NON_ENGLISH_LETTER.test(value);
+
   const send = () => {
     if (!canSend) return;
     onAsk(question);
@@ -67,6 +69,11 @@ export function Composer({ isStreaming, onAsk, onStop }: ComposerProps) {
           readOnly={isStreaming}
           aria-disabled={isStreaming}
           aria-invalid={tooLong}
+          aria-describedby={
+            [nonEnglish ? `${reasonId}-lang` : '', tooLong ? reasonId : '']
+              .filter(Boolean)
+              .join(' ') || undefined
+          }
           rows={1}
           className="max-h-40 min-h-11 resize-none text-base md:text-base"
           onChange={(event) => {
@@ -98,8 +105,8 @@ export function Composer({ isStreaming, onAsk, onStop }: ComposerProps) {
         )}
       </div>
       <div className="flex min-h-5 items-start justify-between gap-3 text-xs">
-        <p aria-live="polite" className="text-muted-foreground">
-          {NON_ENGLISH_LETTER.test(value) ? t('englishOnly') : null}
+        <p id={`${reasonId}-lang`} aria-live="polite" className="text-muted-foreground">
+          {nonEnglish ? t('englishOnly') : null}
         </p>
         {question.length >= COUNTER_FROM ? (
           <span className={tooLong ? 'font-medium text-destructive' : 'text-muted-foreground'}>

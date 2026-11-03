@@ -59,6 +59,71 @@
       "germany": "Why did Germany dip?",
       "apacEurope": "Compare APAC and Europe",
       "forecastMiss": "What drives the forecast miss?"
+    },
+    "panel": {
+      "title": "Assistant",
+      "empty": {
+        "title": "Ask about the portfolio",
+        "body": "Answers come from the AI and may be incomplete. Each answer shows its sources and the matching data, so you can check it.",
+        "englishNote": "Answers are in English."
+      },
+      "youAsked": "You asked",
+      "newContent": "New content"
+    },
+    "answer": {
+      "label": "AI answer · may be incomplete",
+      "writing": "AI answer · writing…",
+      "pending": "Sources and confidence appear when the answer is complete.",
+      "sources": "Sources",
+      "confidence": "Confidence: {level}",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low",
+      "directional": "Treat as directional"
+    },
+    "stopped": {
+      "title": "Stopped — answer incomplete.",
+      "body": "No sources or confidence for a partial answer.",
+      "askAgain": "Ask again"
+    },
+    "abstain": {
+      "title": "I can't answer this from the data",
+      "coverage": "The data covers {from} – {to}. Try:"
+    },
+    "error": {
+      "title": "No answer",
+      "retry": "Try again"
+    },
+    "evidence": {
+      "revenue": "Revenue",
+      "attainment": "Attainment",
+      "growth": "Growth YoY",
+      "units": "Units",
+      "calculated": "Calculated from monthly data",
+      "notInDataset": "Not in the dataset",
+      "trend": "{name} revenue, last 12 months",
+      "showOnDashboard": "Show on dashboard",
+      "clickHint": "Click to show on dashboard",
+      "loading": "Loading data…"
     }
+  },
+  "dataCheck": {
+    "title": "What the data shows",
+    "header": "Market performance · latest period: {period} · updated {updated}",
+    "details": "Details",
+    "portfolio": "Portfolio",
+    "name": "Scope",
+    "attainment": "Attainment",
+    "growth": "Growth YoY",
+    "status": "Status",
+    "notMentioned": "Not mentioned",
+    "regionGap": "{region}: not mentioned in the answer",
+    "showOnDashboard": "Show on dashboard",
+    "onTrack": "On track",
+    "atRisk": "At risk",
+    "offTrack": "Off track",
+    "noStatus": "—",
+    "reasonGrowth": "Growth {value} YoY",
+    "reasonAttainment": "{value} of plan"
   }
 }
