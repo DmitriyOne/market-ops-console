@@ -17,12 +17,6 @@ export default defineConfig([
     },
   },
   {
-    // Tool configs import third-party typings that resolve to `any`
-    // (@feature-sliced/steiger-plugin); type-aware rules add nothing there.
-    files: ['*.config.{ts,mts}'],
-    extends: [tseslint.configs.disableTypeChecked],
-  },
-  {
     plugins: { 'simple-import-sort': simpleImportSort },
     rules: {
       'simple-import-sort/imports': 'error',

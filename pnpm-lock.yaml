@@ -60,6 +60,9 @@ importers:
       '@feature-sliced/steiger-plugin':
         specifier: ^0.8.2
         version: 0.8.2(typescript@6.0.3)
+      '@steiger/toolkit':
+        specifier: ^0.2.4
+        version: 0.2.4(vitest@5.1.0(@types/node@26.6.6)(jsdom@30.1.3)(msw@3.0.3(@types/node@26.6.6)(typescript@6.0.3)(vite@8.3.5(@types/node@26.6.6)(jiti@2.7.0)))(vite@8.3.5(@types/node@26.6.6)(jiti@2.7.0)))
       '@tailwindcss/postcss':
         specifier: ^4.3.4
         version: 4.3.4
@@ -1633,6 +1636,14 @@ packages:
 
   '@standard-schema/spec@1.1.0':
     resolution: {integrity: sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w==}
+
+  '@steiger/toolkit@0.2.4':
+    resolution: {integrity: sha512-DQHsu0JaOJ7EEAgf/gM9C0+que9R9S8SNAz9ZRTFpYce1HR639ygQqC/PS04I55qo2r94PXiGIgNS6g87qhJYw==}
+    peerDependencies:
+      vitest: ^1.6.0 || ^2.1.8 || ^3.0.0
+    peerDependenciesMeta:
+      vitest:
+        optional: true
 
   '@swc/core-darwin-arm64@1.16.21':
     resolution: {integrity: sha512-VRreJpbRygpSD1hj3HBEOIA1xjXYnhB+IfcKsxZRhCIBGRP4UkqxZH4/ipFh/heIRp7EKQ56E8ygwEftLNCWXw==}
@@ -6114,6 +6125,10 @@ snapshots:
   '@sindresorhus/merge-streams@4.0.0': {}
 
   '@standard-schema/spec@1.1.0': {}
+
+  '@steiger/toolkit@0.2.4(vitest@5.1.0(@types/node@26.6.6)(jsdom@30.1.3)(msw@3.0.3(@types/node@26.6.6)(typescript@6.0.3)(vite@8.3.5(@types/node@26.6.6)(jiti@2.7.0)))(vite@8.3.5(@types/node@26.6.6)(jiti@2.7.0)))':
+    optionalDependencies:
+      vitest: 5.1.0(@types/node@26.6.6)(jsdom@30.1.3)(msw@3.0.3(@types/node@26.6.6)(typescript@6.0.3)(vite@8.3.5(@types/node@26.6.6)(jiti@2.7.0)))(vite@8.3.5(@types/node@26.6.6)(jiti@2.7.0))
 
   '@swc/core-darwin-arm64@1.16.21':
     optional: true
