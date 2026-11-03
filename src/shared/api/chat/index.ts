@@ -14,3 +14,4 @@ export {
   type Fixtures,
   fixturesSchema,
 } from './contract';
+export { pickFixture } from './pick-fixture';
