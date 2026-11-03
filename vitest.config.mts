@@ -15,5 +15,8 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./vitest.setup.ts'],
     include: ['src/**/*.test.{ts,tsx}', 'app/**/*.test.{ts,tsx}', 'scripts/**/*.test.ts'],
+    // next-intl imports `next/navigation` without an extension; inlining lets
+    // Vite resolve it (next has no exports map).
+    server: { deps: { inline: ['next-intl'] } },
   },
 });

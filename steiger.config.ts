@@ -10,4 +10,12 @@ export default defineConfig([
       'fsd/insignificant-slice': 'off',
     },
   },
+  {
+    // `src/app/providers` is the agreed home of app-wide providers
+    // (.claude/rules/fsd.md); the name is the convention, not a smell.
+    files: ['./src/app/providers/**'],
+    rules: {
+      'fsd/segments-by-purpose': 'off',
+    },
+  },
 ]);
