@@ -1,0 +1,44 @@
+# PR into master: only develop may merge here (ADR 0007).
+# develop was fully checked on its way in, so this only gates versions.
+name: PR → master
+
+on:
+  pull_request:
+    branches: [master]
+    types: [opened, synchronize, reopened, edited]
+
+concurrency:
+  group: pr-${{ github.event.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  check:
+    if: github.event.action != 'edited' || github.event.changes.base != null
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Require develop as head branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_REF: ${{ github.head_ref }}
+          PR: ${{ github.event.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          if [[ "$HEAD_REF" != "develop" ]]; then
+            gh pr comment "$PR" --repo "$REPO" --body "Only \`develop\` can be merged into \`master\` (ADR 0007)."
+            gh pr close "$PR" --repo "$REPO"
+            exit 1
+          fi
+
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+
+      - name: Version check
+        run: node scripts/check-version.ts

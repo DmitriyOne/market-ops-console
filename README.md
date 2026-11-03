@@ -4,7 +4,7 @@ A console for a commercial operations team: a **streaming AI assistant** that an
 
 Take-home assignment for the Frontend Engineer role at NewPage Solutions.
 
-> Status: `0.1.0`, architecture and planning. No app code yet.
+> Status: `0.2.0`, foundation: tooling, data layer, mock API, i18n, theming, CI. Dashboard and assistant UI come next.
 
 ## Start here (5 minutes)
 
@@ -15,16 +15,18 @@ Take-home assignment for the Frontend Engineer role at NewPage Solutions.
 
 ## Quick start
 
-To be added after scaffolding. Planned:
+Requires Node 24 (`.nvmrc`) and pnpm 10.
 
 ```bash
 pnpm install
-pnpm dev          # http://localhost:3000
-pnpm format       # Prettier
-pnpm lint         # ESLint + Steiger (FSD boundaries)
+cp .env.example .env.local   # optional; defaults work
+pnpm dev                     # http://localhost:3000 → /dashboard
+pnpm build && pnpm start     # production build; pages are static per locale
+pnpm format                  # Prettier (code only)
+pnpm format:check
+pnpm lint                    # ESLint + Steiger (FSD boundaries)
 pnpm typecheck
-pnpm test         # unit + component tests
-pnpm e2e          # one Playwright happy path (local only)
+pnpm test                    # Vitest
 ```
 
 ## Project structure
