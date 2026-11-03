@@ -34,7 +34,7 @@ Import boundaries are checked by Steiger (`steiger` + `@feature-sliced/steiger-p
 
 ## Next.js App Router
 
-- Root `app/` is routing only: pages live under `app/[locale]/` (ADR 0010); `page.tsx` = `export { DashboardPage as default } from '@/pages/dashboard'`. `proxy.ts` sits at the repo root. Route handlers (`app/api/*`) may call into `src/shared/api` or `src/entities/*/api`.
+- Root `app/` is routing only: pages live under `app/[locale]/` (ADR 0010); `page.tsx` = `export { DashboardPage as default } from '@/pages/dashboard'`. `proxy.ts` sits at the repo root. Route handlers (`app/api/v1/*`) may call into `src/shared/api` or `src/entities/*/api`.
 - Root `pages/` exists empty (with README) so Next.js does not treat `src/pages` as the Pages Router.
 
 ## Where state and React Context live
