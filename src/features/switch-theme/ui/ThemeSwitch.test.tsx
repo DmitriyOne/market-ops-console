@@ -8,7 +8,7 @@ import { enMessages as en } from '@/shared/config';
 import { ThemeSwitch } from './ThemeSwitch';
 
 const setTheme = vi.fn();
-vi.mock('next-themes', () => ({ useTheme: () => ({ theme: 'system', setTheme }) }));
+vi.mock('@wrksz/themes/client', () => ({ useTheme: () => ({ theme: 'system', setTheme }) }));
 
 describe('ThemeSwitch', () => {
   it('offers light, dark and system and applies the choice', async () => {

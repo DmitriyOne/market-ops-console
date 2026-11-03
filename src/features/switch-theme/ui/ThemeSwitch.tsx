@@ -1,8 +1,8 @@
 'use client';
 
+import { useTheme } from '@wrksz/themes/client';
 import { MonitorIcon, MoonIcon, SunIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useTheme } from 'next-themes';
 
 import {
   Button,
@@ -32,7 +32,13 @@ export function ThemeSwitch() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuRadioGroup value={theme ?? 'system'} onValueChange={setTheme}>
+        <DropdownMenuRadioGroup
+          value={theme ?? 'system'}
+          onValueChange={(value) => {
+            const choice = THEMES.find((t) => t.value === value);
+            if (choice) setTheme(choice.value);
+          }}
+        >
           {THEMES.map(({ value, Icon }) => (
             <DropdownMenuRadioItem key={value} value={value}>
               <Icon aria-hidden />
