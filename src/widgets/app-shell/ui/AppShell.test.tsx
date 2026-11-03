@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { NextIntlClientProvider } from 'next-intl';
 import { NuqsTestingAdapter, type UrlUpdateEvent } from 'nuqs/adapters/testing';
@@ -210,5 +210,32 @@ describe('AppShell', () => {
     await waitFor(() => {
       expect(screen.queryByText('1 new answer')).not.toBeInTheDocument();
     });
+  });
+
+  it('a crash in the assistant keeps the dashboard, and the reverse', () => {
+    viewport(true);
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const Boom = (): never => {
+      throw new Error('render failed');
+    };
+    const first = render(
+      <NextIntlClientProvider locale="en-GB" messages={en}>
+        <NuqsTestingAdapter>
+          <AppShell header={null} main={<p>Main content</p>} assistant={() => <Boom />} />
+        </NuqsTestingAdapter>
+      </NextIntlClientProvider>,
+    );
+    expect(screen.getByText('Main content')).toBeInTheDocument();
+    expect(within(assistantPane()).getByText(en.errors.sectionTitle)).toBeInTheDocument();
+    first.unmount();
+    render(
+      <NextIntlClientProvider locale="en-GB" messages={en}>
+        <NuqsTestingAdapter>
+          <AppShell header={null} main={<Boom />} assistant={() => <p>Assistant content</p>} />
+        </NuqsTestingAdapter>
+      </NextIntlClientProvider>,
+    );
+    expect(screen.getByText('Assistant content')).toBeInTheDocument();
+    expect(within(screen.getByRole('main')).getByText(en.errors.sectionTitle)).toBeInTheDocument();
   });
 });

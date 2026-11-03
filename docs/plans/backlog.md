@@ -6,7 +6,7 @@ Format: **Item**: what is wrong (file). Why it can wait. Where it goes.
 
 ## From the Plan 1 review (foundation, 2026-11-03)
 
-- **SSE errors lose detail**: `streamSse` drops the API error `code` from a non-2xx JSON body and does not check that `Content-Type` is `text/event-stream` (`src/shared/api/http/stream-sse.ts`). No UI reads it yet. **Plan 2**, first task.
+- **SSE errors lose detail**: `streamSse` drops the API error `code` from a non-2xx JSON body and does not check that `Content-Type` is `text/event-stream` (`src/shared/api/http/stream-sse.ts`). No UI reads it yet; not done in Plan 2. **Plan 5**, hardening.
 - **Region → market hierarchy not enforced**: a URL with a market outside the selected region is accepted (`src/entities/performance`, URL state). No drill-down UI yet. **Plan 3**, with nuqs parsers.
 - **Locale switch rewrites the query**: repeated query keys collapse to one and `#hash` is dropped (`src/features/switch-locale/model/use-switch-locale.ts`). No repeated keys or hashes in use today. **Plan 3**, when URL state lands.
 - **Arbitrary Tailwind values in shadcn components** (`src/shared/ui/*`), against `.claude/rules/ui.md`. Generated code. **Design pass**, with the semantic tokens.
@@ -36,3 +36,4 @@ Format: **Item**: what is wrong (file). Why it can wait. Where it goes.
 - **Phone bottom tab bar look** (`SectionTabBar`): the owner likes it for now but may want it tuned once the dashboard sections land. **Plan 3**, with the D phone screens (Overview / Assistant / Alerts).
 - **Phone `?tab=assistant` deep link paints Overview first** until hydration. Same fix as the panel (ADR 0015). **Plan 3**, with the phone layout.
 - **"Show on dashboard" keeps an earlier region/market filter** (`src/entities/performance/model/use-dashboard-focus.ts`, `highlight`): highlighted markets can fall outside the filtered scope. Nothing reads the URL yet, and whether to reset the scope is a dashboard decision. **Plan 3**, ask the owner when the dashboard reads `markets`.
+- **"New content" smooth scroll can stop short** while tokens keep arriving (PLAUSIBLE, not reproduced; `use-stick-to-bottom.ts`), and sending a question while scrolled up does not jump to it. **Plan 5**, with the Playwright happy path.

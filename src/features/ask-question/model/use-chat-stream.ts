@@ -26,6 +26,11 @@ export type ChatStream = {
 
 type Active = { id: string; controller: AbortController };
 
+/** The assistant reported a failure; `name` is the `code` in the log. */
+class ChatServerError extends Error {
+  override readonly name = 'ChatServerError';
+}
+
 // Not JSON is invalid data too; `undefined` then fails the schema.
 function parseJson(data: string): unknown {
   try {
@@ -65,11 +70,17 @@ export function useChatStream(): ChatStream {
               dispatch({ type: 'token', id, value: event.value });
             } else if (event.type === 'done') {
               const { kind, citations, confidence } = event;
+              if (kind === 'error') {
+                logError(new ChatServerError('Answer ended with kind error'), {
+                  scope: 'chat',
+                  event: 'done',
+                });
+              }
               dispatch({ type: 'done', id, kind, citations, confidence });
               settle();
             } else {
               // The server's text is for the log; the user gets a translated message.
-              logError(new Error(event.message), { scope: 'chat', event: 'error' });
+              logError(new ChatServerError(event.message), { scope: 'chat', event: 'error' });
               dispatch({ type: 'failed', id, error: { key: 'errors.server' } });
               settle();
             }

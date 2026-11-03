@@ -36,7 +36,12 @@ describe('messages', () => {
   it.each([
     ['en-GB' as const, en, '1 of 2 markets needs attention', '1 of 2 markets in X needs attention'],
     ['de-DE' as const, de, '1 von 2 Märkten braucht', '1 von 2 Märkten in X braucht'],
-    ['ru-RU' as const, ru, 'Внимания требует 1 из 2 рынков', 'Внимания требует 1 из 2 рынков региона X'],
+    [
+      'ru-RU' as const,
+      ru,
+      'Внимания требует 1 из 2 рынков',
+      'Внимания требует 1 из 2 рынков региона X',
+    ],
   ])('%s: the attention lines agree with one market', (locale, messages, all, region) => {
     const t = createTranslator({ locale, messages, namespace: 'dataCheck' });
     expect(t('attention', { needAttention: 1, markets: 2, named: 0 })).toContain(all);

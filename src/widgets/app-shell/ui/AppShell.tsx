@@ -6,7 +6,7 @@ import { type ReactNode, useCallback, useMemo, useRef, useState } from 'react';
 
 import { SectionTabBar, useSection } from '@/features/switch-section';
 import { cn, useMediaQuery } from '@/shared/lib';
-import { Button } from '@/shared/ui';
+import { Button, WidgetBoundary } from '@/shared/ui';
 
 import { usePanelCollapsed } from '../model/use-panel-collapsed';
 
@@ -108,7 +108,8 @@ export function AppShell({ header, main, assistant }: AppShellProps) {
             section === 'assistant' && 'max-lg:hidden',
           )}
         >
-          {main}
+          {/* Each side fails on its own: a crash in one keeps the other. */}
+          <WidgetBoundary>{main}</WidgetBoundary>
         </main>
         <aside
           aria-label={t('assistant')}
@@ -134,7 +135,9 @@ export function AppShell({ header, main, assistant }: AppShellProps) {
               ) : null}
             </Button>
           </div>
-          <div className="min-h-0 flex-1 lg:assistant-collapsed:hidden">{assistant(api)}</div>
+          <div className="min-h-0 flex-1 lg:assistant-collapsed:hidden">
+            <WidgetBoundary>{assistant(api)}</WidgetBoundary>
+          </div>
         </aside>
       </div>
       <div className="lg:hidden">
@@ -156,7 +159,8 @@ export function AppShellFallback({ header, main }: Pick<AppShellProps, 'header' 
       <header className="border-b border-border">{header}</header>
       <div className="flex min-h-0 flex-1">
         <main id="main" className="min-w-0 flex-1 overflow-y-auto">
-          {main}
+          {/* Each side fails on its own: a crash in one keeps the other. */}
+          <WidgetBoundary>{main}</WidgetBoundary>
         </main>
         <aside aria-label={t('assistant')} className={cn(ASIDE, 'max-lg:hidden')} />
       </div>

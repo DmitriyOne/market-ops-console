@@ -22,6 +22,8 @@ import { useKpiFormat } from './use-kpi-format';
 type SourceButtonProps = {
   citation: Citation;
   ds: Dataset | undefined;
+  /** Shown instead of "Loading data…" when the dataset failed to load. */
+  dataError?: string | null;
   onSelect: (r: ResolvedCitation) => void;
 };
 
@@ -31,7 +33,7 @@ const TRIGGER = 'min-h-11 rounded-lg border-surface-ai-border text-surface-ai-la
  * One cited source. Fine pointers: hover or focus shows the evidence card,
  * click focuses the dashboard. Touch: tap opens the card, which has the button.
  */
-export function SourceButton({ citation, ds, onSelect }: SourceButtonProps) {
+export function SourceButton({ citation, ds, dataError = null, onSelect }: SourceButtonProps) {
   const t = useTranslations('assistant.evidence');
   const f = useKpiFormat();
   const coarse = useMediaQuery('(pointer: coarse)');
@@ -41,7 +43,7 @@ export function SourceButton({ citation, ds, onSelect }: SourceButtonProps) {
   const card = resolved ? (
     <EvidenceCard resolved={resolved} ds={ds} />
   ) : (
-    <p className="text-sm text-muted-foreground">{t('loading')}</p>
+    <p className="text-sm text-muted-foreground">{dataError ?? t('loading')}</p>
   );
   const select = () => {
     if (!resolved?.known) return;

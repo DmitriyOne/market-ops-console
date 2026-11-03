@@ -11,6 +11,7 @@ import {
   useDashboardFocus,
 } from '@/entities/performance';
 import { Composer, SuggestedQuestions, useChatStream } from '@/features/ask-question';
+import { useErrorMessage } from '@/shared/api';
 
 import { AnswerMessage, isCantAnswer } from './AnswerMessage';
 import { Conversation } from './Conversation';
@@ -35,7 +36,9 @@ export function AssistantPanel({
   const t = useTranslations('assistant.panel');
   const chat = useChatStream();
   // Not suspense: the chat works even if the dataset fails to load.
-  const { data: ds } = useQuery(datasetQueryOptions);
+  const { data: ds, error: dsError } = useQuery(datasetQueryOptions);
+  // Logged by the query cache; here it only replaces "Loading data…".
+  const dataError = useErrorMessage()(dsError);
   const { focus, highlight } = useDashboardFocus();
 
   const notified = useRef(new Set<string>());
@@ -88,6 +91,7 @@ export function AssistantPanel({
             <AnswerMessage
               message={message}
               ds={ds}
+              dataError={dataError}
               onAsk={chat.ask}
               onRetry={chat.retry}
               onSource={onSource}

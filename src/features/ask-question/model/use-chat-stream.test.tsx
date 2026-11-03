@@ -58,8 +58,48 @@ describe('useChatStream', () => {
     const event = fixtureEvents('error')[0];
     expect(errors).toHaveBeenCalledWith(
       '[chat]',
-      expect.objectContaining({ message: event?.type === 'error' ? event.message : '' }),
+      expect.objectContaining({
+        code: 'ChatServerError',
+        message: event?.type === 'error' ? event.message : '',
+      }),
     );
+  });
+
+  it('done with kind error is shown as a server error and logged', async () => {
+    const errors = consoleErrors();
+    server.use(chatStream([{ type: 'done', kind: 'error', citations: [], confidence: 'low' }]));
+    const { result } = setup();
+    act(() => {
+      result.current.ask('anything');
+    });
+    await waitFor(() => {
+      expect(result.current.messages[0]?.error).toEqual({ key: 'errors.server' });
+    });
+    expect(errors).toHaveBeenCalledWith(
+      '[chat]',
+      expect.objectContaining({ code: 'ChatServerError' }),
+    );
+  });
+
+  it('stop and unmount are not logged as errors', async () => {
+    const errors = consoleErrors();
+    server.use(chatFromFixture('germany-dip', { stallAfter: 1 }));
+    const { result, unmount } = setup();
+    act(() => {
+      result.current.ask('Why Germany?');
+    });
+    await waitFor(() => {
+      expect(result.current.messages[0]?.text).not.toBe('');
+    });
+    act(() => {
+      result.current.stop();
+    });
+    act(() => {
+      result.current.ask('Why Germany?');
+    });
+    unmount();
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(errors).not.toHaveBeenCalled();
   });
 
   it('HTTP 500 ends in error with key errors.server and is logged once', async () => {

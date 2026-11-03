@@ -8,7 +8,6 @@ import { useMediaQuery } from '@/shared/lib';
 const BOTTOM_SLACK_PX = 16;
 
 export type StickToBottom = {
-  atBottom: boolean;
   showNewContent: boolean;
   scrollToBottom: () => void;
 };
@@ -23,7 +22,6 @@ export function useStickToBottom(
   contentKey: unknown,
 ): StickToBottom {
   const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
-  const [atBottom, setAtBottom] = useState(true);
   const [showNewContent, setShowNewContent] = useState(false);
   const atBottomRef = useRef(true);
 
@@ -33,7 +31,6 @@ export function useStickToBottom(
     const onScroll = () => {
       const bottom = el.scrollHeight - el.scrollTop - el.clientHeight <= BOTTOM_SLACK_PX;
       atBottomRef.current = bottom;
-      setAtBottom(bottom);
       if (bottom) setShowNewContent(false);
     };
     el.addEventListener('scroll', onScroll, { passive: true });
@@ -58,9 +55,8 @@ export function useStickToBottom(
     if (!el) return;
     el.scrollTo({ top: el.scrollHeight, behavior: reducedMotion ? 'auto' : 'smooth' });
     atBottomRef.current = true;
-    setAtBottom(true);
     setShowNewContent(false);
   }, [ref, reducedMotion]);
 
-  return { atBottom, showNewContent, scrollToBottom };
+  return { showNewContent, scrollToBottom };
 }

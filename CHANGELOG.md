@@ -6,35 +6,31 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 
 ### Added
 - Assistant (ADR 0014, variant A): streamed answers with Stop, Retry, confidence and one source button per citation; hover, focus or tap shows an evidence card with the real numbers; clicking focuses the dashboard through the URL.
-- "What the data shows" block under each answer: portfolio row, cited rows and two deterministic gap rules ("Not mentioned" markets, region gaps), expanded when a gap is found; "Show on dashboard" highlights the listed markets.
-- Composer with Enter / Shift+Enter / Esc, a 500-character limit with counter, four suggested questions (translated label, English question) and an "English only" notice for non-English text.
-- App shell: assistant as a right panel on desktop (collapsible, remembered, badge for unseen answers), Overview / Assistant tabs on phones.
+- "What the data shows" table under each answer: portfolio row, cited rows and two deterministic gap rules ("Not mentioned in the answer", region gaps, each market listed once), closed by default with the gap count in its header; "Show on dashboard" highlights the listed markets.
+- Composer with Enter / Shift+Enter / Esc, a 500-character limit with counter and four suggested questions (translated label, English question). A non-English question gets a client-side reply "I only understand English…" instead of being sent.
+- Answers without matching data read as "I can't answer this from the data"; the suggested questions appear after two such replies in a row.
+- App shell: assistant as a right panel on desktop (collapsible, remembered and applied before the first paint, ADR 0015, badge for unseen answers), Overview / Assistant tabs on phones. Dashboard and assistant each sit in their own error boundary.
+- Page title and description per locale; `noindex, nofollow` (internal console).
+- `AGENTS.md` (entry point for coding agents, keeps the `next dev` block) and `DESIGN.md` (tokens, type, spacing, inventory, checklist).
 - MSW test harness for the SSE chat stream and the data route.
 
-### Changed (owner review, 2026-11-03)
-- Assistant header "Assistant · Answers in English"; one-line composer placeholder.
-- A non-English question gets a reply "I only understand English…" instead of being sent.
-- Answers without matching data read as "I can't answer this from the data"; the suggested questions appear after two such replies in a row.
+### Changed
+- A streaming answer starts in a neutral frame; the AI or "can't answer" style is applied at `done`, when its kind is known.
+- Chat failures are logged once to the console (`[chat]`, named errors) and shown as a translated message; the server's own text stays in the log.
 - Confidence shown as three equal bars; percents always with one decimal.
-- Evidence card: latest status for a past month, the month's anomaly, a marked trend with period labels.
-- "What the data shows" is a table like the design reference, with "Not mentioned in the answer" and an attention summary; closed by default, the header notes gaps.
-- Page title and description per locale; `noindex, nofollow` (internal console).
-- Pointer cursor on clickable controls; hover cards keep 15px from the screen edge; the evidence chart fills the card.
-
-- A streaming answer starts in a neutral frame; the AI or "can't answer" style is applied when it finishes (its kind arrives only at `done`).
-- `AGENTS.md` (entry point for coding agents, keeps the `next dev` block) and `DESIGN.md` (tokens, type, spacing, inventory, checklist).
-
-### Fixed
-- Screen-reader-only text inside the chat log no longer stretches the page with an empty scroll area.
-- A collapsed assistant no longer flashes open on reload: the state is applied in `<head>` before the first paint.
+- Evidence card: latest status for a past month, the month's anomaly, a full-width trend with period labels; a failed dataset load shows the error instead of "Loading data…".
+- Pointer cursor on clickable controls; floating cards keep 15px from the screen edge.
+- `withErrorHandling` is exported only from `@/shared/api/server`.
 
 ### Fixed
 - Chat route validates the request before reading fixtures, so a bad request is always a 400.
 - A failing write in the chat stream can no longer throw out of the stream's error fallback.
 - Error logs use the error name (e.g. `TimeoutError`) as `code` for errors that are not `AppError`.
-
-### Changed
-- `withErrorHandling` is exported only from `@/shared/api/server`.
+- Screen-reader-only text inside the chat log no longer stretches the page with an empty scroll area.
+- A server that keeps the stream open after `done` no longer blocks the next question.
+- Keyboard focus follows collapse / expand and stays in the composer after a suggestion or Stop.
+- The evidence popover closes when it sends a phone to the dashboard; the unread badge clears on Back.
+- The collapsed state stays in sync across tabs and with full storage.
 
 ## [0.3.0] - Unreleased
 

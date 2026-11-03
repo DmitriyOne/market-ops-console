@@ -212,6 +212,21 @@ describe('AssistantPanel', () => {
     });
   });
 
+  it('dataset failure: a source card explains the error instead of loading forever', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    server.use(datasetHandler({ status: 500 }), chatFromFixture('germany-dip'));
+    const { user } = setup();
+    await ask(user, 'Why did Germany dip?');
+    await answerDone();
+    const [source] = within(screen.getByRole('list', { name: t.answer.sources })).getAllByRole(
+      'button',
+    );
+    if (!source) throw new Error('no source');
+    await user.hover(source);
+    expect(await screen.findByText(en.errors.server)).toBeInTheDocument();
+    expect(screen.queryByText(t.evidence.loading)).not.toBeInTheDocument();
+  });
+
   it('stop mid-stream shows the stopped state and no sources', async () => {
     server.use(chatFromFixture('at-risk', { stallAfter: 3 }));
     const { user } = setup();

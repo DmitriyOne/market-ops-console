@@ -111,6 +111,8 @@ function AiSurface({
 type AnswerMessageProps = {
   message: ChatMessage;
   ds: Dataset | undefined;
+  /** Why the dataset is missing, if it failed to load. */
+  dataError?: string | null;
   onAsk: (question: string) => void;
   onRetry: (id: string) => void;
   onSource: (r: ResolvedCitation) => void;
@@ -124,6 +126,7 @@ type AnswerMessageProps = {
 export function AnswerMessage({
   message,
   ds,
+  dataError = null,
   onAsk,
   onRetry,
   onSource,
@@ -236,7 +239,7 @@ export function AnswerMessage({
           <ul aria-label={t('answer.sources')} className="flex flex-wrap gap-1.5">
             {citations.map((c, i) => (
               <li key={i}>
-                <SourceButton citation={c} ds={ds} onSelect={onSource} />
+                <SourceButton citation={c} ds={ds} dataError={dataError} onSelect={onSource} />
               </li>
             ))}
           </ul>

@@ -55,7 +55,6 @@ describe('useStickToBottom', () => {
     act(() => {
       el.dispatchEvent(new Event('scroll'));
     });
-    expect(result.current.atBottom).toBe(false);
     box.scrollHeight = 800;
     rerender({ key: 2 });
     expect(box.scrollTop).toBe(0);

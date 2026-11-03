@@ -161,7 +161,8 @@ Rules: drill-down params are hierarchical (setting `market` sets its `region`; c
    - **discrepancy rule** (deterministic, no AI; "mentioned" = present in citations, answer text is never parsed) **[owner]**:
      - *market list*: if **two or more** markets are cited and all are non-on-track, list every non-on-track market from the data and mark the uncited ones "Not mentioned";
      - *region gaps*: for every cited region, its row lists the region's non-on-track markets that are not cited;
-     - verified against fixtures: `at-risk` and `forecast-miss` expand (+ ES, FR, GB); `apac-vs-europe` expands (all 5 EU markets non-on-track); `summary-long` expands (ES, FR, GB, IT); `germany-dip`, `next-year`, `error`, `default` stay collapsed;
+     - a market found by both rules is listed once (under "Not mentioned");
+     - verified against fixtures: `at-risk` and `forecast-miss` find gaps (+ ES, FR, GB); `apac-vs-europe` (all 5 EU markets non-on-track); `summary-long` (ES, FR, GB, IT); `germany-dip` finds none; `next-year`, `error`, `default` have no block;
    - Spain-type rows show the reason next to the status (e.g. "Growth −4.6% YoY") [call];
    - button "Show on dashboard" highlights the listed markets on the map and table **[owner]**.
    - Collapsed by default, also when a rule finds a gap; the header then shows "N markets not mentioned" **[owner, revised 2026-11-03]**. Hidden when the answer has no citations (e.g. `default`).
