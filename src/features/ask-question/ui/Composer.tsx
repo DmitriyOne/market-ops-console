@@ -5,12 +5,10 @@ import { useTranslations } from 'next-intl';
 import { type KeyboardEvent, type SubmitEvent, useId, useState } from 'react';
 
 import { CHAT_QUESTION_MAX_LENGTH } from '@/shared/api';
+import { cn } from '@/shared/lib';
 import { Button, Textarea } from '@/shared/ui';
 
 const COUNTER_FROM = 450;
-// A letter outside A–Z: Cyrillic, umlauts, accents. German without umlauts
-// is not caught; accepted (owner decision, 2026-11-03).
-const NON_ENGLISH_LETTER = /(?![A-Za-z])\p{L}/u;
 
 type ComposerProps = {
   isStreaming: boolean;
@@ -32,8 +30,6 @@ export function Composer({ isStreaming, onAsk, onStop }: ComposerProps) {
       : tooLong
         ? t('tooLongReason', { max: CHAT_QUESTION_MAX_LENGTH })
         : null;
-
-  const nonEnglish = NON_ENGLISH_LETTER.test(value);
 
   const send = () => {
     if (!canSend) return;
@@ -69,11 +65,7 @@ export function Composer({ isStreaming, onAsk, onStop }: ComposerProps) {
           readOnly={isStreaming}
           aria-disabled={isStreaming}
           aria-invalid={tooLong}
-          aria-describedby={
-            [nonEnglish ? `${reasonId}-lang` : '', tooLong ? reasonId : '']
-              .filter(Boolean)
-              .join(' ') || undefined
-          }
+          aria-describedby={tooLong ? reasonId : undefined}
           rows={1}
           className="max-h-40 min-h-11 resize-none text-base md:text-base"
           onChange={(event) => {
@@ -104,16 +96,16 @@ export function Composer({ isStreaming, onAsk, onStop }: ComposerProps) {
           </Button>
         )}
       </div>
-      <div className="flex min-h-5 items-start justify-between gap-3 text-xs">
-        <p id={`${reasonId}-lang`} aria-live="polite" className="text-muted-foreground">
-          {nonEnglish ? t('englishOnly') : null}
-        </p>
-        {question.length >= COUNTER_FROM ? (
-          <span className={tooLong ? 'font-medium text-destructive' : 'text-muted-foreground'}>
-            {t('counter', { count: question.length, max: CHAT_QUESTION_MAX_LENGTH })}
-          </span>
-        ) : null}
-      </div>
+      {question.length >= COUNTER_FROM ? (
+        <span
+          className={cn(
+            'self-end text-xs',
+            tooLong ? 'font-medium text-destructive' : 'text-muted-foreground',
+          )}
+        >
+          {t('counter', { count: question.length, max: CHAT_QUESTION_MAX_LENGTH })}
+        </span>
+      ) : null}
       <p id={reasonId} className={tooLong ? 'text-xs text-destructive' : 'sr-only'}>
         {reason}
       </p>

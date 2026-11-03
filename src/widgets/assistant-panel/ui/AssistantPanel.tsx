@@ -3,7 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { SparklesIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useEffect, useRef } from 'react';
+import { type ReactNode, useEffect, useRef } from 'react';
 
 import {
   datasetQueryOptions,
@@ -12,7 +12,7 @@ import {
 } from '@/entities/performance';
 import { Composer, SuggestedQuestions, useChatStream } from '@/features/ask-question';
 
-import { AnswerMessage } from './AnswerMessage';
+import { AnswerMessage, isCantAnswer } from './AnswerMessage';
 import { Conversation } from './Conversation';
 
 type AssistantPanelProps = {
@@ -20,9 +20,18 @@ type AssistantPanelProps = {
   onAnswerDone?: () => void;
   /** A source was opened on the dashboard (the phone shell switches to it). */
   onFocusDashboard?: () => void;
+  /** A control for the header row, e.g. the shell's collapse button. */
+  headerAction?: ReactNode;
 };
 
-export function AssistantPanel({ onAnswerDone, onFocusDashboard }: AssistantPanelProps) {
+// From this many "can't answer" replies in a row, offer the suggested questions.
+const SUGGEST_AFTER = 2;
+
+export function AssistantPanel({
+  onAnswerDone,
+  onFocusDashboard,
+  headerAction,
+}: AssistantPanelProps) {
   const t = useTranslations('assistant.panel');
   const chat = useChatStream();
   // Not suspense: the chat works even if the dataset fails to load.
@@ -48,15 +57,29 @@ export function AssistantPanel({ onAnswerDone, onFocusDashboard }: AssistantPane
     onFocusDashboard?.();
   };
 
+  const last = chat.messages.at(-1);
+  let streak = 0;
+  for (let i = chat.messages.length - 1; i >= 0; i--) {
+    const m = chat.messages[i];
+    if (!m || !isCantAnswer(m)) break;
+    streak += 1;
+  }
+
   return (
-    <section aria-label={t('title')} className="flex h-full min-h-0 flex-col bg-card">
+    <section aria-labelledby="assistant-title" className="flex h-full min-h-0 flex-col bg-card">
+      <header className="flex min-h-14 items-center gap-2 border-b border-border px-4">
+        <SparklesIcon aria-hidden className="size-4 text-surface-ai-label" />
+        <h2 id="assistant-title" className="text-base font-semibold">
+          {t('title')}
+        </h2>
+        <span className="flex-1 text-sm text-muted-foreground">{t('subtitle')}</span>
+        {headerAction}
+      </header>
       {chat.messages.length === 0 ? (
         <div className="flex flex-1 flex-col gap-3 overflow-y-auto p-4">
-          <SparklesIcon aria-hidden className="size-7 text-surface-ai-label" />
-          <h2 className="text-lg font-semibold">{t('empty.title')}</h2>
+          <h3 className="text-lg font-semibold">{t('empty.title')}</h3>
           <p className="text-sm text-muted-foreground">{t('empty.body')}</p>
           <SuggestedQuestions onAsk={chat.ask} />
-          <p className="text-xs text-muted-foreground">{t('empty.englishNote')}</p>
         </div>
       ) : (
         <Conversation
@@ -69,6 +92,7 @@ export function AssistantPanel({ onAnswerDone, onFocusDashboard }: AssistantPane
               onRetry={chat.retry}
               onSource={onSource}
               onHighlight={onHighlight}
+              showSuggestions={message.id === last?.id && streak >= SUGGEST_AFTER}
             />
           )}
         />

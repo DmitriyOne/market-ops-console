@@ -1,14 +1,6 @@
 'use client';
 
-import {
-  CircleSlashIcon,
-  SignalHighIcon,
-  SignalLowIcon,
-  SignalMediumIcon,
-  SparklesIcon,
-  SquareIcon,
-  TriangleAlertIcon,
-} from 'lucide-react';
+import { CircleSlashIcon, SparklesIcon, SquareIcon, TriangleAlertIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useMemo } from 'react';
 
@@ -25,10 +17,31 @@ import { SourceButton } from './SourceButton';
 import { useKpiFormat } from './use-kpi-format';
 
 const CONFIDENCE = {
-  high: { Icon: SignalHighIcon, className: 'text-confidence-high' },
-  medium: { Icon: SignalMediumIcon, className: 'text-confidence-medium' },
-  low: { Icon: SignalLowIcon, className: 'text-confidence-low' },
+  high: { bars: 3, className: 'text-confidence-high' },
+  medium: { bars: 2, className: 'text-confidence-medium' },
+  low: { bars: 1, className: 'text-confidence-low' },
 } as const;
+
+/** Three equal bars, `filled` of them solid: the level is the count, not a staircase. */
+function ConfidenceMeter({ filled }: { filled: number }) {
+  return (
+    <span aria-hidden className="flex items-center gap-0.5">
+      {[1, 2, 3].map((bar) => (
+        <span
+          key={bar}
+          className={cn('h-3 w-1.5 rounded-sm bg-current', bar > filled && 'opacity-25')}
+        />
+      ))}
+    </span>
+  );
+}
+
+/** Answers that say the assistant could not answer from the data. */
+export function isCantAnswer(m: ChatMessage): boolean {
+  if (m.notice) return true;
+  if (m.status !== 'done') return false;
+  return m.kind === 'abstain' || (m.kind === 'low_confidence' && m.citations.length === 0);
+}
 
 /** AI text as plain paragraphs, never as HTML or Markdown. */
 function Paragraphs({ text, caret }: { text: string; caret?: boolean }) {
@@ -48,10 +61,10 @@ function Paragraphs({ text, caret }: { text: string; caret?: boolean }) {
 
 function ConfidenceLine({ confidence }: { confidence: Confidence }) {
   const t = useTranslations('assistant.answer');
-  const { Icon, className } = CONFIDENCE[confidence];
+  const { bars, className } = CONFIDENCE[confidence];
   return (
-    <p className={cn('flex items-center gap-1.5 text-sm font-semibold', className)}>
-      <Icon aria-hidden className="size-4" />
+    <p className={cn('flex items-center gap-2 text-sm font-semibold', className)}>
+      <ConfidenceMeter filled={bars} />
       {t('confidence', { level: t(confidence) })}
       {confidence === 'low' ? (
         <span className="font-normal text-muted-foreground">· {t('directional')}</span>
@@ -92,6 +105,8 @@ type AnswerMessageProps = {
   onRetry: (id: string) => void;
   onSource: (r: ResolvedCitation) => void;
   onHighlight: (marketIds: string[]) => void;
+  /** Offer the suggested questions (after repeated "can't answer"). */
+  showSuggestions?: boolean;
 };
 
 export function AnswerMessage({
@@ -101,11 +116,12 @@ export function AnswerMessage({
   onRetry,
   onSource,
   onHighlight,
+  showSuggestions = false,
 }: AnswerMessageProps) {
   const t = useTranslations('assistant');
   const tRoot = useTranslations();
   const f = useKpiFormat();
-  const { status, kind, text, citations, confidence, error } = message;
+  const { status, text, citations, confidence, error } = message;
 
   const check = useMemo(
     () => (ds && status === 'done' ? buildDataCheck(ds, citations) : null),
@@ -181,21 +197,21 @@ export function AnswerMessage({
     );
   }
 
-  if (kind === 'abstain') {
+  if (isCantAnswer(message)) {
     const first = ds?.meta.periods[0];
     return (
       <div className="flex flex-col gap-2 rounded-xl border border-dashed border-border bg-muted p-3 text-sm">
         <p className="flex items-center gap-1.5 font-semibold">
           <CircleSlashIcon aria-hidden className="size-4" />
-          {t('abstain.title')}
+          {message.notice ? t(`declined.${message.notice}`) : t('abstain.title')}
         </p>
-        <Paragraphs text={text} />
-        {ds && first ? (
+        {text ? <Paragraphs text={text} /> : null}
+        {!message.notice && ds && first ? (
           <p className="text-xs text-muted-foreground">
             {t('abstain.coverage', { from: f.period(first), to: f.period(ds.meta.latestPeriod) })}
           </p>
         ) : null}
-        <SuggestedQuestions onAsk={onAsk} />
+        {showSuggestions ? <SuggestedQuestions onAsk={onAsk} /> : null}
       </div>
     );
   }

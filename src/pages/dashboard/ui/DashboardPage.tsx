@@ -57,7 +57,11 @@ export function DashboardPage() {
         header={<Header />}
         main={<Main />}
         assistant={(api) => (
-          <AssistantPanel onAnswerDone={api.notifyAnswer} onFocusDashboard={api.showMain} />
+          <AssistantPanel
+            onAnswerDone={api.notifyAnswer}
+            onFocusDashboard={api.showMain}
+            headerAction={api.headerAction}
+          />
         )}
       />
     </Suspense>

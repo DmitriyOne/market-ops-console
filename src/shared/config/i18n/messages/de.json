@@ -45,13 +45,12 @@
   "assistant": {
     "composer": {
       "label": "Frage zu den Daten",
-      "placeholder": "Fragen Sie nach Märkten, Produkten oder Zeiträumen…",
+      "placeholder": "Frage stellen",
       "send": "Senden",
       "stop": "Antwort stoppen",
       "blankReason": "Geben Sie eine Frage ein, um sie zu senden.",
       "tooLongReason": "Fragen dürfen höchstens {max} Zeichen lang sein.",
-      "counter": "{count} / {max}",
-      "englishOnly": "Der Assistent versteht nur Englisch."
+      "counter": "{count} / {max}"
     },
     "suggestions": {
       "title": "Beispielfragen",
@@ -64,11 +63,11 @@
       "title": "Assistent",
       "empty": {
         "title": "Fragen zum Portfolio",
-        "body": "Antworten stammen von der KI und können unvollständig sein. Jede Antwort zeigt ihre Quellen und die passenden Daten, damit Sie sie prüfen können.",
-        "englishNote": "Antworten sind auf Englisch."
+        "body": "Antworten stammen von der KI und können unvollständig sein. Jede Antwort zeigt ihre Quellen und die passenden Daten, damit Sie sie prüfen können."
       },
       "youAsked": "Ihre Frage",
-      "newContent": "Neuer Inhalt"
+      "newContent": "Neuer Inhalt",
+      "subtitle": "Antwortet auf Englisch"
     },
     "answer": {
       "label": "KI-Antwort · möglicherweise unvollständig",
@@ -88,7 +87,7 @@
     },
     "abstain": {
       "title": "Das kann ich aus den Daten nicht beantworten",
-      "coverage": "Die Daten reichen von {from} bis {to}. Versuchen Sie:"
+      "coverage": "Die Daten reichen von {from} bis {to}."
     },
     "error": {
       "title": "Keine Antwort",
@@ -104,7 +103,11 @@
       "trend": "Umsatz {name}, letzte 12 Monate",
       "showOnDashboard": "Im Dashboard zeigen",
       "clickHint": "Klicken, um im Dashboard zu zeigen",
-      "loading": "Daten werden geladen…"
+      "loading": "Daten werden geladen…",
+      "latestStatus": "Status, {period}"
+    },
+    "declined": {
+      "englishOnly": "Ich verstehe nur Englisch. Bitte stellen Sie Ihre Frage auf Englisch."
     }
   },
   "dataCheck": {
@@ -113,18 +116,19 @@
     "details": "Details",
     "portfolio": "Portfolio",
     "name": "Bereich",
-    "attainment": "Zielerreichung",
-    "growth": "Wachstum ggü. Vorjahr",
+    "attainment": "Ziel",
+    "growth": "Wachstum",
     "status": "Status",
-    "notMentioned": "Nicht erwähnt",
-    "regionGap": "{region}: in der Antwort nicht erwähnt",
+    "notMentioned": "In der Antwort nicht erwähnt",
     "showOnDashboard": "Im Dashboard zeigen",
     "onTrack": "Im Plan",
     "atRisk": "Gefährdet",
     "offTrack": "Unter Plan",
     "noStatus": "—",
     "reasonGrowth": "Wachstum {value} ggü. Vorjahr",
-    "reasonAttainment": "{value} des Plans"
+    "latestOnly": "nur aktuell",
+    "attention": "{needAttention} von {markets} Märkten brauchen Aufmerksamkeit; die Antwort nennt {named}.",
+    "attentionRegion": "{needAttention} von {markets} Märkten in {region} brauchen Aufmerksamkeit; die Antwort nennt {named}."
   },
   "shell": {
     "assistant": "Assistent",

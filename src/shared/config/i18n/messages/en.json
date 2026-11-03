@@ -45,13 +45,12 @@
   "assistant": {
     "composer": {
       "label": "Ask about the data",
-      "placeholder": "Ask about markets, products or periods…",
+      "placeholder": "Ask a question",
       "send": "Send",
       "stop": "Stop answer",
       "blankReason": "Type a question to send it.",
       "tooLongReason": "Questions can be up to {max} characters.",
-      "counter": "{count} / {max}",
-      "englishOnly": "The assistant understands English only."
+      "counter": "{count} / {max}"
     },
     "suggestions": {
       "title": "Try asking",
@@ -64,11 +63,11 @@
       "title": "Assistant",
       "empty": {
         "title": "Ask about the portfolio",
-        "body": "Answers come from the AI and may be incomplete. Each answer shows its sources and the matching data, so you can check it.",
-        "englishNote": "Answers are in English."
+        "body": "Answers come from the AI and may be incomplete. Each answer shows its sources and the matching data, so you can check it."
       },
       "youAsked": "You asked",
-      "newContent": "New content"
+      "newContent": "New content",
+      "subtitle": "Answers in English"
     },
     "answer": {
       "label": "AI answer · may be incomplete",
@@ -88,7 +87,7 @@
     },
     "abstain": {
       "title": "I can't answer this from the data",
-      "coverage": "The data covers {from} – {to}. Try:"
+      "coverage": "The data covers {from} – {to}."
     },
     "error": {
       "title": "No answer",
@@ -104,7 +103,11 @@
       "trend": "{name} revenue, last 12 months",
       "showOnDashboard": "Show on dashboard",
       "clickHint": "Click to show on dashboard",
-      "loading": "Loading data…"
+      "loading": "Loading data…",
+      "latestStatus": "Status, {period}"
+    },
+    "declined": {
+      "englishOnly": "I only understand English. Please ask your question in English."
     }
   },
   "dataCheck": {
@@ -113,18 +116,19 @@
     "details": "Details",
     "portfolio": "Portfolio",
     "name": "Scope",
-    "attainment": "Attainment",
-    "growth": "Growth YoY",
+    "attainment": "Attain.",
+    "growth": "Growth",
     "status": "Status",
-    "notMentioned": "Not mentioned",
-    "regionGap": "{region}: not mentioned in the answer",
+    "notMentioned": "Not mentioned in the answer",
     "showOnDashboard": "Show on dashboard",
     "onTrack": "On track",
     "atRisk": "At risk",
     "offTrack": "Off track",
     "noStatus": "—",
     "reasonGrowth": "Growth {value} YoY",
-    "reasonAttainment": "{value} of plan"
+    "latestOnly": "latest only",
+    "attention": "{needAttention} of {markets} markets need attention; the answer names {named}.",
+    "attentionRegion": "{needAttention} of {markets} markets in {region} need attention; the answer names {named}."
   },
   "shell": {
     "assistant": "Assistant",

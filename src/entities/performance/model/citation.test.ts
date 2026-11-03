@@ -63,6 +63,22 @@ describe('evidenceFor', () => {
     expect(evidence?.trend.at(-1)?.period).toBe('2026-03');
   });
 
+  it('gives the latest status and the anomaly of a market in a past month', () => {
+    const evidence = evidenceFor(ds, resolveCitation(ds, { marketId: 'de', period: '2026-03' }));
+    expect(evidence?.status).toBeNull();
+    expect(evidence?.latestStatus).toBe('off_track');
+    expect(evidence?.anomaly).toEqual({
+      type: 'dip',
+      note: 'Revenue fell 27% versus the prior month.',
+    });
+  });
+
+  it('has no anomaly in a month without one, and no latest status for a region', () => {
+    const evidence = evidenceFor(ds, resolveCitation(ds, { regionId: 'eu', period: '2026-02' }));
+    expect(evidence?.anomaly).toBeNull();
+    expect(evidence?.latestStatus).toBeNull();
+  });
+
   it('has no status for a product even at the latest month', () => {
     const evidence = evidenceFor(ds, resolveCitation(ds, { marketId: 'de', productId: 'veltrix' }));
     expect(evidence?.status).toBeNull();

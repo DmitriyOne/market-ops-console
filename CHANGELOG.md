@@ -11,6 +11,14 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 - App shell: assistant as a right panel on desktop (collapsible, remembered, badge for unseen answers), Overview / Assistant tabs on phones.
 - MSW test harness for the SSE chat stream and the data route.
 
+### Changed (owner review, 2026-11-03)
+- Assistant header "Assistant · Answers in English"; one-line composer placeholder.
+- A non-English question gets a reply "I only understand English…" instead of being sent.
+- Answers without matching data read as "I can't answer this from the data"; the suggested questions appear after two such replies in a row.
+- Confidence shown as three equal bars; percents always with one decimal.
+- Evidence card: latest status for a past month, the month's anomaly, a marked trend with period labels.
+- "What the data shows" is a table like the design reference, with "Not mentioned in the answer" and an attention summary.
+
 ### Fixed
 - Chat route validates the request before reading fixtures, so a bad request is always a 400.
 - A failing write in the chat stream can no longer throw out of the stream's error fallback.

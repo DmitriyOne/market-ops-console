@@ -24,7 +24,14 @@ describe('chatReducer', () => {
         citations: [],
         confidence: null,
         error: null,
+        notice: null,
       },
+    ]);
+  });
+
+  it('answers a question it cannot take with a finished notice', () => {
+    expect(run({ type: 'declined', id: 'a', question: 'Привет', notice: 'englishOnly' })).toEqual([
+      expect.objectContaining({ id: 'a', status: 'done', text: '', notice: 'englishOnly' }),
     ]);
   });
 

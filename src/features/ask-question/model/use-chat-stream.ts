@@ -13,6 +13,7 @@ import {
 import { API_ROUTES } from '@/shared/config';
 
 import { type ChatMessage, chatReducer } from './chat-reducer';
+import { isEnglish } from './language';
 
 export type ChatStream = {
   messages: ChatMessage[];
@@ -83,6 +84,11 @@ export function useChatStream(): ChatStream {
       const question = raw.trim();
       if (active.current || !question || question.length > CHAT_QUESTION_MAX_LENGTH) return;
       const id = crypto.randomUUID();
+      if (!isEnglish(question)) {
+        // The mock assistant matches English keywords only (owner decision, 2026-11-03).
+        dispatch({ type: 'declined', id, question, notice: 'englishOnly' });
+        return;
+      }
       const controller = new AbortController();
       active.current = { id, controller };
       dispatch({ type: 'started', id, question });

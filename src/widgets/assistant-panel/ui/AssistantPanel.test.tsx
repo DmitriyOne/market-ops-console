@@ -52,6 +52,12 @@ describe('AssistantPanel', () => {
     server.use(datasetHandler());
   });
 
+  it('has a header that says answers are in English', () => {
+    setup();
+    expect(screen.getByRole('heading', { name: t.panel.title })).toBeInTheDocument();
+    expect(screen.getByText(t.panel.subtitle)).toBeInTheDocument();
+  });
+
   it('empty state shows four suggestions', () => {
     setup();
     for (const label of Object.values(t.suggestions).filter((v) => v !== t.suggestions.title)) {
@@ -78,12 +84,19 @@ describe('AssistantPanel', () => {
     await waitFor(() => {
       expect(dataCheckToggle()).toHaveAttribute('aria-expanded', 'true');
     });
-    const notMentioned = within(screen.getByRole('list', { name: en.dataCheck.notMentioned }));
-    expect(notMentioned.getAllByRole('listitem').map((li) => li.textContent)).toEqual([
+    const table = within(screen.getByRole('table'));
+    const notMentioned = table
+      .getAllByRole('row')
+      .filter((row) => row.textContent.includes(en.dataCheck.notMentioned))
+      .map((row) => within(row).getAllByRole('cell')[0]?.textContent);
+    expect(notMentioned).toEqual([
       expect.stringContaining('Spain'),
       expect.stringContaining('United Kingdom'),
       expect.stringContaining('France'),
     ]);
+    expect(
+      screen.getByText('6 of 13 markets need attention; the answer names 3.'),
+    ).toBeInTheDocument();
     expect(onAnswerDone).toHaveBeenCalledOnce();
   });
 
@@ -106,14 +119,47 @@ describe('AssistantPanel', () => {
     });
     expect(screen.getByText(/The data covers Jun 2024 – May 2026/)).toBeInTheDocument();
     expect(dataCheckToggle()).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: t.suggestions.risks })).not.toBeInTheDocument();
   });
 
-  it('default answer has no data check', async () => {
+  it('an answer without matching data reads as "can\'t answer", with no data check', async () => {
     server.use(chatFromFixture('default'));
     const { user } = setup();
     await ask(user, 'Hello');
-    await answerDone();
+    expect(await screen.findByText(t.abstain.title)).toBeInTheDocument();
     expect(dataCheckToggle()).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: t.suggestions.risks })).not.toBeInTheDocument();
+  });
+
+  it('a second "can\'t answer" in a row offers the suggested questions', async () => {
+    server.use(chatFromFixture('default'));
+    const { user } = setup();
+    await ask(user, 'Hello');
+    await screen.findByText(t.abstain.title);
+    await ask(user, 'Hello again');
+    await waitFor(() => {
+      expect(screen.getAllByText(t.abstain.title)).toHaveLength(2);
+    });
+    expect(screen.getByRole('button', { name: t.suggestions.risks })).toBeInTheDocument();
+  });
+
+  it('a non-English question gets the English-only reply', async () => {
+    const { user } = setup();
+    await ask(user, 'Какие рынки под риском?');
+    expect(await screen.findByText(t.declined.englishOnly)).toBeInTheDocument();
+  });
+
+  it('the evidence card of a past month shows the latest status and the anomaly', async () => {
+    server.use(chatFromFixture('at-risk'));
+    const { user } = setup();
+    await ask(user, 'Which markets are at risk?');
+    await answerDone();
+    screen.getByRole('button', { name: 'Germany, March dip' }).focus();
+    const card = await screen.findByText('Revenue fell 27% versus the prior month.');
+    const content = card.closest('[data-slot="hover-card-content"]');
+    expect(content).not.toBeNull();
+    expect(content).toHaveTextContent('Status, May 2026');
+    expect(content).toHaveTextContent('Off track');
   });
 
   it('force error shows the error and Retry asks again', async () => {

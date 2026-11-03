@@ -25,24 +25,32 @@ export type DataCheck = {
   notMentioned: Market[];
   /** Per cited region, its non-on-track markets the answer did not cite. */
   regionGaps: { regionId: string; markets: Market[] }[];
+  /** Per gap: how many markets need attention and how many of them the answer cites. */
+  attention: { regionId: string | null; needAttention: number; markets: number; named: number }[];
+  /** Why each listed non-on-track market is not on track. */
+  reasons: Record<string, CheckRow['reason']>;
   /** Every market the block lists, non-on-track first: what "Show on dashboard" highlights. */
   highlightIds: string[];
   expanded: boolean;
 };
 
+/** Below plan, or above plan but shrinking (the Spain case). */
+function reasonFor(
+  status: MarketStatus | null,
+  attainment: number | null,
+  growth: number | null,
+): CheckRow['reason'] {
+  if (!status || status === 'on_track' || attainment === null) return null;
+  return attainment >= 100 && growth !== null
+    ? { kind: 'growth', value: growth }
+    : { kind: 'attainment', value: attainment };
+}
+
 function rowFor(ds: Dataset, resolved: ResolvedCitation): CheckRow {
   const { regionId, marketId, productId } = resolved.scope;
   const kpis = computeKpis(ds, resolved.scope, resolved.period, '1m');
   const status = marketId && !productId ? statusFor(ds, marketId, resolved.period, '1m') : null;
-  let reason: CheckRow['reason'] = null;
-  const attainment = kpis.attainmentPct.value;
-  const growth = kpis.growthPct.value;
-  if (status && status !== 'on_track' && attainment !== null) {
-    reason =
-      attainment >= 100 && growth !== null
-        ? { kind: 'growth', value: growth }
-        : { kind: 'attainment', value: attainment };
-  }
+  const reason = reasonFor(status, kpis.attainmentPct.value, kpis.growthPct.value);
   return {
     key: [regionId, marketId, productId, resolved.period].join('|'),
     resolved,
@@ -98,8 +106,39 @@ export function buildDataCheck(ds: Dataset, citations: Citation[]): DataCheck | 
     ...[...listed].filter((id) => !nonOnTrackIds.has(id)),
   ];
 
+  const named = (markets: Market[]) => markets.filter((m) => citedMarkets.has(m.id)).length;
+  const attention: DataCheck['attention'] = [
+    ...(notMentioned.length > 0
+      ? [
+          {
+            regionId: null,
+            needAttention: allNonOnTrack.length,
+            markets: ds.markets.length,
+            named: named(allNonOnTrack),
+          },
+        ]
+      : []),
+    ...regionGaps.map(({ regionId }) => {
+      const inRegion = nonOnTrackMarkets(ds, latest, '1m', { regionId }) ?? [];
+      return {
+        regionId,
+        needAttention: inRegion.length,
+        markets: ds.markets.filter((m) => m.regionId === regionId).length,
+        named: named(inRegion),
+      };
+    }),
+  ];
+  const reasons = Object.fromEntries(
+    allNonOnTrack.map((m) => [
+      m.id,
+      reasonFor(m.kpis.status, m.kpis.forecastAttainmentPct, m.kpis.growthPct),
+    ]),
+  );
+
   return {
     portfolio: computeKpis(ds, {}, latest, '1m'),
+    attention,
+    reasons,
     rows: [...rows.values()],
     notMentioned,
     regionGaps,

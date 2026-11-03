@@ -91,6 +91,20 @@ describe('buildDataCheck', () => {
     expect(check(id)?.highlightIds).toEqual(ids);
   });
 
+  it('summarises how many markets need attention and how many the answer names', () => {
+    expect(check('at-risk')?.attention).toEqual([
+      { regionId: null, needAttention: 6, markets: 13, named: 3 },
+    ]);
+    expect(check('apac-vs-europe')?.attention).toEqual([
+      { regionId: 'eu', needAttention: 5, markets: 5, named: 0 },
+    ]);
+    expect(check('germany-dip')?.attention).toEqual([]);
+  });
+
+  it('gives a reason for a not-mentioned market above plan', () => {
+    expect(check('at-risk')?.reasons.es).toEqual({ kind: 'growth', value: -4.6 });
+  });
+
   it('skips unknown citations but keeps the block', () => {
     const result = buildDataCheck(ds, [{ marketId: 'xx', label: 'Atlantis' }]);
     expect(result?.rows).toEqual([]);

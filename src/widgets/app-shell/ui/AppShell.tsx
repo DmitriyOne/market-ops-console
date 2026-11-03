@@ -15,6 +15,8 @@ export type AssistantApi = {
   notifyAnswer: () => void;
   /** Phones: switch to the dashboard. Desktop: nothing, both are visible. */
   showMain: () => void;
+  /** The desktop collapse button, for the assistant's header row. */
+  headerAction: ReactNode;
 };
 
 type AppShellProps = {
@@ -47,7 +49,26 @@ export function AppShell({ header, main, assistant }: AppShellProps) {
   const showMain = useCallback(() => {
     if (!desktop) setSection('overview');
   }, [desktop, setSection]);
-  const api = useMemo(() => ({ notifyAnswer, showMain }), [notifyAnswer, showMain]);
+  const headerAction = useMemo(
+    () => (
+      <Button
+        type="button"
+        variant="ghost"
+        className="hidden size-11 lg:inline-flex"
+        aria-label={t('collapse')}
+        onClick={() => {
+          setCollapsed(true);
+        }}
+      >
+        <PanelRightCloseIcon aria-hidden />
+      </Button>
+    ),
+    [t, setCollapsed],
+  );
+  const api = useMemo(
+    () => ({ notifyAnswer, showMain, headerAction }),
+    [notifyAnswer, showMain, headerAction],
+  );
 
   const expand = () => {
     setCollapsed(false);
@@ -104,21 +125,7 @@ export function AppShell({ header, main, assistant }: AppShellProps) {
                 ) : null}
               </Button>
             </div>
-          ) : (
-            <div className="hidden justify-end border-b border-border p-1 lg:flex">
-              <Button
-                type="button"
-                variant="ghost"
-                className="size-11"
-                aria-label={t('collapse')}
-                onClick={() => {
-                  setCollapsed(true);
-                }}
-              >
-                <PanelRightCloseIcon aria-hidden />
-              </Button>
-            </div>
-          )}
+          ) : null}
           <div className={cn('min-h-0 flex-1', collapsed && 'lg:hidden')}>{assistant(api)}</div>
         </aside>
       </div>

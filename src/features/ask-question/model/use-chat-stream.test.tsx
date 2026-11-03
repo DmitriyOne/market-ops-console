@@ -1,6 +1,6 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { http } from 'msw';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { chatFromFixture, chatStream, fixtureEvents, server } from '@/shared/lib/test';
 
@@ -179,6 +179,30 @@ describe('useChatStream', () => {
     expect(result.current.messages[1]?.question).toBe('force error');
     expect(result.current.messages[1]?.id).not.toBe(firstId);
   });
+
+  it.each(['Какие рынки под риском?', 'Märkte mit Risiko'])(
+    'a non-English question gets the English-only reply without a request: %s',
+    (question) => {
+      const requests = vi.fn();
+      server.use(
+        http.post('*/api/v1/chat', () => {
+          requests();
+          return new Response(null, { status: 500 });
+        }),
+      );
+      const { result } = setup();
+      act(() => {
+        result.current.ask(question);
+      });
+      expect(result.current.messages[0]).toMatchObject({
+        question,
+        status: 'done',
+        notice: 'englishOnly',
+      });
+      expect(result.current.isStreaming).toBe(false);
+      expect(requests).not.toHaveBeenCalled();
+    },
+  );
 
   it('ask while streaming is ignored, and so is a blank question', () => {
     server.use(chatFromFixture('germany-dip', { stallAfter: 0 }));

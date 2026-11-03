@@ -77,31 +77,21 @@ describe('Composer', () => {
     expect(onAsk).not.toHaveBeenCalled();
   });
 
-  it.each(['Какие рынки под риском?', 'Märkte mit Risiko'])(
-    'English-only notice for non-English text: %s',
-    async (text) => {
-      const { onAsk, field, user } = setup();
-      await user.type(field, text);
-      const notice = screen.getByText(en.assistant.composer.englishOnly);
-      expect(notice.closest('[aria-live="polite"]')).not.toBeNull();
-      await user.keyboard('{Enter}');
-      expect(onAsk).toHaveBeenCalledWith(text);
-    },
-  );
-
-  it('describes the field with the English-only notice and the length reason', async () => {
+  it('describes the field with the length reason when over the limit', async () => {
     const { field, user } = setup();
-    await user.type(field, 'Märkte');
-    expect(field).toHaveAccessibleDescription(en.assistant.composer.englishOnly);
-    await user.clear(field);
     await user.click(field);
     await user.paste('a'.repeat(CHAT_QUESTION_MAX_LENGTH + 1));
     expect(field).toHaveAccessibleDescription(/up to 500 characters/);
   });
 
-  it('shows no English-only notice for English text', async () => {
-    const { field, user } = setup();
-    await user.type(field, 'Which markets are at risk?');
-    expect(screen.queryByText(en.assistant.composer.englishOnly)).not.toBeInTheDocument();
+  it('sends non-English text too (the assistant replies that it needs English)', async () => {
+    const { onAsk, field, user } = setup();
+    await user.type(field, 'Какие рынки под риском?{Enter}');
+    expect(onAsk).toHaveBeenCalledWith('Какие рынки под риском?');
+  });
+
+  it('starts as a single line', () => {
+    const { field } = setup();
+    expect(field).toHaveAttribute('rows', '1');
   });
 });

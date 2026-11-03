@@ -1,4 +1,4 @@
-import type { Citation, Dataset, MarketStatus, Period } from '@/shared/api';
+import type { Anomaly, Citation, Dataset, MarketStatus, Period } from '@/shared/api';
 
 import { computeKpis, type Kpis } from './kpis';
 import { getMarket, getProduct, getRegion } from './reference';
@@ -18,6 +18,10 @@ export type Evidence = {
   kpis: Kpis;
   /** Market status; only for a market (not a product) at the latest month. */
   status: MarketStatus | null;
+  /** Status of the market now (latest month), shown next to a past month. */
+  latestStatus: MarketStatus | null;
+  /** The market's anomaly in that month, from the dataset. */
+  anomaly: Pick<Anomaly, 'type' | 'note'> | null;
   /** Up to 12 months ending at the citation's period. */
   trend: TrendPoint[];
 };
@@ -57,9 +61,13 @@ export function evidenceFor(ds: Dataset, r: ResolvedCitation): Evidence | null {
   if (!r.known) return null;
   const { marketId, productId } = r.scope;
   const end = ds.meta.periods.indexOf(r.period);
+  const market = marketId && !productId ? getMarket(ds, marketId) : undefined;
+  const anomaly = market?.kpis.anomalies.find((a) => a.period === r.period);
   return {
     kpis: computeKpis(ds, r.scope, r.period, '1m'),
-    status: marketId && !productId ? statusFor(ds, marketId, r.period, '1m') : null,
+    status: market ? statusFor(ds, market.id, r.period, '1m') : null,
+    latestStatus: market?.kpis.status ?? null,
+    anomaly: anomaly ? { type: anomaly.type, note: anomaly.note } : null,
     trend: trendSeries(ds, r.scope).slice(Math.max(0, end + 1 - TREND_MONTHS), end + 1),
   };
 }

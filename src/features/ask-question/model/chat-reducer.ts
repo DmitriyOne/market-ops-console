@@ -12,10 +12,16 @@ export type ChatMessage = {
   confidence: Confidence | null;
   /** `message`: text the server sent in an `error` event; `key`: a client-side cause. */
   error: { message: string } | { key: ErrorMessageKey } | null;
+  /** A reply made on the client instead of asking the assistant. */
+  notice: ChatNotice | null;
 };
+
+/** `englishOnly`: the question is not in English, which the mock assistant needs. */
+export type ChatNotice = 'englishOnly';
 
 export type ChatAction =
   | { type: 'started'; id: string; question: string }
+  | { type: 'declined'; id: string; question: string; notice: ChatNotice }
   | { type: 'token'; id: string; value: string }
   | {
       type: 'done';
@@ -29,7 +35,7 @@ export type ChatAction =
 
 function settle(
   message: ChatMessage,
-  action: Exclude<ChatAction, { type: 'started' }>,
+  action: Exclude<ChatAction, { type: 'started' | 'declined' }>,
 ): ChatMessage {
   switch (action.type) {
     case 'token':
@@ -57,18 +63,19 @@ function settle(
  * actions, so events of a stopped or failed stream change nothing.
  */
 export function chatReducer(state: ChatMessage[], action: ChatAction): ChatMessage[] {
-  if (action.type === 'started') {
+  if (action.type === 'started' || action.type === 'declined') {
     return [
       ...state,
       {
         id: action.id,
         question: action.question,
         text: '',
-        status: 'streaming',
+        status: action.type === 'started' ? 'streaming' : 'done',
         kind: null,
         citations: [],
         confidence: null,
         error: null,
+        notice: action.type === 'declined' ? action.notice : null,
       },
     ];
   }

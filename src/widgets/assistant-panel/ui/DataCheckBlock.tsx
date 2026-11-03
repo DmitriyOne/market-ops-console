@@ -2,61 +2,73 @@
 
 import { ChevronDownIcon, SquareSquareIcon } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { type ReactNode, useState } from 'react';
 
-import { getRegion, type Kpis } from '@/entities/performance';
+import { getRegion, type KpiValue } from '@/entities/performance';
 import type { Dataset, Market, MarketStatus } from '@/shared/api';
+import { cn } from '@/shared/lib';
 import { Button, Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/shared/ui';
 
 import type { CheckRow, DataCheck } from '../model/data-check';
 import { StatusChip } from './StatusChip';
 import { useKpiFormat } from './use-kpi-format';
 
-type Line = { key: string; name: string; kpis: Kpis; status: MarketStatus | null; note?: string };
+type Line = {
+  key: string;
+  name: string;
+  attainment: KpiValue;
+  growth: KpiValue;
+  /** A status chip, or why there is none. */
+  status: MarketStatus | 'none' | 'latestOnly';
+  notMentioned?: boolean;
+  reason?: CheckRow['reason'];
+  portfolio?: boolean;
+};
 
-function marketLine(market: Market, note: string): Line {
-  const { revenue, growthPct, forecastAttainmentPct, sharePct, status } = market.kpis;
+const fromData = (value: number): KpiValue => ({ value, source: 'data' });
+
+function marketLine(market: Market, reason: CheckRow['reason']): Line {
   return {
     key: market.id,
     name: market.name,
-    status,
-    note,
-    kpis: {
-      revenue: { value: revenue, source: 'data' },
-      growthPct: { value: growthPct, source: 'data' },
-      attainmentPct: { value: forecastAttainmentPct, source: 'data' },
-      sharePct: { value: sharePct, source: 'data' },
-      units: { value: null, source: 'unavailable' },
-    },
+    attainment: fromData(market.kpis.forecastAttainmentPct),
+    growth: fromData(market.kpis.growthPct),
+    status: market.kpis.status,
+    notMentioned: true,
+    reason,
   };
 }
 
-function LineRow({ line, reason }: { line: Line; reason?: CheckRow['reason'] }) {
+function LineRow({ line }: { line: Line }) {
   const t = useTranslations('dataCheck');
   const f = useKpiFormat();
+  let status: ReactNode;
+  if (line.status === 'none') status = <span className="text-muted-foreground">—</span>;
+  else if (line.status === 'latestOnly')
+    status = <span className="text-muted-foreground">{t('latestOnly')}</span>;
+  else status = <StatusChip status={line.status} />;
+
   return (
-    <div className="grid grid-cols-4 items-center gap-2 border-t border-border py-1.5 text-xs">
-      <span className="min-w-0">
+    <tr className={cn('border-t border-border align-middle', line.portfolio && 'bg-muted')}>
+      <td className="py-2 pr-2 pl-3">
         <span className="font-semibold">{line.name}</span>
-        {line.note ? <span className="block text-muted-foreground">{line.note}</span> : null}
-      </span>
-      <span className="text-right font-mono tabular-nums">
-        {f.value(line.kpis.attainmentPct, 'percent')}
-      </span>
-      <span className="text-right font-mono tabular-nums">
-        {f.value(line.kpis.growthPct, 'signedPercent')}
-      </span>
-      <span className="flex flex-col items-end gap-0.5">
-        {line.status ? <StatusChip status={line.status} /> : <span>{t('noStatus')}</span>}
-        {reason ? (
-          <span className="text-muted-foreground">
-            {reason.kind === 'growth'
-              ? t('reasonGrowth', { value: f.signedPercent(reason.value) })
-              : t('reasonAttainment', { value: f.percent(reason.value) })}
+        {line.notMentioned ? (
+          <span className="block font-medium text-status-off-track">{t('notMentioned')}</span>
+        ) : null}
+        {line.reason?.kind === 'growth' ? (
+          <span className="block text-muted-foreground">
+            {t('reasonGrowth', { value: f.signedPercent(line.reason.value) })}
           </span>
         ) : null}
-      </span>
-    </div>
+      </td>
+      <td className="px-2 py-2 text-right font-mono tabular-nums">
+        {f.value(line.attainment, 'percent')}
+      </td>
+      <td className="px-2 py-2 text-right font-mono tabular-nums">
+        {f.value(line.growth, 'signedPercent')}
+      </td>
+      <td className="py-2 pr-3 pl-2">{status}</td>
+    </tr>
   );
 }
 
@@ -74,84 +86,119 @@ export function DataCheckBlock({ check, ds, onHighlight }: DataCheckBlockProps) 
   const [open, setOpen] = useState(check.expanded);
   const latest = ds.meta.latestPeriod;
   const updated = format.dateTime(new Date(`${ds.meta.generatedAt}T00:00:00Z`), 'day');
+  const regionName = (id: string) => getRegion(ds, id)?.name ?? id;
+
+  const cited: Line[] = check.rows.map((row) => ({
+    key: row.key,
+    name: f.scopeName(row.resolved, latest),
+    attainment: row.kpis.attainmentPct,
+    growth: row.kpis.growthPct,
+    status: row.status ?? (row.resolved.period === latest ? 'none' : 'latestOnly'),
+    reason: row.reason,
+  }));
 
   return (
     <Collapsible
       open={open}
       onOpenChange={setOpen}
-      className="rounded-xl border border-border bg-surface-data p-3"
+      className="overflow-hidden rounded-xl border border-border bg-surface-data"
     >
-      <CollapsibleTrigger className="flex min-h-11 w-full items-center gap-2 rounded-md text-left text-sm font-semibold focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none">
-        <SquareSquareIcon aria-hidden className="size-4" />
-        <span className="flex-1">{t('title')}</span>
-        <ChevronDownIcon
-          aria-hidden
-          className="size-4 transition-transform in-data-[state=open]:rotate-180 motion-reduce:transition-none"
-        />
-      </CollapsibleTrigger>
-      <p className="text-xs text-muted-foreground">
-        {t('header', { period: f.period(latest), updated })}
-      </p>
-      <CollapsibleContent className="mt-2 flex flex-col">
-        <div className="grid grid-cols-4 gap-2 pb-1 text-xs text-muted-foreground">
-          <span>{t('name')}</span>
-          <span className="text-right">{t('attainment')}</span>
-          <span className="text-right">{t('growth')}</span>
-          <span className="text-right">{t('status')}</span>
-        </div>
-        <LineRow
-          line={{ key: 'portfolio', name: t('portfolio'), kpis: check.portfolio, status: null }}
-        />
-        {check.rows.map((row) => (
-          <LineRow
-            key={row.key}
-            line={{
-              key: row.key,
-              name: f.scopeName(row.resolved, latest),
-              kpis: row.kpis,
-              status: row.status,
-            }}
-            reason={row.reason}
+      <div className="px-3 pt-2 pb-2">
+        <CollapsibleTrigger className="flex min-h-11 w-full items-center gap-2 rounded-md text-left text-sm font-semibold focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none">
+          <SquareSquareIcon aria-hidden className="size-4" />
+          <span className="flex-1">{t('title')}</span>
+          <ChevronDownIcon
+            aria-hidden
+            className="size-4 transition-transform in-data-[state=open]:rotate-180 motion-reduce:transition-none"
           />
-        ))}
-        {check.notMentioned.length > 0 ? (
-          <ul aria-label={t('notMentioned')} className="flex flex-col">
-            {check.notMentioned.map((m) => (
-              <li key={m.id}>
-                <LineRow line={marketLine(m, t('notMentioned'))} />
-              </li>
+        </CollapsibleTrigger>
+        <p className="text-xs text-muted-foreground">
+          {t('header', { period: f.period(latest), updated })}
+        </p>
+      </div>
+      <CollapsibleContent className="flex flex-col text-xs">
+        <table className="w-full border-collapse">
+          <caption className="sr-only">{t('title')}</caption>
+          <thead>
+            <tr className="text-left text-muted-foreground uppercase">
+              <th scope="col" className="py-2 pr-2 pl-3 font-medium tracking-wide">
+                {t('name')}
+              </th>
+              <th scope="col" className="px-2 py-2 text-right font-medium tracking-wide">
+                {t('attainment')}
+              </th>
+              <th scope="col" className="px-2 py-2 text-right font-medium tracking-wide">
+                {t('growth')}
+              </th>
+              <th scope="col" className="py-2 pr-3 pl-2 font-medium tracking-wide">
+                {t('status')}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <LineRow
+              line={{
+                key: 'portfolio',
+                name: t('portfolio'),
+                attainment: check.portfolio.attainmentPct,
+                growth: check.portfolio.growthPct,
+                status: 'none',
+                portfolio: true,
+              }}
+            />
+            {cited.map((line) => (
+              <LineRow key={line.key} line={line} />
             ))}
-          </ul>
-        ) : null}
-        {check.regionGaps.map((gap) => {
-          const label = t('regionGap', {
-            region: getRegion(ds, gap.regionId)?.name ?? gap.regionId,
-          });
-          return (
-            <div key={gap.regionId} className="flex flex-col">
-              <p className="pt-2 text-xs font-medium">{label}</p>
-              <ul aria-label={label} className="flex flex-col">
-                {gap.markets.map((m) => (
-                  <li key={m.id}>
-                    <LineRow line={marketLine(m, t('notMentioned'))} />
-                  </li>
-                ))}
-              </ul>
-            </div>
-          );
-        })}
-        {check.highlightIds.length > 0 ? (
-          <Button
-            type="button"
-            variant="outline"
-            className="mt-3 min-h-11 self-start"
-            onClick={() => {
-              onHighlight(check.highlightIds);
-            }}
-          >
-            {t('showOnDashboard')}
-          </Button>
-        ) : null}
+            {check.notMentioned.map((m) => (
+              <LineRow key={m.id} line={marketLine(m, check.reasons[m.id] ?? null)} />
+            ))}
+          </tbody>
+          {check.regionGaps.map((gap) => (
+            <tbody key={gap.regionId}>
+              <tr className="border-t border-border">
+                <th scope="rowgroup" colSpan={4} className="py-2 pl-3 text-left font-semibold">
+                  {regionName(gap.regionId)}
+                </th>
+              </tr>
+              {gap.markets.map((m) => (
+                <LineRow
+                  key={`${gap.regionId}-${m.id}`}
+                  line={marketLine(m, check.reasons[m.id] ?? null)}
+                />
+              ))}
+            </tbody>
+          ))}
+        </table>
+        <div className="flex flex-col items-start gap-3 border-t border-border p-3">
+          {check.attention.map((a) => (
+            <p key={a.regionId ?? 'all'} className="text-muted-foreground">
+              {a.regionId
+                ? t('attentionRegion', {
+                    needAttention: a.needAttention,
+                    markets: a.markets,
+                    named: a.named,
+                    region: regionName(a.regionId),
+                  })
+                : t('attention', {
+                    needAttention: a.needAttention,
+                    markets: a.markets,
+                    named: a.named,
+                  })}
+            </p>
+          ))}
+          {check.highlightIds.length > 0 ? (
+            <Button
+              type="button"
+              variant="outline"
+              className="min-h-11"
+              onClick={() => {
+                onHighlight(check.highlightIds);
+              }}
+            >
+              {t('showOnDashboard')}
+            </Button>
+          ) : null}
+        </div>
       </CollapsibleContent>
     </Collapsible>
   );

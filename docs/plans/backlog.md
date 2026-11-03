@@ -26,7 +26,6 @@ Format: **Item**: what is wrong (file). Why it can wait. Where it goes.
 
 ## From Plan 2 (assistant, 2026-11-03)
 
-- **Percent precision jumps**: `percent` drops a trailing `.0`, so the data check shows `92%` next to `92.2%` (`src/shared/config/i18n/formats.ts`). Changing it affects every number. **Plan 3**, with the KPI cards: decide `minimumFractionDigits: 1` for KPI percents.
 - **No live accessibility audit yet**: the Plan 2 audit was by code and contrast tests; no rendered axe/Lighthouse run or screen-reader pass of the panel (streaming announcements, `aria-busy` log). **Plan 5**, accessibility pass.
 - **`summary-long` scroll behaviour tested only at hook level** (`use-stick-to-bottom.test.tsx`); no test scrolls the real panel while it streams. **Plan 5**, in the Playwright happy path or manually.
 - **Source clicks on desktop write the URL but nothing reads it yet** (`region`, `market`, `period`, `markets`). **Plan 3**, dashboard reads `dashboardSearchParams`.

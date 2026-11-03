@@ -32,7 +32,12 @@ function setup(searchParams = '') {
           main={<p>Main content</p>}
           assistant={(a) => {
             api.current = a;
-            return <p>Assistant content</p>;
+            return (
+              <div>
+                {a.headerAction}
+                <p>Assistant content</p>
+              </div>
+            );
           }}
         />
       </NuqsTestingAdapter>

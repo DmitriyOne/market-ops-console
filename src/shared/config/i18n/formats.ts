@@ -12,8 +12,13 @@ export const formats = {
     },
     compact: { notation: 'compact', maximumFractionDigits: 1 },
     integer: { maximumFractionDigits: 0 },
-    percent: { style: 'percent', maximumFractionDigits: 1 },
-    signedPercent: { style: 'percent', maximumFractionDigits: 1, signDisplay: 'exceptZero' },
+    percent: { style: 'percent', minimumFractionDigits: 1, maximumFractionDigits: 1 },
+    signedPercent: {
+      style: 'percent',
+      minimumFractionDigits: 1,
+      maximumFractionDigits: 1,
+      signDisplay: 'exceptZero',
+    },
   },
   dateTime: {
     period: { month: 'short', year: 'numeric', timeZone: 'UTC' },
