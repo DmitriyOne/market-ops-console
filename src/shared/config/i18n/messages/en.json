@@ -9,6 +9,7 @@
     "server": "The server couldn't complete the request.",
     "invalidData": "We received data in an unexpected format.",
     "unknown": "Something went wrong.",
+    "sectionTitle": "This section couldn't load.",
     "retry": "Try again"
   },
   "offline": {

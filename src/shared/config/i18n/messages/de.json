@@ -9,6 +9,7 @@
     "server": "Der Server konnte die Anfrage nicht abschließen.",
     "invalidData": "Die empfangenen Daten haben ein unerwartetes Format.",
     "unknown": "Etwas ist schiefgelaufen.",
+    "sectionTitle": "Dieser Bereich konnte nicht geladen werden.",
     "retry": "Erneut versuchen"
   },
   "offline": {

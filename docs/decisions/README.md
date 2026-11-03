@@ -16,3 +16,4 @@ One file per decision: context, decision, alternatives, consequences. Status is 
 | [0010](0010-i18n-and-locale.md) | i18n: next-intl, `as-needed` locale routing, static pages | 2026-11-03 |
 | [0011](0011-linting-and-formatting.md) | Prettier + ESLint + Steiger | 2026-11-03 |
 | [0012](0012-api-versioning-and-resilience.md) | `/api/v1`, timeouts, offline guard, error pages | 2026-11-03 |
+| [0013](0013-error-handling.md) | Error handling: typed errors, boundaries, one log | 2026-11-03 |

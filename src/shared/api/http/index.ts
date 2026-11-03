@@ -17,3 +17,5 @@ export {
   STREAM_FIRST_EVENT_TIMEOUT_MS,
   STREAM_IDLE_TIMEOUT_MS,
 } from './timeouts';
+export { useErrorMessage } from './use-error-message';
+export { withErrorHandling } from './with-error-handling';
