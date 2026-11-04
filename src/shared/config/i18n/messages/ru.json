@@ -41,9 +41,6 @@
     "de-DE": "Deutsch",
     "ru-RU": "Русский"
   },
-  "dashboard": {
-    "marketCount": "{count, plural, one {# рынок} few {# рынка} many {# рынков} other {# рынка}}"
-  },
   "assistant": {
     "composer": {
       "label": "Вопрос по данным",
@@ -183,5 +180,25 @@
     "label": "Вид",
     "executive": "Руководитель",
     "analyst": "Аналитик"
+  },
+  "drill": {
+    "label": "Путь по данным",
+    "portfolio": "Портфель",
+    "chooseRegion": "Выбрать регион",
+    "chooseMarket": "Выбрать рынок",
+    "chooseProduct": "Выбрать продукт",
+    "region": "Регион",
+    "market": "Рынок",
+    "product": "Продукт",
+    "changeRegion": "Регион: {name}. Сменить регион",
+    "changeMarket": "Рынок: {name}. Сменить рынок",
+    "changeProduct": "Продукт: {name}. Сменить продукт"
+  },
+  "header": {
+    "settings": "Настройки: язык и тема",
+    "settingsTitle": "Настройки"
+  },
+  "overview": {
+    "summary": "{markets, plural, one {# рынок} few {# рынка} many {# рынков} other {# рынка}} · {products, plural, one {# продукт} few {# продукта} many {# продуктов} other {# продукта}} · последние данные {period}"
   }
 }

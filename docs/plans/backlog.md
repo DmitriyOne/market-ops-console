@@ -9,7 +9,6 @@ Format: **Item**: what is wrong (file). Why it can wait. Where it goes.
 - **SSE errors lose detail**: `streamSse` drops the API error `code` from a non-2xx JSON body and does not check that `Content-Type` is `text/event-stream` (`src/shared/api/http/stream-sse.ts`). No UI reads it yet; not done in Plan 2. **Plan 5**, hardening.
 - **Arbitrary Tailwind values in shadcn components** (`src/shared/ui/*`), against `.claude/rules/ui.md`. Generated code. **Design pass**, with the semantic tokens.
 - **Offline overlay does not return focus** to where it was after closing (`src/features/network-status/ui/OfflineGuard.tsx`). **Plan 5**, accessibility pass.
-- **404 page has no `id="main"` and no skip link** (`app/[locale]/not-found.tsx`). **Plan 3**, with the app shell layout.
 
 ## From the error-handling review (2026-11-03)
 

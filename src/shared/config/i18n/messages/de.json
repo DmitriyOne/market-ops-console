@@ -41,9 +41,6 @@
     "de-DE": "Deutsch",
     "ru-RU": "Русский"
   },
-  "dashboard": {
-    "marketCount": "{count, plural, one {# Markt} other {# Märkte}}"
-  },
   "assistant": {
     "composer": {
       "label": "Frage zu den Daten",
@@ -183,5 +180,25 @@
     "label": "Ansicht",
     "executive": "Management",
     "analyst": "Analyse"
+  },
+  "drill": {
+    "label": "Drill-down",
+    "portfolio": "Portfolio",
+    "chooseRegion": "Region wählen",
+    "chooseMarket": "Markt wählen",
+    "chooseProduct": "Produkt wählen",
+    "region": "Region",
+    "market": "Markt",
+    "product": "Produkt",
+    "changeRegion": "Region: {name}. Region ändern",
+    "changeMarket": "Markt: {name}. Markt ändern",
+    "changeProduct": "Produkt: {name}. Produkt ändern"
+  },
+  "header": {
+    "settings": "Einstellungen: Sprache und Design",
+    "settingsTitle": "Einstellungen"
+  },
+  "overview": {
+    "summary": "{markets, plural, one {# Markt} other {# Märkte}} · {products, plural, one {# Produkt} other {# Produkte}} · neueste Daten {period}"
   }
 }

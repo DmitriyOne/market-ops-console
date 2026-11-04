@@ -1,50 +1,25 @@
 'use client';
 
-import { useSuspenseQuery } from '@tanstack/react-query';
-import { useTranslations } from 'next-intl';
 import { Suspense } from 'react';
 
-import { datasetQueryOptions } from '@/entities/performance';
-import { LocaleSwitch } from '@/features/switch-locale';
-import { ThemeSwitch } from '@/features/switch-theme';
 import { AppShell, AppShellFallback } from '@/widgets/app-shell';
 import { AssistantPanel } from '@/widgets/assistant-panel';
+import { DashboardHeader, DashboardHeaderSkeleton } from '@/widgets/dashboard-header';
 
-// Placeholder proving the prefetched dataset hydrates; replaced in Plan 3.
-function MarketCount() {
-  const t = useTranslations('dashboard');
-  const { data } = useSuspenseQuery(datasetQueryOptions);
-  return <p className="p-4">{t('marketCount', { count: data.markets.length })}</p>;
-}
-
-function Header() {
-  return (
-    <div className="flex justify-end gap-1 p-2">
-      {/* Reads search params, which static HTML does not have. */}
-      <Suspense>
-        <LocaleSwitch />
-      </Suspense>
-      <ThemeSwitch />
-    </div>
-  );
-}
-
-function Main() {
-  return (
-    <Suspense>
-      <MarketCount />
-    </Suspense>
-  );
-}
+import { Overview, OverviewSkeleton } from './Overview';
 
 export function DashboardPage() {
   return (
     // The shell reads the URL (tab, focus), which static HTML does not have:
-    // the static page shows header and dashboard, the assistant joins on hydration.
-    <Suspense fallback={<AppShellFallback header={<Header />} main={<Main />} />}>
+    // the static page shows skeletons in the real shape, the view joins on hydration.
+    <Suspense
+      fallback={
+        <AppShellFallback header={<DashboardHeaderSkeleton />} main={<OverviewSkeleton />} />
+      }
+    >
       <AppShell
-        header={<Header />}
-        main={<Main />}
+        header={<DashboardHeader />}
+        main={<Overview />}
         assistant={(api) => (
           <AssistantPanel
             onAnswerDone={api.notifyAnswer}
