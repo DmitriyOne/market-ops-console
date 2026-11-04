@@ -7,8 +7,6 @@ Format: **Item**: what is wrong (file). Why it can wait. Where it goes.
 ## From the Plan 1 review (foundation, 2026-11-03)
 
 - **SSE errors lose detail**: `streamSse` drops the API error `code` from a non-2xx JSON body and does not check that `Content-Type` is `text/event-stream` (`src/shared/api/http/stream-sse.ts`). No UI reads it yet; not done in Plan 2. **Plan 5**, hardening.
-- **Region → market hierarchy not enforced**: a URL with a market outside the selected region is accepted (`src/entities/performance`, URL state). No drill-down UI yet. **Plan 3**, with nuqs parsers.
-- **Locale switch rewrites the query**: repeated query keys collapse to one and `#hash` is dropped (`src/features/switch-locale/model/use-switch-locale.ts`). No repeated keys or hashes in use today. **Plan 3**, when URL state lands.
 - **Arbitrary Tailwind values in shadcn components** (`src/shared/ui/*`), against `.claude/rules/ui.md`. Generated code. **Design pass**, with the semantic tokens.
 - **Offline overlay does not return focus** to where it was after closing (`src/features/network-status/ui/OfflineGuard.tsx`). **Plan 5**, accessibility pass.
 - **404 page has no `id="main"` and no skip link** (`app/[locale]/not-found.tsx`). **Plan 3**, with the app shell layout.

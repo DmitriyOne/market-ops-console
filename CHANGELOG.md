@@ -2,7 +2,15 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/). The top version must match `package.json` and the `release/X.Y.Z` branch.
 
-## [0.4.0] - Unreleased
+## [0.5.0] - Unreleased
+
+### Added
+- Dashboard URL state is checked against the data: a market brings its own region, a product needs a market, unknown ids, months, ranges and modes fall back to the default, and a bad link is corrected in place without a history entry.
+
+### Fixed
+- Switching language keeps repeated query keys (`markets=de&markets=es`) and the `#hash`.
+
+## [0.4.0] - 2026-11-04
 
 ### Added
 - Assistant (ADR 0014, variant A): streamed answers with Stop, Retry, confidence and one source button per citation; hover, focus or tap shows an evidence card with the real numbers; clicking focuses the dashboard through the URL.

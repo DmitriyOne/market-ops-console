@@ -1,16 +1,17 @@
-import { parseAsArrayOf, parseAsString, parseAsStringLiteral } from 'nuqs/server';
+import { parseAsArrayOf, parseAsString } from 'nuqs/server';
 
-import type { Range } from './scope';
-
-export const RANGES = ['1m', '3m', '12m'] as const satisfies readonly Range[];
-
-/** Dashboard view state in the URL (spec §6). */
+/**
+ * Dashboard view state in the URL (spec §6). Values are read as plain
+ * strings and checked against the dataset in `normalizeDashboardState`,
+ * so a bad value is corrected in the URL instead of silently kept there.
+ */
 export const dashboardSearchParams = {
   region: parseAsString,
   market: parseAsString,
   product: parseAsString,
   period: parseAsString,
-  range: parseAsStringLiteral(RANGES).withDefault('1m'),
+  range: parseAsString,
+  mode: parseAsString,
   /** Markets highlighted from the assistant's data check. */
   markets: parseAsArrayOf(parseAsString),
 };

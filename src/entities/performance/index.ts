@@ -5,6 +5,13 @@ export {
   resolveCitation,
   type ResolvedCitation,
 } from './model/citation';
+export {
+  type DashboardState,
+  type Mode,
+  MODES,
+  normalizeDashboardState,
+  RANGES,
+} from './model/dashboard-state';
 export { ISO3_TO_NUMERIC } from './model/iso-numeric';
 export { computeKpis, type KpiName, type Kpis, type KpiSource, type KpiValue } from './model/kpis';
 export { periodToDate } from './model/period';
@@ -16,7 +23,8 @@ export {
   type Range,
   type Scope,
 } from './model/scope';
-export { dashboardSearchParams, RANGES } from './model/search-params';
+export { dashboardSearchParams } from './model/search-params';
 export { marketsAtRiskCount, nonOnTrackMarkets, statusFor } from './model/status';
 export { anomaliesInScope, type ScopedAnomaly, type TrendPoint, trendSeries } from './model/trend';
+export { useDashboard } from './model/use-dashboard';
 export { type DashboardFocus, useDashboardFocus } from './model/use-dashboard-focus';
