@@ -1,6 +1,6 @@
 import type { Anomaly, Dataset, MarketStatus, Period } from '@/shared/api';
 
-import { computeKpis, type KpiValue } from './kpis';
+import type { KpiValue } from './kpis';
 import { getRegion } from './reference';
 import { rowsInScope, sumRows } from './rows';
 import { isLatestSnapshot, marketsInOrder, periodsInRange, type Range, type Scope } from './scope';
@@ -199,38 +199,33 @@ export function marketsTable(
 
   const inWindow = new Set(periods);
   const rows = shown.map((m): TableRow => {
-    const kpis = computeKpis(
+    // Every figure from series, so a row agrees with itself and the total is
+    // the sum of the rows. Share is not in series: the stored figure, latest
+    // month and all products only. The tiles keep the stored KPIs (spec §5).
+    const series = rowsInScope(
       ds,
-      {
-        regionId: m.regionId,
-        marketId: m.id,
-        ...(scope.productId ? { productId: scope.productId } : {}),
-      },
-      period,
-      range,
+      { marketId: m.id, ...(scope.productId ? { productId: scope.productId } : {}) },
+      periods,
     );
-    const totals = sumRows(
-      rowsInScope(
-        ds,
-        { marketId: m.id, ...(scope.productId ? { productId: scope.productId } : {}) },
-        periods,
-      ),
-    );
-    const none = periods.length === 0;
+    const none = series.length === 0;
+    const t = sumRows(series);
+    const growth = ratioPct(t.actual, t.priorYear);
+    const of = (value: number | null) => (none ? UNAVAILABLE : calculated(value));
     return {
       id: m.id,
       code: m.iso2,
       name: m.name,
       regionId: m.regionId,
       regionName: getRegion(ds, m.regionId)?.name ?? m.regionId,
-      revenue: kpis.revenue,
-      forecast: none ? UNAVAILABLE : calculated(totals.forecast),
-      priorYear: none ? UNAVAILABLE : calculated(totals.priorYear),
-      gap: none ? UNAVAILABLE : calculated(totals.actual - totals.forecast),
-      attainmentPct: kpis.attainmentPct,
-      growthPct: kpis.growthPct,
-      sharePct: kpis.sharePct,
-      units: kpis.units,
+      revenue: of(t.actual),
+      forecast: of(t.forecast),
+      priorYear: of(t.priorYear),
+      gap: of(t.actual - t.forecast),
+      attainmentPct: of(ratioPct(t.actual, t.forecast)),
+      growthPct: of(growth === null ? null : growth - 100),
+      sharePct:
+        latest && !scope.productId ? { value: m.kpis.sharePct, source: 'data' } : UNAVAILABLE,
+      units: of(t.units),
       status: statusFor(ds, m.id, period, range),
       current: m.id === scope.marketId,
       anomalies: m.kpis.anomalies.filter((a) => inWindow.has(a.period)),

@@ -348,7 +348,7 @@
     "empty": "None of the selected markets is in this view. Clear the selection to see every market.",
     "noteLatest": "Status and share are set for the latest month only.",
     "notePerProduct": "Share is not available per product.",
-    "noteCalculated": "Forecast, gap to forecast, prior year, units and the total are calculated from monthly data.",
+    "noteCalculated": "All figures are calculated from monthly data, so a row adds up and the total is the sum of the rows. Share and status are the stored latest-month figures; the tiles show stored KPIs, which can differ by about 1 point.",
     "anomaly": "Anomaly, {period}: {note}"
   },
   "exportMarkets": {
@@ -382,7 +382,7 @@
       "asc": "{column}, ascending",
       "desc": "{column}, descending",
       "calculated": "How values are made",
-      "calculatedValue": "Stored figures for a market at the latest month; everything else is calculated from monthly data (revenue = Σ actual, attainment = Σ actual ÷ Σ forecast, growth = Σ actual ÷ Σ prior year − 1). Totals follow the Excel filter.",
+      "calculatedValue": "Calculated from monthly data (revenue = Σ actual, attainment = Σ actual ÷ Σ forecast, growth = Σ actual ÷ Σ prior year − 1); share and status as stored for the latest month. Totals follow the Excel filter.",
       "status": "Status",
       "statusValue": "Set in the data for the latest month only.",
       "link": "Open this view"

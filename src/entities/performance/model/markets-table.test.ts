@@ -10,7 +10,7 @@ const sum = (markets: string[], key: 'actual' | 'forecast') =>
     .reduce((total, r) => total + r[key], 0);
 
 describe('marketsTable', () => {
-  it('portfolio, latest month: 13 rows in the map order; stored KPIs, calculated gap', () => {
+  it('portfolio, latest month: 13 rows in the map order; figures from series, share stored', () => {
     const view = marketsTable(ds, {}, '2026-05', '1m', [], null);
     expect(view.rows).toHaveLength(13);
     expect(view.inScope).toBe(13);
@@ -22,14 +22,35 @@ describe('marketsTable', () => {
       regionId: 'eu',
       status: 'off_track',
       current: false,
-      revenue: { source: 'data' },
-      growthPct: { value: -9.7, source: 'data' },
-      attainmentPct: { source: 'data' },
+      revenue: { value: sum(['de'], 'actual'), source: 'calculated' },
+      growthPct: { source: 'calculated' },
+      attainmentPct: { source: 'calculated' },
+      // Not in series: the stored figure, latest month only.
       sharePct: { source: 'data' },
       gap: { source: 'calculated' },
       units: { source: 'calculated' },
     });
     expect(de?.gap.value).toBeCloseTo(sum(['de'], 'actual') - sum(['de'], 'forecast'));
+  });
+
+  it('a row agrees with itself: gap = revenue − forecast, attainment = revenue ÷ forecast', () => {
+    for (const row of marketsTable(ds, {}, '2026-05', '1m', [], null).rows) {
+      const value = (v: { value: number | null }) => v.value ?? Number.NaN;
+      const [revenue, forecast, prior] = [
+        value(row.revenue),
+        value(row.forecast),
+        value(row.priorYear),
+      ];
+      expect(row.gap.value).toBeCloseTo(revenue - forecast);
+      expect(row.attainmentPct.value).toBeCloseTo((revenue / forecast) * 100);
+      expect(row.growthPct.value).toBeCloseTo((revenue / prior) * 100 - 100);
+    }
+  });
+
+  it('the total is the sum of the rows', () => {
+    const view = marketsTable(ds, {}, '2026-05', '1m', [], null);
+    const total = view.rows.reduce((t, r) => t + (r.revenue.value ?? 0), 0);
+    expect(view.totals.revenue.value).toBeCloseTo(total);
   });
 
   it('a region shows its markets; a market drill keeps its region and marks the market', () => {

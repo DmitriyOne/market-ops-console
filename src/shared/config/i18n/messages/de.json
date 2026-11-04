@@ -348,7 +348,7 @@
     "empty": "Keiner der ausgewählten Märkte ist in dieser Ansicht. Heben Sie die Auswahl auf, um alle Märkte zu sehen.",
     "noteLatest": "Status und Marktanteil gibt es nur für den letzten Monat.",
     "notePerProduct": "Marktanteil gibt es nicht pro Produkt.",
-    "noteCalculated": "Prognose, Abstand zur Prognose, Vorjahr, Stückzahlen und Summe sind aus Monatsdaten berechnet.",
+    "noteCalculated": "Alle Werte sind aus Monatsdaten berechnet, daher geht jede Zeile auf und die Summe ist die Summe der Zeilen. Anteil und Status sind die gespeicherten Werte des letzten Monats; die Kacheln zeigen gespeicherte KPIs, die um etwa 1 Punkt abweichen können.",
     "anomaly": "Anomalie, {period}: {note}"
   },
   "exportMarkets": {
@@ -382,7 +382,7 @@
       "asc": "{column}, aufsteigend",
       "desc": "{column}, absteigend",
       "calculated": "Wie Werte entstehen",
-      "calculatedValue": "Gespeicherte Werte für einen Markt im letzten Monat; alles andere wird aus Monatsdaten berechnet (Umsatz = Σ Ist, Zielerreichung = Σ Ist ÷ Σ Prognose, Wachstum = Σ Ist ÷ Σ Vorjahr − 1). Summen folgen dem Excel-Filter.",
+      "calculatedValue": "Aus Monatsdaten berechnet (Umsatz = Σ Ist, Zielerreichung = Σ Ist ÷ Σ Prognose, Wachstum = Σ Ist ÷ Σ Vorjahr − 1); Anteil und Status wie für den letzten Monat gespeichert. Summen folgen dem Excel-Filter.",
       "status": "Status",
       "statusValue": "In den Daten nur für den letzten Monat gesetzt.",
       "link": "Diese Ansicht öffnen"

@@ -20,7 +20,7 @@ describe('marketsCsv', () => {
     expect(rows).toHaveLength(13);
     const de = rows[0]?.split(',');
     expect(de?.slice(0, 4)).toEqual(['de', 'DE', 'Germany', 'Europe']);
-    expect(de?.[9]).toBe('-9.7');
+    expect(de?.[9]).toBe('-9.73');
     expect(de?.[12]).toBe('off_track');
     expect(de?.[13]).toBe('');
     expect(Number(de?.[4])).toBe(Math.round(Number(de?.[4])));
