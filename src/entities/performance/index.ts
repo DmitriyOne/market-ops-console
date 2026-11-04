@@ -15,6 +15,21 @@ export {
 export { ISO3_TO_NUMERIC } from './model/iso-numeric';
 export { computeKpis, type KpiName, type Kpis, type KpiSource, type KpiValue } from './model/kpis';
 export {
+  MAP_METRICS,
+  MAP_SCALES,
+  type MapMetric,
+  type MapScale,
+  type ScaleMetric,
+  type ScaleStep,
+} from './model/map-scale';
+export {
+  type MapItem,
+  type MapLegend,
+  type MapNotice,
+  marketMap,
+  type MarketMapView,
+} from './model/market-map';
+export {
   type MarketTile,
   marketTiles,
   type RiskItem,
