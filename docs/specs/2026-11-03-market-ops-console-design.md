@@ -128,7 +128,7 @@ Locale prefix `as-needed`: `/dashboard` is `en-GB`; `/de-DE/dashboard`, `/en-US/
 
 Product drill-down **[call]**: `product` is always the last step under a `market` (brief hierarchy: portfolio → region → market → product). Selecting a product narrows series-based views to that product: KPI strip, time series and evidence use the market × product rows; heat map and markets table show that product across the markets in scope (so the user can compare one product across markets); map keeps market-level status and highlights the selected market; share and status show "not available per product"; radar stays market/region level.
 
-Rules: drill-down params are hierarchical (setting `market` sets its `region`; clearing `region` clears `market`/`product`). Drill-down and selection changes push history; cosmetic changes (`kpi`, `mode`) replace [call]. Invalid params fall back to defaults silently.
+Rules: drill-down params are hierarchical (setting `market` sets its `region`; clearing `region` clears `market`/`product`). Drill-down and selection changes push history; cosmetic changes (`kpi`, `mode`) replace [call]. Invalid params fall back to defaults silently, and the URL is corrected in place (no history entry) so a link has one spelling; defaults (`period` = latest, `range=1m`, `mode=executive`) are not written (`normalizeDashboardState`, 0.5.0).
 
 `range` label is "1 month / 3 months / 12 months", ending at `period`; never "quarter" (calendar Q2 2026 is incomplete) **[owner approved]**.
 
@@ -137,7 +137,7 @@ Rules: drill-down params are hierarchical (setting `market` sets its `region`; c
 - **Desktop** **[owner]**: header + dashboard; assistant is a **persistent right panel, collapsible**. Collapsed state is a per-browser preference (not in URL) [call]. A badge shows a new answer while collapsed [call]. Alerts open as a right-side sheet from the header [call].
 - **Tablet** [call]: same as desktop, assistant panel overlays when opened; navigation rail optional if needed.
 - **Phone** **[owner]**: bottom tab bar: **Overview · Assistant · Alerts** (labels always shown, 44×44 targets, badge on Assistant). Assistant is full screen. Locale and theme sit behind a ⚙︎ button in the header and open as a sheet. Period and filters open as short sheets with a Close button and back-gesture support. Default mode on phone is Executive [call].
-- **Header** (all sizes): drill-down breadcrumbs, period + range, Executive/Analyst switch, alerts button with count, locale, theme.
+- **Header** (all sizes): drill-down breadcrumbs (each step lists its siblings; the product step appears under a market **[owner]**), period + range (a month grid with a year switch built from `Popover` + `Button`, no day grid **[owner, 2026-11-04]**), Executive/Analyst switch, alerts button with count, locale, theme. Phone: path and ⚙︎ on the first row, period and mode full width below.
 
 ## 7. Assistant
 
@@ -178,21 +178,22 @@ Four suggested questions (buttons) taken from the brief: risks this quarter, Ger
 
 ### Modes **[owner]**
 
-- **Executive**: KPI strip (revenue, growth, attainment, markets at risk), status map, top risks, portfolio trend (one chart). Minimal numbers.
+- **Executive**: KPI strip (revenue, forecast attainment, growth, markets at risk), market status, top risks, revenue trend (one chart). Minimal numbers. Layout = variant A (ADR 0014 checkpoint): title, KPI cards, market status (two thirds) next to top risks, trend below **[owner, 2026-11-04]**.
 - **Analyst**: everything above plus metric picker on the map, radar, time series with units, heat map, top movers, dense markets table with all KPIs, sort and filter.
 
 ### Widgets [call unless noted]
 
 | Widget | Behaviour |
 | --- | --- |
-| KPI strip | values for current scope and period/range; 12-month sparkline; "Calculated" badge where applicable |
+| KPI strip | values for current scope and period/range; 12-month sparkline; "Calculated" badge where applicable (its name carries the formula); off the latest month "Markets at risk" says why and offers the latest month |
+| Market status (0.5.0) | variant A tiles grouped by region: code, status shape, attainment; off-track hatched; markets from "Show on dashboard" ringed and named as highlighted; click = drill into market; a drill shows its region only; "Show as table"; off the latest month attainment only with a notice **[owner: A tiles in M1, the map joins in M2]** |
 | Top movers | 3 biggest risers and fallers by YoY growth in the range (markets in scope) |
 | Top risks | non-on-track markets, sorted off-track first, then by attainment; markets flagged by alert rules included with 🔔 |
 | Market map | choropleth by `kpi`; pattern/icon per status so colour is not the only signal; click = drill into market; on past periods `status` is unavailable, so the map switches to `attainment` with a notice; table alternative; keyboard: each country focusable with an accessible name and value |
 | Comparison radar | up to 4 markets or regions, axes: growth, attainment, share, revenue (normalised), momentum (3-month change); follows `period`/`range` (computed values labelled); add via "+ Compare" in table/map; table alternative |
-| Time series | actual vs forecast vs prior year for the current scope; anomalies from data marked with a labelled point (handles a list, not just one); units in tooltip; table alternative |
+| Time series | actual vs forecast vs prior year for the current scope; anomalies from data marked with a labelled point (handles a list, not just one); the selected window shaded; units in tooltip (M3); table alternative. Executive shows it as the revenue trend (0.5.0) |
 | Heat map | markets × 24 months, attainment on a diverging scale centred on 100%, values readable on focus; arrow-key navigation; click = select market + period; table alternative |
-| Markets table | analyst only; all KPIs incl. units; sort; filtered by `markets` selection; horizontal scroll with sticky first column on small screens |
+| Markets table | analyst only; all KPIs incl. units; sort; filtered by `markets` selection; horizontal scroll with sticky first column on small screens; "Export CSV" of the rows as shown (filter, sort, period, range), raw numbers so any locale's spreadsheet reads them, file `markets-<period>-<range>.csv` **[owner, 2026-11-04; M3]** |
 
 ### Coordinated views
 
@@ -204,7 +205,7 @@ Four suggested questions (buttons) taken from the brief: risks this quarter, Ger
 ### States
 
 - Skeletons while loading; widgets that depend on URL state render inside `Suspense` with a skeleton (static HTML has no search params; ADR 0010).
-- Each widget has its own error boundary with Retry; one failing widget does not break the page.
+- Each widget has its own error boundary with Retry naming the widget; one failing widget does not break the page. A failed dataset (every widget would fail together) is one page message with one Retry (0.5.0).
 - Empty states (e.g. no markets match filter) with a reset action.
 
 ## 9. Alerts **[owner approved]**

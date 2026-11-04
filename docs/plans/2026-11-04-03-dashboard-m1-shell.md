@@ -6,7 +6,7 @@ in the URL (back/forward and shared links work), and Executive mode shows
 the four KPI cards, market status, top risks and the revenue trend for
 whatever is selected. Assistant source clicks now visibly move the dashboard.
 
-**Status:** approved by the owner, 2026-11-04.
+**Status:** built on `feature/0.5.0/dashboard-shell` (2026-11-04); review pending.
 
 **Spec:** `docs/specs/2026-11-03-market-ops-console-design.md` §5, §6, §8,
 §11, §11a. Decisions: ADR 0004, 0006, 0010, 0014 (checkpoint: variant A),
@@ -128,7 +128,7 @@ compare, CSV, alerts and the 🔔 marks, tablet-specific layout.
 Each task: tests first (watch them fail), then code, then the full checks,
 then one commit.
 
-### Task 1 — Release setup and URL state
+### ✅ Task 1 — Release setup and URL state
 
 - `0.5.0` in `package.json` and `CHANGELOG.md`.
 - Extend `dashboardSearchParams` with `mode` (`executive` | `analyst`,
@@ -143,7 +143,7 @@ then one commit.
 - **Tests:** every case of review focus 1; locale switch keeps
   `markets=de&markets=es` and `#x`.
 
-### Task 2 — Drill-down, period and mode actions
+### ✅ Task 2 — Drill-down, period and mode actions
 
 - `features/drill-down`: `useDrillDown()` → `toPortfolio`, `toRegion(id)`,
   `toMarket(id)` (sets its region), `toProduct(id)`; push history; clears
@@ -156,7 +156,7 @@ then one commit.
 - **Tests:** each action writes the expected URL and history mode; the
   picker cannot select a month without data; keyboard moves and selects.
 
-### Task 3 — Header and page frame
+### ✅ Task 3 — Header and page frame
 
 - `widgets/dashboard-header`: shadcn `breadcrumb`, each step a dropdown of
   its children (`aria-current` on the last), period button, mode switch,
@@ -168,7 +168,7 @@ then one commit.
 - **Tests:** choosing a crumb item drills (URL); product step only with a
   market; ⚙︎ sheet opens, closes with Esc, returns focus; title follows scope.
 
-### Task 4 — KPI cards
+### ✅ Task 4 — KPI cards
 
 - Selectors: `kpiCards(ds, state)` (values, supporting line, source) and
   `sparklineSeries(ds, scope, period)` (12 months ending at `period`).
@@ -178,7 +178,7 @@ then one commit.
   Germany May 2026 uses stored KPIs (no badge); March 2026 shows the notice
   instead of a count; product scope shows share/status as not available.
 
-### Task 5 — Market status and Top risks
+### ✅ Task 5 — Market status and Top risks
 
 - Selector `marketTiles(ds, state)`: region groups, attainment, status or
   null, highlighted (from `markets`).
@@ -193,7 +193,7 @@ then one commit.
   "Show on dashboard" from the assistant rings the listed tiles; past month
   → no glyphs, notice shown; table alternative has the same numbers.
 
-### Task 6 — Revenue trend
+### ✅ Task 6 — Revenue trend
 
 - shadcn `chart` (Recharts 3): actual (solid), forecast (dashed), prior year
   (dotted) for the scope, 24 months; anomalies in scope as labelled points;
@@ -204,7 +204,7 @@ then one commit.
 - **Tests:** table alternative rows for portfolio and Germany; Germany
   March 2026 anomaly listed; scope change updates the series.
 
-### Task 7 — States, phone, wiring and docs
+### ✅ Task 7 — States, phone, wiring and docs
 
 - Skeletons for every widget in the static HTML; `WidgetBoundary` button
   says which widget failed ("Try again: KPI cards"); one page-level
@@ -217,6 +217,17 @@ then one commit.
   M3), DESIGN.md inventory, CHANGELOG 0.5.0, README status, backlog cleaned.
 - **Tests:** a throwing widget leaves the others working; source click
   moves KPI cards and title; skeleton present in server-rendered HTML.
+
+## Deviations from the plan (my calls while building)
+
+- Market status tiles: a drill into a region shows that region only, full width.
+- Mode switch reads `mode` on its own (no dataset needed); range and mode are read as strings and checked in `normalizeDashboardState`, so a bad value is removed from the URL.
+- A drill clears `markets` (assistant highlights); period and range stay.
+- A failed dataset is one page message with one Retry (`DatasetGate`) instead of an announcement next to five widget errors; named widget boundaries stay quiet.
+- shadcn `card` added (widget frame); shadcn `chart` trimmed to the container (its tooltip/legend did not pass lint and wrote inline `<style>`).
+- `StatusChip`, `useKpiFormat` moved from the assistant widget to `entities/performance/ui`; `Sparkline` to `shared/ui`.
+- "Show as table" is one toggle with a fixed label and `aria-pressed`.
+- Top movers stay in M3 (spec puts them in Analyst; the brief lists them under "at a glance" — raised with the owner).
 
 ## Done when
 

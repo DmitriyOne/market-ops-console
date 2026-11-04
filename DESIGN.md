@@ -136,7 +136,22 @@ Rules:
 | `Tooltip` | the name of an icon-only control on hover and focus (New chat) |
 | `Skeleton` | content not known yet, in the shape of what replaces it (`ConversationSkeleton`: question bubble + answer frame); no pulse under reduced motion |
 | `Toaster` / `toast.success` / `toast.error` (sonner) | short confirmations and failures that are not tied to a field ("Thanks for the feedback", "Couldn't copy"); top centre, as wide as the text up to 28rem |
-| `ErrorBoundary`, `WidgetBoundary` | a failing widget explains itself and offers "Try again" without taking the page down |
+| `ErrorBoundary`, `WidgetBoundary` | a failing widget explains itself and offers "Try again" without taking the page down; dashboard widgets pass `name` ("Try again: Key figures") |
+| `Card` | dashboard widget frame: `border border-border ring-0`, `h2` inside `CardTitle`, actions in `CardAction` |
+| `Breadcrumb` | the drill-down path; callers give it its `aria-label` |
+| `MonthPicker` (ours) | month grid with a year switch for monthly data (`Popover` + `Button`, months without data disabled, arrow keys); in `PeriodPicker` |
+| `ToggleGroup` | one-of-few choices (Executive / Analyst, 1 / 3 / 12 months): `bg-muted p-0.5`, active item `bg-card shadow-sm`, items `min-h-11` |
+| `Sheet` | phone settings (language, theme) from the bottom |
+| `Table` | every chart's table alternative; caption `sr-only` |
+| `ChartContainer` | Recharts frame (trimmed shadcn chart): series colours are token vars on each mark, legend and tooltip drawn by the chart; a pixel `height` when the chart can be hidden |
+| `Sparkline` | 12-month line in text colour; decorative (`aria-hidden`) unless given a `label` |
+
+### Dashboard building blocks (0.5.0)
+
+`DashboardHeader` (path, `PeriodPicker`, `ModeSwitch`, language, theme; phone `SettingsSheet`), `ScopeTitle`, `KpiStrip` / `KpiCard`, `MarketStatus` / `StatusTile`, `TopRisks`, `RevenueTrend` (Recharts via `next/dynamic`). Entity UI shared with the assistant: `StatusChip`, `StatusIcon`, `useKpiFormat`, `DatasetGate` (one message when the dataset fails).
+
+- Status tiles: `bg-status-*-muted text-status-*`; off-track adds a `bg-hatch` band (utility in `globals.css`); no status → `bg-muted`; highlighted from the assistant → `ring-2 ring-ring`, and the accessible name says so.
+- Line patterns in charts: actual solid `chart-1`, forecast dashed `chart-5`, prior year dotted `chart-3`, anomaly ring `chart-4`; the legend draws the pattern, not just the colour.
 
 ### Assistant building blocks (`src/widgets/assistant-panel/ui`)
 

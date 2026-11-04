@@ -15,6 +15,7 @@
 - `next/script` with `strategy="beforeInteractive"`: the same inline script with extra wiring; the guide uses a plain `<script>`.
 
 **Consequences.**
-- Any future persisted UI state that changes the first paint (for example the phone `?tab=` section) uses the same pattern: an attribute on `<html>` plus CSS, not `matchMedia` or state in the first render (`DESIGN.md` §7).
+- Any future persisted UI state that changes the first paint uses the same pattern: an attribute on `<html>` plus CSS, not `matchMedia` or state in the first render (`DESIGN.md` §7).
+- Applied a second time in 0.5.0 for the phone `?tab=assistant` link: `SECTION_SCRIPT` (`src/features/switch-section/model/section-script.ts`) sets `data-section="assistant"`, the `section-assistant` variant shows the assistant area in the static fallback, and the app shell removes the attribute on mount (from then on the URL decides).
 - A future `Content-Security-Policy` must allow these inline scripts by hash or nonce; the theme script needs the same. There is no CSP today.
 - The script blocks parsing for a few microseconds; it must stay tiny and must never throw.
