@@ -18,6 +18,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 - shadcn `breadcrumb`, `chart` (trimmed to the frame; Recharts 3), `sheet`, `table`, `toggle-group`.
 - Dashboard URL state is checked against the data: a market brings its own region, a product needs a market, unknown ids, months, ranges and modes fall back to the default, and a bad link is corrected in place without a history entry.
 
+- When the dataset cannot load, the dashboard shows one message with one "Try again" instead of one alert per widget; a widget that fails on its own names itself ("Couldn't load Key figures", "Try again: Key figures").
+- A phone link to the Assistant tab (`?tab=assistant`) shows the assistant area from the first paint (inline script, ADR 0015) instead of flashing Overview.
+
 ### Fixed
 - The 404 page has a skip link and a `main#main` landmark.
 - Switching language keeps repeated query keys (`markets=de&markets=es`) and the `#hash`.

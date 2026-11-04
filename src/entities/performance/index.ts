@@ -38,5 +38,6 @@ export { anomaliesInScope, type ScopedAnomaly, type TrendPoint, trendSeries } fr
 export { type TrendAnomaly, type TrendView, trendView } from './model/trend-view';
 export { useDashboard } from './model/use-dashboard';
 export { type DashboardFocus, useDashboardFocus } from './model/use-dashboard-focus';
+export { DatasetGate } from './ui/DatasetGate';
 export { StatusChip, StatusIcon, useStatusLabel } from './ui/StatusChip';
 export { useKpiFormat } from './ui/use-kpi-format';

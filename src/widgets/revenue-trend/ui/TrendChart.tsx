@@ -25,6 +25,8 @@ export const SERIES = {
 } as const;
 export type SeriesKey = keyof typeof SERIES;
 const KEYS: SeriesKey[] = ['actual', 'forecast', 'priorYear'];
+// Same as h-56; a number, so a hidden chart (phone Assistant tab) still has a size.
+const CHART_HEIGHT = 224;
 
 type TrendChartProps = { view: TrendView; title: string };
 
@@ -63,7 +65,7 @@ export function TrendChart({ view, title }: TrendChartProps) {
   };
 
   return (
-    <ChartContainer className="h-56 w-full">
+    <ChartContainer className="h-56 w-full" height={CHART_HEIGHT}>
       <LineChart data={view.points} title={title} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
         <CartesianGrid vertical={false} />
         {single ? (

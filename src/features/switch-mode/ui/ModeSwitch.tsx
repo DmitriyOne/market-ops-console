@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import { parseAsStringLiteral, useQueryState } from 'nuqs';
 
 import { type Mode, MODES } from '@/entities/performance';
+import { cn } from '@/shared/lib';
 import { ToggleGroup, ToggleGroupItem } from '@/shared/ui';
 
 const modeParser = parseAsStringLiteral(MODES).withDefault('executive').withOptions({
@@ -15,7 +16,7 @@ const modeParser = parseAsStringLiteral(MODES).withDefault('executive').withOpti
 const isMode = (v: string): v is Mode => MODES.some((m) => m === v);
 
 /** Executive overview or analyst deep-dive (spec §8 Modes). */
-export function ModeSwitch() {
+export function ModeSwitch({ className }: { className?: string }) {
   const t = useTranslations('mode');
   const [mode, setMode] = useQueryState('mode', modeParser);
   return (
@@ -28,13 +29,13 @@ export function ModeSwitch() {
       }}
       aria-label={t('label')}
       spacing={0}
-      className="rounded-lg bg-muted p-0.5"
+      className={cn('rounded-lg bg-muted p-0.5', className)}
     >
       {MODES.map((m) => (
         <ToggleGroupItem
           key={m}
           value={m}
-          className="min-h-11 px-3 data-[state=on]:bg-card data-[state=on]:shadow-sm"
+          className="min-h-11 flex-1 px-3 data-[state=on]:bg-card data-[state=on]:shadow-sm"
         >
           {t(m)}
         </ToggleGroupItem>

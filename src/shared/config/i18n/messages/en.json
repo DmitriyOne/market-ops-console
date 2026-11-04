@@ -12,7 +12,10 @@
     "invalidData": "We received data in an unexpected format.",
     "unknown": "Something went wrong.",
     "sectionTitle": "This section couldn't load.",
-    "retry": "Try again"
+    "retry": "Try again",
+    "widgetTitle": "Couldn't load {name}",
+    "retryWidget": "Try again: {name}",
+    "dataFailed": "The dashboard data couldn't load. Each section has a Try again button."
   },
   "offline": {
     "title": "You're offline",
@@ -258,6 +261,7 @@
     "caption": "Revenue by month for {scope}",
     "anomalyMark": "anomaly",
     "window": "selected",
-    "legend": "Legend"
+    "legend": "Legend",
+    "name": "Revenue trend"
   }
 }

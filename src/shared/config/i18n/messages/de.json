@@ -12,7 +12,10 @@
     "invalidData": "Die empfangenen Daten haben ein unerwartetes Format.",
     "unknown": "Etwas ist schiefgelaufen.",
     "sectionTitle": "Dieser Bereich konnte nicht geladen werden.",
-    "retry": "Erneut versuchen"
+    "retry": "Erneut versuchen",
+    "widgetTitle": "{name} konnte nicht geladen werden",
+    "retryWidget": "Erneut versuchen: {name}",
+    "dataFailed": "Die Dashboard-Daten konnten nicht geladen werden. Jeder Bereich hat eine Schaltfläche „Erneut versuchen“."
   },
   "offline": {
     "title": "Sie sind offline",
@@ -258,6 +261,7 @@
     "caption": "Umsatz je Monat für {scope}",
     "anomalyMark": "Auffälligkeit",
     "window": "ausgewählt",
-    "legend": "Legende"
+    "legend": "Legende",
+    "name": "Umsatzverlauf"
   }
 }

@@ -1,7 +1,9 @@
 'use client';
 
-import { Suspense } from 'react';
+import { useTranslations } from 'next-intl';
+import { type ReactNode, Suspense } from 'react';
 
+import { DatasetGate } from '@/entities/performance';
 import { WidgetBoundary } from '@/shared/ui';
 import { ScopeTitle, ScopeTitleSkeleton } from '@/widgets/dashboard-header';
 import { KpiStrip, KpiStripSkeleton } from '@/widgets/kpi-strip';
@@ -14,35 +16,49 @@ const PAGE = 'flex flex-col gap-4 p-4';
 const ROW = 'grid gap-4 xl:grid-cols-3';
 const WIDE = 'xl:col-span-2';
 
+/** One widget: its own error (named) and its own skeleton. */
+function Slot({
+  name,
+  fallback,
+  children,
+}: {
+  name: string;
+  fallback: ReactNode;
+  children: ReactNode;
+}) {
+  return (
+    <WidgetBoundary name={name}>
+      <Suspense fallback={fallback}>{children}</Suspense>
+    </WidgetBoundary>
+  );
+}
+
 /** Executive layout, variant A (ADR 0014 checkpoint). */
 export function Overview() {
+  const t = useTranslations();
   return (
     <div className={PAGE}>
-      <ScopeTitle />
-      <WidgetBoundary>
-        <Suspense fallback={<KpiStripSkeleton />}>
+      <DatasetGate>
+        <Suspense fallback={<ScopeTitleSkeleton />}>
+          <ScopeTitle />
+        </Suspense>
+        <Slot name={t('kpi.title')} fallback={<KpiStripSkeleton />}>
           <KpiStrip />
-        </Suspense>
-      </WidgetBoundary>
-      <div className={ROW}>
-        <div className={WIDE}>
-          <WidgetBoundary>
-            <Suspense fallback={<MarketStatusSkeleton />}>
+        </Slot>
+        <div className={ROW}>
+          <div className={WIDE}>
+            <Slot name={t('marketStatus.title')} fallback={<MarketStatusSkeleton />}>
               <MarketStatus />
-            </Suspense>
-          </WidgetBoundary>
-        </div>
-        <WidgetBoundary>
-          <Suspense fallback={<TopRisksSkeleton />}>
+            </Slot>
+          </div>
+          <Slot name={t('topRisks.title')} fallback={<TopRisksSkeleton />}>
             <TopRisks />
-          </Suspense>
-        </WidgetBoundary>
-      </div>
-      <WidgetBoundary>
-        <Suspense fallback={<RevenueTrendSkeleton />}>
+          </Slot>
+        </div>
+        <Slot name={t('trend.name')} fallback={<RevenueTrendSkeleton />}>
           <RevenueTrend />
-        </Suspense>
-      </WidgetBoundary>
+        </Slot>
+      </DatasetGate>
     </div>
   );
 }

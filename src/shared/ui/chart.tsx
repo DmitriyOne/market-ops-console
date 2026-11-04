@@ -17,10 +17,13 @@ function ChartContainer({
   className,
   children,
   initialDimension = INITIAL_DIMENSION,
+  height = '100%',
   ...props
 }: React.ComponentProps<'div'> & {
   children: React.ComponentProps<typeof ResponsiveContainer>['children'];
   initialDimension?: { width: number; height: number };
+  /** A fixed pixel height keeps the size known while the chart is hidden (phone tabs). */
+  height?: number | `${number}%`;
 }) {
   return (
     <div
@@ -31,7 +34,9 @@ function ChartContainer({
       )}
       {...props}
     >
-      <ResponsiveContainer initialDimension={initialDimension}>{children}</ResponsiveContainer>
+      <ResponsiveContainer initialDimension={initialDimension} height={height}>
+        {children}
+      </ResponsiveContainer>
     </div>
   );
 }

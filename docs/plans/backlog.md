@@ -13,7 +13,6 @@ Format: **Item**: what is wrong (file). Why it can wait. Where it goes.
 ## From the error-handling review (2026-11-03)
 
 - **TanStack `CancelledError` would be logged as a failure** (`src/app/providers/query-client.ts`). No `cancelQueries` in the code yet. **Plan 2**, if the assistant cancels queries; add a test.
-- **One data failure, many alerts**: every widget's fallback is a `role="alert"` with an identically named "Try again" button (`src/shared/ui/widget-boundary.tsx`). **Plan 3**: a widget label in the button name, one page-level announcement.
 
 ## From the design pass (2026-11-03)
 
@@ -24,12 +23,10 @@ Format: **Item**: what is wrong (file). Why it can wait. Where it goes.
 
 - **No live accessibility audit yet**: the Plan 2 audit was by code and contrast tests; no rendered axe/Lighthouse run or screen-reader pass of the panel (streaming announcements, `aria-busy` log). **Plan 5**, accessibility pass.
 - **`summary-long` scroll behaviour tested only at hook level** (`use-stick-to-bottom.test.tsx`); no test scrolls the real panel while it streams. **Plan 5**, in the Playwright happy path or manually.
-- **Source clicks on desktop write the URL but nothing reads it yet** (`region`, `market`, `period`, `markets`). **Plan 3**, dashboard reads `dashboardSearchParams`.
 
 ## From the owner review of 0.4.0 (2026-11-03)
 
 - **Phone bottom tab bar look** (`SectionTabBar`): the owner likes it for now but may want it tuned once the dashboard sections land. **Plan 3**, with the D phone screens (Overview / Assistant / Alerts).
-- **Phone `?tab=assistant` deep link paints Overview first** until hydration. Same fix as the panel (ADR 0015). **Plan 3**, with the phone layout.
 - **"New content" smooth scroll can stop short** while tokens keep arriving (PLAUSIBLE, not reproduced; `use-stick-to-bottom.ts`), and sending a question while scrolled up does not jump to it. **Plan 5**, with the Playwright happy path.
 
 ## From the 0.4.0 answer-actions review (2026-11-04)

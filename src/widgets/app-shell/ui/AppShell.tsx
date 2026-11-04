@@ -2,7 +2,7 @@
 
 import { PanelRightCloseIcon, PanelRightOpenIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { type ReactNode, useCallback, useMemo, useRef, useState } from 'react';
+import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { SectionTabBar, useSection } from '@/features/switch-section';
 import { cn, useMediaQuery } from '@/shared/lib';
@@ -47,6 +47,11 @@ export function AppShell({ header, main, assistant }: AppShellProps) {
   // Focus moves to whichever of the two buttons is shown next.
   const collapseRef = useRef<HTMLButtonElement>(null);
   const expandRef = useRef<HTMLButtonElement>(null);
+
+  // The before-paint section mark is for the static page only; the URL rules from here.
+  useEffect(() => {
+    document.documentElement.removeAttribute('data-section');
+  }, []);
 
   const hidden = desktop ? collapsed : section !== 'assistant';
   // Seen again, however it happened (expand, tab bar, Back): clear the badge.
@@ -152,17 +157,27 @@ export function AppShell({ header, main, assistant }: AppShellProps) {
  * same header, dashboard and an empty panel of the right width, so nothing
  * jumps when the live shell takes over.
  */
-export function AppShellFallback({ header, main }: Pick<AppShellProps, 'header' | 'main'>) {
+export function AppShellFallback({
+  header,
+  main,
+  assistant,
+}: Pick<AppShellProps, 'header' | 'main'> & { assistant?: ReactNode }) {
   const t = useTranslations('shell');
   return (
     <div className={FRAME}>
       <header className="border-b border-border">{header}</header>
       <div className="flex min-h-0 flex-1">
-        <main id="main" className="min-w-0 flex-1 overflow-y-auto">
+        {/* `section-assistant`: set before paint for `?tab=assistant` (ADR 0015). */}
+        <main id="main" className="min-w-0 flex-1 overflow-y-auto max-lg:section-assistant:hidden">
           {/* Each side fails on its own: a crash in one keeps the other. */}
           <WidgetBoundary>{main}</WidgetBoundary>
         </main>
-        <aside aria-label={t('assistant')} className={cn(ASIDE, 'max-lg:hidden')} />
+        <aside
+          aria-label={t('assistant')}
+          className={cn(ASIDE, 'max-lg:hidden max-lg:section-assistant:flex')}
+        >
+          {assistant}
+        </aside>
       </div>
     </div>
   );

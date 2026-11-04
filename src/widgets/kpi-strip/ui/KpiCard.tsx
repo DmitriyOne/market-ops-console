@@ -30,7 +30,7 @@ export function KpiCard({ label, value, detail, formula, source, spark }: KpiCar
       aria-labelledby={labelId}
       className="flex min-w-0 flex-col gap-1 rounded-xl border border-border bg-card p-3"
     >
-      <div className="flex min-h-6 items-center justify-between gap-2">
+      <div className="flex min-h-6 flex-wrap items-center justify-between gap-x-2 gap-y-1">
         <p
           id={labelId}
           className="text-xs font-semibold tracking-wide text-muted-foreground uppercase"
