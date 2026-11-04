@@ -101,7 +101,10 @@ Rules:
   `min-h-14` tab bar. Floating cards keep 15px from the viewport edge
   (`collisionPadding={15}`).
 - Clickable things show `cursor: pointer` (global rule in `globals.css`);
-  disabled shows `not-allowed`.
+  disabled (`disabled` or `aria-disabled="true"`) shows `not-allowed` and has
+  no hover or press effect: `Button` uses the `interactive:` variant
+  (`globals.css`) for both. Use `aria-disabled` instead of `disabled` when the
+  control must keep focus or a tooltip (New chat, a locked rating).
 
 ## 5. Screen frame
 
@@ -130,16 +133,20 @@ Rules:
 | `Popover` | the same card on coarse pointers (tap) |
 | `Collapsible` | "What the data shows" (closed by default) |
 | `DropdownMenu` | theme and locale switches |
+| `Tooltip` | the name of an icon-only control on hover and focus (New chat) |
+| `Skeleton` | content not known yet, in the shape of what replaces it (`ConversationSkeleton`: question bubble + answer frame); no pulse under reduced motion |
+| `Toaster` / `toast.success` / `toast.error` (sonner) | short confirmations and failures that are not tied to a field ("Thanks for the feedback", "Couldn't copy"); top centre, as wide as the text up to 28rem |
 | `ErrorBoundary`, `WidgetBoundary` | a failing widget explains itself and offers "Try again" without taking the page down |
 
 ### Assistant building blocks (`src/widgets/assistant-panel/ui`)
 
-`AssistantPanel` (header "✦ Assistant · Answers in English", log, composer),
+`AssistantPanel` (header "✦ Assistant · Answers in English", New chat, log, composer),
 `Conversation` (`role="log"`, sticky bottom, "New content"), `AnswerMessage`
 (states below), `SourceButton` + `EvidenceCard` (numbers, status, 12-month
 chart with the anomaly marked), `DataCheckBlock` (table: Scope, Attain.,
 Growth, Status; "Not mentioned in the answer"; attention summary;
-"Show on dashboard"), `StatusChip`.
+"Show on dashboard"; status for the latest month only), `AnswerActions` (Copy,
+👍 / 👎 with a reason), `StatusChip`.
 
 Answer states, each from the "A · Assistant" board:
 

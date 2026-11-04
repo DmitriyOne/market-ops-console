@@ -6,6 +6,8 @@
 
 /* Desktop assistant collapsed: set on <html> before first paint (widgets/app-shell). */
 @custom-variant assistant-collapsed (&:where([data-assistant-collapsed] *));
+/* Hover and press feedback only for controls that can act (DESIGN.md §4). */
+@custom-variant interactive (&:not(:disabled, [aria-disabled='true']));
 
 @theme inline {
   --font-sans: var(--font-space-grotesk), system-ui, sans-serif;
@@ -238,7 +240,9 @@
   summary {
     cursor: pointer;
   }
+  /* `button[...]` outweighs `button:not(:disabled)` above. */
   button:disabled,
+  button[aria-disabled='true'],
   [aria-disabled='true'] {
     cursor: not-allowed;
   }

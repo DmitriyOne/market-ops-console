@@ -30,4 +30,9 @@ describe('DataCheckBlock', () => {
       expect(screen.getByText(/updated 9 June 2026/)).toBeInTheDocument();
     },
   );
+
+  it('says that status exists for the latest month only', () => {
+    renderWith('2026-06-09');
+    expect(screen.getByText(en.dataCheck.statusNote)).toBeInTheDocument();
+  });
 });

@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { SparklesIcon } from 'lucide-react';
+import { SparklesIcon, SquarePenIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { type ReactNode, useEffect, useRef } from 'react';
 
@@ -12,9 +12,12 @@ import {
 } from '@/entities/performance';
 import { Composer, SuggestedQuestions, useChatStream } from '@/features/ask-question';
 import { useErrorMessage } from '@/shared/api';
+import { useMediaQuery } from '@/shared/lib';
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui';
 
 import { AnswerMessage, isCantAnswer } from './AnswerMessage';
 import { Conversation } from './Conversation';
+import { ConversationSkeleton } from './ConversationSkeleton';
 
 type AssistantPanelProps = {
   /** An answer finished (the shell shows a badge when the panel is hidden). */
@@ -35,21 +38,28 @@ export function AssistantPanel({
 }: AssistantPanelProps) {
   const t = useTranslations('assistant.panel');
   const chat = useChatStream();
+  const coarse = useMediaQuery('(pointer: coarse)');
   // Not suspense: the chat works even if the dataset fails to load.
   const { data: ds, error: dsError } = useQuery(datasetQueryOptions);
   // Logged by the query cache; here it only replaces "Loading data…".
   const dataError = useErrorMessage()(dsError);
   const { focus, highlight } = useDashboardFocus();
 
-  const notified = useRef(new Set<string>());
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  // Answers restored from sessionStorage were seen before the reload: the first
+  // pass after the history is read records them without announcing them.
+  const notified = useRef<Set<string> | null>(null);
   useEffect(() => {
+    if (!chat.ready) return;
+    const first = notified.current === null;
+    const seen = (notified.current ??= new Set());
     for (const m of chat.messages) {
-      if (m.status === 'done' && !notified.current.has(m.id)) {
-        notified.current.add(m.id);
-        onAnswerDone?.();
+      if (m.status === 'done' && !seen.has(m.id)) {
+        seen.add(m.id);
+        if (!first) onAnswerDone?.();
       }
     }
-  }, [chat.messages, onAnswerDone]);
+  }, [chat.ready, chat.messages, onAnswerDone]);
 
   const onSource = (r: ResolvedCitation) => {
     focus(r);
@@ -76,9 +86,33 @@ export function AssistantPanel({
           {t('title')}
         </h2>
         <span className="flex-1 text-sm text-muted-foreground">{t('subtitle')}</span>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            {/* aria-disabled, not disabled: it keeps focus and its tooltip when empty. */}
+            <Button
+              type="button"
+              variant="ghost"
+              className="size-11 aria-disabled:opacity-50"
+              aria-label={t('newChat')}
+              aria-disabled={chat.messages.length === 0}
+              onClick={() => {
+                if (chat.messages.length === 0) return;
+                chat.reset();
+                // Not on touch: focusing the field would open the on-screen keyboard (owner, 2026-11-04).
+                if (!coarse) inputRef.current?.focus();
+              }}
+            >
+              <SquarePenIcon aria-hidden />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>{t('newChat')}</TooltipContent>
+        </Tooltip>
         {headerAction}
       </header>
-      {chat.messages.length === 0 ? (
+      {!chat.ready ? (
+        // Until the stored conversation is read (server HTML, hydration).
+        <ConversationSkeleton />
+      ) : chat.messages.length === 0 ? (
         <div className="relative flex flex-1 flex-col gap-3 overflow-y-auto p-4">
           <h3 className="text-lg font-semibold">{t('empty.title')}</h3>
           <p className="text-sm text-muted-foreground">{t('empty.body')}</p>
@@ -103,7 +137,12 @@ export function AssistantPanel({
         />
       )}
       <div className="border-t border-border p-3">
-        <Composer isStreaming={chat.isStreaming} onAsk={chat.ask} onStop={chat.stop} />
+        <Composer
+          isStreaming={chat.isStreaming}
+          onAsk={chat.ask}
+          onStop={chat.stop}
+          inputRef={inputRef}
+        />
       </div>
     </section>
   );

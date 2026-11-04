@@ -1,6 +1,6 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { http } from 'msw';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { STREAM_FIRST_EVENT_TIMEOUT_MS } from '@/shared/api';
 import { chatFromFixture, chatStream, fixtureEvents, server } from '@/shared/lib/test';
@@ -21,6 +21,9 @@ function consoleErrors() {
 }
 
 describe('useChatStream', () => {
+  beforeEach(() => {
+    sessionStorage.clear();
+  });
   afterEach(() => {
     vi.restoreAllMocks();
     vi.useRealTimers();
@@ -225,6 +228,138 @@ describe('useChatStream', () => {
     await waitFor(() => {
       expect(signal?.aborted).toBe(true);
     });
+  });
+
+  it('reset clears the conversation and aborts a running stream', async () => {
+    let signal: AbortSignal | undefined;
+    server.use(
+      http.post('*/api/v1/chat', ({ request }) => {
+        signal = request.signal;
+        return new Response(new ReadableStream({ start: () => undefined }), {
+          headers: { 'Content-Type': 'text/event-stream' },
+        });
+      }),
+    );
+    const { result } = setup();
+    act(() => {
+      result.current.ask('Why Germany?');
+    });
+    await waitFor(() => {
+      expect(signal).toBeDefined();
+    });
+    act(() => {
+      result.current.reset();
+    });
+    expect(result.current.messages).toEqual([]);
+    expect(result.current.isStreaming).toBe(false);
+    await waitFor(() => {
+      expect(signal?.aborted).toBe(true);
+    });
+    server.use(chatFromFixture('at-risk'));
+    act(() => {
+      result.current.ask('Which markets are at risk?');
+    });
+    await waitFor(() => {
+      expect(result.current.messages[0]?.status).toBe('done');
+    });
+    expect(result.current.messages).toHaveLength(1);
+  });
+
+  it('a reload in the same tab restores the conversation (sessionStorage)', async () => {
+    server.use(chatFromFixture('germany-dip'));
+    const first = setup();
+    act(() => {
+      first.result.current.ask('Why Germany?');
+    });
+    await waitFor(() => {
+      expect(first.result.current.messages[0]?.status).toBe('done');
+    });
+    first.unmount();
+    const second = setup();
+    expect(second.result.current.messages).toHaveLength(1);
+    expect(second.result.current.messages[0]).toMatchObject({
+      question: 'Why Germany?',
+      status: 'done',
+      text: tokensOf('germany-dip').join(''),
+    });
+  });
+
+  it('writes the conversation when a message starts or ends, not on every token', async () => {
+    const setItem = vi.spyOn(Storage.prototype, 'setItem');
+    server.use(chatFromFixture('germany-dip'));
+    const { result } = setup();
+    act(() => {
+      result.current.ask('Why Germany?');
+    });
+    await waitFor(() => {
+      expect(result.current.messages[0]?.status).toBe('done');
+    });
+    expect(tokensOf('germany-dip').length).toBeGreaterThan(5);
+    // Once when the question starts, once when the answer is done.
+    expect(setItem.mock.calls.filter(([key]) => key === 'mo:chat:v1')).toHaveLength(2);
+  });
+
+  it('does not write back the conversation it just restored', () => {
+    const stored = {
+      v: 1,
+      messages: [
+        {
+          id: 'a1',
+          question: 'Why Germany?',
+          text: 'Because.',
+          status: 'done',
+          kind: 'normal',
+          citations: [],
+          confidence: 'high',
+          error: null,
+          notice: null,
+        },
+      ],
+    };
+    sessionStorage.setItem('mo:chat:v1', JSON.stringify(stored));
+    const setItem = vi.spyOn(Storage.prototype, 'setItem');
+    const { result } = setup();
+    expect(result.current.messages).toHaveLength(1);
+    expect(setItem.mock.calls.filter(([key]) => key === 'mo:chat:v1')).toHaveLength(0);
+  });
+
+  it('a stored answer marked streaming comes back stopped and does not lock the composer', () => {
+    const stored = {
+      v: 1,
+      messages: [
+        {
+          id: 'a1',
+          question: 'Why Germany?',
+          text: 'Because',
+          status: 'streaming',
+          kind: null,
+          citations: [],
+          confidence: null,
+          error: null,
+          notice: null,
+        },
+      ],
+    };
+    sessionStorage.setItem('mo:chat:v1', JSON.stringify(stored));
+    const { result } = setup();
+    expect(result.current.messages[0]?.status).toBe('stopped');
+    expect(result.current.isStreaming).toBe(false);
+  });
+
+  it('reset also clears the stored conversation', async () => {
+    server.use(chatFromFixture('germany-dip'));
+    const first = setup();
+    act(() => {
+      first.result.current.ask('Why Germany?');
+    });
+    await waitFor(() => {
+      expect(first.result.current.messages[0]?.status).toBe('done');
+    });
+    act(() => {
+      first.result.current.reset();
+    });
+    first.unmount();
+    expect(setup().result.current.messages).toEqual([]);
   });
 
   it('stop mid-stream keeps partial text as stopped', async () => {

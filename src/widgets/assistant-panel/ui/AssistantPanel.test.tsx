@@ -1,9 +1,11 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { cleanup, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { NextIntlClientProvider } from 'next-intl';
 import { NuqsTestingAdapter, type UrlUpdateEvent } from 'nuqs/adapters/testing';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { renderToString } from 'react-dom/server';
+import { Toaster } from 'sonner';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { enMessages as en, formats } from '@/shared/config';
 import {
@@ -13,6 +15,7 @@ import {
   fixtureEvents,
   server,
 } from '@/shared/lib/test';
+import { TooltipProvider } from '@/shared/ui';
 
 import { AssistantPanel } from './AssistantPanel';
 
@@ -27,7 +30,10 @@ function setup() {
     <QueryClientProvider client={client}>
       <NextIntlClientProvider locale="en-GB" messages={en} formats={formats} timeZone="UTC">
         <NuqsTestingAdapter onUrlUpdate={onUrlUpdate}>
-          <AssistantPanel onAnswerDone={onAnswerDone} onFocusDashboard={onFocusDashboard} />
+          <TooltipProvider>
+            <AssistantPanel onAnswerDone={onAnswerDone} onFocusDashboard={onFocusDashboard} />
+          </TooltipProvider>
+          <Toaster />
         </NuqsTestingAdapter>
       </NextIntlClientProvider>
     </QueryClientProvider>,
@@ -44,12 +50,45 @@ const answerDone = () =>
     expect(screen.getByText(t.answer.label)).toBeInTheDocument();
   });
 
+const tokensText = (id: string) =>
+  fixtureEvents(id)
+    .flatMap((e) => (e.type === 'token' ? [e.value] : []))
+    .join('')
+    .split('\n\n')[0] ?? '';
+
 const dataCheckToggle = () =>
   screen.queryByRole('button', { name: new RegExp(en.dataCheck.title) });
 
 describe('AssistantPanel', () => {
   beforeEach(() => {
+    sessionStorage.clear();
     server.use(datasetHandler());
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
+
+  it('server HTML shows a loading conversation, not the empty state (history is client-only)', () => {
+    const client = new QueryClient();
+    const html = renderToString(
+      <QueryClientProvider client={client}>
+        <NextIntlClientProvider locale="en-GB" messages={en} formats={formats} timeZone="UTC">
+          <NuqsTestingAdapter>
+            <TooltipProvider>
+              <AssistantPanel />
+            </TooltipProvider>
+          </NuqsTestingAdapter>
+        </NextIntlClientProvider>
+      </QueryClientProvider>,
+    );
+    expect(html).toContain('aria-busy="true"');
+    expect(html).toContain(t.panel.loading);
+    // Shaped like the chat: a question bubble and an answer frame.
+    expect(html).toContain('data-skeleton="question"');
+    expect(html).toContain('data-skeleton="answer"');
+    expect(html).not.toContain(t.panel.empty.title);
   });
 
   it('has a header that says answers are in English', () => {
@@ -225,6 +264,172 @@ describe('AssistantPanel', () => {
     await user.hover(source);
     expect(await screen.findByText(en.errors.server)).toBeInTheDocument();
     expect(screen.queryByText(t.evidence.loading)).not.toBeInTheDocument();
+  });
+
+  it('New chat clears the conversation and is disabled when there is nothing to clear', async () => {
+    server.use(chatFromFixture('germany-dip'));
+    const { user } = setup();
+    const newChat = screen.getByRole('button', { name: t.panel.newChat });
+    expect(newChat).toHaveAttribute('aria-disabled', 'true');
+    await ask(user, 'Tell me about the German market');
+    await answerDone();
+    await user.click(newChat);
+    expect(screen.getByRole('heading', { name: t.panel.empty.title })).toBeInTheDocument();
+    expect(screen.queryByText('Tell me about the German market')).not.toBeInTheDocument();
+    expect(newChat).toHaveAttribute('aria-disabled', 'true');
+    // Clicking it while empty does nothing.
+    await user.click(newChat);
+    expect(screen.getByRole('heading', { name: t.panel.empty.title })).toBeInTheDocument();
+  });
+
+  it('New chat moves focus to the composer', async () => {
+    server.use(chatFromFixture('germany-dip'));
+    const { user } = setup();
+    await ask(user, 'Tell me about the German market');
+    await answerDone();
+    await user.click(screen.getByRole('button', { name: t.panel.newChat }));
+    expect(screen.getByRole('textbox', { name: t.composer.label })).toHaveFocus();
+  });
+
+  it('touch: New chat does not focus the composer (no on-screen keyboard)', async () => {
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn((query: string) => ({
+        matches: query === '(pointer: coarse)',
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      })),
+    );
+    server.use(chatFromFixture('germany-dip'));
+    const { user } = setup();
+    await ask(user, 'Tell me about the German market');
+    await answerDone();
+    const newChat = screen.getByRole('button', { name: t.panel.newChat });
+    await user.click(newChat);
+    expect(screen.getByRole('textbox', { name: t.composer.label })).not.toHaveFocus();
+  });
+
+  it('Copy of a low-confidence answer keeps "Treat as directional"', async () => {
+    server.use(chatFromFixture('forecast-miss'));
+    const { user } = setup();
+    await ask(user, 'Where did we miss the forecast?');
+    await answerDone();
+    await user.click(screen.getByRole('button', { name: t.actions.copy }));
+    expect(await navigator.clipboard.readText()).toContain(t.answer.directional);
+  });
+
+  it('Copy that the browser blocks shows an error toast', async () => {
+    server.use(chatFromFixture('germany-dip'));
+    const { user } = setup();
+    await ask(user, 'Why did Germany dip?');
+    await answerDone();
+    vi.spyOn(navigator.clipboard, 'writeText').mockRejectedValueOnce(new Error('denied'));
+    await user.click(screen.getByRole('button', { name: t.actions.copy }));
+    expect(await screen.findByText(t.actions.copyFailed)).toBeInTheDocument();
+    expect(screen.queryByText(t.actions.copied)).not.toBeInTheDocument();
+  });
+
+  it('Copy answer puts the text, its sources and confidence on the clipboard', async () => {
+    server.use(chatFromFixture('germany-dip'));
+    const { user } = setup();
+    await ask(user, 'Why did Germany dip?');
+    await answerDone();
+    await user.click(screen.getByRole('button', { name: t.actions.copy }));
+    const copied = await navigator.clipboard.readText();
+    const event = fixtureEvents('germany-dip').find((e) => e.type === 'done');
+    const labels = event?.type === 'done' ? event.citations.map((c) => c.label ?? '') : [];
+    expect(copied).toContain(tokensText('germany-dip'));
+    for (const label of labels) expect(copied).toContain(label);
+    expect(copied).toContain(t.answer.label);
+    expect(await screen.findByText(t.actions.copied)).toBeInTheDocument();
+    // "Copied" goes away on its own.
+    await waitFor(
+      () => {
+        expect(screen.queryByText(t.actions.copied)).not.toBeInTheDocument();
+      },
+      { timeout: 3000 },
+    );
+  });
+
+  it('feedback: thumbs down asks why and logs the reason without the question text', async () => {
+    const info = vi.spyOn(console, 'info').mockImplementation(() => undefined);
+    server.use(chatFromFixture('germany-dip'));
+    const { user } = setup();
+    await ask(user, 'Why did Germany dip?');
+    await answerDone();
+    const down = screen.getByRole('button', { name: t.actions.notHelpful });
+    await user.click(down);
+    expect(down).toHaveAttribute('aria-pressed', 'true');
+    await user.click(screen.getByRole('button', { name: t.actions.reasons.wrongNumbers }));
+    // The reasons are gone; keyboard focus goes back to the button that opened them.
+    expect(down).toHaveFocus();
+    expect(info).toHaveBeenCalledWith(
+      '[event] answer_feedback',
+      expect.objectContaining({ rating: 'down', reason: 'wrongNumbers', confidence: 'high' }),
+    );
+    expect(JSON.stringify(info.mock.calls)).not.toContain('Why did Germany dip?');
+    // A toast, not a grey line next to the icons.
+    expect(await screen.findByText(t.actions.thanks)).toBeInTheDocument();
+    // One rating per answer: both buttons are locked, nothing more is logged.
+    const up = screen.getByRole('button', { name: t.actions.helpful });
+    expect(up).toHaveAttribute('aria-disabled', 'true');
+    expect(down).toHaveAttribute('aria-disabled', 'true');
+    await user.click(up);
+    await user.click(down);
+    expect(info).toHaveBeenCalledTimes(1);
+  });
+
+  it('feedback: thumbs up is logged at once', async () => {
+    const info = vi.spyOn(console, 'info').mockImplementation(() => undefined);
+    server.use(chatFromFixture('germany-dip'));
+    const { user } = setup();
+    await ask(user, 'Why did Germany dip?');
+    await answerDone();
+    await user.click(screen.getByRole('button', { name: t.actions.helpful }));
+    expect(info).toHaveBeenCalledWith(
+      '[event] answer_feedback',
+      expect.objectContaining({ rating: 'up' }),
+    );
+    expect(
+      screen.queryByRole('button', { name: t.actions.reasons.wrongNumbers }),
+    ).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: t.actions.helpful }));
+    expect(info).toHaveBeenCalledTimes(1);
+  });
+
+  it('feedback: thumbs down can still become thumbs up before a reason is picked', async () => {
+    const info = vi.spyOn(console, 'info').mockImplementation(() => undefined);
+    server.use(chatFromFixture('germany-dip'));
+    const { user } = setup();
+    await ask(user, 'Why did Germany dip?');
+    await answerDone();
+    await user.click(screen.getByRole('button', { name: t.actions.notHelpful }));
+    await user.click(screen.getByRole('button', { name: t.actions.helpful }));
+    expect(info).toHaveBeenCalledTimes(1);
+    expect(info).toHaveBeenCalledWith(
+      '[event] answer_feedback',
+      expect.objectContaining({ rating: 'up' }),
+    );
+  });
+
+  it('New chat shows a tooltip on hover', async () => {
+    const { user } = setup();
+    // Empty chat: the button is aria-disabled but still explains itself.
+    await user.hover(screen.getByRole('button', { name: t.panel.newChat }));
+    expect(await screen.findByRole('tooltip', { name: t.panel.newChat })).toBeInTheDocument();
+  });
+
+  it('answers restored after a reload are shown but not counted as new', async () => {
+    server.use(chatFromFixture('germany-dip'));
+    const first = setup();
+    await ask(first.user, 'Why did Germany dip?');
+    await answerDone();
+    expect(first.onAnswerDone).toHaveBeenCalledTimes(1);
+    cleanup();
+    const second = setup();
+    await answerDone();
+    expect(screen.getAllByText('Why did Germany dip?').length).toBeGreaterThan(0);
+    expect(second.onAnswerDone).not.toHaveBeenCalled();
   });
 
   it('stop mid-stream shows the stopped state and no sources', async () => {

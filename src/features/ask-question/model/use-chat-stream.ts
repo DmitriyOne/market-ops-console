@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useReducer, useRef } from 'react';
+import { useCallback, useEffect, useReducer, useRef, useState, useSyncExternalStore } from 'react';
 
 import {
   AbortedError,
@@ -14,14 +14,19 @@ import { API_ROUTES } from '@/shared/config';
 import { logError } from '@/shared/lib';
 
 import { type ChatMessage, chatReducer } from './chat-reducer';
+import { loadChat, saveChat } from './chat-storage';
 import { isEnglish } from './language';
 
 export type ChatStream = {
   messages: ChatMessage[];
+  /** False until the stored conversation is read (server HTML and hydration). */
+  ready: boolean;
   isStreaming: boolean;
   ask: (question: string) => void;
   stop: () => void;
   retry: (id: string) => void;
+  /** Start over: stop any answer and clear the conversation. */
+  reset: () => void;
 };
 
 type Active = { id: string; controller: AbortController };
@@ -40,9 +45,24 @@ function parseJson(data: string): unknown {
   }
 }
 
+const subscribeNothing = () => () => undefined;
+const isClient = () => true;
+const isServer = () => false;
+
+// Changes when a message is added, removed or settles; tokens do not change it.
+const storageKey = (messages: ChatMessage[]) => messages.map((m) => `${m.id}:${m.status}`).join();
+
 /** The assistant conversation: one streamed answer at a time (ADR 0003, 0006). */
 export function useChatStream(): ChatStream {
   const [messages, dispatch] = useReducer(chatReducer, []);
+  // The server (and `next dev` SSR) has no sessionStorage: render "not ready"
+  // there and while hydrating, then restore on the first client render after.
+  const hydrated = useSyncExternalStore(subscribeNothing, isClient, isServer);
+  const [ready, setReady] = useState(false);
+  if (hydrated && !ready) {
+    setReady(true);
+    dispatch({ type: 'restore', messages: loadChat() });
+  }
   // A ref, not state: `ask` must see a stream started in the same tick.
   const active = useRef<Active | null>(null);
 
@@ -132,6 +152,13 @@ export function useChatStream(): ChatStream {
     current.controller.abort();
   }, []);
 
+  const reset = useCallback(() => {
+    const current = active.current;
+    active.current = null;
+    current?.controller.abort();
+    dispatch({ type: 'reset' });
+  }, []);
+
   const retry = useCallback(
     (id: string) => {
       const message = messages.find((m) => m.id === id);
@@ -147,11 +174,28 @@ export function useChatStream(): ChatStream {
     [],
   );
 
+  // Write when a message starts or ends (ids and statuses), not on every token.
+  // The first ready commit holds exactly what was restored: remember it, don't write it back.
+  const saved = useRef<string | null>(null);
+  useEffect(() => {
+    if (!ready) return;
+    const key = storageKey(messages);
+    if (saved.current === null) {
+      saved.current = key;
+      return;
+    }
+    if (key === saved.current) return;
+    saved.current = key;
+    saveChat(messages);
+  }, [ready, messages]);
+
   return {
     messages,
+    ready,
     isStreaming: messages.some((m) => m.status === 'streaming'),
     ask,
     stop,
     retry,
+    reset,
   };
 }

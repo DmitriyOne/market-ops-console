@@ -20,7 +20,6 @@ Format: **Item**: what is wrong (file). Why it can wait. Where it goes.
 
 ## From the design pass (2026-11-03)
 
-- **Fallback checkpoint, dashboard D → A** (ADR 0014): when Plan 2 (assistant) is done, compare the days left to the D estimate. Not enough time means build dashboard A. **Before Plan 3** starts.
 - **D screens drawn on the canvas (2026-11-03)**: Analyst, phone (Overview / Assistant / Alerts), widget and assistant states. Builder calls to confirm in Plan 3: phone map has no labels (Top risks below carries the facts); heat-map cells show whole percent, one decimal on focus; heat map is calculated from the series, so it can differ from stored KPIs by a few tenths and says so; radar uses 4 token colours + 4 dash patterns, scaled worst-to-best across 13 markets; in Analyst the assistant is shown collapsed with a badge.
 - **Not drawn yet**: tablet, Alerts as a desktop sheet, evidence card on a source chip, product drill-down. **Plan 3**, from the drawn screens and the tokens.
 
@@ -29,11 +28,26 @@ Format: **Item**: what is wrong (file). Why it can wait. Where it goes.
 - **No live accessibility audit yet**: the Plan 2 audit was by code and contrast tests; no rendered axe/Lighthouse run or screen-reader pass of the panel (streaming announcements, `aria-busy` log). **Plan 5**, accessibility pass.
 - **`summary-long` scroll behaviour tested only at hook level** (`use-stick-to-bottom.test.tsx`); no test scrolls the real panel while it streams. **Plan 5**, in the Playwright happy path or manually.
 - **Source clicks on desktop write the URL but nothing reads it yet** (`region`, `market`, `period`, `markets`). **Plan 3**, dashboard reads `dashboardSearchParams`.
-- **`AGENTS.md` is re-created by `next dev`** (Next.js agent rules). Untracked; the owner decides whether to commit or ignore it.
 
 ## From the owner review of 0.4.0 (2026-11-03)
 
 - **Phone bottom tab bar look** (`SectionTabBar`): the owner likes it for now but may want it tuned once the dashboard sections land. **Plan 3**, with the D phone screens (Overview / Assistant / Alerts).
 - **Phone `?tab=assistant` deep link paints Overview first** until hydration. Same fix as the panel (ADR 0015). **Plan 3**, with the phone layout.
-- **"Show on dashboard" keeps an earlier region/market filter** (`src/entities/performance/model/use-dashboard-focus.ts`, `highlight`): highlighted markets can fall outside the filtered scope. Nothing reads the URL yet, and whether to reset the scope is a dashboard decision. **Plan 3**, ask the owner when the dashboard reads `markets`.
 - **"New content" smooth scroll can stop short** while tokens keep arriving (PLAUSIBLE, not reproduced; `use-stick-to-bottom.ts`), and sending a question while scrolled up does not jump to it. **Plan 5**, with the Playwright happy path.
+
+## From the 0.4.0 answer-actions review (2026-11-04)
+
+- **Copied text can hold empty source labels** when a citation has no `label` and the dataset failed to load (`copyText` in `AnswerMessage.tsx` gives `''`, so "Sources: ; Germany"). Needs a failed dataset and a fixture without labels; none today. **Plan 5**, hardening.
+- **Skeleton test queries `data-skeleton` attributes** (`AssistantPanel.test.tsx`, SSR test), not roles, against `.claude/rules/testing.md`. The skeleton has no roles to query apart from `aria-busy`. **Plan 5**, test pass.
+- **Rating is not kept across a reload** of the tab (state in `AnswerActions`), so a restored answer can be rated again. Owner accepted on 2026-11-04; the server would dedupe by `answerId`. **README notes** if feedback goes to a real endpoint.
+
+## README notes (owner, 2026-11-04)
+
+Points the owner wants explained in the README, in his own words:
+
+- **Chat history in sessionStorage, not localStorage or a server.** Production keeps threads on the server per user, with retention and real deletion; the brief forbids a real backend. sessionStorage survives a reload and ends with the tab. localStorage was rejected: transcript left on shared computers, races between tabs. Risks that remain and how they are handled: XSS can read it (plain-text rendering, no third-party scripts, CSP later), ~5 MB quota (50 messages, try/catch), sync writes (only when a message starts or ends), old formats (versioned key, zod on read). "New chat" clears it.
+- **Citations are per answer, not per claim**: the contract has no positions in the text; guessing them means parsing AI text.
+- **Status is for the latest month only** in the data; the data block says so, while a question may say "this quarter".
+- **Answer feedback** (👍/👎 + reason, once per answer) goes to `logEvent` (console now, analytics later); it never includes the question text.
+- **Rate limits belong on the server**: per user / IP in middleware or the platform firewall (e.g. Vercel WAF) for `/api/chat` and a future `/api/feedback`; the client only prevents accidental repeats (one stream at a time, one rating per answer).
+- **Stale lines in the README today**: the status line still says `0.2.0` ("Dashboard and assistant UI come next"); the structure block lists "chat message" under `entities`, but it lives in `features/ask-question`.
