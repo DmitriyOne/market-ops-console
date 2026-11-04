@@ -224,5 +224,26 @@
       "growth": "Ist ÷ Vorjahres-Ist im gewählten Zeitraum, minus 100 %."
     },
     "unavailable": "—"
+  },
+  "marketStatus": {
+    "title": "Marktstatus",
+    "showTable": "Als Tabelle",
+    "tile": "{name}, {status}, Planerfüllung {value}",
+    "tileNoStatus": "{name}, Planerfüllung {value}",
+    "highlighted": "vom Assistenten markiert",
+    "selected": "ausgewählt",
+    "hatched": "schraffiert",
+    "latestOnly": "Der Status gilt nur für den neuesten Monat; die Kacheln zeigen die Planerfüllung.",
+    "market": "Markt",
+    "region": "Region",
+    "attainment": "Planerfüllung",
+    "status": "Status",
+    "caption": "Marktstatus nach Region, {period}"
+  },
+  "topRisks": {
+    "title": "Größte Risiken",
+    "order": "Verfehlt zuerst, dann nach Planerfüllung",
+    "reason": "{attainment} · {growth} ggü. Vorjahr",
+    "empty": "Hier gibt es keine Märkte mit Risiko."
   }
 }

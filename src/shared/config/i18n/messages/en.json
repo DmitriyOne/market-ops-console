@@ -224,5 +224,26 @@
       "growth": "actual ÷ prior-year actual over the selected months, minus 100%."
     },
     "unavailable": "—"
+  },
+  "marketStatus": {
+    "title": "Market status",
+    "showTable": "Show as table",
+    "tile": "{name}, {status}, attainment {value}",
+    "tileNoStatus": "{name}, attainment {value}",
+    "highlighted": "highlighted from the assistant",
+    "selected": "selected",
+    "hatched": "hatched",
+    "latestOnly": "Status is set for the latest month only; tiles show forecast attainment.",
+    "market": "Market",
+    "region": "Region",
+    "attainment": "Attainment",
+    "status": "Status",
+    "caption": "Market status by region, {period}"
+  },
+  "topRisks": {
+    "title": "Top risks",
+    "order": "Off track first, then by attainment",
+    "reason": "{attainment} · {growth} YoY",
+    "empty": "No markets at risk here."
   }
 }

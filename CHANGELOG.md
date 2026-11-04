@@ -6,6 +6,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 
 ### Added
 - Dashboard header: drill-down path `Portfolio › Region › Market › Product` (each step opens the list of its siblings; picking the current one goes back up to it), period, mode, language and theme; on phones the path and a ⚙︎ button that opens language and theme in a bottom sheet, period and mode below. Skeleton of the same shape in the static HTML.
+- Market status (variant A): markets as tiles grouped by region, status by shape, word and colour, off-track tiles hatched, attainment following the period; markets listed by the assistant ("Show on dashboard") are ringed and named as highlighted; a tile drills into its market; "Show as table" gives the same facts. Off the latest month the tiles show attainment only, with a notice.
+- Top risks: non-on-track markets, off track first then by attainment, each with attainment, growth and the status word; a row drills in; an empty region says so.
+- shadcn `card`; a `bg-hatch` utility for the off-track pattern.
 - KPI cards for the current view: revenue, forecast attainment, growth YoY and markets at risk ("6 of 13", "2 off track · 4 at risk"), each with a supporting line and a 12-month line; computed figures carry a "Calculated" badge that names the formula. Off the latest month the risk card says status exists for the latest month only and offers to jump there; a product says status is per market.
 - Scope title: "Veltrix · Germany" with the number of markets and products and the latest data month.
 - Period picker: a month grid with a year switch (months without data cannot be picked, arrow keys move between months) and the window 1 / 3 / 12 months; both go into the URL with a history entry.

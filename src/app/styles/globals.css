@@ -9,6 +9,15 @@
 /* Hover and press feedback only for controls that can act (DESIGN.md §4). */
 @custom-variant interactive (&:not(:disabled, [aria-disabled='true']));
 
+/* Off-track pattern: a second signal next to the ■ shape and the word (never colour alone). */
+@utility bg-hatch {
+  background-image: repeating-linear-gradient(
+    135deg,
+    var(--color-map-hatch) 0 2px,
+    transparent 2px 6px
+  );
+}
+
 @theme inline {
   --font-sans: var(--font-space-grotesk), system-ui, sans-serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;

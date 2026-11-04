@@ -1,5 +1,6 @@
 export * from './breadcrumb';
 export { Button, buttonVariants } from './button';
+export { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from './card';
 export { ChartContainer } from './chart';
 export { Collapsible, CollapsibleContent, CollapsibleTrigger } from './collapsible';
 export * from './dropdown-menu';

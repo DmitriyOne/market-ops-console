@@ -3,8 +3,8 @@
 import { useTranslations } from 'next-intl';
 
 import { overviewKpis, useDashboard, useKpiFormat } from '@/entities/performance';
-import { useSelectPeriod } from '@/features/select-period';
-import { Button, Skeleton } from '@/shared/ui';
+import { LatestOnlyNotice } from '@/features/select-period';
+import { Skeleton } from '@/shared/ui';
 
 import { KpiCard, KpiCardSkeletonFrame } from './KpiCard';
 
@@ -15,7 +15,6 @@ export function KpiStrip() {
   const t = useTranslations('kpi');
   const f = useKpiFormat();
   const { ds, state } = useDashboard();
-  const { toLatest } = useSelectPeriod();
   const { kpis, totals, spark, risk } = overviewKpis(ds, state.scope, state.period, state.range);
   const money = (n: number) => f.value({ value: n, source: 'calculated' }, 'currency');
 
@@ -30,19 +29,7 @@ export function KpiStrip() {
         ? t('riskNone')
         : t('riskSplit', { offTrack: risk.offTrack, atRisk: risk.atRisk });
   } else if (risk.kind === 'latestOnly') {
-    riskDetail = (
-      <span className="flex flex-col items-start">
-        {t('latestOnly')}
-        <Button
-          type="button"
-          variant="link"
-          className="h-auto min-h-11 p-0 text-xs"
-          onClick={toLatest}
-        >
-          {t('goLatest', { period: f.period(ds.meta.latestPeriod) })}
-        </Button>
-      </span>
-    );
+    riskDetail = <LatestOnlyNotice />;
   } else {
     riskDetail = t('perProduct');
   }
