@@ -19,6 +19,7 @@ import { useMediaQuery } from '@/shared/lib';
 // Direct path, not the shared/ui index: Recharts must stay in this lazy chunk.
 import { ChartContainer } from '@/shared/ui/chart';
 
+import { LegendLine } from './LegendLine';
 import { SERIES, SERIES_KEYS as KEYS } from './series';
 
 // Same as h-56; a number, so a hidden chart (phone Assistant tab) still has a size.
@@ -47,7 +48,11 @@ function TrendTooltip({
       <dl className="grid grid-cols-2 gap-x-3 font-mono tabular-nums">
         {KEYS.map((key) => (
           <div key={key} className="contents">
-            <dt className="font-sans text-muted-foreground">{t(key)}</dt>
+            {/* The line's own colour and pattern, as in the legend. */}
+            <dt className="flex items-center gap-1.5 font-sans text-muted-foreground">
+              <LegendLine series={key} />
+              {t(key)}
+            </dt>
             <dd className="text-right">{format.number(point[key], 'compactCurrency')}</dd>
           </div>
         ))}
