@@ -303,7 +303,8 @@
     "legend": "Legend",
     "name": "Revenue trend",
     "showChart": "Show as chart",
-    "windowRange": "{from} – {to}"
+    "windowRange": "{from} – {to}",
+    "units": "Units"
   },
   "topMovers": {
     "title": "Top movers",

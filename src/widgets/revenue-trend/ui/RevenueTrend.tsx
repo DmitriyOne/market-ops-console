@@ -50,6 +50,8 @@ export function RevenueTrend() {
   if (asTable === null) return <RevenueTrendSkeleton />;
 
   const view = trendView(ds, state.scope, state.period, state.range);
+  // Analyst reads volume too; units have their own scale, so no second line (one axis).
+  const units = state.mode === 'analyst';
   const period = (p: string) => format.dateTime(periodToDate(p), 'period');
   const money = (n: number) => format.number(n, 'compactCurrency');
   const scope = scopeLabel(ds, state.scope) ?? tDrill('portfolio');
@@ -124,6 +126,7 @@ export function RevenueTrend() {
                       {t(key)}
                     </TableHead>
                   ))}
+                  {units ? <TableHead className="text-right">{t('units')}</TableHead> : null}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -146,13 +149,18 @@ export function RevenueTrend() {
                         {format.number(p[key], 'wholeCurrency')}
                       </TableCell>
                     ))}
+                    {units ? (
+                      <TableCell className="text-right font-mono tabular-nums">
+                        {format.number(p.units, 'integer')}
+                      </TableCell>
+                    ) : null}
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
           </div>
         ) : (
-          <TrendChart view={view} title={summary} />
+          <TrendChart view={view} title={summary} units={units} />
         )}
         {view.anomalies.length > 0 ? (
           <ul className="flex flex-col gap-1 text-xs">

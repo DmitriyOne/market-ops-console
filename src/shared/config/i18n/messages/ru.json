@@ -303,7 +303,8 @@
     "legend": "Легенда",
     "name": "Динамика выручки",
     "showChart": "Показать графиком",
-    "windowRange": "{from} – {to}"
+    "windowRange": "{from} – {to}",
+    "units": "Штуки"
   },
   "topMovers": {
     "title": "Лидеры изменений",

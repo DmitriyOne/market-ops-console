@@ -303,7 +303,8 @@
     "legend": "Legende",
     "name": "Umsatzverlauf",
     "showChart": "Als Diagramm anzeigen",
-    "windowRange": "{from} – {to}"
+    "windowRange": "{from} – {to}",
+    "units": "Stück"
   },
   "topMovers": {
     "title": "Größte Veränderungen",
