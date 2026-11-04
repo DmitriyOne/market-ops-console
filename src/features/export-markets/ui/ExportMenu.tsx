@@ -1,7 +1,8 @@
 'use client';
 
-import { ChevronDownIcon, DownloadIcon } from 'lucide-react';
+import { ChevronDownIcon, DownloadIcon, LoaderCircleIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { useMemo, useState } from 'react';
 
 import { marketsMonthly, marketsTable, useDashboard } from '@/entities/performance';
 import { downloadBlob, downloadText, logError } from '@/shared/lib';
@@ -28,18 +29,41 @@ export function ExportMenu() {
   const t = useTranslations('exportMarkets');
   const { ds, state } = useDashboard();
   const { scope, period, range, selected, sort } = state;
-  const view = marketsTable(ds, scope, period, range, selected, sort);
+  const view = useMemo(
+    () => marketsTable(ds, scope, period, range, selected, sort),
+    [ds, scope, period, range, selected, sort],
+  );
   const sheetLabels = useSheetLabels();
+  const [pending, setPending] = useState(false);
+
+  // Any failure (ExcelJS chunk not loaded, workbook not written, download
+  // refused) is logged and told; the dashboard stays as it is.
+  // The trigger keeps focus (menu items wait instead): disabling it would drop focus.
+  const save = async (action: 'export_xlsx' | 'export_csv', make: () => Promise<void> | void) => {
+    if (pending) return;
+    setPending(true);
+    try {
+      await make();
+    } catch (error) {
+      logError(error, { scope: 'ui', action });
+      toast.error(t('failed'));
+    } finally {
+      setPending(false);
+    }
+  };
 
   const saveExcel = async () => {
-    try {
-      const months = marketsMonthly(ds, view, scope, period, range);
-      const blob = await marketsXlsx(view, months, sheetLabels(window.location.href));
-      downloadBlob(marketsXlsxName(period, range, scope.productId), blob);
-    } catch (error) {
-      logError(error, { scope: 'ui', action: 'export_xlsx' });
-      toast.error(t('failed'));
-    }
+    const months = marketsMonthly(ds, view, scope, period, range);
+    const blob = await marketsXlsx(view, months, sheetLabels(window.location.href));
+    downloadBlob(marketsXlsxName(period, range, scope.productId), blob);
+  };
+
+  const saveCsv = () => {
+    downloadText(
+      marketsCsvName(period, range, scope.productId),
+      marketsCsv(view),
+      'text/csv;charset=utf-8',
+    );
   };
 
   return (
@@ -50,9 +74,14 @@ export function ExportMenu() {
           variant="outline"
           className="min-h-11 gap-1"
           disabled={view.rows.length === 0}
+          aria-busy={pending}
         >
-          <DownloadIcon aria-hidden />
-          {t('button')}
+          {pending ? (
+            <LoaderCircleIcon aria-hidden className="motion-safe:animate-spin" />
+          ) : (
+            <DownloadIcon aria-hidden />
+          )}
+          {pending ? t('preparing') : t('button')}
           <ChevronDownIcon aria-hidden />
         </Button>
       </DropdownMenuTrigger>
@@ -62,8 +91,9 @@ export function ExportMenu() {
         </DropdownMenuLabel>
         <DropdownMenuItem
           className="min-h-11 flex-col items-start gap-0"
+          disabled={pending}
           onSelect={() => {
-            void saveExcel();
+            void save('export_xlsx', saveExcel);
           }}
         >
           {t('excel')}
@@ -71,12 +101,9 @@ export function ExportMenu() {
         </DropdownMenuItem>
         <DropdownMenuItem
           className="min-h-11 flex-col items-start gap-0"
+          disabled={pending}
           onSelect={() => {
-            downloadText(
-              marketsCsvName(period, range, scope.productId),
-              marketsCsv(view),
-              'text/csv;charset=utf-8',
-            );
+            void save('export_csv', saveCsv);
           }}
         >
           {t('csv')}

@@ -86,7 +86,8 @@ export function normalizeDashboardState(
   if (raw.kpi !== null && metric === 'status') fix.kpi = null;
   const kpi = mode === 'analyst' ? metric : 'status';
 
-  const selected = (raw.markets ?? []).filter((id) => getMarket(ds, id));
+  // Unknown ids and repeats (`?markets=de&markets=de`) are dropped.
+  const selected = [...new Set(raw.markets ?? [])].filter((id) => getMarket(ds, id));
   if (raw.markets !== null && selected.length !== raw.markets.length) {
     fix.markets = selected.length > 0 ? selected : null;
   }

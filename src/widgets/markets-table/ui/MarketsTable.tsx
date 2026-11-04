@@ -2,7 +2,7 @@
 
 import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon, TriangleAlertIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useId, useMemo } from 'react';
+import { useCallback, useId, useMemo, useRef } from 'react';
 
 import {
   isLatestSnapshot,
@@ -119,6 +119,10 @@ export function MarketsTable() {
     [ds, scope, period, range, selected, sort],
   );
   const latest = isLatestSnapshot(ds, period, range);
+  const title = useRef<HTMLHeadingElement>(null);
+  const focusTitle = useCallback(() => {
+    title.current?.focus();
+  }, []);
   const window =
     range === '1m'
       ? f.period(period)
@@ -128,7 +132,13 @@ export function MarketsTable() {
     <Card aria-labelledby={titleId} role="region" className={CARD}>
       <CardHeader className="flex flex-wrap items-center justify-between gap-2">
         <CardTitle>
-          <h2 id={titleId} className="text-base font-semibold">
+          {/* Focus lands here when the last chip is removed. */}
+          <h2
+            id={titleId}
+            ref={title}
+            tabIndex={-1}
+            className="text-base font-semibold outline-none"
+          >
             {t('title')}
           </h2>
         </CardTitle>
@@ -137,7 +147,7 @@ export function MarketsTable() {
       <CardContent className="flex flex-col gap-3">
         <div className="flex flex-col gap-2">
           <MarketFilter />
-          <SelectionChips />
+          <SelectionChips onEmptied={focusTitle} />
         </div>
         {view.rows.length === 0 ? (
           // The filter's own Clear above is the way back.
@@ -210,7 +220,7 @@ function MarketRow({ row, onOpen }: { row: Row; onOpen: (id: string) => void }) 
           {row.anomalies.map((a) => {
             const label = t('anomaly', { period: f.period(a.period), note: a.note });
             return (
-              <Tooltip key={a.period}>
+              <Tooltip key={`${a.period}:${a.note}`}>
                 <TooltipTrigger asChild>
                   <Button
                     type="button"

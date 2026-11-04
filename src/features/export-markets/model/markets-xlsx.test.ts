@@ -110,6 +110,24 @@ describe('marketsXlsx', () => {
     );
   });
 
+  it('ratio totals are blank, not #DIV/0!, when the filter hides every row', async () => {
+    const total = sheetOf(await book(['de', 'es'], '1m'), 'Markets').getRow(6);
+    for (const col of [7, 9]) {
+      expect(JSON.stringify(total.getCell(col).value)).toMatch(/IFERROR\(.*,\\"\\"\)/);
+    }
+  });
+
+  it('no rows: the table still has a (blank) data row, so Excel opens it without repair', async () => {
+    const view = marketsTable(ds, { regionId: 'apac' }, '2026-05', '1m', ['de'], null);
+    expect(view.rows).toHaveLength(0);
+    const wb = new ExcelJS.Workbook();
+    await wb.xlsx.load(await (await marketsXlsx(view, [], LABELS)).arrayBuffer());
+    const sheet = sheetOf(wb, 'Markets');
+    expect(sheet.getRow(4).getCell(1).value).toBeNull();
+    expect(sheet.getRow(5).getCell(1).value).toBe('Total');
+    expect(JSON.stringify(sheet.getRow(5).getCell(4).value)).toContain('D4:D4');
+  });
+
   it('status and negative gaps carry a colour rule; the word stays', async () => {
     const sheet = sheetOf(await book(), 'Markets');
     // Read back by ExcelJS but missing from its types: checked with a schema, not a cast.

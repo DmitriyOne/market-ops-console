@@ -1,7 +1,8 @@
 type Cell = string | number | null;
 
-// A text cell starting with one of these runs as a formula in a spreadsheet (CSV injection).
-const FORMULA = /^[=+\-@]/;
+// A text cell starting with one of these runs as a formula in a spreadsheet
+// (CSV injection; OWASP lists tab and carriage return too).
+const FORMULA = /^[=+\-@\t\r]/;
 
 function cell(value: Cell): string {
   if (value === null) return '';

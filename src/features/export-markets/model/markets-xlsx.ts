@@ -51,6 +51,8 @@ const monthDate = (p: Period) => {
 const letter = (index: number) => String.fromCharCode(65 + index);
 const span = (col: string, first: number, last: number) =>
   `${col}${String(first)}:${col}${String(last)}`;
+// Blank, not #DIV/0!, when the filter hides every row or the base is 0.
+const ratio = (formula: string) => `IFERROR(${formula},"")`;
 
 type Column = {
   header: string;
@@ -85,7 +87,8 @@ function addTable(
     totalsRow: false,
     style: { theme: 'TableStyleMedium2', showRowStripes: true },
     columns: columns.map((c) => ({ name: c.header, filterButton: true })),
-    rows,
+    // A table needs a data row: header-only, Excel "repairs" the file.
+    rows: rows.length > 0 ? rows : [columns.map(() => null)],
   });
   const total = sheet.getRow(last + 1);
   columns.forEach((c, i) => {
@@ -160,14 +163,15 @@ export async function marketsXlsx(
         header: h('attainment'),
         width: 12,
         numFmt: PERCENT,
-        total: (a, b) => `SUBTOTAL(109,${span('D', a, b)})/SUBTOTAL(109,${span('E', a, b)})`,
+        total: (a, b) => ratio(`SUBTOTAL(109,${span('D', a, b)})/SUBTOTAL(109,${span('E', a, b)})`),
       },
       { header: h('priorYear'), width: 14, numFmt: MONEY, total: 'sum' },
       {
         header: h('growth'),
         width: 12,
         numFmt: SIGNED_PERCENT,
-        total: (a, b) => `SUBTOTAL(109,${span('D', a, b)})/SUBTOTAL(109,${span('H', a, b)})-1`,
+        total: (a, b) =>
+          ratio(`SUBTOTAL(109,${span('D', a, b)})/SUBTOTAL(109,${span('H', a, b)})-1`),
       },
       { header: h('share'), width: 10, numFmt: PERCENT },
       { header: h('units'), width: 11, numFmt: INTEGER, total: 'sum' },

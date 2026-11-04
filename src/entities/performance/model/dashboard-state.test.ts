@@ -120,6 +120,13 @@ describe('normalizeDashboardState', () => {
     expect(normalize({ markets: ['zz'] }).fix).toEqual({ markets: null });
   });
 
+  it('a market listed twice is kept once', () => {
+    expect(normalize({ markets: ['de', 'es', 'de'] })).toMatchObject({
+      state: { selected: ['de', 'es'] },
+      fix: { markets: ['de', 'es'] },
+    });
+  });
+
   it('a valid table order is kept as written', () => {
     expect(normalize({ sort: '-growth' })).toMatchObject({
       state: { sort: { column: 'growth', dir: 'desc' } },

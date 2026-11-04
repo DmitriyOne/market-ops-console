@@ -16,9 +16,13 @@ describe('toCsv', () => {
   });
 
   it('a text that a spreadsheet would run as a formula is kept as text', () => {
-    for (const text of ['=SUM(A1)', '+1', '-1', '@x']) {
+    for (const text of ['=SUM(A1)', '+1', '-1', '@x', '\t=1']) {
       expect(toCsv(['x'], [[text]]).slice(1)).toBe(`x\r\n'${text}\r\n`);
     }
+  });
+
+  it('a leading carriage return is guarded too (and quoted, as a line break)', () => {
+    expect(toCsv(['x'], [['\r=1']]).slice(1)).toBe(`x\r\n"'\r=1"\r\n`);
   });
 
   it('numbers stay plain (no locale), missing values are empty', () => {

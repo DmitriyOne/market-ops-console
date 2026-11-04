@@ -10,7 +10,8 @@ import { SelectionChips } from './SelectionChips';
 /**
  * The selection where there is no filter menu (Market status, also in
  * Executive): what is selected, a way to remove one or all. `onCleared`
- * gets focus somewhere sensible once the bar is gone.
+ * gets focus somewhere sensible once the bar is gone (Clear, or the
+ * last chip removed).
  */
 export function SelectionBar({ onCleared }: { onCleared?: () => void }) {
   const t = useTranslations('marketFilter');
@@ -21,7 +22,7 @@ export function SelectionBar({ onCleared }: { onCleared?: () => void }) {
       <span aria-hidden className="text-xs font-medium text-muted-foreground">
         {t('selected')}
       </span>
-      <SelectionChips />
+      <SelectionChips onEmptied={onCleared} />
       <Button
         type="button"
         variant="ghost"

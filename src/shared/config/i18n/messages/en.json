@@ -353,6 +353,7 @@
   },
   "exportMarkets": {
     "button": "Export",
+    "preparing": "Preparing…",
     "title": "Rows as shown",
     "excel": "Excel (.xlsx)",
     "excelHint": "Formatted, with filters",

@@ -28,8 +28,13 @@ export function useMarketSelection(): MarketSelection {
     };
     return {
       selected,
+      // From the URL as it is now, not as rendered: two quick toggles both count.
       toggle: (id) => {
-        write(selected.includes(id) ? selected.filter((s) => s !== id) : [...selected, id]);
+        void setParams((prev) => {
+          const now = prev.markets;
+          const next = now.includes(id) ? now.filter((s) => s !== id) : [...now, id];
+          return { markets: next.length > 0 ? next : null };
+        });
       },
       set: write,
       clear: () => {

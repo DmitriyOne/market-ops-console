@@ -5,17 +5,31 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { enMessages as en } from '@/shared/config';
 import { datasetHandler, renderWithProviders, server } from '@/shared/lib/test';
 
+import * as xlsx from '../model/markets-xlsx';
 import { ExportMenu } from './ExportMenu';
 
-const { downloadBlob, downloadText } = vi.hoisted(() => ({
+const { downloadBlob, downloadText, logError, marketsXlsx, toastError } = vi.hoisted(() => ({
+  toastError: vi.fn(),
   downloadBlob: vi.fn(),
   downloadText: vi.fn(),
+  logError: vi.fn(),
+  marketsXlsx: vi.fn(),
 }));
 vi.mock('@/shared/lib', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/shared/lib')>()),
   downloadBlob,
   downloadText,
+  logError,
 }));
+vi.mock('@/shared/ui', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/shared/ui')>()),
+  toast: { error: toastError },
+}));
+vi.mock('../model/markets-xlsx', async (importOriginal) => ({
+  ...(await importOriginal<typeof xlsx>()),
+  marketsXlsx,
+}));
+const { marketsXlsx: realXlsx } = await vi.importActual<typeof xlsx>('../model/markets-xlsx');
 
 const t = en.exportMarkets;
 const SEARCH = '?mode=analyst&range=3m&markets=de&markets=es&sort=-units';
@@ -31,8 +45,11 @@ function setup(searchParams = SEARCH) {
 
 describe('ExportMenu', () => {
   beforeEach(() => {
-    downloadBlob.mockClear();
-    downloadText.mockClear();
+    downloadBlob.mockReset();
+    downloadText.mockReset();
+    logError.mockReset();
+    toastError.mockReset();
+    marketsXlsx.mockReset().mockImplementation(realXlsx);
     server.use(datasetHandler());
   });
 
@@ -60,5 +77,65 @@ describe('ExportMenu', () => {
   it('nothing to save: the button is disabled', async () => {
     setup('?mode=analyst&region=apac&markets=de');
     expect(await screen.findByRole('button', { name: t.button })).toBeDisabled();
+  });
+
+  it('Excel that cannot be made (ExcelJS not loaded) is logged and told; the menu still works', async () => {
+    const failure = new Error('Loading chunk exceljs failed');
+    marketsXlsx.mockRejectedValueOnce(failure);
+    const { user } = setup();
+    await user.click(await screen.findByRole('button', { name: t.button }));
+    await user.click(await screen.findByRole('menuitem', { name: /^Excel/ }));
+    await waitFor(() => {
+      expect(toastError).toHaveBeenCalledWith(t.failed);
+    });
+    expect(logError).toHaveBeenCalledWith(failure, { scope: 'ui', action: 'export_xlsx' });
+    expect(downloadBlob).not.toHaveBeenCalled();
+    // Not stuck busy: a second try goes through.
+    const button = screen.getByRole('button', { name: t.button });
+    expect(button).not.toHaveAttribute('aria-busy', 'true');
+    await user.click(button);
+    await user.click(await screen.findByRole('menuitem', { name: /^Excel/ }));
+    await waitFor(() => {
+      expect(downloadBlob).toHaveBeenCalledOnce();
+    });
+  });
+
+  it('CSV the browser refuses to save is logged and told', async () => {
+    const failure = new Error('blocked');
+    downloadText.mockImplementationOnce(() => {
+      throw failure;
+    });
+    const { user } = setup();
+    await user.click(await screen.findByRole('button', { name: t.button }));
+    await user.click(await screen.findByRole('menuitem', { name: /^CSV/ }));
+    await waitFor(() => {
+      expect(toastError).toHaveBeenCalledWith(t.failed);
+    });
+    expect(logError).toHaveBeenCalledWith(failure, { scope: 'ui', action: 'export_csv' });
+  });
+
+  it('while the workbook is made the button says so and a second click waits', async () => {
+    let finish: (blob: Blob) => void = () => {};
+    marketsXlsx.mockImplementationOnce(
+      () =>
+        new Promise<Blob>((resolve) => {
+          finish = resolve;
+        }),
+    );
+    const { user } = setup();
+    await user.click(await screen.findByRole('button', { name: t.button }));
+    await user.click(await screen.findByRole('menuitem', { name: /^Excel/ }));
+    const busy = await screen.findByRole('button', { name: t.preparing });
+    expect(busy).toHaveAttribute('aria-busy', 'true');
+    await user.click(busy);
+    expect(await screen.findByRole('menuitem', { name: /^Excel/ })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
+    finish(new Blob(['x']));
+    await waitFor(() => {
+      expect(downloadBlob).toHaveBeenCalledOnce();
+    });
+    expect(marketsXlsx).toHaveBeenCalledOnce();
   });
 });

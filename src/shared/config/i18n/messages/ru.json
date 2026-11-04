@@ -353,6 +353,7 @@
   },
   "exportMarkets": {
     "button": "Экспорт",
+    "preparing": "Готовим…",
     "title": "Строки как на экране",
     "excel": "Excel (.xlsx)",
     "excelHint": "С форматами и фильтрами",

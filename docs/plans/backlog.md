@@ -71,6 +71,15 @@ Points the owner wants explained in the README, in his own words:
 - **Total row's sticky cell** is plain `bg-muted` while the footer row is `bg-muted/50` over the card, so the first cell is a shade darker. An opaque mixed token would fix it. **Design pass**.
 - **Shift+Enter on a tile** relies on the browser putting `shiftKey` on the click a key press makes (Chrome and Firefox do); the map handles Shift+Enter itself. **Hardening plan**, with the a11y pass.
 
+## From the 0.7.0 branch review (2026-11-04)
+
+- **Row figures mix two sources at the latest month** (open question to the owner): with no product and `1m` at the latest month, revenue, attainment and growth are the stored `market.kpis`, while forecast, prior year and gap are summed from series. In the data they differ a little (India 103.1% shown vs 104.2% = revenue ÷ forecast in the same row; revenue − forecast ≠ gap by $1–2), and the Excel total attainment is a ratio of the columns, so it does not match the rows' figures. Choice: series everywhere in the table (tiles keep stored KPIs), or derive gap from the stored revenue. Not changed without the owner.
+- **Table slot outside its boundary**: `AnalystOnly` in `Overview.tsx` reads `useDashboard` outside the slot's `WidgetBoundary`, in a Suspense with no fallback. `DatasetGate` already guards the data, so the risk is low. Move the mode check inside the slot. **Hardening plan**.
+- **Excel has no share total** while the UI footer has one (a revenue-weighted share is not a column formula). Add as a value, or leave. **Design pass**.
+- **Back undoes one checkbox at a time** in the multi-pick menu (each pick is its own history entry, spec §6). Confirm or batch the menu's picks into one entry on close.
+- **Popups in the assistant's scroll area** (message list) have no scroll boundary yet (`PopperBoundary` covers `<main>` only): a source card's popup could follow its trigger over the panel header. Same fix if it shows. **Hardening plan**.
+- **Map Shift+click** builds the map's still-view key from the rendered selection (`toggleOnMap`), while the toggle itself now reads the URL as it is; two Shift+clicks inside one render could make the map fit once. Cosmetic.
+
 ## For M4 (owner, 2026-11-04)
 
 - **Radar = selection**: the radar compares the selected markets (`markets`, first 4); with nothing selected it compares regions. No `compare` param and no "+ Compare" buttons. The heat map's multi-select changes the same list.

@@ -353,6 +353,7 @@
   },
   "exportMarkets": {
     "button": "Exportieren",
+    "preparing": "Wird erstellt…",
     "title": "Zeilen wie angezeigt",
     "excel": "Excel (.xlsx)",
     "excelHint": "Formatiert, mit Filtern",
