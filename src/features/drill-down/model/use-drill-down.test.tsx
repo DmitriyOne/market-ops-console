@@ -47,6 +47,24 @@ describe('useDrillDown', () => {
     expect(event?.options.history).toBe('push');
   });
 
+  it('another market keeps the chosen product', async () => {
+    const { result, last } = await setup('?region=eu&market=de&product=veltrix');
+    act(() => {
+      result.current.toMarket('jp');
+    });
+    expect((await last())?.queryString).toBe('?region=apac&market=jp&product=veltrix');
+  });
+
+  it('clearing the product goes back up to the market', async () => {
+    const { result, last } = await setup('?region=eu&market=de&product=veltrix&markets=fr');
+    act(() => {
+      result.current.clearProduct();
+    });
+    const event = await last();
+    expect(event?.queryString).toBe('?region=eu&market=de');
+    expect(event?.options.history).toBe('push');
+  });
+
   it('a region clears the market and product below it', async () => {
     const { result, last } = await setup('?region=eu&market=de&product=veltrix');
     act(() => {

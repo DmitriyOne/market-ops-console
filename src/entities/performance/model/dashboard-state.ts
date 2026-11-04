@@ -1,5 +1,6 @@
 import type { Dataset, Period } from '@/shared/api';
 
+import { MAP_METRICS, type MapMetric } from './map-scale';
 import { getMarket, getProduct, getRegion } from './reference';
 import type { Range, Scope } from './scope';
 
@@ -16,6 +17,7 @@ export type RawDashboardParams = {
   range: string | null;
   mode: string | null;
   markets: string[] | null;
+  kpi: string | null;
 };
 
 /** The view every widget reads: valid ids only, defaults filled in. */
@@ -24,12 +26,15 @@ export type DashboardState = {
   period: Period;
   range: Range;
   mode: Mode;
+  /** Map metric; always `status` in Executive. */
+  kpi: MapMetric;
   /** Markets highlighted from the assistant ("Show on dashboard"). */
   highlighted: string[];
 };
 
 const isRange = (v: string): v is Range => RANGES.some((r) => r === v);
 const isMode = (v: string): v is Mode => MODES.some((m) => m === v);
+const isMetric = (v: string): v is MapMetric => MAP_METRICS.some((m) => m === v);
 
 /**
  * Applies the URL rules (spec §6): a market brings its region, a product
@@ -69,6 +74,11 @@ export function normalizeDashboardState(
   const mode = raw.mode !== null && isMode(raw.mode) ? raw.mode : 'executive';
   if (raw.mode !== null && mode === 'executive') fix.mode = null;
 
+  // Executive reads status but leaves a valid metric in the URL for Analyst.
+  const metric = raw.kpi !== null && isMetric(raw.kpi) ? raw.kpi : 'status';
+  if (raw.kpi !== null && metric === 'status') fix.kpi = null;
+  const kpi = mode === 'analyst' ? metric : 'status';
+
   const highlighted = (raw.markets ?? []).filter((id) => getMarket(ds, id));
   if (raw.markets !== null && highlighted.length !== raw.markets.length) {
     fix.markets = highlighted.length > 0 ? highlighted : null;
@@ -81,7 +91,7 @@ export function normalizeDashboardState(
   };
 
   return {
-    state: { scope, period, range, mode, highlighted },
+    state: { scope, period, range, mode, kpi, highlighted },
     fix: Object.keys(fix).length > 0 ? fix : null,
   };
 }
