@@ -44,7 +44,8 @@ const metaSchema = z.object({
   currency: z.string(),
   periods: z.array(periodSchema).min(1),
   latestPeriod: periodSchema,
-  generatedAt: z.string(),
+  // A day (`2026-06-09`) or a timestamp; anything else is invalid data.
+  generatedAt: z.union([z.iso.date(), z.iso.datetime({ offset: true })]),
 });
 
 export const datasetSchema = z

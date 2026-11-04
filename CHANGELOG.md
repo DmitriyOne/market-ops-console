@@ -2,6 +2,42 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/). The top version must match `package.json` and the `release/X.Y.Z` branch.
 
+## [0.4.0] - Unreleased
+
+### Added
+- Assistant (ADR 0014, variant A): streamed answers with Stop, Retry, confidence and one source button per citation; hover, focus or tap shows an evidence card with the real numbers; clicking focuses the dashboard through the URL.
+- "What the data shows" table under each answer: portfolio row, cited rows and two deterministic gap rules ("Not mentioned in the answer", region gaps, each market listed once), closed by default with the gap count in its header; "Show on dashboard" highlights the listed markets.
+- Composer with Enter / Shift+Enter / Esc, a 500-character limit with counter and four suggested questions (translated label, English question). A non-English question gets a client-side reply "I only understand English…" instead of being sent.
+- Answers without matching data read as "I can't answer this from the data"; the suggested questions appear after two such replies in a row.
+- App shell: assistant as a right panel on desktop (collapsible, remembered and applied before the first paint, ADR 0015, badge for unseen answers), Overview / Assistant tabs on phones. Dashboard and assistant each sit in their own error boundary.
+- Page title and description per locale; `noindex, nofollow` (internal console).
+- `AGENTS.md` (entry point for coding agents, keeps the `next dev` block) and `DESIGN.md` (tokens, type, spacing, inventory, checklist).
+- Answer actions: Copy (text with sources and confidence, "Treat as directional" for Low, "Copied" for 2 s), 👍 / 👎 with a reason, once per answer (logged through `logEvent`, never the question, thanks as a toast); "New chat" with a tooltip clears the conversation and focuses the composer (not on touch screens).
+- The conversation survives a reload of the same tab (sessionStorage, last 50 messages), read after hydration behind a skeleton so server and client HTML match; restored answers are not counted as new. An answer cut by the reload comes back as "Stopped" without its partial text (written when a message starts or ends, not per token).
+- Toasts (sonner, top centre, as wide as the text), tooltips and skeletons (shadcn).
+- Disabled controls show the not-allowed cursor and no hover or press effect.
+- The data block says that status exists for the latest month only.
+- MSW test harness for the SSE chat stream and the data route.
+
+### Changed
+- A streaming answer starts in a neutral frame; the AI or "can't answer" style is applied at `done`, when its kind is known.
+- Chat failures are logged once to the console (`[chat]`, named errors) and shown as a translated message; the server's own text stays in the log.
+- Confidence shown as three equal bars; percents always with one decimal.
+- Evidence card: latest status for a past month, the month's anomaly, a full-width trend with period labels; a failed dataset load shows the error instead of "Loading data…".
+- Pointer cursor on clickable controls; floating cards keep 15px from the screen edge.
+- `withErrorHandling` is exported only from `@/shared/api/server`.
+- "Show on dashboard" resets the scope to the portfolio and the latest month before highlighting.
+
+### Fixed
+- Chat route validates the request before reading fixtures, so a bad request is always a 400.
+- A failing write in the chat stream can no longer throw out of the stream's error fallback.
+- Error logs use the error name (e.g. `TimeoutError`) as `code` for errors that are not `AppError`.
+- Screen-reader-only text inside the chat log no longer stretches the page with an empty scroll area.
+- A server that keeps the stream open after `done` no longer blocks the next question.
+- Keyboard focus follows collapse / expand and stays in the composer after a suggestion or Stop.
+- The evidence popover closes when it sends a phone to the dashboard; the unread badge clears on Back.
+- The collapsed state stays in sync across tabs and with full storage.
+
 ## [0.3.0] - Unreleased
 
 ### Added

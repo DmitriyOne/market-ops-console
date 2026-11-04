@@ -5,6 +5,7 @@ import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import type { ReactNode } from 'react';
 
 import { OfflineGuard } from '@/features/network-status';
+import { Toaster, TooltipProvider } from '@/shared/ui';
 
 import { getQueryClient } from './query-client';
 
@@ -18,7 +19,11 @@ export function Providers({ children }: { children: ReactNode }) {
   return (
     <QueryClientProvider client={getQueryClient()}>
       <NuqsAdapter>
-        <OfflineGuard>{children}</OfflineGuard>
+        <TooltipProvider delayDuration={300}>
+          <OfflineGuard>{children}</OfflineGuard>
+        </TooltipProvider>
+        {/* Top centre: clear of the composer on desktop and the tab bar on phones. */}
+        <Toaster position="top-center" />
       </NuqsAdapter>
     </QueryClientProvider>
   );

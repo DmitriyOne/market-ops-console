@@ -147,26 +147,28 @@ Rules: drill-down params are hierarchical (setting `market` sets its `region`; c
 - Message states: `streaming` → `done` | `stopped` | `error`. Stopped messages keep their partial text and show "Stopped — answer incomplete"; no citations/confidence are shown for them [call].
 - Input is disabled while streaming; the Send button becomes Stop. Esc also stops [call].
 - Auto-scroll only while the user is at the bottom; otherwise show "↓ New content" [call].
-- History lives for the session only (lost on reload) [call]. Each question is independent (fixtures are stateless).
+- History is kept in `sessionStorage` **[owner, 2026-11-04]**: it survives a reload of the same tab and ends with the tab; a new tab starts empty. Versioned and validated on read (`mo:chat:v1`), last 50 messages, written when a message starts or ends (not per token), an answer cut by the reload comes back as stopped; restored answers do not count as unread. localStorage was rejected (shared computers, races between tabs). "New chat" in the header clears it (disabled when empty) and puts focus in the composer, except on touch screens, where that would open the keyboard. Each question is independent (fixtures are stateless).
 - The reference route is fixed so it stops enqueuing when the client aborts (otherwise it throws on a closed controller).
 
 ### Message anatomy [owner + call]
 
 1. **AI answer** on its own surface token, with ✦ icon and the label "AI answer · may be incomplete". Text rendered as plain paragraphs (split on blank lines), never as HTML.
 2. **Confidence** from `done.confidence`: icon + word (High / Medium / Low). Low adds "Treat as directional".
-3. **Sources**: one button per citation, labelled from `citation.label` (fallback: resolved names + formatted period). Hover/focus/tap shows an evidence card with the real numbers for that entity and period (revenue, attainment, growth, units, status if available, mini trend). Click focuses the dashboard on that entity and period (phone: switches to Overview; back returns to Assistant).
+3. **Sources** (answer level, not per claim **[owner, 2026-11-04]**: the contract carries no positions in the text, and guessing them would mean parsing AI text; the README explains this): one button per citation, labelled from `citation.label` (fallback: resolved names + formatted period). Hover/focus/tap shows an evidence card with the real numbers for that entity and period (revenue, attainment, growth, units, status if available, mini trend). Click focuses the dashboard on that entity and period (phone: switches to Overview; back returns to Assistant).
 4. **"What the data shows"** block (authoritative surface, ▣ icon), header: "Market performance · latest period: May 2026 · updated 9 June 2026" (from `meta.latestPeriod`, `meta.generatedAt`, formatted per locale) **[owner]**. Contents:
    - always: a portfolio row for the latest period (revenue, attainment, growth) — this surfaces the `forecast-miss` contradiction **[owner approved]**;
    - one row per cited market/region/product with real KPIs and status where available;
    - **discrepancy rule** (deterministic, no AI; "mentioned" = present in citations, answer text is never parsed) **[owner]**:
      - *market list*: if **two or more** markets are cited and all are non-on-track, list every non-on-track market from the data and mark the uncited ones "Not mentioned";
      - *region gaps*: for every cited region, its row lists the region's non-on-track markets that are not cited;
-     - verified against fixtures: `at-risk` and `forecast-miss` expand (+ ES, FR, GB); `apac-vs-europe` expands (all 5 EU markets non-on-track); `summary-long` expands (ES, FR, GB, IT); `germany-dip`, `next-year`, `error`, `default` stay collapsed;
+     - a market found by both rules is listed once (under "Not mentioned");
+     - verified against fixtures: `at-risk` and `forecast-miss` find gaps (+ ES, FR, GB); `apac-vs-europe` (all 5 EU markets non-on-track); `summary-long` (ES, FR, GB, IT); `germany-dip` finds none; `next-year`, `error`, `default` have no block;
    - Spain-type rows show the reason next to the status (e.g. "Growth −4.6% YoY") [call];
    - button "Show on dashboard" highlights the listed markets on the map and table **[owner]**.
-   - Collapsed by default; **expanded automatically when either rule finds a gap** **[owner]**. Hidden when the answer has no citations (e.g. `default`).
-5. **Abstain** (`kind: abstain`): distinct style, "I can't answer this from the data", suggestion of answerable questions.
-6. **Error** (`error` event or network failure): error style, message, Retry.
+   - Collapsed by default, also when a rule finds a gap; the header then shows "N markets not mentioned" **[owner, revised 2026-11-03]**. Hidden when the answer has no citations (e.g. `default`). "Show on dashboard" resets the scope to the portfolio and the latest month, then sets `markets` **[owner, 2026-11-04]**.
+5. **Can't answer** (`kind: abstain`, an answer with `low_confidence` and no citations, or a non-English question answered on the client with "I only understand English"): distinct style with the ⊘ icon, "I can't answer this from the data"; the suggested questions appear after two such replies in a row **[owner, revised 2026-11-03]**. The kind is known only at `done`, so while streaming the answer sits in a neutral frame (no AI colour yet) with "Sources and confidence appear when the answer is complete" **[owner, revised 2026-11-03]**.
+5a. **Answer actions** under a finished answer **[owner, 2026-11-04]**: Copy (text, sources, confidence with "Treat as directional" for Low, and the AI label as plain text), 👍 Helpful / 👎 Not helpful with a reason (wrong numbers, didn't answer, missing markets or periods, something else); one rating per answer, locked once logged (👎 can still become 👍 before a reason is picked); "Thanks" and a failed copy are toasts at the top centre, "Copied" shows for 2 s; feedback is logged through `logEvent` without the question text.
+6. **Error** (`error` event or network failure): error style, a translated message for the cause (server, network, timeout, invalid data), Retry. The server's own text goes to the console log, not to the user.
 
 ### Empty state [call]
 
@@ -254,7 +256,7 @@ Unit: SSE parsing, schemas, selectors, formatters, chat reducer, discrepancy rul
 ## 13. Dependencies beyond ADR 0002 **[owner approved]**
 
 - `world-atlas` (`countries-110m.json`, served locally, no CDN) for map shapes; `topojson-client` comes with `react-simple-maps`.
-- `sonner` (shadcn toast) for the rollback message.
+- `sonner` (shadcn toast) for the rollback message, answer-feedback thanks and a failed copy **[2026-11-04]**.
 
 ## 14. Cut line if time runs short **[owner]**
 
