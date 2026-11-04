@@ -3,7 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { SparklesIcon, SquarePenIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { type ReactNode, useEffect, useRef } from 'react';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
 
 import {
   datasetQueryOptions,
@@ -12,7 +12,7 @@ import {
 } from '@/entities/performance';
 import { Composer, SuggestedQuestions, useChatStream } from '@/features/ask-question';
 import { useErrorMessage } from '@/shared/api';
-import { Button } from '@/shared/ui';
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui';
 
 import { AnswerMessage, isCantAnswer } from './AnswerMessage';
 import { Conversation } from './Conversation';
@@ -43,15 +43,18 @@ export function AssistantPanel({
   const { focus, highlight } = useDashboardFocus();
 
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const notified = useRef(new Set<string>());
+  // Answers restored from sessionStorage were seen before the reload: not new.
+  const [notified] = useState(
+    () => new Set(chat.messages.filter((m) => m.status === 'done').map((m) => m.id)),
+  );
   useEffect(() => {
     for (const m of chat.messages) {
-      if (m.status === 'done' && !notified.current.has(m.id)) {
-        notified.current.add(m.id);
+      if (m.status === 'done' && !notified.has(m.id)) {
+        notified.add(m.id);
         onAnswerDone?.();
       }
     }
-  }, [chat.messages, onAnswerDone]);
+  }, [chat.messages, notified, onAnswerDone]);
 
   const onSource = (r: ResolvedCitation) => {
     focus(r);
@@ -78,20 +81,28 @@ export function AssistantPanel({
           {t('title')}
         </h2>
         <span className="flex-1 text-sm text-muted-foreground">{t('subtitle')}</span>
-        <Button
-          type="button"
-          variant="ghost"
-          className="size-11"
-          aria-label={t('newChat')}
-          disabled={chat.messages.length === 0}
-          onClick={() => {
-            chat.reset();
-            // The button is disabled next; keep keyboard focus in the composer.
-            inputRef.current?.focus();
-          }}
-        >
-          <SquarePenIcon aria-hidden />
-        </Button>
+        <Tooltip>
+          {/* A span, so the tooltip also explains the disabled (empty chat) button. */}
+          <TooltipTrigger asChild>
+            <span className="inline-flex">
+              <Button
+                type="button"
+                variant="ghost"
+                className="size-11"
+                aria-label={t('newChat')}
+                disabled={chat.messages.length === 0}
+                onClick={() => {
+                  chat.reset();
+                  // The button is disabled next; keep keyboard focus in the composer.
+                  inputRef.current?.focus();
+                }}
+              >
+                <SquarePenIcon aria-hidden />
+              </Button>
+            </span>
+          </TooltipTrigger>
+          <TooltipContent>{t('newChat')}</TooltipContent>
+        </Tooltip>
         {headerAction}
       </header>
       {chat.messages.length === 0 ? (

@@ -130,6 +130,8 @@ Rules:
 | `Popover` | the same card on coarse pointers (tap) |
 | `Collapsible` | "What the data shows" (closed by default) |
 | `DropdownMenu` | theme and locale switches |
+| `Tooltip` | the name of an icon-only control on hover and focus (New chat); wrap a disabled button in a `span` |
+| `Toaster` / `toast` (sonner) | short confirmations and failures that are not tied to a field ("Thanks for the feedback", "Couldn't copy"); top centre, clear of the composer and the tab bar |
 | `ErrorBoundary`, `WidgetBoundary` | a failing widget explains itself and offers "Try again" without taking the page down |
 
 ### Assistant building blocks (`src/widgets/assistant-panel/ui`)

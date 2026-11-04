@@ -1,6 +1,6 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { http } from 'msw';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { STREAM_FIRST_EVENT_TIMEOUT_MS } from '@/shared/api';
 import { chatFromFixture, chatStream, fixtureEvents, server } from '@/shared/lib/test';
@@ -21,6 +21,9 @@ function consoleErrors() {
 }
 
 describe('useChatStream', () => {
+  beforeEach(() => {
+    sessionStorage.clear();
+  });
   afterEach(() => {
     vi.restoreAllMocks();
     vi.useRealTimers();
@@ -260,6 +263,57 @@ describe('useChatStream', () => {
       expect(result.current.messages[0]?.status).toBe('done');
     });
     expect(result.current.messages).toHaveLength(1);
+  });
+
+  it('a reload in the same tab restores the conversation (sessionStorage)', async () => {
+    server.use(chatFromFixture('germany-dip'));
+    const first = setup();
+    act(() => {
+      first.result.current.ask('Why Germany?');
+    });
+    await waitFor(() => {
+      expect(first.result.current.messages[0]?.status).toBe('done');
+    });
+    first.unmount();
+    const second = setup();
+    expect(second.result.current.messages).toHaveLength(1);
+    expect(second.result.current.messages[0]).toMatchObject({
+      question: 'Why Germany?',
+      status: 'done',
+      text: tokensOf('germany-dip').join(''),
+    });
+  });
+
+  it('writes the conversation when a message starts or ends, not on every token', async () => {
+    const setItem = vi.spyOn(Storage.prototype, 'setItem');
+    server.use(chatFromFixture('germany-dip'));
+    const { result } = setup();
+    act(() => {
+      result.current.ask('Why Germany?');
+    });
+    await waitFor(() => {
+      expect(result.current.messages[0]?.status).toBe('done');
+    });
+    expect(tokensOf('germany-dip').length).toBeGreaterThan(5);
+    expect(setItem.mock.calls.filter(([key]) => key === 'mo:chat:v1').length).toBeLessThanOrEqual(
+      2,
+    );
+  });
+
+  it('reset also clears the stored conversation', async () => {
+    server.use(chatFromFixture('germany-dip'));
+    const first = setup();
+    act(() => {
+      first.result.current.ask('Why Germany?');
+    });
+    await waitFor(() => {
+      expect(first.result.current.messages[0]?.status).toBe('done');
+    });
+    act(() => {
+      first.result.current.reset();
+    });
+    first.unmount();
+    expect(setup().result.current.messages).toEqual([]);
   });
 
   it('stop mid-stream keeps partial text as stopped', async () => {

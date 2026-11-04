@@ -14,6 +14,7 @@ import { API_ROUTES } from '@/shared/config';
 import { logError } from '@/shared/lib';
 
 import { type ChatMessage, chatReducer } from './chat-reducer';
+import { loadChat, saveChat } from './chat-storage';
 import { isEnglish } from './language';
 
 export type ChatStream = {
@@ -42,9 +43,14 @@ function parseJson(data: string): unknown {
   }
 }
 
+// Changes when a message is added, removed or settles; tokens do not change it.
+const storageKey = (messages: ChatMessage[]) => messages.map((m) => `${m.id}:${m.status}`).join();
+
 /** The assistant conversation: one streamed answer at a time (ADR 0003, 0006). */
 export function useChatStream(): ChatStream {
-  const [messages, dispatch] = useReducer(chatReducer, []);
+  // The panel renders on the client only (it is not in the static HTML),
+  // so reading sessionStorage in the initial state cannot mismatch.
+  const [messages, dispatch] = useReducer(chatReducer, undefined, loadChat);
   // A ref, not state: `ask` must see a stream started in the same tick.
   const active = useRef<Active | null>(null);
 
@@ -155,6 +161,16 @@ export function useChatStream(): ChatStream {
     },
     [],
   );
+
+  // Write when a message starts or ends (ids and statuses), not on every token;
+  // what was just loaded is not written back.
+  const saved = useRef(storageKey(messages));
+  useEffect(() => {
+    const key = storageKey(messages);
+    if (key === saved.current) return;
+    saved.current = key;
+    saveChat(messages);
+  }, [messages]);
 
   return {
     messages,

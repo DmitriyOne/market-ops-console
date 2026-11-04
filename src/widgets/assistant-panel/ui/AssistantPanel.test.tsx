@@ -1,8 +1,9 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { cleanup, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { NextIntlClientProvider } from 'next-intl';
 import { NuqsTestingAdapter, type UrlUpdateEvent } from 'nuqs/adapters/testing';
+import { Toaster } from 'sonner';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { enMessages as en, formats } from '@/shared/config';
@@ -13,6 +14,7 @@ import {
   fixtureEvents,
   server,
 } from '@/shared/lib/test';
+import { TooltipProvider } from '@/shared/ui';
 
 import { AssistantPanel } from './AssistantPanel';
 
@@ -27,7 +29,10 @@ function setup() {
     <QueryClientProvider client={client}>
       <NextIntlClientProvider locale="en-GB" messages={en} formats={formats} timeZone="UTC">
         <NuqsTestingAdapter onUrlUpdate={onUrlUpdate}>
-          <AssistantPanel onAnswerDone={onAnswerDone} onFocusDashboard={onFocusDashboard} />
+          <TooltipProvider>
+            <AssistantPanel onAnswerDone={onAnswerDone} onFocusDashboard={onFocusDashboard} />
+          </TooltipProvider>
+          <Toaster />
         </NuqsTestingAdapter>
       </NextIntlClientProvider>
     </QueryClientProvider>,
@@ -55,6 +60,7 @@ const dataCheckToggle = () =>
 
 describe('AssistantPanel', () => {
   beforeEach(() => {
+    sessionStorage.clear();
     server.use(datasetHandler());
   });
 
@@ -259,6 +265,13 @@ describe('AssistantPanel', () => {
     for (const label of labels) expect(copied).toContain(label);
     expect(copied).toContain(t.answer.label);
     expect(await screen.findByText(t.actions.copied)).toBeInTheDocument();
+    // "Copied" goes away on its own.
+    await waitFor(
+      () => {
+        expect(screen.queryByText(t.actions.copied)).not.toBeInTheDocument();
+      },
+      { timeout: 3000 },
+    );
   });
 
   it('feedback: thumbs down asks why and logs the reason without the question text', async () => {
@@ -276,7 +289,15 @@ describe('AssistantPanel', () => {
       expect.objectContaining({ rating: 'down', reason: 'wrongNumbers', confidence: 'high' }),
     );
     expect(JSON.stringify(info.mock.calls)).not.toContain('Why did Germany dip?');
-    expect(screen.getByText(t.actions.thanks)).toBeInTheDocument();
+    // A toast, not a grey line next to the icons.
+    expect(await screen.findByText(t.actions.thanks)).toBeInTheDocument();
+    // One rating per answer: both buttons are locked, nothing more is logged.
+    const up = screen.getByRole('button', { name: t.actions.helpful });
+    expect(up).toHaveAttribute('aria-disabled', 'true');
+    expect(down).toHaveAttribute('aria-disabled', 'true');
+    await user.click(up);
+    await user.click(down);
+    expect(info).toHaveBeenCalledTimes(1);
   });
 
   it('feedback: thumbs up is logged at once', async () => {
@@ -293,6 +314,45 @@ describe('AssistantPanel', () => {
     expect(
       screen.queryByRole('button', { name: t.actions.reasons.wrongNumbers }),
     ).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: t.actions.helpful }));
+    expect(info).toHaveBeenCalledTimes(1);
+  });
+
+  it('feedback: thumbs down can still become thumbs up before a reason is picked', async () => {
+    const info = vi.spyOn(console, 'info').mockImplementation(() => undefined);
+    server.use(chatFromFixture('germany-dip'));
+    const { user } = setup();
+    await ask(user, 'Why did Germany dip?');
+    await answerDone();
+    await user.click(screen.getByRole('button', { name: t.actions.notHelpful }));
+    await user.click(screen.getByRole('button', { name: t.actions.helpful }));
+    expect(info).toHaveBeenCalledTimes(1);
+    expect(info).toHaveBeenCalledWith(
+      '[event] answer_feedback',
+      expect.objectContaining({ rating: 'up' }),
+    );
+  });
+
+  it('New chat shows a tooltip on hover', async () => {
+    const { user } = setup();
+    // Disabled while empty: the pointer lands on its wrapper, as in a browser.
+    const wrapper = screen.getByRole('button', { name: t.panel.newChat }).parentElement;
+    if (!wrapper) throw new Error('no wrapper');
+    await user.hover(wrapper);
+    expect(await screen.findByRole('tooltip', { name: t.panel.newChat })).toBeInTheDocument();
+  });
+
+  it('answers restored after a reload are shown but not counted as new', async () => {
+    server.use(chatFromFixture('germany-dip'));
+    const first = setup();
+    await ask(first.user, 'Why did Germany dip?');
+    await answerDone();
+    expect(first.onAnswerDone).toHaveBeenCalledTimes(1);
+    cleanup();
+    const second = setup();
+    await answerDone();
+    expect(screen.getAllByText('Why did Germany dip?').length).toBeGreaterThan(0);
+    expect(second.onAnswerDone).not.toHaveBeenCalled();
   });
 
   it('stop mid-stream shows the stopped state and no sources', async () => {

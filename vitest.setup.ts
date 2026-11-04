@@ -22,3 +22,12 @@ afterAll(() => {
 // `server-only` throws outside the react-server condition; tests import
 // server modules (route handlers, the dataset loader) directly.
 vi.mock('server-only', () => ({}));
+
+// jsdom has no ResizeObserver; Radix measures floating content (tooltip arrow) with it.
+class ResizeObserverStub {
+  observe(): void {}
+  unobserve(): void {}
+  disconnect(): void {}
+}
+// Assigned, not stubbed: tests that unstub their own globals must keep it.
+Object.assign(globalThis, { ResizeObserver: ResizeObserverStub });

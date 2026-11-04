@@ -9,7 +9,7 @@ import { dashboardSearchParams } from './search-params';
 export type DashboardFocus = {
   /** Show what a citation points at: its scope and month, nothing highlighted. */
   focus: (r: ResolvedCitation) => void;
-  /** Highlight markets on the dashboard. */
+  /** Highlight markets on the whole portfolio, latest month. */
   highlight: (marketIds: string[]) => void;
 };
 
@@ -34,7 +34,16 @@ export function useDashboardFocus(): DashboardFocus {
 
   const highlight = useCallback(
     (marketIds: string[]) => {
-      void setParams({ markets: marketIds });
+      // The data block that asks for this is the portfolio in the latest month,
+      // so an earlier focus (market, month) is cleared (owner, 2026-11-04).
+      void setParams({
+        region: null,
+        market: null,
+        product: null,
+        period: null,
+        range: null,
+        markets: marketIds,
+      });
     },
     [setParams],
   );

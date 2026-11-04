@@ -6,11 +6,16 @@ import { useId, useRef, useState } from 'react';
 
 import type { ChatMessage } from '@/features/ask-question';
 import { logEvent } from '@/shared/lib';
-import { Button } from '@/shared/ui';
+import { Button, toast } from '@/shared/ui';
 
 const REASONS = ['wrongNumbers', 'offTopic', 'missing', 'other'] as const;
 type Reason = (typeof REASONS)[number];
 type Rating = 'up' | 'down';
+
+const COPIED_MS = 2000;
+// Locked rating: the chosen one stays marked, the other fades.
+const RATE =
+  'size-11 aria-pressed:bg-muted aria-disabled:cursor-not-allowed aria-disabled:not-aria-pressed:opacity-50';
 
 type AnswerActionsProps = {
   message: ChatMessage;
@@ -24,11 +29,15 @@ export function AnswerActions({ message, getCopyText }: AnswerActionsProps) {
   const reasonsId = useId();
   // The reason buttons disappear once one is picked; focus returns here.
   const downRef = useRef<HTMLButtonElement>(null);
-  const [copy, setCopy] = useState<'idle' | 'copied' | 'failed'>('idle');
+  const [copy, setCopy] = useState<'idle' | 'copied'>('idle');
   const [rating, setRating] = useState<Rating | null>(null);
   const [reason, setReason] = useState<Reason | null>(null);
+  // One rating per answer (owner, 2026-11-04): locked once it is logged.
+  const [sent, setSent] = useState(false);
 
   const record = (value: Rating, why: Reason | null) => {
+    setSent(true);
+    toast.success(t('thanks'));
     logEvent('answer_feedback', {
       answerId: message.id,
       rating: value,
@@ -43,19 +52,21 @@ export function AnswerActions({ message, getCopyText }: AnswerActionsProps) {
     try {
       await navigator.clipboard.writeText(getCopyText());
       setCopy('copied');
+      setTimeout(() => {
+        setCopy('idle');
+      }, COPIED_MS);
     } catch {
       // Clipboard blocked (permissions, insecure context): say so, nothing to log.
-      setCopy('failed');
+      toast.error(t('copyFailed'));
     }
   };
 
   const rate = (value: Rating) => {
+    if (sent) return;
     setRating(value);
     setReason(null);
     if (value === 'up') record('up', null);
   };
-
-  const thanks = rating === 'up' || reason !== null;
 
   return (
     <div className="flex flex-col gap-2">
@@ -74,8 +85,9 @@ export function AnswerActions({ message, getCopyText }: AnswerActionsProps) {
         <Button
           type="button"
           variant="ghost"
-          className="size-11"
+          className={RATE}
           aria-label={t('helpful')}
+          aria-disabled={sent}
           aria-pressed={rating === 'up'}
           onClick={() => {
             rate('up');
@@ -87,8 +99,9 @@ export function AnswerActions({ message, getCopyText }: AnswerActionsProps) {
           ref={downRef}
           type="button"
           variant="ghost"
-          className="size-11"
+          className={RATE}
           aria-label={t('notHelpful')}
+          aria-disabled={sent}
           aria-pressed={rating === 'down'}
           onClick={() => {
             rate('down');
@@ -96,10 +109,8 @@ export function AnswerActions({ message, getCopyText }: AnswerActionsProps) {
         >
           <ThumbsDownIcon aria-hidden />
         </Button>
-        <span aria-live="polite" className="flex gap-2 text-xs text-muted-foreground">
-          {copy === 'copied' ? <span>{t('copied')}</span> : null}
-          {copy === 'failed' ? <span>{t('copyFailed')}</span> : null}
-          {thanks ? <span>{t('thanks')}</span> : null}
+        <span aria-live="polite" className="text-xs text-muted-foreground">
+          {copy === 'copied' ? t('copied') : null}
         </span>
       </div>
       {rating === 'down' && reason === null ? (

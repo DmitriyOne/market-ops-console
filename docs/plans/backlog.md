@@ -34,14 +34,14 @@ Format: **Item**: what is wrong (file). Why it can wait. Where it goes.
 
 - **Phone bottom tab bar look** (`SectionTabBar`): the owner likes it for now but may want it tuned once the dashboard sections land. **Plan 3**, with the D phone screens (Overview / Assistant / Alerts).
 - **Phone `?tab=assistant` deep link paints Overview first** until hydration. Same fix as the panel (ADR 0015). **Plan 3**, with the phone layout.
-- **"Show on dashboard" keeps an earlier region/market filter** (`src/entities/performance/model/use-dashboard-focus.ts`, `highlight`): highlighted markets can fall outside the filtered scope. Nothing reads the URL yet, and whether to reset the scope is a dashboard decision. **Plan 3**, ask the owner when the dashboard reads `markets`.
 - **"New content" smooth scroll can stop short** while tokens keep arriving (PLAUSIBLE, not reproduced; `use-stick-to-bottom.ts`), and sending a question while scrolled up does not jump to it. **Plan 5**, with the Playwright happy path.
 
 ## README notes (owner, 2026-11-04)
 
 Points the owner wants explained in the README, in his own words:
 
-- **Chat history is per session on purpose.** Production keeps threads on the server per user, with retention and real deletion; the brief forbids a real backend. Browser storage was weighed and rejected: XSS can read it, shared computers, ~5 MB quota, sync writes block the page, multi-tab races, old formats after a deploy, Safari wipes after 7 days. "New chat" clears the conversation.
+- **Chat history in sessionStorage, not localStorage or a server.** Production keeps threads on the server per user, with retention and real deletion; the brief forbids a real backend. sessionStorage survives a reload and ends with the tab. localStorage was rejected: transcript left on shared computers, races between tabs. Risks that remain and how they are handled: XSS can read it (plain-text rendering, no third-party scripts, CSP later), ~5 MB quota (50 messages, try/catch), sync writes (only when a message starts or ends), old formats (versioned key, zod on read). "New chat" clears it.
 - **Citations are per answer, not per claim**: the contract has no positions in the text; guessing them means parsing AI text.
 - **Status is for the latest month only** in the data; the data block says so, while a question may say "this quarter".
-- **Answer feedback** (👍/👎 + reason) goes to `logEvent` (console now, analytics later); it never includes the question text.
+- **Answer feedback** (👍/👎 + reason, once per answer) goes to `logEvent` (console now, analytics later); it never includes the question text.
+- **Rate limits belong on the server**: per user / IP in middleware or the platform firewall (e.g. Vercel WAF) for `/api/chat` and a future `/api/feedback`; the client only prevents accidental repeats (one stream at a time, one rating per answer).

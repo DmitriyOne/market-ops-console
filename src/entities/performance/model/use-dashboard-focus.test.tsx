@@ -44,4 +44,18 @@ describe('useDashboardFocus', () => {
     expect(event?.searchParams.get('markets')).toBe('es,fr');
     expect(event?.options.history).toBe('push');
   });
+
+  it('highlight resets an earlier focus to the portfolio, latest month', async () => {
+    const { result, onUrlUpdate } = setup(
+      '?region=eu&market=de&product=nuvora&period=2026-03&range=3m',
+    );
+    act(() => {
+      result.current.highlight(['es', 'fr']);
+    });
+    await vi.waitFor(() => {
+      expect(onUrlUpdate).toHaveBeenCalled();
+    });
+    // The data block it comes from is the whole portfolio in the latest month.
+    expect(onUrlUpdate.mock.calls.at(-1)?.[0].queryString).toBe('?markets=es,fr');
+  });
 });

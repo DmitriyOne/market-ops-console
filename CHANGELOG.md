@@ -12,7 +12,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 - App shell: assistant as a right panel on desktop (collapsible, remembered and applied before the first paint, ADR 0015, badge for unseen answers), Overview / Assistant tabs on phones. Dashboard and assistant each sit in their own error boundary.
 - Page title and description per locale; `noindex, nofollow` (internal console).
 - `AGENTS.md` (entry point for coding agents, keeps the `next dev` block) and `DESIGN.md` (tokens, type, spacing, inventory, checklist).
-- Answer actions: Copy (text with sources and confidence), 👍 / 👎 with a reason (logged through `logEvent`, never the question); "New chat" clears the conversation.
+- Answer actions: Copy (text with sources and confidence, "Copied" for 2 s), 👍 / 👎 with a reason, once per answer (logged through `logEvent`, never the question, thanks as a toast); "New chat" with a tooltip clears the conversation.
+- The conversation survives a reload of the same tab (sessionStorage, last 50 messages); restored answers are not counted as new.
+- Toasts (sonner, top centre) and tooltips (shadcn).
 - The data block says that status exists for the latest month only.
 - MSW test harness for the SSE chat stream and the data route.
 
@@ -23,6 +25,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 - Evidence card: latest status for a past month, the month's anomaly, a full-width trend with period labels; a failed dataset load shows the error instead of "Loading data…".
 - Pointer cursor on clickable controls; floating cards keep 15px from the screen edge.
 - `withErrorHandling` is exported only from `@/shared/api/server`.
+- "Show on dashboard" resets the scope to the portfolio and the latest month before highlighting.
 
 ### Fixed
 - Chat route validates the request before reading fixtures, so a bad request is always a 400.
