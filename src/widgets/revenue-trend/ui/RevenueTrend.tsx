@@ -23,14 +23,12 @@ import {
   TableRow,
 } from '@/shared/ui';
 
-import { SERIES, type SeriesKey } from './TrendChart';
+import { SERIES, SERIES_KEYS as KEYS, type SeriesKey } from './series';
 
 const TrendChart = dynamic(() => import('./TrendChart').then((m) => m.TrendChart), {
   ssr: false,
   loading: () => <Skeleton className="h-56 w-full" />,
 });
-
-const KEYS: SeriesKey[] = ['actual', 'forecast', 'priorYear'];
 
 /** A line sample in the series' colour and dash pattern. */
 function LegendLine({ series }: { series: SeriesKey }) {

@@ -143,7 +143,7 @@ Rules:
 | `ToggleGroup` | one-of-few choices (Executive / Analyst, 1 / 3 / 12 months): `bg-muted p-0.5`, active item `bg-card shadow-sm`, items `min-h-11` |
 | `Sheet` | phone settings (language, theme) from the bottom |
 | `Table` | every chart's table alternative; caption `sr-only` |
-| `ChartContainer` | Recharts frame (trimmed shadcn chart): series colours are token vars on each mark, legend and tooltip drawn by the chart; a pixel `height` when the chart can be hidden |
+| `ChartContainer` | Recharts frame (trimmed shadcn chart): series colours are token vars on each mark, legend and tooltip drawn by the chart; a pixel `height` when the chart can be hidden. Import it from `@/shared/ui/chart`, not the index, and only inside a `next/dynamic` chart, so Recharts stays out of the first bundle |
 | `Sparkline` | 12-month line in text colour; decorative (`aria-hidden`) unless given a `label` |
 
 ### Dashboard building blocks (0.5.0)

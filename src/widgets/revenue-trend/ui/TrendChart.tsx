@@ -15,16 +15,11 @@ import {
 } from 'recharts';
 
 import { periodToDate, type TrendView } from '@/entities/performance';
-import { ChartContainer } from '@/shared/ui';
+// Direct path, not the shared/ui index: Recharts must stay in this lazy chunk.
+import { ChartContainer } from '@/shared/ui/chart';
 
-// Token colours; the legend repeats each line's pattern, so colour is never the only signal.
-export const SERIES = {
-  actual: { stroke: 'var(--color-chart-1)', dash: undefined, width: 2.2 },
-  forecast: { stroke: 'var(--color-chart-5)', dash: '5 3', width: 2 },
-  priorYear: { stroke: 'var(--color-chart-3)', dash: '1.5 3', width: 2 },
-} as const;
-export type SeriesKey = keyof typeof SERIES;
-const KEYS: SeriesKey[] = ['actual', 'forecast', 'priorYear'];
+import { SERIES, SERIES_KEYS as KEYS } from './series';
+
 // Same as h-56; a number, so a hidden chart (phone Assistant tab) still has a size.
 const CHART_HEIGHT = 224;
 
