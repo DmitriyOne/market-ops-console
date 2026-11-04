@@ -341,5 +341,9 @@
     "noteLatest": "Status und Marktanteil gibt es nur für den letzten Monat.",
     "notePerProduct": "Marktanteil gibt es nicht pro Produkt.",
     "noteCalculated": "Abstand zur Prognose, Stückzahlen und Summe sind aus Monatsdaten berechnet."
+  },
+  "exportMarkets": {
+    "button": "CSV exportieren",
+    "hint": "Zeilen wie angezeigt, Rohwerte in USD"
   }
 }

@@ -17,6 +17,7 @@ import {
   useKpiFormat,
 } from '@/entities/performance';
 import { useDrillDown } from '@/features/drill-down';
+import { ExportMarketsButton } from '@/features/export-markets';
 import { MarketFilter } from '@/features/select-markets';
 import { cn } from '@/shared/lib';
 import {
@@ -126,6 +127,7 @@ export function MarketsTable() {
             {t('title')}
           </h2>
         </CardTitle>
+        <ExportMarketsButton />
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center gap-2">

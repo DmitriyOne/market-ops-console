@@ -40,6 +40,7 @@ describe('MarketsTable', () => {
     expect(germany).toHaveTextContent('-9.7%');
     expect(germany).toHaveTextContent('92.0%');
     expect(germany).toHaveTextContent('Off track');
+    expect(screen.getByRole('button', { name: en.exportMarkets.button })).toBeEnabled();
     const total = within((await table()).querySelector('tfoot') ?? document.body).getByRole('row');
     expect(total).toHaveTextContent(t.total);
   });

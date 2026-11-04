@@ -341,5 +341,9 @@
     "noteLatest": "Status and share are set for the latest month only.",
     "notePerProduct": "Share is not available per product.",
     "noteCalculated": "Gap to forecast, units and the total are calculated from monthly data."
+  },
+  "exportMarkets": {
+    "button": "Export CSV",
+    "hint": "Rows as shown, raw USD"
   }
 }
