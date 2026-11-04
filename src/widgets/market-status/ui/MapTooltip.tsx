@@ -34,9 +34,8 @@ export function MapTooltip({ item, metric, tip, onOpen, onClose }: MapTooltipPro
   const anchor = useMemo(
     () => ({
       current: {
-        // A zero-size box at the point; a plain object, as Radix only reads its fields.
-        getBoundingClientRect: () =>
-          ({ x, y, top: y, left: x, right: x, bottom: y, width: 0, height: 0 }) as DOMRect,
+        // A zero-size box at the point.
+        getBoundingClientRect: () => new DOMRect(x, y, 0, 0),
       },
     }),
     [x, y],

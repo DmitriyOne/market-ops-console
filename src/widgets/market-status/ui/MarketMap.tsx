@@ -34,6 +34,8 @@ type GeographyInput = Parameters<typeof useGeographies>[0]['geography'];
 const ANTARCTICA = '010';
 const ZOOM_STEP = 1.5;
 const FLY_MS = 450;
+// The only cast in the map (owner to confirm, backlog): react-simple-maps types its input as
+// GeoJSON, but it reads a TopoJSON topology at runtime, which is what world-atlas ships.
 const TOPOLOGY = topology as unknown as GeographyInput;
 const NON_SCALING = { vectorEffect: 'non-scaling-stroke' } as const;
 
@@ -45,12 +47,13 @@ const isArea = (g: Geography['geometry']): g is Polygon | MultiPolygon =>
 // Plain wheel and one finger scroll the page; Ctrl/⌘ + wheel or a pinch
 // zooms; the mouse drags only once zoomed in; no double-click zoom.
 function allowGesture(event: Event, zoom: number): boolean {
-  if (event.type === 'wheel') {
-    const wheel = event as WheelEvent;
-    return wheel.ctrlKey || wheel.metaKey;
+  if (event instanceof WheelEvent) return event.ctrlKey || event.metaKey;
+  // TouchEvent does not exist in every desktop browser: check the shape, not the class.
+  if (event.type === 'touchstart' && 'touches' in event && event.touches instanceof TouchList) {
+    return event.touches.length >= 2;
   }
-  if (event.type === 'touchstart') return (event as TouchEvent).touches.length >= 2;
-  if (event.type === 'mousedown') return zoom > 1 && (event as MouseEvent).button === 0;
+  if (event instanceof MouseEvent && event.type === 'mousedown')
+    return zoom > 1 && event.button === 0;
   return false;
 }
 

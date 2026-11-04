@@ -55,8 +55,8 @@ src/
   app/               providers, global styles, design tokens
   pages/             page composition, no logic (dashboard)
   widgets/           screen blocks: app-shell, assistant-panel, dashboard-header, kpi-strip, market-status (tiles, table and map), top-risks, top-movers, revenue-trend; planned: radar, heat map, markets table
-  features/          user actions: ask-question (chat stream, composer, history), drill-down, reset-view, select-period, switch-mode, switch-section, switch-locale, switch-theme, network-status; planned: alerts
-  entities/          performance (dataset, dashboard URL state, KPI and status selectors, citations, status chip)
+  features/          user actions: ask-question (chat stream, composer, history), drill-down, reset-view, select-period, select-metric, switch-mode, switch-section, switch-locale, switch-theme, network-status; planned: alerts
+  entities/          performance (dataset, dashboard URL state, KPI and status selectors, map scales and the map selector, citations, status chip)
   shared/            ui (shadcn, error boundaries, toasts), lib (cn, dom, errors, events, media, storage), api (HTTP client, SSE, contracts, dataset), config (env, API routes, i18n)
 data/                data.json, fixtures.json (source of truth)
 docs/

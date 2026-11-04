@@ -75,7 +75,10 @@ export function MapLegend({ view }: { view: MarketMapView }) {
                 ? t('below', { to: m.bound(metric, step.to) })
                 : step.to === null && step.from !== null
                   ? t('above', { from: m.bound(metric, step.from) })
-                  : m.range(metric, step.from ?? 0, step.to ?? 0)}
+                  : t('between', {
+                      from: m.bound(metric, step.from ?? 0),
+                      to: m.bound(metric, step.to ?? 0),
+                    })}
               <span className="font-mono tabular-nums">{step.count}</span>
             </li>
           ))}

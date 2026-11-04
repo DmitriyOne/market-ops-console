@@ -61,7 +61,9 @@ Points the owner wants explained in the README, in his own words:
   - When zoomed in, Tab can focus a market outside the view; fly to it on focus if off-screen. **Plan 5**.
   - Status metric with a product: tooltip shows the product's attainment next to the market's status; only the note under the card says status is per market. Owner decision №9; add the note to the tooltip if users misread it.
   - "Back returns to the old market with the product" needs real browser history (the nuqs test adapter keeps none): add it to the **E2E** happy path (Playwright). Locale switch keeping `kpi` and the SSR skeleton are now unit-tested.
-- **Dev warning "Encountered a script tag while rendering React component"** comes from `@wrksz/themes` (its anti-flash `ThemeScript` sits in the tree and React warns when that tree renders on the client). Dev only, no effect on the theme or production. Check the library for a head-only script option. **Plan 5**.
+- **Dev warning "Encountered a script tag while rendering React component"** (seen by the owner in the browser console). Source not confirmed yet: the likely one is our two inline `<script>` tags in `app/[locale]/layout.tsx` (ADR 0015) when React renders the layout on the client; ADR 0009 says `@wrksz/themes` injects its script outside the tree. Reproduce with the stack trace, then fix in the ADR 0015 pattern. Dev only so far. **Plan 5**.
+
+- **One type cast in the map** (`MarketMap.tsx`, `TOPOLOGY`): react-simple-maps types its `geography` as GeoJSON while it accepts the TopoJSON that world-atlas ships; CLAUDE.md forbids casts that silence errors. Owner to choose: keep with the comment (recommended), or convert with `topojson-client` as a direct dependency (still one cast at the JSON import).
 
 ## Currency picker (owner, 2026-11-04) — after the required work, its own release before the README
 

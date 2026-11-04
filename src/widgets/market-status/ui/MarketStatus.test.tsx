@@ -329,14 +329,14 @@ describe('MarketStatus map', () => {
     ]);
   });
 
-  it('revenue steps read as compact ranges', async () => {
+  it('revenue steps read in the compact currency format', async () => {
     setup('?mode=analyst&kpi=revenue');
     const legend = await screen.findByRole('list', { name: t.legend });
     const items = within(legend)
       .getAllByRole('listitem')
       .map((li) => li.textContent);
     expect(items[0]).toMatch(/^below US\$1m\d+$/);
-    expect(items[1]).toMatch(/^US\$1–1\.5m\d+$/);
+    expect(items[1]).toMatch(/^US\$1m – US\$1\.5m\d+$/);
   });
 
   it('Open in the tap tooltip brings the page back to its top', async () => {

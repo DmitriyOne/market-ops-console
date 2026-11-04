@@ -151,7 +151,7 @@ product; breadcrumb clears it.
 
 ### 3. Scale tokens (app/styles)
 
-`--scale-div-1…6`, `--scale-seq-1…5`, `--map-land`, `--map-ocean`, light
+`--scale-div-1…6`, `--scale-seq-1…5`, `--map-land`, `--map-sea`, light
 and dark, values above. `tokens.test.ts`: diverging steps and land ΔE ≥ 15
 (all pairs); sequential ramp monotone with ΔL ≥ 0.06 per step (the skill's
 ordinal rule); sequential light end ≥ 2:1. The

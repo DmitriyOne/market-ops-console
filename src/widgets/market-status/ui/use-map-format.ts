@@ -1,6 +1,6 @@
 'use client';
 
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 
 import {
   type KpiValue,
@@ -10,7 +10,6 @@ import {
   useKpiFormat,
   useStatusLabel,
 } from '@/entities/performance';
-import { formats } from '@/shared/config';
 
 const KIND = {
   attainment: 'percent',
@@ -24,7 +23,6 @@ export function useMapFormat() {
   const t = useTranslations('marketStatus');
   const f = useKpiFormat();
   const statusLabel = useStatusLabel();
-  const locale = useLocale();
 
   const metricLabel = (metric: MapMetric) => t(`metric.${metric}`);
   /** Status shows attainment as its number. */
@@ -34,18 +32,6 @@ export function useMapFormat() {
     kpi.value === null ? t('noData') : f.value(kpi, KIND[valueMetric(metric)]);
   const bound = (metric: ScaleMetric, n: number) =>
     f.value({ value: n, source: 'data' }, KIND[metric]);
-  /**
-   * A legend step: "US$1–1.5m", "94.0% – 98.0%". Growth spells both ends
-   * out, as ICU drops the second minus of a negative range ("-5.0–1.0%").
-   */
-  const range = (metric: ScaleMetric, from: number, to: number) => {
-    if (metric === 'growth')
-      return t('between', { from: bound(metric, from), to: bound(metric, to) });
-    const revenue = metric === 'revenue';
-    const options = revenue ? formats.number.compactCurrency : formats.number.percent;
-    const scale = revenue ? 1 : 1 / 100;
-    return new Intl.NumberFormat(locale, options).formatRange(from * scale, to * scale);
-  };
   const countryName = (item: MapItem, metric: MapMetric) => {
     const args = {
       name: item.name,
@@ -56,5 +42,5 @@ export function useMapFormat() {
       ? t('countryStatus', { ...args, status: statusLabel(item.status) })
       : t('country', args);
   };
-  return { metricLabel, valueMetric, value, bound, range, countryName };
+  return { metricLabel, valueMetric, value, bound, countryName };
 }
