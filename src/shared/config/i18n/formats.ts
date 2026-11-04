@@ -12,6 +12,14 @@ export const formats = {
       notation: 'compact',
       maximumFractionDigits: 1,
     },
+    /** A gap to plan: "−$80K", "+$1.2M". */
+    signedCompactCurrency: {
+      style: 'currency',
+      currency: 'USD',
+      notation: 'compact',
+      maximumFractionDigits: 1,
+      signDisplay: 'exceptZero',
+    },
     compact: { notation: 'compact', maximumFractionDigits: 1 },
     integer: { maximumFractionDigits: 0 },
     percent: { style: 'percent', minimumFractionDigits: 1, maximumFractionDigits: 1 },

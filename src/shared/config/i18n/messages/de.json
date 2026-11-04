@@ -318,5 +318,28 @@
     "title": "Nur diese Märkte zeigen",
     "clear": "Auswahl aufheben",
     "remove": "{name} entfernen"
+  },
+  "marketsTable": {
+    "title": "Märkte",
+    "caption": "Märkte in {scope}, {window}. Spaltenköpfe sortieren die Tabelle.",
+    "total": "Summe",
+    "totalCalculated": "Summe der gezeigten Zeilen, aus Monatsdaten berechnet",
+    "sortHint": "Sortieren",
+    "column": {
+      "market": "Markt",
+      "region": "Region",
+      "revenue": "Umsatz",
+      "gap": "Abstand zur Prognose",
+      "attainment": "Zielerreichung",
+      "growth": "Wachstum ggü. Vj.",
+      "share": "Marktanteil",
+      "units": "Stück",
+      "status": "Status"
+    },
+    "empty": "Keiner der ausgewählten Märkte ist in dieser Ansicht. Heben Sie die Auswahl auf, um alle Märkte zu sehen.",
+    "shown": "{shown} von {total} Märkten",
+    "noteLatest": "Status und Marktanteil gibt es nur für den letzten Monat.",
+    "notePerProduct": "Marktanteil gibt es nicht pro Produkt.",
+    "noteCalculated": "Abstand zur Prognose, Stückzahlen und Summe sind aus Monatsdaten berechnet."
   }
 }

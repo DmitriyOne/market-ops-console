@@ -3,11 +3,12 @@
 import { useTranslations } from 'next-intl';
 import { type ReactNode, Suspense } from 'react';
 
-import { DatasetGate } from '@/entities/performance';
+import { DatasetGate, useDashboard } from '@/entities/performance';
 import { WidgetBoundary } from '@/shared/ui';
 import { ScopeTitle, ScopeTitleSkeleton } from '@/widgets/dashboard-header';
 import { KpiStrip, KpiStripSkeleton } from '@/widgets/kpi-strip';
 import { MarketStatus, MarketStatusSkeleton } from '@/widgets/market-status';
+import { MarketsTable, MarketsTableSkeleton } from '@/widgets/markets-table';
 import { RevenueTrend, RevenueTrendSkeleton } from '@/widgets/revenue-trend';
 import { TopMovers, TopMoversSkeleton } from '@/widgets/top-movers';
 import { TopRisks, TopRisksSkeleton } from '@/widgets/top-risks';
@@ -35,7 +36,16 @@ function Slot({
   );
 }
 
-/** Executive layout, variant A (ADR 0014 checkpoint). */
+/** Widgets of the Analyst deep-dive; Executive leaves them out. */
+function AnalystOnly({ children }: { children: ReactNode }) {
+  const { state } = useDashboard();
+  return state.mode === 'analyst' ? children : null;
+}
+
+/**
+ * Variant A (ADR 0014 checkpoint). Analyst adds the markets table under
+ * the map, so a pick on the map narrows the table in view.
+ */
 export function Overview() {
   const t = useTranslations();
   return (
@@ -57,6 +67,13 @@ export function Overview() {
             <TopRisks />
           </Slot>
         </div>
+        <Suspense>
+          <AnalystOnly>
+            <Slot name={t('marketsTable.title')} fallback={<MarketsTableSkeleton />}>
+              <MarketsTable />
+            </Slot>
+          </AnalystOnly>
+        </Suspense>
         <div className={ROW}>
           <div className={WIDE}>
             <Slot name={t('trend.name')} fallback={<RevenueTrendSkeleton />}>

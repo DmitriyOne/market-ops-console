@@ -318,5 +318,28 @@
     "title": "Show only these markets",
     "clear": "Clear selection",
     "remove": "Remove {name}"
+  },
+  "marketsTable": {
+    "title": "Markets",
+    "caption": "Markets in {scope}, {window}. Column headers sort the table.",
+    "total": "Total",
+    "totalCalculated": "Total of the rows shown, calculated from monthly data",
+    "sortHint": "Sort",
+    "column": {
+      "market": "Market",
+      "region": "Region",
+      "revenue": "Revenue",
+      "gap": "Gap to forecast",
+      "attainment": "Attainment",
+      "growth": "Growth YoY",
+      "share": "Share",
+      "units": "Units",
+      "status": "Status"
+    },
+    "empty": "None of the selected markets is in this view. Clear the selection to see every market.",
+    "shown": "{shown} of {total} markets",
+    "noteLatest": "Status and share are set for the latest month only.",
+    "notePerProduct": "Share is not available per product.",
+    "noteCalculated": "Gap to forecast, units and the total are calculated from monthly data."
   }
 }

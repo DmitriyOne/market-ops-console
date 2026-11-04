@@ -68,4 +68,14 @@ describe('Overview', () => {
     // March is not the latest month: no status anywhere.
     expect(screen.getAllByText(en.kpi.latestOnly).length).toBeGreaterThan(0);
   });
+
+  it('Analyst adds the markets table; Executive does not', async () => {
+    server.use(datasetHandler());
+    const { unmount } = renderWithProviders(<Overview />, { searchParams: '?mode=analyst' });
+    expect(await screen.findByRole('region', { name: en.marketsTable.title })).toBeInTheDocument();
+    unmount();
+    renderWithProviders(<Overview />);
+    await screen.findByRole('heading', { level: 1, name: 'Portfolio' });
+    expect(screen.queryByRole('region', { name: en.marketsTable.title })).not.toBeInTheDocument();
+  });
 });
