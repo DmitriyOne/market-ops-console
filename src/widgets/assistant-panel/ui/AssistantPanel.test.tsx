@@ -3,6 +3,7 @@ import { cleanup, render, screen, waitFor, within } from '@testing-library/react
 import userEvent from '@testing-library/user-event';
 import { NextIntlClientProvider } from 'next-intl';
 import { NuqsTestingAdapter, type UrlUpdateEvent } from 'nuqs/adapters/testing';
+import { renderToString } from 'react-dom/server';
 import { Toaster } from 'sonner';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -62,6 +63,23 @@ describe('AssistantPanel', () => {
   beforeEach(() => {
     sessionStorage.clear();
     server.use(datasetHandler());
+  });
+
+  it('server HTML shows a loading conversation, not the empty state (history is client-only)', () => {
+    const client = new QueryClient();
+    const html = renderToString(
+      <QueryClientProvider client={client}>
+        <NextIntlClientProvider locale="en-GB" messages={en} formats={formats} timeZone="UTC">
+          <NuqsTestingAdapter>
+            <TooltipProvider>
+              <AssistantPanel />
+            </TooltipProvider>
+          </NuqsTestingAdapter>
+        </NextIntlClientProvider>
+      </QueryClientProvider>,
+    );
+    expect(html).toContain('aria-busy="true"');
+    expect(html).not.toContain(t.panel.empty.title);
   });
 
   it('has a header that says answers are in English', () => {
@@ -243,13 +261,16 @@ describe('AssistantPanel', () => {
     server.use(chatFromFixture('germany-dip'));
     const { user } = setup();
     const newChat = screen.getByRole('button', { name: t.panel.newChat });
-    expect(newChat).toBeDisabled();
+    expect(newChat).toHaveAttribute('aria-disabled', 'true');
     await ask(user, 'Tell me about the German market');
     await answerDone();
     await user.click(newChat);
     expect(screen.getByRole('heading', { name: t.panel.empty.title })).toBeInTheDocument();
     expect(screen.queryByText('Tell me about the German market')).not.toBeInTheDocument();
-    expect(newChat).toBeDisabled();
+    expect(newChat).toHaveAttribute('aria-disabled', 'true');
+    // Clicking it while empty does nothing.
+    await user.click(newChat);
+    expect(screen.getByRole('heading', { name: t.panel.empty.title })).toBeInTheDocument();
   });
 
   it('Copy answer puts the text, its sources and confidence on the clipboard', async () => {
@@ -335,10 +356,8 @@ describe('AssistantPanel', () => {
 
   it('New chat shows a tooltip on hover', async () => {
     const { user } = setup();
-    // Disabled while empty: the pointer lands on its wrapper, as in a browser.
-    const wrapper = screen.getByRole('button', { name: t.panel.newChat }).parentElement;
-    if (!wrapper) throw new Error('no wrapper');
-    await user.hover(wrapper);
+    // Empty chat: the button is aria-disabled but still explains itself.
+    await user.hover(screen.getByRole('button', { name: t.panel.newChat }));
     expect(await screen.findByRole('tooltip', { name: t.panel.newChat })).toBeInTheDocument();
   });
 

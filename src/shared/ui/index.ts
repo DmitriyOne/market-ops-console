@@ -4,6 +4,7 @@ export * from './dropdown-menu';
 export { ErrorBoundary } from './error-boundary';
 export { HoverCard, HoverCardContent, HoverCardTrigger } from './hover-card';
 export { Popover, PopoverContent, PopoverTrigger } from './popover';
+export { Skeleton } from './skeleton';
 export { toast, Toaster } from './sonner';
 export { Textarea } from './textarea';
 export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip';

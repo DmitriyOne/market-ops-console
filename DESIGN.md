@@ -101,7 +101,10 @@ Rules:
   `min-h-14` tab bar. Floating cards keep 15px from the viewport edge
   (`collisionPadding={15}`).
 - Clickable things show `cursor: pointer` (global rule in `globals.css`);
-  disabled shows `not-allowed`.
+  disabled (`disabled` or `aria-disabled="true"`) shows `not-allowed` and has
+  no hover or press effect: `Button` uses the `interactive:` variant
+  (`globals.css`) for both. Use `aria-disabled` instead of `disabled` when the
+  control must keep focus or a tooltip (New chat, a locked rating).
 
 ## 5. Screen frame
 
@@ -130,8 +133,9 @@ Rules:
 | `Popover` | the same card on coarse pointers (tap) |
 | `Collapsible` | "What the data shows" (closed by default) |
 | `DropdownMenu` | theme and locale switches |
-| `Tooltip` | the name of an icon-only control on hover and focus (New chat); wrap a disabled button in a `span` |
-| `Toaster` / `toast` (sonner) | short confirmations and failures that are not tied to a field ("Thanks for the feedback", "Couldn't copy"); top centre, clear of the composer and the tab bar |
+| `Tooltip` | the name of an icon-only control on hover and focus (New chat) |
+| `Skeleton` | a block whose content is not known yet (the conversation before the stored chat is read) |
+| `Toaster` / `toast.success` / `toast.error` (sonner) | short confirmations and failures that are not tied to a field ("Thanks for the feedback", "Couldn't copy"); top centre, as wide as the text up to 28rem |
 | `ErrorBoundary`, `WidgetBoundary` | a failing widget explains itself and offers "Try again" without taking the page down |
 
 ### Assistant building blocks (`src/widgets/assistant-panel/ui`)

@@ -3,7 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { SparklesIcon, SquarePenIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { type ReactNode, useEffect, useRef, useState } from 'react';
+import { type ReactNode, useEffect, useRef } from 'react';
 
 import {
   datasetQueryOptions,
@@ -12,7 +12,7 @@ import {
 } from '@/entities/performance';
 import { Composer, SuggestedQuestions, useChatStream } from '@/features/ask-question';
 import { useErrorMessage } from '@/shared/api';
-import { Button, Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui';
+import { Button, Skeleton, Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui';
 
 import { AnswerMessage, isCantAnswer } from './AnswerMessage';
 import { Conversation } from './Conversation';
@@ -43,18 +43,20 @@ export function AssistantPanel({
   const { focus, highlight } = useDashboardFocus();
 
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  // Answers restored from sessionStorage were seen before the reload: not new.
-  const [notified] = useState(
-    () => new Set(chat.messages.filter((m) => m.status === 'done').map((m) => m.id)),
-  );
+  // Answers restored from sessionStorage were seen before the reload: the first
+  // pass after the history is read records them without announcing them.
+  const notified = useRef<Set<string> | null>(null);
   useEffect(() => {
+    if (!chat.ready) return;
+    const first = notified.current === null;
+    const seen = (notified.current ??= new Set());
     for (const m of chat.messages) {
-      if (m.status === 'done' && !notified.has(m.id)) {
-        notified.add(m.id);
-        onAnswerDone?.();
+      if (m.status === 'done' && !seen.has(m.id)) {
+        seen.add(m.id);
+        if (!first) onAnswerDone?.();
       }
     }
-  }, [chat.messages, notified, onAnswerDone]);
+  }, [chat.ready, chat.messages, onAnswerDone]);
 
   const onSource = (r: ResolvedCitation) => {
     focus(r);
@@ -82,30 +84,35 @@ export function AssistantPanel({
         </h2>
         <span className="flex-1 text-sm text-muted-foreground">{t('subtitle')}</span>
         <Tooltip>
-          {/* A span, so the tooltip also explains the disabled (empty chat) button. */}
           <TooltipTrigger asChild>
-            <span className="inline-flex">
-              <Button
-                type="button"
-                variant="ghost"
-                className="size-11"
-                aria-label={t('newChat')}
-                disabled={chat.messages.length === 0}
-                onClick={() => {
-                  chat.reset();
-                  // The button is disabled next; keep keyboard focus in the composer.
-                  inputRef.current?.focus();
-                }}
-              >
-                <SquarePenIcon aria-hidden />
-              </Button>
-            </span>
+            {/* aria-disabled, not disabled: it keeps focus and its tooltip when empty. */}
+            <Button
+              type="button"
+              variant="ghost"
+              className="size-11 aria-disabled:opacity-50"
+              aria-label={t('newChat')}
+              aria-disabled={chat.messages.length === 0}
+              onClick={() => {
+                if (chat.messages.length === 0) return;
+                chat.reset();
+                inputRef.current?.focus();
+              }}
+            >
+              <SquarePenIcon aria-hidden />
+            </Button>
           </TooltipTrigger>
           <TooltipContent>{t('newChat')}</TooltipContent>
         </Tooltip>
         {headerAction}
       </header>
-      {chat.messages.length === 0 ? (
+      {!chat.ready ? (
+        // Until the stored conversation is read (server HTML, hydration).
+        <div aria-busy="true" className="flex flex-1 flex-col gap-3 p-4">
+          <Skeleton className="h-6 w-2/3" />
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-5/6" />
+        </div>
+      ) : chat.messages.length === 0 ? (
         <div className="relative flex flex-1 flex-col gap-3 overflow-y-auto p-4">
           <h3 className="text-lg font-semibold">{t('empty.title')}</h3>
           <p className="text-sm text-muted-foreground">{t('empty.body')}</p>

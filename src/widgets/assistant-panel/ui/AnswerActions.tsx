@@ -14,8 +14,7 @@ type Rating = 'up' | 'down';
 
 const COPIED_MS = 2000;
 // Locked rating: the chosen one stays marked, the other fades.
-const RATE =
-  'size-11 aria-pressed:bg-muted aria-disabled:cursor-not-allowed aria-disabled:not-aria-pressed:opacity-50';
+const RATE = 'size-11 aria-pressed:bg-muted aria-disabled:not-aria-pressed:opacity-50';
 
 type AnswerActionsProps = {
   message: ChatMessage;

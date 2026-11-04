@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useReducer, useRef } from 'react';
+import { useCallback, useEffect, useReducer, useRef, useState, useSyncExternalStore } from 'react';
 
 import {
   AbortedError,
@@ -19,6 +19,8 @@ import { isEnglish } from './language';
 
 export type ChatStream = {
   messages: ChatMessage[];
+  /** False until the stored conversation is read (server HTML and hydration). */
+  ready: boolean;
   isStreaming: boolean;
   ask: (question: string) => void;
   stop: () => void;
@@ -43,14 +45,24 @@ function parseJson(data: string): unknown {
   }
 }
 
+const subscribeNothing = () => () => undefined;
+const isClient = () => true;
+const isServer = () => false;
+
 // Changes when a message is added, removed or settles; tokens do not change it.
 const storageKey = (messages: ChatMessage[]) => messages.map((m) => `${m.id}:${m.status}`).join();
 
 /** The assistant conversation: one streamed answer at a time (ADR 0003, 0006). */
 export function useChatStream(): ChatStream {
-  // The panel renders on the client only (it is not in the static HTML),
-  // so reading sessionStorage in the initial state cannot mismatch.
-  const [messages, dispatch] = useReducer(chatReducer, undefined, loadChat);
+  const [messages, dispatch] = useReducer(chatReducer, []);
+  // The server (and `next dev` SSR) has no sessionStorage: render "not ready"
+  // there and while hydrating, then restore on the first client render after.
+  const hydrated = useSyncExternalStore(subscribeNothing, isClient, isServer);
+  const [ready, setReady] = useState(false);
+  if (hydrated && !ready) {
+    setReady(true);
+    dispatch({ type: 'restore', messages: loadChat() });
+  }
   // A ref, not state: `ask` must see a stream started in the same tick.
   const active = useRef<Active | null>(null);
 
@@ -174,6 +186,7 @@ export function useChatStream(): ChatStream {
 
   return {
     messages,
+    ready,
     isStreaming: messages.some((m) => m.status === 'streaming'),
     ask,
     stop,

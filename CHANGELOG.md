@@ -13,8 +13,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 - Page title and description per locale; `noindex, nofollow` (internal console).
 - `AGENTS.md` (entry point for coding agents, keeps the `next dev` block) and `DESIGN.md` (tokens, type, spacing, inventory, checklist).
 - Answer actions: Copy (text with sources and confidence, "Copied" for 2 s), 👍 / 👎 with a reason, once per answer (logged through `logEvent`, never the question, thanks as a toast); "New chat" with a tooltip clears the conversation.
-- The conversation survives a reload of the same tab (sessionStorage, last 50 messages); restored answers are not counted as new.
-- Toasts (sonner, top centre) and tooltips (shadcn).
+- The conversation survives a reload of the same tab (sessionStorage, last 50 messages), read after hydration behind a skeleton so server and client HTML match; restored answers are not counted as new.
+- Toasts (sonner, top centre, as wide as the text), tooltips and skeletons (shadcn).
+- Disabled controls show the not-allowed cursor and no hover or press effect.
 - The data block says that status exists for the latest month only.
 - MSW test harness for the SSE chat stream and the data route.
 
