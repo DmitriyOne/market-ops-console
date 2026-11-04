@@ -2,6 +2,8 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: superpowers:executing-plans (owner's usual flow: build → owner check → review → owner check). Steps use `- [ ]`.
 
+**Status:** built on `feature/0.7.0/analyst-table` (2026-11-04), in review.
+
 **Goal.** Analyst mode gets the brief's "dense tables": a markets table with
 every KPI, sort, a markets filter fed by the map ("brush … and the table
 narrows"), totals, a gap-to-forecast column and a CSV export of exactly
@@ -79,6 +81,8 @@ filter. A new `sort` param keeps the order in shared links. New slices:
 - **Hint under the map in Analyst:** "Shift+click adds a market to the
   table filter" (touch: "Tap a market, then Add to filter").
 - **History:** selection changes push (spec §6); sort replaces.
+- **Map flight (found while building):** a pick on the map keeps the map still (it would fly away from the pointer); a selection from the assistant or the table filter still flies the map to it.
+- **Empty state** uses the filter's own `Clear selection` above it (two buttons with one name would confuse a screen reader).
 - **Plan numbering:** this file is Plan 5. The backlog's "Plan 5"
   (hardening, a11y pass) is renamed **"Hardening plan"** in Task 6.
 

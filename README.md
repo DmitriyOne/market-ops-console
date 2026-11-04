@@ -4,20 +4,21 @@ A console for a commercial operations team: a **streaming AI assistant** that an
 
 Take-home assignment for the Frontend Engineer role at NewPage Solutions.
 
-> Status: `0.6.0` market map in review. Done: foundation (0.2.0), design direction and tokens (0.3.0), assistant (0.4.0), dashboard shell (0.5.0). Next, one release each: Analyst view with the markets table and CSV export (0.7.0), heat map and radar (0.8.0), then alerts, end-to-end test and deploy. Full list: `CHANGELOG.md`.
+> Status: `0.7.0` Analyst markets table in review. Done: foundation (0.2.0), design direction and tokens (0.3.0), assistant (0.4.0), dashboard shell (0.5.0), market map (0.6.0). Next, one release each: heat map and radar (0.8.0), then alerts, end-to-end test and deploy. Full list: `CHANGELOG.md`.
 
 ## What works now
 
 - **Assistant** in a right panel on desktop (collapsible, remembered without a flash) and an Assistant tab on phones.
 - **Streamed answers** with Stop, Retry, confidence and the label "AI answer · may be incomplete". Answers without matching data say "I can't answer this from the data".
 - **Sources**: one button per citation. Hover, focus or tap shows an evidence card with the real numbers and a 12-month trend; a click focuses the dashboard through the URL.
-- **"What the data shows"** under each answer: the portfolio row, the cited rows and markets the answer did not mention, found by fixed rules (no AI). "Show on dashboard" highlights them.
+- **"What the data shows"** under each answer: the portfolio row, the cited rows and markets the answer did not mention, found by fixed rules (no AI). "Show on dashboard" selects them on the map and in the table.
 - **Answer actions**: Copy, 👍 / 👎 with a reason (once per answer), New chat.
 - **History** survives a reload of the same tab (`sessionStorage`) and ends with the tab.
 - **Dashboard, Executive view**: drill-down path `Portfolio › Region › Market › Product`, a month picker with a 1 / 3 / 12-month window, KPI cards (revenue, forecast attainment, growth, markets at risk), market status as a world map, tiles by region or a table (map coloured by status; in Analyst also by attainment, growth, share or revenue), top risks, top movers and the revenue trend (actual vs forecast vs prior year) with a table alternative. Every view is in the URL: links can be shared, Back and Forward work (mode included), a broken link is corrected in place; the app name returns to the clean view (phone: also ⚙︎ › Reset view). A source click in the assistant moves the whole dashboard and scrolls it to the top. The chosen view (map, tiles, table; chart or table) is remembered per browser.
+- **Dashboard, Analyst view**: everything above plus the map metric picker, a markets table with every KPI (gap to forecast included), a total row and sortable headers, a markets filter fed by the map (Shift+click) and the tiles, "Export CSV" of the rows as shown, and units in the revenue trend. Selection and sort are in the URL too.
 - 4 locales (en-GB, en-US, de-DE, ru-RU), light and dark themes, an offline screen, error boundaries per widget.
 
-Try it: run `pnpm dev`, click Europe › Germany in the path or Germany on the map, pick March 2026 to see the dip, then open the assistant and pick a suggested question, or ask "Why did Germany dip in March?", "What will sales be next year?" (can't answer) or "force error" (error and Retry).
+Try it: run `pnpm dev`, switch to Analyst and Shift+click Germany and Spain on the map to narrow the markets table, click Europe › Germany in the path or Germany on the map, pick March 2026 to see the dip, then open the assistant and pick a suggested question, or ask "Why did Germany dip in March?", "What will sales be next year?" (can't answer) or "force error" (error and Retry).
 
 ## Start here (5 minutes)
 
@@ -54,10 +55,10 @@ pages/               empty on purpose (see pages/README.md)
 src/
   app/               providers, global styles, design tokens
   pages/             page composition, no logic (dashboard)
-  widgets/           screen blocks: app-shell, assistant-panel, dashboard-header, kpi-strip, market-status (tiles, table and map), top-risks, top-movers, revenue-trend; planned: radar, heat map, markets table
-  features/          user actions: ask-question (chat stream, composer, history), drill-down, reset-view, select-period, select-metric, switch-mode, switch-section, switch-locale, switch-theme, network-status; planned: alerts
-  entities/          performance (dataset, dashboard URL state, KPI and status selectors, map scales and the map selector, citations, status chip)
-  shared/            ui (shadcn, error boundaries, toasts), lib (cn, dom, errors, events, media, storage), api (HTTP client, SSE, contracts, dataset), config (env, API routes, i18n)
+  widgets/           screen blocks: app-shell, assistant-panel, dashboard-header, kpi-strip, market-status (tiles, table and map), markets-table, top-risks, top-movers, revenue-trend; planned: radar, heat map
+  features/          user actions: ask-question (chat stream, composer, history), drill-down, reset-view, select-period, select-metric, select-markets, export-markets, switch-mode, switch-section, switch-locale, switch-theme, network-status; planned: alerts
+  entities/          performance (dataset, dashboard URL state, KPI and status selectors, map scales and the map selector, the markets table selector, citations, status chip)
+  shared/            ui (shadcn, error boundaries, toasts), lib (cn, csv, dom, errors, events, media, storage), api (HTTP client, SSE, contracts, dataset), config (env, API routes, i18n)
 data/                data.json, fixtures.json (source of truth)
 docs/
   decisions/         architecture decision records

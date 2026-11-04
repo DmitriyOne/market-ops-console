@@ -14,4 +14,4 @@
 
 React Context is not used for app state. No Redux/Zustand: the three tools above cover every case.
 
-URL shape: `/[de-DE/]dashboard?region=eu&market=de&product=veltrix&period=2026-03&range=3m&mode=analyst&kpi=attainment&markets=de&markets=es` (defaults are not written; `compare` joins with the radar in M4).
+URL shape: `/[de-DE/]dashboard?region=eu&market=de&product=veltrix&period=2026-03&range=3m&mode=analyst&kpi=attainment&markets=de&markets=es&sort=-growth` (defaults are not written; `markets` is the one selection list, `sort` the markets table order; `compare` joins with the radar in M4).
