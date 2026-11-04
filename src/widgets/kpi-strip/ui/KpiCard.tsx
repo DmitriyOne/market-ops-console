@@ -1,6 +1,6 @@
 'use client';
 
-import { SigmaIcon } from 'lucide-react';
+import { CalculatorIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 import { useId } from 'react';
@@ -51,7 +51,7 @@ export function KpiCard({ label, value, detail, formula, source, spark }: KpiCar
               >
                 <span className="flex h-6 items-center rounded-md border border-dashed border-input px-1.5 text-xs text-muted-foreground transition-colors group-hover/calc:border-foreground/40 group-hover/calc:text-foreground group-focus-visible/calc:ring-3 group-focus-visible/calc:ring-ring/50 group-aria-expanded/calc:border-foreground/40 group-aria-expanded/calc:text-foreground">
                   {/* A narrow card gets the sign, a wide one the word. */}
-                  <SigmaIcon aria-hidden className="size-3.5 @min-[11rem]:hidden" />
+                  <CalculatorIcon aria-hidden className="size-3.5 @min-[11rem]:hidden" />
                   <span className="hidden @min-[11rem]:inline">{t('calculated')}</span>
                 </span>
               </button>

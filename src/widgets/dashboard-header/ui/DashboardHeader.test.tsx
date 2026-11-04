@@ -101,8 +101,16 @@ describe('DashboardHeader', () => {
     const settings = await screen.findByRole('button', { name: en.header.settings });
     await user.click(settings);
     const sheet = screen.getByRole('dialog', { name: en.header.settingsTitle });
-    expect(within(sheet).getByRole('button', { name: en.theme.label })).toBeInTheDocument();
-    expect(within(sheet).getByRole('button', { name: en.locale.label })).toBeInTheDocument();
+    // Whole rows are the targets, and they say the current choice.
+    expect(
+      within(sheet).getByRole('button', { name: `${en.theme.label} ${en.theme.light}` }),
+    ).toBeInTheDocument();
+    const language = within(sheet).getByRole('button', {
+      name: `${en.locale.label} ${en.locale['en-GB']}`,
+    });
+    await user.click(language);
+    expect(screen.getAllByRole('menuitemradio')).toHaveLength(4);
+    await user.keyboard('{Escape}');
     await user.keyboard('{Escape}');
     await waitFor(() => {
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();

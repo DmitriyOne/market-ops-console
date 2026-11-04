@@ -21,13 +21,15 @@ function notify(key: string) {
   for (const listener of listeners.get(key) ?? []) listener();
 }
 
-const getServerSnapshot = () => false;
+// Unknown until the browser is read: the caller shows a placeholder, not
+// the default, so a remembered choice does not flash the other view first.
+const getServerSnapshot = () => null;
 
 /**
  * An on/off view choice remembered per browser (a table instead of a
- * chart, say). Off on the server and until set.
+ * chart, say). `null` on the server and while hydrating, then off until set.
  */
-export function useStoredFlag(key: string): [boolean, (on: boolean) => void] {
+export function useStoredFlag(key: string): [boolean | null, (on: boolean) => void] {
   const subscribe = useCallback(
     (onChange: () => void) => {
       const set = listeners.get(key) ?? new Set();
@@ -47,7 +49,11 @@ export function useStoredFlag(key: string): [boolean, (on: boolean) => void] {
     },
     [key],
   );
-  const value = useSyncExternalStore(subscribe, () => read(key), getServerSnapshot);
+  const value = useSyncExternalStore<boolean | null>(
+    subscribe,
+    () => read(key),
+    getServerSnapshot,
+  );
   const update = useCallback(
     (on: boolean) => {
       try {

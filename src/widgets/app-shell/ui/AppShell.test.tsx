@@ -10,6 +10,7 @@ import { applyPanelCollapsed } from '../model/panel-collapsed-script';
 import { AppShell, type AssistantApi } from './AppShell';
 
 const t = en.shell;
+const scrollTo = vi.fn();
 
 function viewport(desktop: boolean) {
   vi.stubGlobal(
@@ -53,6 +54,9 @@ const assistantPane = () => screen.getByRole('complementary', { name: t.assistan
 
 describe('AppShell', () => {
   beforeEach(() => {
+    // jsdom has no Element#scrollTo; showMain calls it.
+    scrollTo.mockClear();
+    Element.prototype.scrollTo = scrollTo;
     localStorage.clear();
     document.documentElement.removeAttribute('data-assistant-collapsed');
   });
@@ -173,6 +177,26 @@ describe('AppShell', () => {
     expect(onUrlUpdate.mock.calls.at(-1)?.[0].searchParams.get('tab')).toBeNull();
     await waitFor(() => {
       expect(screen.getByRole('main')).not.toHaveClass('max-lg:hidden');
+    });
+  });
+
+  it('desktop: showMain scrolls the dashboard to the top', () => {
+    viewport(true);
+    const { api } = setup();
+    act(() => {
+      api.current?.showMain();
+    });
+    expect(scrollTo).toHaveBeenCalledWith(expect.objectContaining({ top: 0 }));
+  });
+
+  it('phone: showMain scrolls the dashboard to the top once it is shown', async () => {
+    viewport(false);
+    const { api } = setup('?tab=assistant');
+    act(() => {
+      api.current?.showMain();
+    });
+    await waitFor(() => {
+      expect(scrollTo).toHaveBeenCalledWith(expect.objectContaining({ top: 0 }));
     });
   });
 

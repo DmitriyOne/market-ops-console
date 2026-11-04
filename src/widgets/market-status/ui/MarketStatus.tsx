@@ -51,6 +51,8 @@ export function MarketStatus() {
   const { ds, state } = useDashboard();
   const { toMarket } = useDrillDown();
   const [asTable, setAsTable] = useStoredFlag('mo:market-status-table');
+  // The remembered view is read after hydration: keep the skeleton until then.
+  if (asTable === null) return <MarketStatusSkeleton />;
 
   const groups = marketTiles(ds, state.scope, state.period, state.range, state.highlighted);
   const tiles = groups.flatMap((g) => g.tiles);

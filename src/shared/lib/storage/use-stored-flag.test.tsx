@@ -1,4 +1,5 @@
 import { act, renderHook } from '@testing-library/react';
+import { renderToString } from 'react-dom/server';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { useStoredFlag } from './use-stored-flag';
@@ -7,6 +8,13 @@ describe('useStoredFlag', () => {
   afterEach(() => {
     localStorage.clear();
     vi.restoreAllMocks();
+  });
+
+  it('is unknown on the server, so a caller can wait instead of showing the default', () => {
+    function Probe() {
+      return <>{String(useStoredFlag('mo:test')[0])}</>;
+    }
+    expect(renderToString(<Probe />)).toBe('null');
   });
 
   it('is off until set', () => {

@@ -3,12 +3,13 @@
 import type { MouseEvent, ReactNode } from 'react';
 
 import { Link } from '@/shared/config';
+import { scrollMainToTop } from '@/shared/lib';
 
 import { useResetView } from '../model/use-reset-view';
 
 /**
  * A link to the clean dashboard. A plain click resets the view in place
- * (one history step); a new-tab click opens the clean URL.
+ * (one history step) and scrolls it to the top; a new-tab click opens the clean URL.
  */
 export function ResetViewLink({
   children,
@@ -27,6 +28,7 @@ export function ResetViewLink({
     }
     event.preventDefault();
     reset();
+    scrollMainToTop();
     onReset?.();
   };
   return (

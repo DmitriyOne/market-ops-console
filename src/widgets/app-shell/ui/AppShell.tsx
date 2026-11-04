@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { SectionTabBar, useSection } from '@/features/switch-section';
-import { cn, useMediaQuery } from '@/shared/lib';
+import { cn, scrollMainToTop, useMediaQuery } from '@/shared/lib';
 import { Button, WidgetBoundary } from '@/shared/ui';
 
 import { usePanelCollapsed } from '../model/use-panel-collapsed';
@@ -13,7 +13,7 @@ import { usePanelCollapsed } from '../model/use-panel-collapsed';
 export type AssistantApi = {
   /** An answer finished; badges it when the assistant is not visible. */
   notifyAnswer: () => void;
-  /** Phones: switch to the dashboard. Desktop: nothing, both are visible. */
+  /** Bring the dashboard into view at its top (phones also switch to it). */
   showMain: () => void;
   /** The desktop collapse button, for the assistant's header row. */
   headerAction: ReactNode;
@@ -68,9 +68,16 @@ export function AppShell({ header, main, assistant }: AppShellProps) {
   const notifyAnswer = useCallback(() => {
     if (hidden) setUnread((n) => n + 1);
   }, [hidden]);
+  // Phones scroll once the dashboard is shown: a hidden area cannot scroll.
+  const [scrollRequest, setScrollRequest] = useState(0);
   const showMain = useCallback(() => {
     if (!desktop) setSection('overview');
+    setScrollRequest((n) => n + 1);
   }, [desktop, setSection]);
+  const mainShown = desktop || section !== 'assistant';
+  useEffect(() => {
+    if (scrollRequest > 0 && mainShown) scrollMainToTop();
+  }, [scrollRequest, mainShown]);
   const headerAction = useMemo(
     () => (
       <Button

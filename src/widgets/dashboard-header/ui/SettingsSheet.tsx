@@ -5,8 +5,8 @@ import { useTranslations } from 'next-intl';
 import { Suspense, useState } from 'react';
 
 import { ResetViewLink } from '@/features/reset-view';
-import { LocaleSwitch } from '@/features/switch-locale';
-import { ThemeSwitch } from '@/features/switch-theme';
+import { LocaleSwitchRow } from '@/features/switch-locale';
+import { ThemeSwitchRow } from '@/features/switch-theme';
 import { cn } from '@/shared/lib';
 import {
   Button,
@@ -18,11 +18,13 @@ import {
   SheetTrigger,
 } from '@/shared/ui';
 
+// A whole row is the target, not a small icon at its end.
+const ROW =
+  '-mx-2 flex min-h-12 items-center justify-between gap-3 rounded-md px-2 text-left outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-50';
+
 /** Phones: language, theme and reset behind one ⚙︎ button (spec §6 Layout). */
 export function SettingsSheet({ className }: { className?: string }) {
   const t = useTranslations('header');
-  const tLocale = useTranslations('locale');
-  const tTheme = useTranslations('theme');
   const [open, setOpen] = useState(false);
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -42,21 +44,15 @@ export function SettingsSheet({ className }: { className?: string }) {
           <SheetDescription className="sr-only">{t('settings')}</SheetDescription>
         </SheetHeader>
         <div className="flex flex-col gap-2 px-4">
-          <div className="flex min-h-11 items-center justify-between">
-            <span>{tLocale('label')}</span>
-            {/* Reads search params, which static HTML does not have. */}
-            <Suspense>
-              <LocaleSwitch />
-            </Suspense>
-          </div>
-          <div className="flex min-h-11 items-center justify-between">
-            <span>{tTheme('label')}</span>
-            <ThemeSwitch />
-          </div>
+          {/* Reads search params, which static HTML does not have. */}
+          <Suspense>
+            <LocaleSwitchRow className={ROW} />
+          </Suspense>
+          <ThemeSwitchRow className={ROW} />
           {/* Reads search params, which static HTML does not have. */}
           <Suspense>
             <ResetViewLink
-              className="flex min-h-11 items-center gap-3 rounded-md outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+              className="-mx-2 flex min-h-12 items-center gap-3 rounded-md px-2 outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50"
               onReset={() => {
                 setOpen(false);
               }}

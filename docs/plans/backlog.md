@@ -35,6 +35,10 @@ Format: **Item**: what is wrong (file). Why it can wait. Where it goes.
 - **Skeleton test queries `data-skeleton` attributes** (`AssistantPanel.test.tsx`, SSR test), not roles, against `.claude/rules/testing.md`. The skeleton has no roles to query apart from `aria-busy`. **Plan 5**, test pass.
 - **Rating is not kept across a reload** of the tab (state in `AnswerActions`), so a restored answer can be rated again. Owner accepted on 2026-11-04; the server would dedupe by `answerId`. **README notes** if feedback goes to a real endpoint.
 
+## From the owner check of 0.5.0 (2026-11-04)
+
+- **No favicon**: every page requests `/favicon.ico` and gets a 404 (console error in the browser). Add an `app/icon.svg` (or `favicon.ico`) in the app's style. **Plan 5**, polish before the README.
+
 ## README notes (owner, 2026-11-04)
 
 Points the owner wants explained in the README, in his own words:

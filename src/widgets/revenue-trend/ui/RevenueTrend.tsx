@@ -61,6 +61,8 @@ export function RevenueTrend() {
   const titleId = useId();
   const { ds, state } = useDashboard();
   const [asTable, setAsTable] = useStoredFlag('mo:revenue-trend-table');
+  // The remembered view is read after hydration: keep the skeleton until then.
+  if (asTable === null) return <RevenueTrendSkeleton />;
 
   const view = trendView(ds, state.scope, state.period, state.range);
   const period = (p: string) => format.dateTime(periodToDate(p), 'period');
