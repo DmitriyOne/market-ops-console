@@ -2,10 +2,10 @@
 
 import { PanelRightCloseIcon, PanelRightOpenIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { type ReactNode, useCallback, useMemo, useRef, useState } from 'react';
+import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { SectionTabBar, useSection } from '@/features/switch-section';
-import { cn, useMediaQuery } from '@/shared/lib';
+import { cn, scrollMainToTop, useMediaQuery } from '@/shared/lib';
 import { Button, WidgetBoundary } from '@/shared/ui';
 
 import { usePanelCollapsed } from '../model/use-panel-collapsed';
@@ -13,7 +13,7 @@ import { usePanelCollapsed } from '../model/use-panel-collapsed';
 export type AssistantApi = {
   /** An answer finished; badges it when the assistant is not visible. */
   notifyAnswer: () => void;
-  /** Phones: switch to the dashboard. Desktop: nothing, both are visible. */
+  /** Bring the dashboard into view at its top (phones also switch to it). */
   showMain: () => void;
   /** The desktop collapse button, for the assistant's header row. */
   headerAction: ReactNode;
@@ -26,6 +26,10 @@ type AppShellProps = {
 };
 
 const FRAME = 'flex h-dvh flex-col bg-background';
+// `relative`: screen-reader-only text inside is placed against the scroll
+// area, not the page, so it cannot stretch the page below the tab bar.
+const HEADER = 'border-b border-border';
+const MAIN = 'relative min-w-0 flex-1 overflow-y-auto';
 const ASIDE =
   'flex min-h-0 flex-col border-border max-lg:flex-1 lg:w-96 lg:border-l lg:assistant-collapsed:w-14';
 
@@ -48,6 +52,11 @@ export function AppShell({ header, main, assistant }: AppShellProps) {
   const collapseRef = useRef<HTMLButtonElement>(null);
   const expandRef = useRef<HTMLButtonElement>(null);
 
+  // The before-paint section mark is for the static page only; the URL rules from here.
+  useEffect(() => {
+    document.documentElement.removeAttribute('data-section');
+  }, []);
+
   const hidden = desktop ? collapsed : section !== 'assistant';
   // Seen again, however it happened (expand, tab bar, Back): clear the badge.
   const [wasHidden, setWasHidden] = useState(hidden);
@@ -59,9 +68,16 @@ export function AppShell({ header, main, assistant }: AppShellProps) {
   const notifyAnswer = useCallback(() => {
     if (hidden) setUnread((n) => n + 1);
   }, [hidden]);
+  // Phones scroll once the dashboard is shown: a hidden area cannot scroll.
+  const [scrollRequest, setScrollRequest] = useState(0);
   const showMain = useCallback(() => {
     if (!desktop) setSection('overview');
+    setScrollRequest((n) => n + 1);
   }, [desktop, setSection]);
+  const mainShown = desktop || section !== 'assistant';
+  useEffect(() => {
+    if (scrollRequest > 0 && mainShown) scrollMainToTop();
+  }, [scrollRequest, mainShown]);
   const headerAction = useMemo(
     () => (
       <Button
@@ -99,15 +115,10 @@ export function AppShell({ header, main, assistant }: AppShellProps) {
       >
         {tCommon('skipToContent')}
       </a>
-      <header className="border-b border-border">{header}</header>
+      {/* Phone assistant: the whole screen, as a chat app. */}
+      <header className={cn(HEADER, section === 'assistant' && 'max-lg:hidden')}>{header}</header>
       <div className="flex min-h-0 flex-1">
-        <main
-          id="main"
-          className={cn(
-            'min-w-0 flex-1 overflow-y-auto',
-            section === 'assistant' && 'max-lg:hidden',
-          )}
-        >
+        <main id="main" className={cn(MAIN, section === 'assistant' && 'max-lg:hidden')}>
           {/* Each side fails on its own: a crash in one keeps the other. */}
           <WidgetBoundary>{main}</WidgetBoundary>
         </main>
@@ -152,17 +163,27 @@ export function AppShell({ header, main, assistant }: AppShellProps) {
  * same header, dashboard and an empty panel of the right width, so nothing
  * jumps when the live shell takes over.
  */
-export function AppShellFallback({ header, main }: Pick<AppShellProps, 'header' | 'main'>) {
+export function AppShellFallback({
+  header,
+  main,
+  assistant,
+}: Pick<AppShellProps, 'header' | 'main'> & { assistant?: ReactNode }) {
   const t = useTranslations('shell');
   return (
     <div className={FRAME}>
-      <header className="border-b border-border">{header}</header>
+      <header className={cn(HEADER, 'max-lg:section-assistant:hidden')}>{header}</header>
       <div className="flex min-h-0 flex-1">
-        <main id="main" className="min-w-0 flex-1 overflow-y-auto">
+        {/* `section-assistant`: set before paint for `?tab=assistant` (ADR 0015). */}
+        <main id="main" className={cn(MAIN, 'max-lg:section-assistant:hidden')}>
           {/* Each side fails on its own: a crash in one keeps the other. */}
           <WidgetBoundary>{main}</WidgetBoundary>
         </main>
-        <aside aria-label={t('assistant')} className={cn(ASIDE, 'max-lg:hidden')} />
+        <aside
+          aria-label={t('assistant')}
+          className={cn(ASIDE, 'max-lg:hidden max-lg:section-assistant:flex')}
+        >
+          {assistant}
+        </aside>
       </div>
     </div>
   );

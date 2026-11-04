@@ -4,6 +4,8 @@ import type { Formats } from 'next-intl';
 export const formats = {
   number: {
     currency: { style: 'currency', currency: 'USD' },
+    /** Whole dollars, for tables that stand in for a chart. */
+    wholeCurrency: { style: 'currency', currency: 'USD', maximumFractionDigits: 0 },
     compactCurrency: {
       style: 'currency',
       currency: 'USD',
@@ -22,6 +24,10 @@ export const formats = {
   },
   dateTime: {
     period: { month: 'short', year: 'numeric', timeZone: 'UTC' },
+    /** Chart axis on narrow screens: "Jun 24". */
+    periodShort: { month: 'short', year: '2-digit', timeZone: 'UTC' },
     day: { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' },
+    month: { month: 'short', timeZone: 'UTC' },
+    year: { year: 'numeric', timeZone: 'UTC' },
   },
 } satisfies Formats;

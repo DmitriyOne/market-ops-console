@@ -100,3 +100,25 @@ describe('WidgetBoundary', () => {
     expect(await screen.findByText('fresh data')).toBeInTheDocument();
   });
 });
+
+describe('WidgetBoundary with a name (dashboard widgets)', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+    shouldFail = true;
+  });
+
+  it('names the widget in the message and the Retry button, without its own alert', () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    render(
+      <NextIntlClientProvider locale="en-GB" messages={en}>
+        <WidgetBoundary name="KPI cards">
+          <FlakyWidget />
+        </WidgetBoundary>
+      </NextIntlClientProvider>,
+    );
+    // One data failure breaks every widget; the page announces it once instead.
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(screen.getByText("Couldn't load KPI cards")).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Try again: KPI cards' })).toBeInTheDocument();
+  });
+});

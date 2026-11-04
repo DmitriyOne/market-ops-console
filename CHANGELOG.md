@@ -2,7 +2,38 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/). The top version must match `package.json` and the `release/X.Y.Z` branch.
 
-## [0.4.0] - Unreleased
+## [0.5.0] - Unreleased
+
+### Added
+- Dashboard header: drill-down path `Portfolio › Region › Market › Product` (each step opens the list of its siblings; picking the current one goes back up to it), period, mode, language and theme; on phones the path and a ⚙︎ button that opens language, theme and "Reset view" in a bottom sheet (whole rows are the targets), period and mode below. Skeleton of the same shape in the static HTML.
+- Market status (variant A): markets as tiles grouped by region, status by shape, word and colour, off-track tiles hatched, attainment following the period; markets listed by the assistant ("Show on dashboard") are ringed and named as highlighted; a tile drills into its market; "Show as table" gives the same facts. Off the latest month the tiles show attainment only, with a notice.
+- Top risks: non-on-track markets, off track first then by attainment, each with attainment, growth and the status word; a row drills in; an empty region says so.
+- Top movers: highest and lowest growth YoY in the window for the markets of the scope (brief: "health at a glance"), with a bar per market (red only for a decline); a row drills in.
+- Revenue trend: actual vs forecast vs prior year over 24 months for the current scope (Recharts, loaded on its own after the page), the selected month marked with a dashed labelled line (a labelled band for 3 / 12 months), anomalies in the data marked and named under the chart; a legend with each line's pattern, a sentence describing the selected month for screen readers, keyboard access through the Recharts accessibility layer and "Show as table" with every month.
+- shadcn `card`; a `bg-hatch` utility for the off-track pattern.
+- KPI cards for the current view: revenue, forecast attainment, growth YoY and markets at risk ("6 of 13", "2 off track · 4 at risk"), each with a supporting line and a 12-month line; computed figures carry a "Calculated" badge that names the formula. Off the latest month the risk card says status exists for the latest month only and offers to jump there; a product says status is per market.
+- Scope title: "Veltrix · Germany" with the number of markets and products and the latest data month.
+- Period picker: a month grid with a year switch (months without data cannot be picked, arrow keys move between months) and the window 1 / 3 / 12 months; both go into the URL with a history entry.
+- Executive / Analyst switch; each switch is a history entry, so Back returns to the previous mode.
+- The app name leads to the clean dashboard (portfolio, latest month, Executive) in one history step; on phones "Reset view" in the ⚙︎ sheet.
+- "Show as table" on market status and the revenue trend is remembered per browser, and the button then reads "Show as tiles" / "Show as chart"; the card keeps its skeleton until the choice is read, so a reload never flashes the other view.
+- Reset and the assistant's source / "Show on dashboard" scroll the dashboard back to its top, so the change is in view.
+- Phone settings sheet: the whole Language and Theme rows open their menus and show the current choice.
+- Chart motion: the trend lines draw in and move to new values, sparklines reveal left to right, mover bars grow; all off under reduced motion.
+- Drill-down actions (portfolio, region, market, product) keep the period and range; a market brings its region.
+- shadcn `breadcrumb`, `chart` (trimmed to the frame; Recharts 3), `sheet`, `table`, `toggle-group`.
+- Dashboard URL state is checked against the data: a market brings its own region, a product needs a market, unknown ids, months, ranges and modes fall back to the default, and a bad link is corrected in place without a history entry.
+
+- When the dataset cannot load, the dashboard shows one message with one "Try again" instead of one alert per widget; a widget that fails on its own names itself ("Couldn't load Key figures", "Try again: Key figures").
+- A phone link to the Assistant tab (`?tab=assistant`) shows the assistant area from the first paint (inline script, ADR 0015) instead of flashing Overview.
+
+### Fixed
+- Review of 0.5.0: market tiles' names start with the visible code ("DE Germany, …", WCAG 2.5.3); the "Calculated" badge is a 44px target that opens the formula on tap; the header steps aside when the dataset fails, so the page shows its single message; repeated `markets` keys are read; a product step clears highlights; tiles say they are whole markets when a product is chosen; the trend table shows whole dollars; the month picker keeps focus at the first and last year; Russian verb agreement in the risk split; table caption names the window.
+- Owner check of 0.5.0: a wide table no longer widens its card past the phone screen; screen-reader-only text no longer stretches the page below the tab bar; the "Calculated" badge has no grey box on hover and keeps its corner (a calculator icon in a narrow card); the selected month on the trend chart is a thin dashed line with its name (a light band for 3 / 12 months) instead of a thick grey bar; phone chart axes are shorter ("Jun 24", a tick a year); the mode and range switches have room around their labels; the phone period picker is as wide as its button; the phone Assistant tab hides the header; the bottom tab bar is a segmented track with the current section as a raised chip (owner, variant E); market status and revenue trend skeletons have the real card's title, corner button and layout; the chart tooltip shows each line's colour and pattern next to its name; a source card no longer flashes in the screen corner after "Show on dashboard" on touch screens.
+- The 404 page has a skip link and a `main#main` landmark.
+- Switching language keeps repeated query keys (`markets=de&markets=es`) and the `#hash`.
+
+## [0.4.0] - 2026-11-04
 
 ### Added
 - Assistant (ADR 0014, variant A): streamed answers with Stop, Retry, confidence and one source button per citation; hover, focus or tap shows an evidence card with the real numbers; clicking focuses the dashboard through the URL.

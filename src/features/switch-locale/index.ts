@@ -1,2 +1,2 @@
 export { useSwitchLocale } from './model/use-switch-locale';
-export { LocaleSwitch } from './ui/LocaleSwitch';
+export { LocaleSwitch, LocaleSwitchRow } from './ui/LocaleSwitch';
