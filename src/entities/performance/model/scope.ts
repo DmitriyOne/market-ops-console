@@ -22,3 +22,13 @@ export function marketsInScope(ds: Dataset, scope: Scope): Market[] {
   if (scope.regionId) return ds.markets.filter((m) => m.regionId === scope.regionId);
   return ds.markets;
 }
+
+/** Regions in data order, then market names: the map's Tab order and the table's default order. */
+export function marketsInOrder(ds: Dataset): Market[] {
+  const regionOrder = new Map(ds.regions.map((r, i) => [r.id, i]));
+  return ds.markets.toSorted(
+    (a, b) =>
+      (regionOrder.get(a.regionId) ?? 0) - (regionOrder.get(b.regionId) ?? 0) ||
+      a.name.localeCompare(b.name, 'en'),
+  );
+}

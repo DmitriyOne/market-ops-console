@@ -234,7 +234,7 @@
     "title": "Marktstatus",
     "tile": "{code} {name}, {status}, Planerfüllung {value}",
     "tileNoStatus": "{code} {name}, Planerfüllung {value}",
-    "highlighted": "vom Assistenten markiert",
+    "current": "geöffnet",
     "selected": "ausgewählt",
     "hatched": "schraffiert",
     "latestOnly": "Der Status gilt nur für den neuesten Monat; die Kacheln zeigen die Planerfüllung.",

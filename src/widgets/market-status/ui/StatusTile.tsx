@@ -22,8 +22,8 @@ export function StatusTile({ tile, onSelect }: { tile: MarketTile; onSelect: () 
     tile.status
       ? t('tile', { code: tile.iso2, name: tile.name, status: statusLabel(tile.status), value })
       : t('tileNoStatus', { code: tile.iso2, name: tile.name, value }),
-    tile.highlighted ? t('highlighted') : null,
     tile.selected ? t('selected') : null,
+    tile.current ? t('current') : null,
   ]
     .filter(Boolean)
     .join(' · ');
@@ -36,8 +36,8 @@ export function StatusTile({ tile, onSelect }: { tile: MarketTile; onSelect: () 
       className={cn(
         'relative flex min-h-14 flex-col items-start justify-center gap-0.5 overflow-hidden rounded-lg border border-transparent px-2 py-1.5 text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
         tile.status ? TONE[tile.status] : 'bg-muted text-foreground',
-        tile.selected && 'border-foreground',
-        tile.highlighted && 'ring-2 ring-ring ring-offset-2 ring-offset-card',
+        tile.current && 'border-foreground',
+        tile.selected && 'ring-2 ring-ring ring-offset-2 ring-offset-card',
       )}
     >
       {tile.status === 'off_track' ? (

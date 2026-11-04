@@ -1,6 +1,7 @@
 import type { Dataset, Period } from '@/shared/api';
 
 import { MAP_METRICS, type MapMetric } from './map-scale';
+import { parseSort, type TableSort } from './markets-table';
 import { getMarket, getProduct, getRegion } from './reference';
 import type { Range, Scope } from './scope';
 
@@ -18,6 +19,7 @@ export type RawDashboardParams = {
   mode: string | null;
   markets: string[] | null;
   kpi: string | null;
+  sort: string | null;
 };
 
 /** The view every widget reads: valid ids only, defaults filled in. */
@@ -28,8 +30,13 @@ export type DashboardState = {
   mode: Mode;
   /** Map metric; always `status` in Executive. */
   kpi: MapMetric;
-  /** Markets highlighted from the assistant ("Show on dashboard"). */
-  highlighted: string[];
+  /**
+   * Selected markets: from the assistant ("Show on dashboard"), the map,
+   * the tiles or the table filter. Rings on the map, narrows the table.
+   */
+  selected: string[];
+  /** Markets table order (Analyst); null = the default order. */
+  sort: TableSort;
 };
 
 const isRange = (v: string): v is Range => RANGES.some((r) => r === v);
@@ -79,10 +86,13 @@ export function normalizeDashboardState(
   if (raw.kpi !== null && metric === 'status') fix.kpi = null;
   const kpi = mode === 'analyst' ? metric : 'status';
 
-  const highlighted = (raw.markets ?? []).filter((id) => getMarket(ds, id));
-  if (raw.markets !== null && highlighted.length !== raw.markets.length) {
-    fix.markets = highlighted.length > 0 ? highlighted : null;
+  const selected = (raw.markets ?? []).filter((id) => getMarket(ds, id));
+  if (raw.markets !== null && selected.length !== raw.markets.length) {
+    fix.markets = selected.length > 0 ? selected : null;
   }
+
+  const sort = raw.sort === null ? undefined : parseSort(raw.sort);
+  if (raw.sort !== null && !sort) fix.sort = null;
 
   const scope: Scope = {
     ...(regionId ? { regionId } : {}),
@@ -91,7 +101,7 @@ export function normalizeDashboardState(
   };
 
   return {
-    state: { scope, period, range, mode, kpi, highlighted },
+    state: { scope, period, range, mode, kpi, selected, sort: sort ?? null },
     fix: Object.keys(fix).length > 0 ? fix : null,
   };
 }

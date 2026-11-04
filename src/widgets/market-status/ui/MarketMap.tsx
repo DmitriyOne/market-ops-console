@@ -439,7 +439,7 @@ const Countries = memo(function Countries({ view, shapes, onOpen, onTip }: Count
           return (
             <g key={item.id}>
               {fill ? <path d={d} fill={`url(#${fill === 'dots' ? DOTS : HATCH})`} /> : null}
-              {item.highlighted ? (
+              {item.selected ? (
                 <path
                   d={d}
                   fill="none"
@@ -449,7 +449,7 @@ const Countries = memo(function Countries({ view, shapes, onOpen, onTip }: Count
                   style={NON_SCALING}
                 />
               ) : null}
-              {item.selected ? (
+              {item.current ? (
                 <path
                   d={d}
                   fill="none"

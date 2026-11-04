@@ -234,7 +234,7 @@
     "title": "Market status",
     "tile": "{code} {name}, {status}, attainment {value}",
     "tileNoStatus": "{code} {name}, attainment {value}",
-    "highlighted": "highlighted from the assistant",
+    "current": "open now",
     "selected": "selected",
     "hatched": "hatched",
     "latestOnly": "Status is set for the latest month only; tiles show forecast attainment.",

@@ -46,7 +46,7 @@ describe('useDashboard', () => {
   it('reads repeated markets keys, the form a shared link and the locale switch keep', async () => {
     const { result } = setup('?markets=de&markets=es');
     await waitFor(() => {
-      expect(result.current.state.highlighted).toEqual(['de', 'es']);
+      expect(result.current.state.selected).toEqual(['de', 'es']);
     });
   });
 

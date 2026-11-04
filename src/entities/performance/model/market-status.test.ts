@@ -17,16 +17,16 @@ describe('marketTiles', () => {
       iso2: 'DE',
       status: 'off_track',
       attainmentPct: { value: 92, source: 'data' },
-      highlighted: false,
       selected: false,
+      current: false,
     });
   });
 
   it('a region shows only its markets; the chosen market is marked', () => {
     const groups = marketTiles(ds, { regionId: 'eu', marketId: 'de' }, '2026-05', '1m', []);
     expect(groups).toHaveLength(1);
-    expect(groups[0]?.tiles.find((t) => t.id === 'de')?.selected).toBe(true);
-    expect(groups[0]?.tiles.filter((t) => t.selected)).toHaveLength(1);
+    expect(groups[0]?.tiles.find((t) => t.id === 'de')?.current).toBe(true);
+    expect(groups[0]?.tiles.filter((t) => t.current)).toHaveLength(1);
   });
 
   it('off the latest month there is no status and attainment is calculated', () => {
@@ -52,9 +52,9 @@ describe('marketTiles', () => {
     expect(fr?.status).toBe('at_risk');
   });
 
-  it('markets from the assistant are highlighted', () => {
+  it('selected markets are marked', () => {
     const tiles = marketTiles(ds, {}, '2026-05', '1m', ['es', 'fr']).flatMap((g) => g.tiles);
-    expect(tiles.filter((t) => t.highlighted).map((t) => t.id)).toEqual(['fr', 'es']);
+    expect(tiles.filter((t) => t.selected).map((t) => t.id)).toEqual(['fr', 'es']);
   });
 });
 

@@ -12,6 +12,7 @@ const EMPTY: RawDashboardParams = {
   mode: null,
   markets: null,
   kpi: null,
+  sort: null,
 };
 
 const normalize = (raw: Partial<RawDashboardParams>) =>
@@ -26,7 +27,8 @@ describe('normalizeDashboardState', () => {
       range: '1m',
       mode: 'executive',
       kpi: 'status',
-      highlighted: [],
+      selected: [],
+      sort: null,
     });
     expect(fix).toBeNull();
   });
@@ -63,7 +65,7 @@ describe('normalizeDashboardState', () => {
     });
     expect(state.scope).toEqual({ regionId: 'eu', marketId: 'de', productId: 'veltrix' });
     expect(state).toMatchObject({ period: '2026-03', range: '3m', mode: 'analyst' });
-    expect(state.highlighted).toEqual(['de', 'es']);
+    expect(state.selected).toEqual(['de', 'es']);
     expect(fix).toBeNull();
   });
 
@@ -110,11 +112,24 @@ describe('normalizeDashboardState', () => {
     expect(fix).toEqual({ period: null, range: null, mode: null });
   });
 
-  it('unknown highlighted markets are dropped; none left clears the list', () => {
+  it('unknown selected markets are dropped; none left clears the list', () => {
     expect(normalize({ markets: ['de', 'zz'] })).toMatchObject({
-      state: { highlighted: ['de'] },
+      state: { selected: ['de'] },
       fix: { markets: ['de'] },
     });
     expect(normalize({ markets: ['zz'] }).fix).toEqual({ markets: null });
+  });
+
+  it('a valid table order is kept as written', () => {
+    expect(normalize({ sort: '-growth' })).toMatchObject({
+      state: { sort: { column: 'growth', dir: 'desc' } },
+      fix: null,
+    });
+  });
+
+  it('a broken table order is removed from the URL', () => {
+    for (const sort of ['foo', '--growth', '']) {
+      expect(normalize({ sort })).toMatchObject({ state: { sort: null }, fix: { sort: null } });
+    }
   });
 });

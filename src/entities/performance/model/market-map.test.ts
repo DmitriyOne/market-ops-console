@@ -136,7 +136,7 @@ describe('marketMap', () => {
       kind: 'status',
       counts: { on_track: 0, at_risk: 3, off_track: 2 },
     });
-    expect(map.items.filter((i) => i.selected).map((i) => i.id)).toEqual(['de']);
+    expect(map.items.filter((i) => i.current).map((i) => i.id)).toEqual(['de']);
   });
 
   it('scale counts add up to the markets in scope', () => {
@@ -149,6 +149,6 @@ describe('marketMap', () => {
 
   it('marks the markets listed by the assistant', () => {
     const map = marketMap(ds, {}, '2026-05', '1m', 'status', ['es', 'fr']);
-    expect(map.items.filter((i) => i.highlighted).map((i) => i.id)).toEqual(['fr', 'es']);
+    expect(map.items.filter((i) => i.selected).map((i) => i.id)).toEqual(['fr', 'es']);
   });
 });

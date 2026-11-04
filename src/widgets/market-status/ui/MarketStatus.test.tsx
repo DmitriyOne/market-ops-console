@@ -73,7 +73,7 @@ describe('MarketStatus', () => {
     setup('?markets=es&markets=fr');
     expect(
       await screen.findByRole('button', {
-        name: 'ES Spain, Off track, attainment 104.5% · highlighted from the assistant',
+        name: 'ES Spain, Off track, attainment 104.5% · selected',
       }),
     ).toBeInTheDocument();
   });

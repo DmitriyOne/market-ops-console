@@ -85,26 +85,26 @@ export function MarketStatus() {
     legacyTable ? 'table' : wide ? 'map' : 'tiles',
   );
 
-  const { scope, period, range, kpi, highlighted } = state;
+  const { scope, period, range, kpi, selected } = state;
   const map = useMemo(
-    () => marketMap(ds, scope, period, range, kpi, highlighted),
-    [ds, scope, period, range, kpi, highlighted],
+    () => marketMap(ds, scope, period, range, kpi, selected),
+    [ds, scope, period, range, kpi, selected],
   );
   // A drill fits its region (a market: its region, outlined); the assistant's markets win.
   const fitIds = useMemo(
     () =>
-      highlighted.length > 0
-        ? highlighted
+      selected.length > 0
+        ? selected
         : scope.regionId
           ? map.items.filter((i) => i.regionId === scope.regionId).map((i) => i.id)
           : [],
-    [highlighted, map.items, scope.regionId],
+    [selected, map.items, scope.regionId],
   );
 
   // The remembered view is read after hydration: keep the skeleton until then.
   if (view === null || legacyTable === null) return <MarketStatusSkeleton />;
 
-  const groups = marketTiles(ds, scope, period, range, highlighted);
+  const groups = marketTiles(ds, scope, period, range, selected);
   const product = scope.productId ? getProduct(ds, scope.productId) : undefined;
 
   return (

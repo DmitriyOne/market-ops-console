@@ -10,7 +10,7 @@ import {
   scaleSteps,
   stepFor,
 } from './map-scale';
-import { isLatestSnapshot, periodsInRange, type Range, type Scope } from './scope';
+import { isLatestSnapshot, marketsInOrder, periodsInRange, type Range, type Scope } from './scope';
 import { statusFor } from './status';
 
 export type MapNotice = 'statusLatestOnly' | 'shareLatestOnly' | 'sharePerProduct';
@@ -29,8 +29,10 @@ export type MapItem = {
   status: MarketStatus | null;
   /** Scale step (0-based); null for status or a missing value. */
   step: number | null;
-  highlighted: boolean;
+  /** In the selection (assistant, map, tiles or table filter). */
   selected: boolean;
+  /** The market the dashboard is drilled into. */
+  current: boolean;
 };
 
 export type MapLegend =
@@ -77,49 +79,42 @@ export function marketMap(
   period: Period,
   range: Range,
   kpi: MapMetric,
-  highlighted: readonly string[],
+  selected: readonly string[],
 ): MarketMapView {
   const latest = isLatestSnapshot(ds, period, range);
   const { metric, notice } = resolveMetric(kpi, latest, Boolean(scope.productId));
   const valueMetric: ScaleMetric = metric === 'status' ? 'attainment' : metric;
   const months = periodsInRange(ds.meta.periods, period, range).length;
-  const marked = new Set(highlighted);
-  const regionOrder = new Map(ds.regions.map((r, i) => [r.id, i]));
+  const marked = new Set(selected);
 
-  const items = ds.markets
-    .toSorted(
-      (a, b) =>
-        (regionOrder.get(a.regionId) ?? 0) - (regionOrder.get(b.regionId) ?? 0) ||
-        a.name.localeCompare(b.name, 'en'),
-    )
-    .map((m): MapItem => {
-      const kpis = computeKpis(
-        ds,
-        {
-          regionId: m.regionId,
-          marketId: m.id,
-          ...(scope.productId ? { productId: scope.productId } : {}),
-        },
-        period,
-        range,
-      );
-      const value = kpis[KPI[valueMetric]];
-      return {
-        id: m.id,
-        name: m.name,
-        numericIso: ISO3_TO_NUMERIC[m.iso3] ?? '',
+  const items = marketsInOrder(ds).map((m): MapItem => {
+    const kpis = computeKpis(
+      ds,
+      {
         regionId: m.regionId,
-        inScope: !scope.regionId || m.regionId === scope.regionId,
-        value,
-        status: statusFor(ds, m.id, period, range),
-        step:
-          metric === 'status' || value.value === null
-            ? null
-            : stepFor(valueMetric, value.value, months),
-        highlighted: marked.has(m.id),
-        selected: m.id === scope.marketId,
-      };
-    });
+        marketId: m.id,
+        ...(scope.productId ? { productId: scope.productId } : {}),
+      },
+      period,
+      range,
+    );
+    const value = kpis[KPI[valueMetric]];
+    return {
+      id: m.id,
+      name: m.name,
+      numericIso: ISO3_TO_NUMERIC[m.iso3] ?? '',
+      regionId: m.regionId,
+      inScope: !scope.regionId || m.regionId === scope.regionId,
+      value,
+      status: statusFor(ds, m.id, period, range),
+      step:
+        metric === 'status' || value.value === null
+          ? null
+          : stepFor(valueMetric, value.value, months),
+      selected: marked.has(m.id),
+      current: m.id === scope.marketId,
+    };
+  });
 
   const counted = items.filter((i) => i.inScope);
   const legend: MapLegend =

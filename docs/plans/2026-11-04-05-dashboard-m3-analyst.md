@@ -106,9 +106,11 @@ filter. A new `sort` param keeps the order in shared links. New slices:
 2. **Sort on a column with missing values** (share off the latest month,
    status on a 3-month window): rows with "—" go last in both directions,
    the order is stable. → test in Task 1.
-3. **Broken `sort` in a link** (`sort=foo`, `sort=--growth`, sort on
-   status when status is hidden): falls back to the default and the URL
-   is corrected in place. → test in Task 1.
+3. **Broken `sort` in a link** (`sort=foo`, `sort=--growth`): falls back
+   to the default and the URL is corrected in place. A sort on a column
+   the view has no values for (status on 3 months) is kept: rows stay in
+   the default order and the sort comes back with the latest month. →
+   test in Task 1.
 4. **CSV opened in German Excel**: numbers must not be formatted with a
    locale (no `1.234,5`), umlauts survive (BOM), a market name with a
    comma or a quote stays one cell. → test in Task 4.
