@@ -14,6 +14,12 @@ describe('datasetSchema', () => {
     expect(ds.meta.periods).toHaveLength(24);
   });
 
+  it('rejects a generatedAt that is not a date', () => {
+    const bad = clone();
+    bad.meta.generatedAt = 'yesterday';
+    expect(datasetSchema.safeParse(bad).success).toBe(false);
+  });
+
   it('rejects a series row pointing at an unknown market', () => {
     const bad = clone();
     const row = bad.series[0];

@@ -24,6 +24,18 @@ describe('formats', () => {
     expect(normalise(formatterFor(locale).number(0.073, 'signedPercent'))).toBe(expected);
   });
 
+  it.each<[AppLocale, string, number, string]>([
+    ['en-GB', 'percent', 0.92, '92.0%'],
+    ['en-GB', 'signedPercent', 0.02, '+2.0%'],
+    ['de-DE', 'percent', 0.92, '92,0 %'],
+  ])('%s %s keeps one decimal', (locale, format, value, expected) => {
+    expect(
+      normalise(
+        formatterFor(locale).number(value, format === 'percent' ? 'percent' : 'signedPercent'),
+      ),
+    ).toBe(expected);
+  });
+
   it.each<[AppLocale, string]>([
     ['en-GB', 'May 2026'],
     ['de-DE', 'Mai 2026'],

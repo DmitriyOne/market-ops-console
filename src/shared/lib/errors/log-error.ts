@@ -1,6 +1,9 @@
 import { AppError } from './app-error';
 
-export type LogContext = { scope: 'api' | 'ui' | 'query' | 'mutation'; [key: string]: unknown };
+export type LogContext = {
+  scope: 'api' | 'ui' | 'query' | 'mutation' | 'chat';
+  [key: string]: unknown;
+};
 
 // The same error can surface twice: a failed query is logged by the query
 // cache and then thrown into an error boundary. Remember what was logged.
@@ -17,7 +20,7 @@ export function logError(error: unknown, { scope, ...context }: LogContext): voi
   }
   console.error(`[${scope}]`, {
     ...context,
-    code: error instanceof AppError ? error.code : 'unknown',
+    code: error instanceof AppError ? error.code : error instanceof Error ? error.name : 'unknown',
     message: error instanceof Error ? error.message : String(error),
     error,
   });

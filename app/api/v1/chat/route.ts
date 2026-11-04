@@ -2,8 +2,8 @@
 // Ported from reference/chat-route.ts, plus request validation, JSON errors
 // (ADR 0013) and a stop when the client aborts (the reference keeps
 // enqueuing into a closed stream).
-import { type ChatEvent, chatRequestSchema, pickFixture, withErrorHandling } from '@/shared/api';
-import { loadFixtures } from '@/shared/api/server';
+import { type ChatEvent, chatRequestSchema, pickFixture } from '@/shared/api';
+import { loadFixtures, withErrorHandling } from '@/shared/api/server';
 import { env } from '@/shared/config';
 import { logError, ValidationError } from '@/shared/lib';
 
@@ -34,7 +34,9 @@ async function readQuestion(request: Request): Promise<string> {
 }
 
 export const POST = withErrorHandling(ROUTE, async (request: Request) => {
-  const fixture = pickFixture(loadFixtures(), await readQuestion(request));
+  // Validate first: a bad request is a 400 even when the fixtures are broken.
+  const question = await readQuestion(request);
+  const fixture = pickFixture(loadFixtures(), question);
   let cancelled = false;
   const stopped = () => cancelled || request.signal.aborted;
 
@@ -66,7 +68,12 @@ export const POST = withErrorHandling(ROUTE, async (request: Request) => {
         }
       } catch (error) {
         logError(error, { scope: 'api', route: ROUTE, phase: 'stream' });
-        if (!stopped()) send({ type: 'error', message: 'Something went wrong.' });
+        try {
+          if (!stopped()) send({ type: 'error', message: 'Something went wrong.' });
+        } catch {
+          // The stream is already broken and the cause is logged above;
+          // the client sees the stream end without an error event.
+        }
       } finally {
         if (!cancelled) controller.close();
       }

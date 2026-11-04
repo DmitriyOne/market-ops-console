@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Instructions for AI coding agents working in this repo. Humans: see `README.md`.
+Instructions for AI coding agents working in this repo. Humans: see `README.md`. UI work: read `DESIGN.md` first (tokens, inventory, checklist).
 
 ## Project
 

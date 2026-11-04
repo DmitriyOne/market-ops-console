@@ -11,10 +11,17 @@ export const formats = {
       maximumFractionDigits: 1,
     },
     compact: { notation: 'compact', maximumFractionDigits: 1 },
-    percent: { style: 'percent', maximumFractionDigits: 1 },
-    signedPercent: { style: 'percent', maximumFractionDigits: 1, signDisplay: 'exceptZero' },
+    integer: { maximumFractionDigits: 0 },
+    percent: { style: 'percent', minimumFractionDigits: 1, maximumFractionDigits: 1 },
+    signedPercent: {
+      style: 'percent',
+      minimumFractionDigits: 1,
+      maximumFractionDigits: 1,
+      signDisplay: 'exceptZero',
+    },
   },
   dateTime: {
     period: { month: 'short', year: 'numeric', timeZone: 'UTC' },
+    day: { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' },
   },
 } satisfies Formats;

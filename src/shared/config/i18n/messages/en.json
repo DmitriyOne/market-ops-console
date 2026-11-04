@@ -1,7 +1,8 @@
 {
   "common": {
     "appName": "Market Ops Console",
-    "skipToContent": "Skip to content"
+    "skipToContent": "Skip to content",
+    "description": "Sales performance by market, product and period, with an AI assistant that shows its sources."
   },
   "errors": {
     "timeout": "The request took too long. Please try again.",
@@ -41,5 +42,105 @@
   },
   "dashboard": {
     "marketCount": "{count, plural, one {# market} other {# markets}}"
+  },
+  "assistant": {
+    "composer": {
+      "label": "Ask about the data",
+      "placeholder": "Ask a question",
+      "send": "Send",
+      "stop": "Stop answer",
+      "blankReason": "Type a question to send it.",
+      "tooLongReason": "Questions can be up to {max} characters.",
+      "counter": "{count} / {max}"
+    },
+    "suggestions": {
+      "title": "Try asking",
+      "risks": "Which markets are at risk?",
+      "germany": "Why did Germany dip?",
+      "apacEurope": "Compare APAC and Europe",
+      "forecastMiss": "What drives the forecast miss?"
+    },
+    "panel": {
+      "title": "Assistant",
+      "empty": {
+        "title": "Ask about the portfolio",
+        "body": "Answers come from the AI and may be incomplete. Each answer shows its sources and the matching data, so you can check it."
+      },
+      "youAsked": "You asked",
+      "newContent": "New content",
+      "subtitle": "Answers in English"
+    },
+    "answer": {
+      "label": "AI answer · may be incomplete",
+      "writing": "AI answer · writing…",
+      "pending": "Sources and confidence appear when the answer is complete.",
+      "sources": "Sources",
+      "confidence": "Confidence: {level}",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low",
+      "directional": "Treat as directional"
+    },
+    "stopped": {
+      "title": "Stopped — answer incomplete.",
+      "body": "No sources or confidence for a partial answer.",
+      "askAgain": "Ask again"
+    },
+    "abstain": {
+      "title": "I can't answer this from the data",
+      "coverage": "The data covers {from} – {to}."
+    },
+    "error": {
+      "title": "No answer",
+      "retry": "Try again"
+    },
+    "evidence": {
+      "revenue": "Revenue",
+      "attainment": "Attainment",
+      "growth": "Growth YoY",
+      "units": "Units",
+      "calculated": "Calculated from monthly data",
+      "notInDataset": "Not in the dataset",
+      "trend": "{name} revenue, last 12 months",
+      "showOnDashboard": "Show on dashboard",
+      "clickHint": "Click to show on dashboard",
+      "loading": "Loading data…",
+      "latestStatus": "Status, {period}"
+    },
+    "declined": {
+      "englishOnly": "I only understand English. Please ask your question in English."
+    }
+  },
+  "dataCheck": {
+    "title": "What the data shows",
+    "header": "Market performance · latest period: {period} · updated {updated}",
+    "details": "Details",
+    "portfolio": "Portfolio",
+    "name": "Scope",
+    "attainment": "Attain.",
+    "growth": "Growth",
+    "status": "Status",
+    "notMentioned": "Not mentioned in the answer",
+    "showOnDashboard": "Show on dashboard",
+    "onTrack": "On track",
+    "atRisk": "At risk",
+    "offTrack": "Off track",
+    "noStatus": "—",
+    "reasonGrowth": "Growth {value} YoY",
+    "latestOnly": "latest only",
+    "attention": "{needAttention, plural, one {# of {markets} markets needs} other {# of {markets} markets need}} attention; the answer names {named}.",
+    "attentionRegion": "{needAttention, plural, one {# of {markets} markets in {region} needs} other {# of {markets} markets in {region} need}} attention; the answer names {named}.",
+    "gapNote": "{count, plural, one {# market not mentioned} other {# markets not mentioned}}"
+  },
+  "shell": {
+    "assistant": "Assistant",
+    "sections": "Sections",
+    "tabs": {
+      "overview": "Overview",
+      "assistant": "Assistant"
+    },
+    "collapse": "Hide assistant",
+    "expand": "Show assistant",
+    "newAnswers": "{count, plural, one {# new answer} other {# new answers}}"
   }
 }

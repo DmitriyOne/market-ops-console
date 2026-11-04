@@ -45,7 +45,7 @@ describe('WidgetBoundary', () => {
     expect(alert).toHaveTextContent(en.errors.sectionTitle);
     expect(alert).toHaveTextContent(en.errors.timeout);
     expect(screen.getByText('other widget')).toBeInTheDocument();
-    expect(log).toHaveBeenCalledWith('[ui]', expect.objectContaining({ code: 'unknown' }));
+    expect(log).toHaveBeenCalledWith('[ui]', expect.objectContaining({ code: 'TimeoutError' }));
   });
 
   it('renders the widget again after Retry', async () => {

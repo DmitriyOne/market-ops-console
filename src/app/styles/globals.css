@@ -4,6 +4,9 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Desktop assistant collapsed: set on <html> before first paint (widgets/app-shell). */
+@custom-variant assistant-collapsed (&:where([data-assistant-collapsed] *));
+
 @theme inline {
   --font-sans: var(--font-space-grotesk), system-ui, sans-serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
@@ -228,5 +231,15 @@
   }
   html {
     @apply font-sans;
+  }
+  /* Tailwind v4 resets buttons to the default cursor; clickable things show a hand. */
+  button:not(:disabled),
+  [role='button']:not([aria-disabled='true']),
+  summary {
+    cursor: pointer;
+  }
+  button:disabled,
+  [aria-disabled='true'] {
+    cursor: not-allowed;
   }
 }
