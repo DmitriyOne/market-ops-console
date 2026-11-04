@@ -10,12 +10,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 - `kpi` URL param (map metric, Analyst only; changes replace history).
 - The table view gets the map metric's column; tiles, table and map follow the chosen product (status stays market level).
 
+### Removed
+- The unused 7-step attainment scale tokens (`--scale-1…7`); the heat map will use the map's diverging scale.
+
 ### Changed
 - Phone header: the app name is back on the first row next to ⚙︎; the path moves to its own row.
 - Moving to another market keeps the chosen product (map, tiles, top risks, top movers, breadcrumbs); picking the current market again in the breadcrumbs goes back up from the product.
-
-### Fixed
-- Asking the assistant failed with "crypto.randomUUID is not a function" when the app was opened over plain http by a LAN address (not a secure context); ids now fall back to `crypto.getRandomValues`.
 
 ## [0.5.0] - Unreleased
 

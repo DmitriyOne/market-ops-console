@@ -1,9 +1,13 @@
+import { QueryClient } from '@tanstack/react-query';
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
+import { renderToString } from 'react-dom/server';
 import { Suspense } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import raw from '@/data/data.json';
+import { datasetSchema } from '@/shared/api';
 import { enMessages as en } from '@/shared/config';
-import { datasetHandler, renderWithProviders, server } from '@/shared/lib/test';
+import { datasetHandler, renderWithProviders, server, TestProviders } from '@/shared/lib/test';
 
 import { MarketStatus } from './MarketStatus';
 
@@ -137,6 +141,22 @@ describe('MarketStatus', () => {
     const table = await screen.findByRole('table');
     expect(within(table).getByRole('columnheader', { name: 'Growth YoY' })).toBeInTheDocument();
     expect(within(table).getByRole('row', { name: /Germany/ })).toHaveTextContent('-9.7%');
+  });
+});
+
+describe('MarketStatus on the server', () => {
+  it('static HTML has the card skeleton: the stored view is unknown until the browser is read', () => {
+    const client = new QueryClient();
+    client.setQueryData(['dataset', 'v1'], datasetSchema.parse(raw));
+    const html = renderToString(
+      <TestProviders client={client}>
+        <MarketStatus />
+      </TestProviders>,
+    );
+    expect(html).toContain('aria-hidden="true"');
+    expect(html).not.toContain(t.title);
+    expect(html).not.toContain('World map');
+    expect(html).not.toContain('Germany');
   });
 });
 

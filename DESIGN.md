@@ -44,8 +44,7 @@ values** (`bg-[#fff]`, `w-[37px]`).
 | **Source-of-truth data** | `surface-data` (the "What the data shows" block, evidence) |
 | Status | `status-on-track`, `status-at-risk`, `status-off-track`, each with `-muted` for its chip background |
 | Map | `map-sea` (= `muted`), `map-land` (= `card`), `map-hatch` |
-| Map scales (0.6.0) | diverging `scale-div-1` … `scale-div-6` (orange · grey · blue), sequential `scale-seq-1` … `scale-seq-5` (blue); SVG fills read these source tokens, not `--color-*` aliases |
-| Attainment scale (heat map, M4) | `scale-1` … `scale-7`, text on each step: `scale-N-foreground`; M4 decides between it and `scale-div-*` (backlog) |
+| Map and heat-map scales (0.6.0; heat map in M4) | diverging `scale-div-1` … `scale-div-6` (orange · grey · blue), sequential `scale-seq-1` … `scale-seq-5` (blue); SVG fills read these source tokens, not `--color-*` aliases |
 
 Rules:
 

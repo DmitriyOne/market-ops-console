@@ -11,7 +11,7 @@ import {
   streamSse,
 } from '@/shared/api';
 import { API_ROUTES } from '@/shared/config';
-import { createId, logError } from '@/shared/lib';
+import { logError } from '@/shared/lib';
 
 import { type ChatMessage, chatReducer } from './chat-reducer';
 import { loadChat, saveChat } from './chat-storage';
@@ -129,7 +129,7 @@ export function useChatStream(): ChatStream {
     (raw: string) => {
       const question = raw.trim();
       if (active.current || !question || question.length > CHAT_QUESTION_MAX_LENGTH) return;
-      const id = createId();
+      const id = crypto.randomUUID();
       if (!isEnglish(question)) {
         // The mock assistant matches English keywords only (owner decision, 2026-11-03).
         dispatch({ type: 'declined', id, question, notice: 'englishOnly' });

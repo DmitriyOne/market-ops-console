@@ -53,7 +53,6 @@ function contrast(theme: Map<string, string>, front: string, back: string): numb
 }
 
 const statuses = ['on-track', 'at-risk', 'off-track'];
-const scaleSteps = ['1', '2', '3', '4', '5', '6', '7'];
 
 // [foreground, background, minimum ratio]: 4.5 for text, 3 for control borders and chart marks.
 const pairs: [string, string, number][] = [
@@ -78,7 +77,6 @@ const pairs: [string, string, number][] = [
     [`status-${s}`, `status-${s}-muted`, 4.5],
     [`status-${s}`, 'card', 4.5],
   ]),
-  ...scaleSteps.map((n): [string, string, number] => [`scale-${n}-foreground`, `scale-${n}`, 4.5]),
   ['input', 'background', 3],
   ['input', 'card', 3],
   ['ring', 'background', 3],
