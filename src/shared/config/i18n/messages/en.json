@@ -2,7 +2,8 @@
   "common": {
     "appName": "Market Ops Console",
     "skipToContent": "Skip to content",
-    "description": "Sales performance by market, product and period, with an AI assistant that shows its sources."
+    "description": "Sales performance by market, product and period, with an AI assistant that shows its sources.",
+    "close": "Close"
   },
   "errors": {
     "timeout": "The request took too long. Please try again.",
@@ -161,5 +162,26 @@
     "collapse": "Hide assistant",
     "expand": "Show assistant",
     "newAnswers": "{count, plural, one {# new answer} other {# new answers}}"
+  },
+  "monthPicker": {
+    "previousYear": "Previous year",
+    "nextYear": "Next year",
+    "months": "Months of {year}"
+  },
+  "period": {
+    "trigger": "Period: {period}, {range}. Change period",
+    "label": "{period} · {range}",
+    "title": "Period",
+    "range": {
+      "1m": "1 month",
+      "3m": "3 months",
+      "12m": "12 months"
+    },
+    "rangeLabel": "Months ending in {period}"
+  },
+  "mode": {
+    "label": "View",
+    "executive": "Executive",
+    "analyst": "Analyst"
   }
 }

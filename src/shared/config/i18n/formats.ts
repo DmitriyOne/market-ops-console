@@ -23,5 +23,7 @@ export const formats = {
   dateTime: {
     period: { month: 'short', year: 'numeric', timeZone: 'UTC' },
     day: { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' },
+    month: { month: 'short', timeZone: 'UTC' },
+    year: { year: 'numeric', timeZone: 'UTC' },
   },
 } satisfies Formats;

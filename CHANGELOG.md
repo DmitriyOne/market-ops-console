@@ -5,6 +5,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 ## [0.5.0] - Unreleased
 
 ### Added
+- Period picker: a month grid with a year switch (months without data cannot be picked, arrow keys move between months) and the window 1 / 3 / 12 months; both go into the URL with a history entry.
+- Executive / Analyst switch; it replaces the URL entry instead of adding one, so Back skips it.
+- Drill-down actions (portfolio, region, market, product) keep the period and range; a market brings its region.
+- shadcn `breadcrumb`, `chart` (trimmed to the frame; Recharts 3), `sheet`, `table`, `toggle-group`.
 - Dashboard URL state is checked against the data: a market brings its own region, a product needs a market, unknown ids, months, ranges and modes fall back to the default, and a bad link is corrected in place without a history entry.
 
 ### Fixed

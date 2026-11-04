@@ -2,7 +2,8 @@
   "common": {
     "appName": "Market Ops Console",
     "skipToContent": "Zum Inhalt springen",
-    "description": "Vertriebsleistung nach Markt, Produkt und Zeitraum, mit einem KI-Assistenten, der seine Quellen zeigt."
+    "description": "Vertriebsleistung nach Markt, Produkt und Zeitraum, mit einem KI-Assistenten, der seine Quellen zeigt.",
+    "close": "Schließen"
   },
   "errors": {
     "timeout": "Die Anfrage hat zu lange gedauert. Bitte versuchen Sie es erneut.",
@@ -161,5 +162,26 @@
     "collapse": "Assistent ausblenden",
     "expand": "Assistent einblenden",
     "newAnswers": "{count, plural, one {# neue Antwort} other {# neue Antworten}}"
+  },
+  "monthPicker": {
+    "previousYear": "Vorheriges Jahr",
+    "nextYear": "Nächstes Jahr",
+    "months": "Monate {year}"
+  },
+  "period": {
+    "trigger": "Zeitraum: {period}, {range}. Zeitraum ändern",
+    "label": "{period} · {range}",
+    "title": "Zeitraum",
+    "range": {
+      "1m": "1 Monat",
+      "3m": "3 Monate",
+      "12m": "12 Monate"
+    },
+    "rangeLabel": "Monate bis {period}"
+  },
+  "mode": {
+    "label": "Ansicht",
+    "executive": "Management",
+    "analyst": "Analyse"
   }
 }
