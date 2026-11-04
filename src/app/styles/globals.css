@@ -94,6 +94,17 @@
   --color-map-sea: var(--map-sea);
   --color-map-land: var(--map-land);
   --color-map-hatch: var(--map-hatch);
+  --color-scale-div-1: var(--scale-div-1);
+  --color-scale-div-2: var(--scale-div-2);
+  --color-scale-div-3: var(--scale-div-3);
+  --color-scale-div-4: var(--scale-div-4);
+  --color-scale-div-5: var(--scale-div-5);
+  --color-scale-div-6: var(--scale-div-6);
+  --color-scale-seq-1: var(--scale-seq-1);
+  --color-scale-seq-2: var(--scale-seq-2);
+  --color-scale-seq-3: var(--scale-seq-3);
+  --color-scale-seq-4: var(--scale-seq-4);
+  --color-scale-seq-5: var(--scale-seq-5);
   --color-scale-1: var(--scale-1);
   --color-scale-1-foreground: var(--scale-1-foreground);
   --color-scale-2: var(--scale-2);
@@ -168,9 +179,23 @@
   --confidence-medium: var(--muted-foreground);
   --confidence-low: var(--status-at-risk);
 
-  --map-sea: oklch(0.9468 0.0086 247.92);
-  --map-land: oklch(0.8827 0.0116 252.1);
+  /* Map: sea = muted surface, plain land = card with a hairline (plan 2026-11-04-04). */
+  --map-sea: var(--muted);
+  --map-land: var(--card);
   --map-hatch: oklch(0.1763 0.014 258.36 / 35%);
+
+  /* Map scales: diverging orange · grey · blue, sequential blue; checked with the dataviz validator. */
+  --scale-div-1: oklch(0.4007 0.1335 35.98);
+  --scale-div-2: oklch(0.5997 0.1598 40.07);
+  --scale-div-3: oklch(0.8207 0.0079 241.69);
+  --scale-div-4: oklch(0.7107 0.1424 256.56);
+  --scale-div-5: oklch(0.5295 0.1606 257.21);
+  --scale-div-6: oklch(0.3593 0.1241 257.02);
+  --scale-seq-1: oklch(0.7747 0.0802 256.85);
+  --scale-seq-2: oklch(0.6598 0.1308 257.26);
+  --scale-seq-3: oklch(0.5485 0.16 257.02);
+  --scale-seq-4: oklch(0.4387 0.1552 257.04);
+  --scale-seq-5: oklch(0.3314 0.115 257.05);
 
   --scale-1: oklch(0.6709 0.1403 48.97);
   --scale-1-foreground: oklch(0.1763 0.014 258.36);
@@ -237,9 +262,22 @@
   --confidence-medium: var(--muted-foreground);
   --confidence-low: var(--status-at-risk);
 
-  --map-sea: oklch(0.1671 0.0142 258.35);
-  --map-land: oklch(0.2293 0.0173 259.75);
+  --map-sea: var(--muted);
+  --map-land: var(--card);
   --map-hatch: oklch(0.1392 0.0097 261.76 / 55%);
+
+  /* Dark poles are the lighter ends. */
+  --scale-div-1: oklch(0.7202 0.166 36.15);
+  --scale-div-2: oklch(0.5204 0.1525 39.98);
+  --scale-div-3: oklch(0.3891 0.0078 255.54);
+  --scale-div-4: oklch(0.5096 0.16 257.12);
+  --scale-div-5: oklch(0.7107 0.1424 256.56);
+  --scale-div-6: oklch(0.8789 0.0521 257.37);
+  --scale-seq-1: oklch(0.4611 0.1299 256.92);
+  --scale-seq-2: oklch(0.5751 0.1494 256.93);
+  --scale-seq-3: oklch(0.691 0.13 256.89);
+  --scale-seq-4: oklch(0.8094 0.0854 257.35);
+  --scale-seq-5: oklch(0.9197 0.0346 256.34);
 
   --scale-1: oklch(0.6569 0.1643 45.04);
   --scale-1-foreground: oklch(0.1392 0.0097 261.76);
