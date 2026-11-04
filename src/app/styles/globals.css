@@ -22,7 +22,8 @@
 /* Chart entrances: lines draw left to right, bars grow from their start.
    Used with `motion-safe:` so reduced motion shows the final state at once. */
 @theme {
-  --animate-reveal-x: reveal-x 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  /* `backwards`: the clip is dropped once drawn, so overflowing marks show. */
+  --animate-reveal-x: reveal-x 700ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
   --animate-grow-x: grow-x 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
 
   @keyframes reveal-x {

@@ -1,4 +1,4 @@
-import { act, renderHook } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import type { UrlUpdateEvent } from 'nuqs/adapters/testing';
 import type { ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
@@ -19,12 +19,27 @@ describe('useResetView', () => {
       </TestProviders>
     );
     const { result } = renderHook(() => useResetView(), { wrapper });
-    await act(async () => {
+    act(() => {
       result.current();
-      await new Promise((r) => setTimeout(r, 100));
+    });
+    await waitFor(() => {
+      expect(onUrlUpdate).toHaveBeenCalled();
     });
     const last = onUrlUpdate.mock.calls.at(-1)?.[0];
     expect(last?.queryString).toBe('');
     expect(last?.options.history).toBe('push');
+  });
+
+  it('on the clean view it adds no history step', async () => {
+    const onUrlUpdate = vi.fn<(event: UrlUpdateEvent) => void>();
+    const wrapper = ({ children }: { children: ReactNode }) => (
+      <TestProviders onUrlUpdate={onUrlUpdate}>{children}</TestProviders>
+    );
+    const { result } = renderHook(() => useResetView(), { wrapper });
+    act(() => {
+      result.current();
+    });
+    await new Promise((r) => setTimeout(r, 100));
+    expect(onUrlUpdate).not.toHaveBeenCalled();
   });
 });

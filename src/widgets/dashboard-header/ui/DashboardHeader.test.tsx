@@ -112,7 +112,7 @@ describe('DashboardHeader', () => {
 
   it('the app name leads to the clean dashboard and resets the view', async () => {
     const { user, lastUpdate } = setup('?region=eu&market=de&period=2026-03&mode=analyst');
-    const home = screen.getByRole('link', { name: en.common.appName });
+    const home = screen.getByRole('link', { name: `${en.common.appName}, ${en.header.resetView}` });
     expect(home).toHaveAttribute('href', expect.stringMatching(/\/dashboard$/));
     await user.click(home);
     await waitFor(() => {

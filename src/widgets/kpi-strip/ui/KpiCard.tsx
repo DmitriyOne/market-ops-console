@@ -41,11 +41,12 @@ export function KpiCard({ label, value, detail, formula, source, spark }: KpiCar
         </p>
         {source === 'calculated' && formula ? (
           // Popover, not a tooltip: a tap opens it, so phones can read the formula too.
+          // A plain <button>: `Button` paints a hover box around the whole 44px target.
           <Popover>
             <PopoverTrigger asChild>
               <button
                 type="button"
-                className="group/calc -my-2.5 flex min-h-11 shrink-0 items-center outline-none"
+                className="group/calc -my-2.5 flex min-h-11 min-w-11 shrink-0 items-center justify-end outline-none"
                 aria-label={t('calculatedLabel', { formula })}
               >
                 <span className="flex h-6 items-center rounded-md border border-dashed border-input px-1.5 text-xs text-muted-foreground transition-colors group-hover/calc:border-foreground/40 group-hover/calc:text-foreground group-focus-visible/calc:ring-3 group-focus-visible/calc:ring-ring/50 group-aria-expanded/calc:border-foreground/40 group-aria-expanded/calc:text-foreground">

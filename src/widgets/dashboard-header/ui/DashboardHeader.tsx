@@ -24,15 +24,17 @@ const APP_NAME = 'font-semibold whitespace-nowrap max-lg:hidden';
 /** The app name; live, it leads back to the clean dashboard. */
 function AppName({ live = false }: { live?: boolean }) {
   const t = useTranslations('common');
+  const tHeader = useTranslations('header');
   if (!live) return <span className={APP_NAME}>{t('appName')}</span>;
   return (
     <ResetViewLink
       className={cn(
         APP_NAME,
-        'rounded-sm underline-offset-4 outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/50',
+        'inline-flex min-h-11 items-center rounded-sm underline-offset-4 outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/50',
       )}
     >
       {t('appName')}
+      <span className="sr-only">{`, ${tHeader('resetView')}`}</span>
     </ResetViewLink>
   );
 }

@@ -48,7 +48,7 @@ export function PeriodPicker({ className }: { className?: string }) {
       <PopoverContent
         align="end"
         collisionPadding={15}
-        className="w-80 gap-3 max-lg:w-(--radix-popover-trigger-width)"
+        className="w-80 gap-3 max-sm:w-(--radix-popover-trigger-width)"
       >
         <MonthPicker
           value={state.period}
@@ -72,7 +72,7 @@ export function PeriodPicker({ className }: { className?: string }) {
             <ToggleGroupItem
               key={r}
               value={r}
-              className="min-h-11 flex-1 px-3 hover:bg-card/60 data-[state=on]:bg-card data-[state=on]:shadow-sm"
+              className="min-h-11 flex-1 px-4 hover:bg-card/60 data-[state=on]:bg-card data-[state=on]:shadow-sm"
             >
               {t(`range.${r}`)}
             </ToggleGroupItem>

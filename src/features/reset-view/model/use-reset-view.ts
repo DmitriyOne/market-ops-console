@@ -12,8 +12,12 @@ const params = { ...dashboardSearchParams, tab: parseAsString };
  * no highlights. One history step, so Back returns to where you were.
  */
 export function useResetView(): () => void {
-  const [, setParams] = useQueryStates(params, { history: 'push' });
+  const [values, setParams] = useQueryStates(params, { history: 'push' });
+  // Already clean: pushing the same URL would make the next Back do nothing.
+  const clean = Object.values(values).every(
+    (v) => v === null || (Array.isArray(v) && v.length === 0),
+  );
   return useCallback(() => {
-    void setParams(null);
-  }, [setParams]);
+    if (!clean) void setParams(null);
+  }, [clean, setParams]);
 }

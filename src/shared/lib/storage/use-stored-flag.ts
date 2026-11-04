@@ -3,15 +3,17 @@
 import { useCallback, useSyncExternalStore } from 'react';
 
 const listeners = new Map<string, Set<() => void>>();
-// The value for this visit when storage is blocked (private mode, policy).
+// This visit's choice when it could not be written (blocked or full
+// storage); it wins over what storage still holds. Another tab's change clears it.
 const memory = new Map<string, boolean>();
 
 function read(key: string): boolean {
+  const own = memory.get(key);
+  if (own !== undefined) return own;
   try {
     return localStorage.getItem(key) === '1';
   } catch {
-    // Blocked storage: fall back to this visit's value.
-    return memory.get(key) ?? false;
+    return false;
   }
 }
 
@@ -33,7 +35,9 @@ export function useStoredFlag(key: string): [boolean, (on: boolean) => void] {
       listeners.set(key, set);
       // Another tab changed it (`key` is null when storage was cleared).
       const onStorage = (event: StorageEvent) => {
-        if (event.key === key || event.key === null) onChange();
+        if (event.key !== key && event.key !== null) return;
+        memory.delete(key);
+        onChange();
       };
       window.addEventListener('storage', onStorage);
       return () => {
@@ -46,11 +50,12 @@ export function useStoredFlag(key: string): [boolean, (on: boolean) => void] {
   const value = useSyncExternalStore(subscribe, () => read(key), getServerSnapshot);
   const update = useCallback(
     (on: boolean) => {
-      memory.set(key, on);
       try {
         localStorage.setItem(key, on ? '1' : '0');
+        memory.delete(key);
       } catch {
         // Not remembered across reloads; works for now.
+        memory.set(key, on);
       }
       notify(key);
     },

@@ -23,7 +23,8 @@ import { SERIES, SERIES_KEYS as KEYS } from './series';
 
 // Same as h-56; a number, so a hidden chart (phone Assistant tab) still has a size.
 const CHART_HEIGHT = 224;
-const TICK = { fontSize: 11 };
+// text-xs, the smallest size on the type scale.
+const TICK = { fontSize: 12 };
 const MARK = 'var(--color-muted-foreground)';
 
 type TrendChartProps = { view: TrendView; title: string };
@@ -85,7 +86,7 @@ export function TrendChart({ view, title }: TrendChartProps) {
       : t('windowRange', { from: period(view.window.from), to: period(view.window.to) }),
     position: 'top' as const,
     fill: MARK,
-    fontSize: 11,
+    fontSize: TICK.fontSize,
     textAnchor: anchor,
   };
 

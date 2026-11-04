@@ -55,4 +55,15 @@ describe('useStoredFlag', () => {
     });
     expect(result.current[0]).toBe(true);
   });
+
+  it('a full storage (writes fail, reads work) still switches for this visit', () => {
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('QuotaExceededError');
+    });
+    const { result } = renderHook(() => useStoredFlag('mo:full'));
+    act(() => {
+      result.current[1](true);
+    });
+    expect(result.current[0]).toBe(true);
+  });
 });

@@ -226,7 +226,7 @@ then one commit.
 - A failed dataset is one page message with one Retry (`DatasetGate`) instead of an announcement next to five widget errors; named widget boundaries stay quiet.
 - shadcn `card` added (widget frame); shadcn `chart` trimmed to the container (its tooltip/legend did not pass lint and wrote inline `<style>`).
 - `StatusChip`, `useKpiFormat` moved from the assistant widget to `entities/performance/ui`; `Sparkline` to `shared/ui`.
-- "Show as table" is one toggle with a fixed label and `aria-pressed`.
+- "Show as table" is one toggle with a fixed label and `aria-pressed`. Changed after the owner check: the label names the view it switches to ("Show as tiles" / "Show as chart") and the choice is remembered per browser.
 - Top movers added to Executive in M1 (owner, 2026-11-04: the brief lists them under "health at a glance"); lists are "highest / lowest growth" because the lowest can still be positive.
 
 ## Done when
