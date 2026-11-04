@@ -24,7 +24,7 @@ export {
 } from './model/market-status';
 export { type OverviewKpis, overviewKpis, type RiskCount } from './model/overview';
 export { periodToDate } from './model/period';
-export { getMarket, getProduct, getRegion } from './model/reference';
+export { getMarket, getProduct, getRegion, scopeLabel } from './model/reference';
 export {
   isLatestSnapshot,
   marketsInScope,
@@ -35,6 +35,7 @@ export {
 export { dashboardSearchParams } from './model/search-params';
 export { marketsAtRiskCount, nonOnTrackMarkets, statusFor } from './model/status';
 export { anomaliesInScope, type ScopedAnomaly, type TrendPoint, trendSeries } from './model/trend';
+export { type TrendAnomaly, type TrendView, trendView } from './model/trend-view';
 export { useDashboard } from './model/use-dashboard';
 export { type DashboardFocus, useDashboardFocus } from './model/use-dashboard-focus';
 export { StatusChip, StatusIcon, useStatusLabel } from './ui/StatusChip';

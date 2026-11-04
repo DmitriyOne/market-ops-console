@@ -245,5 +245,19 @@
     "order": "Сначала отстающие, затем по выполнению плана",
     "reason": "{attainment} · {growth} к прошлому году",
     "empty": "Здесь нет рынков под риском."
+  },
+  "trend": {
+    "title": "Выручка · {from} – {to}",
+    "actual": "Факт",
+    "forecast": "План",
+    "priorYear": "Прошлый год",
+    "showTable": "Показать таблицей",
+    "summary": "Выручка: {scope}, с {from} по {to}. {period}: факт {actual}, план {forecast}, прошлый год {priorYear}.",
+    "anomaly": "{period} · {market}: {note}",
+    "month": "Месяц",
+    "caption": "Выручка по месяцам: {scope}",
+    "anomalyMark": "аномалия",
+    "window": "выбрано",
+    "legend": "Легенда"
   }
 }

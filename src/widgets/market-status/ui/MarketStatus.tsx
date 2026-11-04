@@ -15,6 +15,7 @@ import {
 import { useDrillDown } from '@/features/drill-down';
 import { LatestOnlyNotice } from '@/features/select-period';
 import type { MarketStatus as Status } from '@/shared/api';
+import { cn } from '@/shared/lib';
 import {
   Button,
   Card,
@@ -53,6 +54,8 @@ export function MarketStatus() {
   const groups = marketTiles(ds, state.scope, state.period, state.range, state.highlighted);
   const tiles = groups.flatMap((g) => g.tiles);
   const hasStatus = tiles.some((tile) => tile.status !== null);
+  // A drill into one region gives it the whole width.
+  const single = groups.length === 1;
 
   return (
     <Card aria-labelledby={titleId} role="region" className="gap-3 border border-border ring-0">
@@ -109,13 +112,18 @@ export function MarketStatus() {
             </TableBody>
           </Table>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className={cn('grid gap-4', single ? '' : 'sm:grid-cols-2 xl:grid-cols-4')}>
             {groups.map((g) => (
               <div key={g.region.id} className="flex flex-col gap-1.5">
                 <p className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
                   {g.region.name}
                 </p>
-                <div className="grid grid-cols-2 gap-1.5">
+                <div
+                  className={cn(
+                    'grid gap-1.5',
+                    single ? 'grid-cols-3 sm:grid-cols-5' : 'grid-cols-2',
+                  )}
+                >
                   {g.tiles.map((tile) => (
                     <StatusTile
                       key={tile.id}

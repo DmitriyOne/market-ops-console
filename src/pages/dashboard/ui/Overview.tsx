@@ -6,6 +6,7 @@ import { WidgetBoundary } from '@/shared/ui';
 import { ScopeTitle, ScopeTitleSkeleton } from '@/widgets/dashboard-header';
 import { KpiStrip, KpiStripSkeleton } from '@/widgets/kpi-strip';
 import { MarketStatus, MarketStatusSkeleton } from '@/widgets/market-status';
+import { RevenueTrend, RevenueTrendSkeleton } from '@/widgets/revenue-trend';
 import { TopRisks, TopRisksSkeleton } from '@/widgets/top-risks';
 
 const PAGE = 'flex flex-col gap-4 p-4';
@@ -37,6 +38,11 @@ export function Overview() {
           </Suspense>
         </WidgetBoundary>
       </div>
+      <WidgetBoundary>
+        <Suspense fallback={<RevenueTrendSkeleton />}>
+          <RevenueTrend />
+        </Suspense>
+      </WidgetBoundary>
     </div>
   );
 }
@@ -52,6 +58,7 @@ export function OverviewSkeleton() {
         </div>
         <TopRisksSkeleton />
       </div>
+      <RevenueTrendSkeleton />
     </div>
   );
 }

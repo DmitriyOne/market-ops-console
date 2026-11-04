@@ -1,0 +1,195 @@
+'use client';
+
+import { TableIcon } from 'lucide-react';
+import dynamic from 'next/dynamic';
+import { useFormatter, useTranslations } from 'next-intl';
+import { useId, useState } from 'react';
+
+import { periodToDate, scopeLabel, trendView, useDashboard } from '@/entities/performance';
+import {
+  Button,
+  Card,
+  CardAction,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Skeleton,
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/shared/ui';
+
+import { SERIES, type SeriesKey } from './TrendChart';
+
+const TrendChart = dynamic(() => import('./TrendChart').then((m) => m.TrendChart), {
+  ssr: false,
+  loading: () => <Skeleton className="h-56 w-full" />,
+});
+
+const KEYS: SeriesKey[] = ['actual', 'forecast', 'priorYear'];
+
+/** A line sample in the series' colour and dash pattern. */
+function LegendLine({ series }: { series: SeriesKey }) {
+  const { stroke, dash, width } = SERIES[series];
+  return (
+    <svg width="22" height="8" aria-hidden className="shrink-0">
+      <line
+        x1="0"
+        y1="4"
+        x2="22"
+        y2="4"
+        stroke={stroke}
+        strokeWidth={width}
+        strokeDasharray={dash}
+      />
+    </svg>
+  );
+}
+
+/**
+ * Actual vs forecast vs prior year for the selected scope (brief: time
+ * series for the selected entity); the selected months are shaded and
+ * anomalies marked. Words and a table carry the same facts.
+ */
+export function RevenueTrend() {
+  const t = useTranslations('trend');
+  const tDrill = useTranslations('drill');
+  const format = useFormatter();
+  const titleId = useId();
+  const { ds, state } = useDashboard();
+  const [asTable, setAsTable] = useState(false);
+
+  const view = trendView(ds, state.scope, state.period, state.range);
+  const period = (p: string) => format.dateTime(periodToDate(p), 'period');
+  const money = (n: number) => format.number(n, 'compactCurrency');
+  const scope = scopeLabel(ds, state.scope) ?? tDrill('portfolio');
+  const first = view.points[0];
+  const last = view.points.at(-1);
+  const selected = view.points.find((p) => p.period === state.period);
+  const windowSet = new Set(
+    view.points.map((p) => p.period).filter((p) => p >= view.window.from && p <= view.window.to),
+  );
+  const anomalyAt = new Set(view.anomalies.map((a) => a.period));
+
+  const title = t('title', {
+    from: first ? period(first.period) : '',
+    to: last ? period(last.period) : '',
+  });
+  const summary = selected
+    ? t('summary', {
+        scope,
+        from: first ? period(first.period) : '',
+        to: last ? period(last.period) : '',
+        period: period(selected.period),
+        actual: money(selected.actual),
+        forecast: money(selected.forecast),
+        priorYear: money(selected.priorYear),
+      })
+    : '';
+
+  return (
+    <Card aria-labelledby={titleId} role="region" className="gap-3 border border-border ring-0">
+      <CardHeader>
+        <CardTitle>
+          <h2 id={titleId} className="text-base font-semibold">
+            {title}
+          </h2>
+        </CardTitle>
+        <CardAction>
+          <Button
+            type="button"
+            variant="outline"
+            className="min-h-11"
+            aria-pressed={asTable}
+            onClick={() => {
+              setAsTable((v) => !v);
+            }}
+          >
+            <TableIcon aria-hidden />
+            {t('showTable')}
+          </Button>
+        </CardAction>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-3">
+        <ul
+          aria-label={t('legend')}
+          className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground"
+        >
+          {KEYS.map((key) => (
+            <li key={key} className="flex items-center gap-1.5">
+              <LegendLine series={key} />
+              {t(key)}
+            </li>
+          ))}
+        </ul>
+        <p className="sr-only">{summary}</p>
+        {asTable ? (
+          <div className="max-h-80 overflow-y-auto">
+            <Table>
+              <TableCaption className="sr-only">{t('caption', { scope })}</TableCaption>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>{t('month')}</TableHead>
+                  {KEYS.map((key) => (
+                    <TableHead key={key} className="text-right">
+                      {t(key)}
+                    </TableHead>
+                  ))}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {view.points.map((p) => (
+                  <TableRow
+                    key={p.period}
+                    data-state={windowSet.has(p.period) ? 'selected' : undefined}
+                  >
+                    <TableCell>
+                      {period(p.period)}
+                      {windowSet.has(p.period) ? (
+                        <span className="text-muted-foreground"> · {t('window')}</span>
+                      ) : null}
+                      {anomalyAt.has(p.period) ? (
+                        <span className="text-status-off-track"> · {t('anomalyMark')}</span>
+                      ) : null}
+                    </TableCell>
+                    {KEYS.map((key) => (
+                      <TableCell key={key} className="text-right font-mono tabular-nums">
+                        {money(p[key])}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        ) : (
+          <TrendChart view={view} title={summary} />
+        )}
+        {view.anomalies.length > 0 ? (
+          <ul className="flex flex-col gap-1 text-xs">
+            {view.anomalies.map((a) => (
+              <li key={`${a.marketId}-${a.period}`} className="flex items-start gap-1.5">
+                <span aria-hidden className="mt-1 size-2 shrink-0 rotate-45 bg-status-off-track" />
+                {t('anomaly', { period: period(a.period), market: a.marketName, note: a.note })}
+              </li>
+            ))}
+          </ul>
+        ) : null}
+      </CardContent>
+    </Card>
+  );
+}
+
+export function RevenueTrendSkeleton() {
+  return (
+    <div aria-hidden className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4">
+      <Skeleton className="h-5 w-56" />
+      <Skeleton className="h-4 w-48" />
+      <Skeleton className="h-56 w-full" />
+    </div>
+  );
+}

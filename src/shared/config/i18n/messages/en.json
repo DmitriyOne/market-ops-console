@@ -245,5 +245,19 @@
     "order": "Off track first, then by attainment",
     "reason": "{attainment} · {growth} YoY",
     "empty": "No markets at risk here."
+  },
+  "trend": {
+    "title": "Revenue · {from} – {to}",
+    "actual": "Actual",
+    "forecast": "Forecast",
+    "priorYear": "Prior year",
+    "showTable": "Show as table",
+    "summary": "Revenue for {scope}, {from} to {to}. {period}: actual {actual}, forecast {forecast}, prior year {priorYear}.",
+    "anomaly": "{period} · {market}: {note}",
+    "month": "Month",
+    "caption": "Revenue by month for {scope}",
+    "anomalyMark": "anomaly",
+    "window": "selected",
+    "legend": "Legend"
   }
 }

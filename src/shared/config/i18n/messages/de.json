@@ -245,5 +245,19 @@
     "order": "Verfehlt zuerst, dann nach Planerfüllung",
     "reason": "{attainment} · {growth} ggü. Vorjahr",
     "empty": "Hier gibt es keine Märkte mit Risiko."
+  },
+  "trend": {
+    "title": "Umsatz · {from} – {to}",
+    "actual": "Ist",
+    "forecast": "Plan",
+    "priorYear": "Vorjahr",
+    "showTable": "Als Tabelle",
+    "summary": "Umsatz für {scope}, {from} bis {to}. {period}: Ist {actual}, Plan {forecast}, Vorjahr {priorYear}.",
+    "anomaly": "{period} · {market}: {note}",
+    "month": "Monat",
+    "caption": "Umsatz je Monat für {scope}",
+    "anomalyMark": "Auffälligkeit",
+    "window": "ausgewählt",
+    "legend": "Legende"
   }
 }
