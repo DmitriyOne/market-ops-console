@@ -2,7 +2,7 @@
 
 Status: approved by the owner · 2026-11-03 · Release `0.1.0` · Plan 1 (foundation) built from it in `0.2.0`
 
-Sources: brief (`Frontend Engineer - Assignment v1.docx`, summarised in `docs/STARTER_PACK.md`), contract `docs/CONTRACT.md`, data `data/data.json`, fixtures `data/fixtures.json`, decisions `docs/decisions/0001–0013`.
+Sources: brief (`Frontend Engineer - Assignment v1.docx`, summarised in `docs/STARTER_PACK.md`), contract `docs/CONTRACT.md`, data `data/data.json`, fixtures `data/fixtures.json`, decisions `docs/decisions/0001–0015`.
 
 Marking: **[owner]** = decided by the owner in conversation. **[call]** = Claude's call, open to owner correction. Unmarked = required by the brief or already in an ADR.
 
@@ -66,7 +66,7 @@ The submission is assessed on engineering quality, taste and the reasoning in th
 
 ## 3. Constraints
 
-- Due 2026-11-09. Stack, architecture, git flow and tooling are fixed by ADRs 0001–0013 and `CLAUDE.md`.
+- Due 2026-11-09. Stack, architecture, git flow and tooling are fixed by ADRs 0001–0015 and `CLAUDE.md`.
 - FSD v2.1; `src/pages` composes only (may read URL params and choose layout).
 - Static rendering per locale: `app/[locale]/…`, `generateStaticParams`, `next/root-params` (ADR 0010).
 - No string literals in markup; all formatting through next-intl global formats.
@@ -137,7 +137,7 @@ Rules: drill-down params are hierarchical (setting `market` sets its `region`; c
 - **Desktop** **[owner]**: header + dashboard; assistant is a **persistent right panel, collapsible**. Collapsed state is a per-browser preference (not in URL) [call]. A badge shows a new answer while collapsed [call]. Alerts open as a right-side sheet from the header [call].
 - **Tablet** [call]: same as desktop, assistant panel overlays when opened; navigation rail optional if needed.
 - **Phone** **[owner]**: bottom tab bar: **Overview · Assistant · Alerts** (labels always shown, 44×44 targets, badge on Assistant). Assistant is full screen (the header hides on that tab). Locale, theme and "Reset view" sit behind a ⚙︎ button in the header and open as a sheet. Period and filters open as short sheets with a Close button and back-gesture support. Default mode on phone is Executive [call].
-- **Header** (all sizes): drill-down breadcrumbs (each step lists its siblings; the product step appears under a market **[owner]**), period + range (a month grid with a year switch built from `Popover` + `Button`, no day grid **[owner, 2026-11-04]**), Executive/Analyst switch, alerts button with count, locale, theme. Phone: path and ⚙︎ on the first row, period and mode full width below.
+- **Header** (all sizes): drill-down breadcrumbs (each step lists its siblings; the product step appears under a market **[owner]**), period + range (a month grid with a year switch built from `Popover` + `Button`, no day grid **[owner, 2026-11-04]**), Executive/Analyst switch, alerts button with count, locale, theme. Phone: the app name and ⚙︎ on the first row, the path below, period and mode full width under it **[owner, 2026-11-04]**.
 
 ## 7. Assistant
 
@@ -199,7 +199,7 @@ Four suggested questions (buttons) taken from the brief: risks this quarter, Ger
 
 - Map/table/heat-map click → drill into market (URL `market`).
 - Heat-map cell → also sets `period`; radar and time series follow `period`/`range`.
-- Multi-select markets on map or heat map (Shift+click / long-press) → `markets` param → table narrows (replaces the brief's "brush the scatter" example; heat map chosen over scatter, ADR 0004).
+- Multi-select markets on map or heat map (Shift+click / long-press) → `markets` param → table narrows (M3, with the markets table **[owner, 2026-11-04]**) (replaces the brief's "brush the scatter" example; heat map chosen over scatter, ADR 0004).
 - Citation click and "Show on dashboard" → same URL mechanisms.
 
 ### States
@@ -223,7 +223,7 @@ Four suggested questions (buttons) taken from the brief: risks this quarter, Ger
 - Dataset: `/api/v1/data` returns `data.json` validated by zod; fetched with TanStack Query; prefetched in the server component at build time and hydrated, so static HTML already contains the data. `staleTime: Infinity` (static data).
 - Alert rules: TanStack Query against `/api/v1/alerts`.
 - Selectors (pure functions in `entities/*/model`) compute every aggregate from the validated dataset; no component computes KPIs inline.
-- Market ↔ map join: `iso3 → numeric ISO` table in `entities/market`.
+- Market ↔ map join: `iso3 → numeric ISO` table in `entities/performance` (`ISO3_TO_NUMERIC`).
 
 ## 11. Cross-cutting
 

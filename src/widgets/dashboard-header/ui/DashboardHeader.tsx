@@ -17,9 +17,12 @@ import { SettingsSheet } from './SettingsSheet';
 
 const ROW = 'flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2';
 // Phone: period and mode each take a full row, so nothing runs off the screen.
-const CONTROLS = 'flex items-center gap-2 max-lg:w-full max-lg:flex-col max-lg:items-stretch';
+const CONTROLS =
+  'flex items-center gap-2 max-lg:order-2 max-lg:w-full max-lg:flex-col max-lg:items-stretch';
 
-const APP_NAME = 'font-semibold whitespace-nowrap max-lg:hidden';
+// Phone: the name fills the first row next to ⚙︎; the path drops to its own row.
+const APP_NAME = 'font-semibold whitespace-nowrap max-lg:flex-1';
+const PATH = 'min-w-0 flex-1 max-lg:order-1 max-lg:basis-full';
 
 /** The app name; live, it leads back to the clean dashboard. */
 function AppName({ live = false }: { live?: boolean }) {
@@ -41,7 +44,8 @@ function AppName({ live = false }: { live?: boolean }) {
 
 /**
  * Desktop: name · path · period · mode · language · theme in one row.
- * Phone: path and ⚙︎ on the first row, period and mode full width below.
+ * Phone: name and ⚙︎ on the first row, the path below, then period and
+ * mode full width.
  */
 export function DashboardHeader() {
   return (
@@ -52,9 +56,9 @@ export function DashboardHeader() {
       </Suspense>
       {/* The path and period need the dataset: they wait with a skeleton, and
           if it fails they step aside (the page says so once, ADR 0013). */}
-      <DatasetGate fallback={<div className="min-w-0 flex-1" />}>
+      <DatasetGate fallback={<div className={PATH} />}>
         <Suspense fallback={<PathSkeleton />}>
-          <DrillBreadcrumbs className="min-w-0 flex-1" />
+          <DrillBreadcrumbs className={PATH} />
         </Suspense>
       </DatasetGate>
       <SettingsSheet className="lg:hidden" />
@@ -79,7 +83,7 @@ export function DashboardHeader() {
 
 function PathSkeleton() {
   return (
-    <div aria-hidden className="flex min-h-11 min-w-0 flex-1 items-center">
+    <div aria-hidden className={cn('flex min-h-11 items-center', PATH)}>
       <Skeleton className="h-5 w-44" />
     </div>
   );
