@@ -4,6 +4,8 @@ import { cn } from 'cn';
 import { Tooltip as TooltipPrimitive } from 'radix-ui';
 import * as React from 'react';
 
+import { usePopperBoundary } from './popper-boundary';
+
 function TooltipProvider({
   delayDuration = 0,
   ...props
@@ -31,9 +33,11 @@ function TooltipContent({
   children,
   ...props
 }: React.ComponentProps<typeof TooltipPrimitive.Content>) {
+  const boundary = usePopperBoundary();
   return (
     <TooltipPrimitive.Portal>
       <TooltipPrimitive.Content
+        {...boundary}
         data-slot="tooltip-content"
         sideOffset={sideOffset}
         className={cn(

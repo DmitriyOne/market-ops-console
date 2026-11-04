@@ -4,6 +4,8 @@ import { cn } from 'cn';
 import { HoverCard as HoverCardPrimitive } from 'radix-ui';
 import * as React from 'react';
 
+import { usePopperBoundary } from './popper-boundary';
+
 function HoverCard({ ...props }: React.ComponentProps<typeof HoverCardPrimitive.Root>) {
   return <HoverCardPrimitive.Root data-slot="hover-card" {...props} />;
 }
@@ -18,9 +20,11 @@ function HoverCardContent({
   sideOffset = 4,
   ...props
 }: React.ComponentProps<typeof HoverCardPrimitive.Content>) {
+  const boundary = usePopperBoundary();
   return (
     <HoverCardPrimitive.Portal data-slot="hover-card-portal">
       <HoverCardPrimitive.Content
+        {...boundary}
         data-slot="hover-card-content"
         align={align}
         sideOffset={sideOffset}
