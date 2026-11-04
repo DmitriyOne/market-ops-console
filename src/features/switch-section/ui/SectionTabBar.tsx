@@ -16,40 +16,43 @@ type SectionTabBarProps = {
   badge?: number;
 };
 
-/** Bottom tab bar for phones: labels always shown, 44px targets. */
+/**
+ * Bottom tab bar for phones, styled as the header's segmented switches
+ * (owner, variant E): the current section is a raised card chip on a muted
+ * track. Labels always shown, targets over 44px.
+ */
 export function SectionTabBar({ section, onChange, badge = 0 }: SectionTabBarProps) {
   const t = useTranslations('shell');
   return (
-    <nav aria-label={t('sections')} className="border-t border-border bg-card">
-      <ul className="grid grid-cols-2">
+    <nav
+      aria-label={t('sections')}
+      className="bg-background px-2.5 pt-1.5 pb-[max(0.625rem,env(safe-area-inset-bottom))]"
+    >
+      <ul className="flex gap-1 rounded-2xl border border-border bg-muted p-1">
         {SECTIONS.map((s) => {
           const Icon = ICONS[s];
           const active = s === section;
           return (
-            <li key={s}>
+            <li key={s} className="flex-1">
               <button
                 type="button"
                 aria-current={active ? 'page' : undefined}
                 className={cn(
-                  'flex min-h-14 w-full flex-col items-center justify-center gap-0.5 text-xs font-medium focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none',
-                  active ? 'font-semibold text-foreground' : 'text-muted-foreground',
+                  'flex min-h-13 w-full flex-col items-center justify-center gap-0.5 rounded-xl text-xs transition-colors focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none',
+                  active
+                    ? 'bg-card font-semibold text-foreground shadow-sm'
+                    : 'font-medium text-muted-foreground hover:text-foreground',
                 )}
                 onClick={() => {
                   onChange(s);
                 }}
               >
-                {/* The current section: a filled pill behind the icon, not colour alone. */}
-                <span
-                  className={cn(
-                    'relative flex h-7 w-14 items-center justify-center rounded-full transition-colors',
-                    active && 'bg-foreground text-background',
-                  )}
-                >
+                <span className="relative flex h-6 w-7 items-center justify-center">
                   <Icon aria-hidden className="size-5" />
                   {s === 'assistant' && badge > 0 ? (
                     <span
                       aria-hidden
-                      className="absolute top-0.5 right-3 size-2.5 rounded-full bg-surface-ai-label"
+                      className="absolute top-0 -right-0.5 size-2.5 rounded-full bg-surface-ai-label ring-2 ring-muted"
                     />
                   ) : null}
                 </span>

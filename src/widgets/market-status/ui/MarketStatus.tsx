@@ -36,6 +36,7 @@ import {
 import { StatusTile } from './StatusTile';
 
 const STATUSES: Status[] = ['on_track', 'at_risk', 'off_track'];
+const CARD = 'gap-3 border border-border ring-0';
 
 /**
  * Markets as tiles grouped by region (variant A): status by shape, word and
@@ -61,7 +62,7 @@ export function MarketStatus() {
   const single = groups.length === 1;
 
   return (
-    <Card aria-labelledby={titleId} role="region" className="gap-3 border border-border ring-0">
+    <Card aria-labelledby={titleId} role="region" className={CARD}>
       <CardHeader>
         <CardTitle>
           <h2 id={titleId} className="text-base font-semibold">
@@ -172,18 +173,32 @@ export function MarketStatus() {
   );
 }
 
+/** The card's own frame: title, the table button in the corner, region groups, legend. */
 export function MarketStatusSkeleton() {
   return (
-    <div aria-hidden className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4">
-      <Skeleton className="h-5 w-32" />
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {[0, 1, 2, 3].map((i) => (
-          <div key={i} className="grid grid-cols-2 gap-1.5">
-            <Skeleton className="h-14" />
-            <Skeleton className="h-14" />
-          </div>
-        ))}
-      </div>
-    </div>
+    <Card aria-hidden className={CARD}>
+      <CardHeader>
+        <CardTitle>
+          <Skeleton className="h-6 w-32" />
+        </CardTitle>
+        <CardAction>
+          <Skeleton className="h-11 w-36 rounded-lg" />
+        </CardAction>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-3">
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {[0, 1, 2, 3].map((i) => (
+            <div key={i} className="flex flex-col gap-1.5">
+              <Skeleton className="h-4 w-24" />
+              <div className="grid grid-cols-2 gap-1.5">
+                <Skeleton className="h-14 rounded-lg" />
+                <Skeleton className="h-14 rounded-lg" />
+              </div>
+            </div>
+          ))}
+        </div>
+        <Skeleton className="h-4 w-64 max-w-full" />
+      </CardContent>
+    </Card>
   );
 }

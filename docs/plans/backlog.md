@@ -26,7 +26,6 @@ Format: **Item**: what is wrong (file). Why it can wait. Where it goes.
 
 ## From the owner review of 0.4.0 (2026-11-03)
 
-- **Phone bottom tab bar look** (`SectionTabBar`): the owner likes it for now but may want it tuned once the dashboard sections land. **Plan 3**, with the D phone screens (Overview / Assistant / Alerts).
 - **"New content" smooth scroll can stop short** while tokens keep arriving (PLAUSIBLE, not reproduced; `use-stick-to-bottom.ts`), and sending a question while scrolled up does not jump to it. **Plan 5**, with the Playwright happy path.
 
 ## From the 0.4.0 answer-actions review (2026-11-04)

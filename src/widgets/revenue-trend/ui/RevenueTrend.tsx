@@ -24,30 +24,15 @@ import {
   TableRow,
 } from '@/shared/ui';
 
-import { SERIES, SERIES_KEYS as KEYS, type SeriesKey } from './series';
+import { LegendLine } from './LegendLine';
+import { SERIES_KEYS as KEYS } from './series';
 
 const TrendChart = dynamic(() => import('./TrendChart').then((m) => m.TrendChart), {
   ssr: false,
   loading: () => <Skeleton className="h-56 w-full" />,
 });
 
-/** A line sample in the series' colour and dash pattern. */
-function LegendLine({ series }: { series: SeriesKey }) {
-  const { stroke, dash, width } = SERIES[series];
-  return (
-    <svg width="22" height="8" aria-hidden className="shrink-0">
-      <line
-        x1="0"
-        y1="4"
-        x2="22"
-        y2="4"
-        stroke={stroke}
-        strokeWidth={width}
-        strokeDasharray={dash}
-      />
-    </svg>
-  );
-}
+const CARD = 'gap-3 border border-border ring-0';
 
 /**
  * Actual vs forecast vs prior year for the selected scope (brief: time
@@ -93,7 +78,7 @@ export function RevenueTrend() {
     : '';
 
   return (
-    <Card aria-labelledby={titleId} role="region" className="gap-3 border border-border ring-0">
+    <Card aria-labelledby={titleId} role="region" className={CARD}>
       <CardHeader>
         <CardTitle>
           <h2 id={titleId} className="text-base font-semibold">
@@ -184,12 +169,23 @@ export function RevenueTrend() {
   );
 }
 
+/** The card's own frame: title (two lines on a phone), the table button, legend, chart. */
 export function RevenueTrendSkeleton() {
   return (
-    <div aria-hidden className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4">
-      <Skeleton className="h-5 w-56" />
-      <Skeleton className="h-4 w-48" />
-      <Skeleton className="h-56 w-full" />
-    </div>
+    <Card aria-hidden className={CARD}>
+      <CardHeader>
+        <CardTitle className="flex flex-col gap-1.5">
+          <Skeleton className="h-6 w-56 max-w-full" />
+          <Skeleton className="h-6 w-28 sm:hidden" />
+        </CardTitle>
+        <CardAction>
+          <Skeleton className="h-11 w-36 rounded-lg" />
+        </CardAction>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-3">
+        <Skeleton className="h-4 w-60 max-w-full" />
+        <Skeleton className="h-56 w-full" />
+      </CardContent>
+    </Card>
   );
 }
