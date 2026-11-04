@@ -151,7 +151,11 @@ Rules:
 `DashboardHeader` (path, `PeriodPicker`, `ModeSwitch`, language, theme; phone `SettingsSheet`), `ScopeTitle`, `KpiStrip` / `KpiCard`, `MarketStatus` / `StatusTile`, `TopRisks`, `RevenueTrend` (Recharts via `next/dynamic`). Entity UI shared with the assistant: `StatusChip`, `StatusIcon`, `useKpiFormat`, `DatasetGate` (one message when the dataset fails).
 
 - Status tiles: `bg-status-*-muted text-status-*`; off-track adds a `bg-hatch` band (utility in `globals.css`); no status → `bg-muted`; highlighted from the assistant → `ring-2 ring-ring`, and the accessible name says so.
-- "Calculated" badge: a 44px `Popover` trigger (tap opens the formula; a tooltip would never open on a phone), the dashed chip drawn inside it.
+- "Calculated" badge: a 44px `Popover` trigger (tap opens the formula; a tooltip would never open on a phone), the dashed chip drawn inside it with no background of its own; it keeps the top-right corner (the label wraps) and shows `Σ` when the card is under `11rem` (container query).
+- Segmented switches (mode, range): `ToggleGroup` `spacing={1}` in a `rounded-xl bg-muted p-1` track; items `min-h-11 px-4`, on = `bg-card shadow-sm`.
+- Table/chart toggles: the button names the view it switches to ("Show as table" ↔ "Show as tiles" / "Show as chart"), no `aria-pressed`; the choice is remembered with `useStoredFlag` (`mo:market-status-table`, `mo:revenue-trend-table`).
+- Chart motion: `motion-safe:animate-reveal-x` (sparklines), `motion-safe:animate-grow-x origin-left` (bars), Recharts line animation off under `prefers-reduced-motion`. Window marker: dashed `muted-foreground` line (1 month) or `muted` band (3 / 12 months), labelled above the plot.
+- Grid cells that hold a card get `min-w-0`, so a wide table scrolls inside its card.
 - Top movers bars: `chart-5` for growth, `chart-4` for decline (chart tokens, not status ones); the signed number is the signal.
 - Line patterns in charts: actual solid `chart-1`, forecast dashed `chart-5`, prior year dotted `chart-3`, anomaly ring `chart-4`; the legend draws the pattern, not just the colour.
 

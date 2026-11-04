@@ -59,7 +59,12 @@ export function SourceButton({ citation, ds, dataError = null, onSelect }: Sourc
             {label}
           </Button>
         </PopoverTrigger>
-        <PopoverContent collisionPadding={15} className="flex w-72 flex-col gap-3">
+        {/* No closing fade: "Show on dashboard" hides the panel, the trigger goes
+            with it, and a fading card would jump to the screen corner. */}
+        <PopoverContent
+          collisionPadding={15}
+          className="flex w-72 flex-col gap-3 data-closed:animate-none!"
+        >
           {card}
           {resolved?.known ? (
             <Button type="button" className="min-h-11" onClick={select}>

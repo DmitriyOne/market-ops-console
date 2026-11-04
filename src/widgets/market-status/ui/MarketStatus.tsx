@@ -1,8 +1,8 @@
 'use client';
 
-import { TableIcon } from 'lucide-react';
+import { LayoutGridIcon, TableIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useId, useState } from 'react';
+import { useId } from 'react';
 
 import {
   marketTiles,
@@ -15,7 +15,7 @@ import {
 import { useDrillDown } from '@/features/drill-down';
 import { LatestOnlyNotice } from '@/features/select-period';
 import type { MarketStatus as Status } from '@/shared/api';
-import { cn } from '@/shared/lib';
+import { cn, useStoredFlag } from '@/shared/lib';
 import {
   Button,
   Card,
@@ -50,7 +50,7 @@ export function MarketStatus() {
   const titleId = useId();
   const { ds, state } = useDashboard();
   const { toMarket } = useDrillDown();
-  const [asTable, setAsTable] = useState(false);
+  const [asTable, setAsTable] = useStoredFlag('mo:market-status-table');
 
   const groups = marketTiles(ds, state.scope, state.period, state.range, state.highlighted);
   const tiles = groups.flatMap((g) => g.tiles);
@@ -71,13 +71,12 @@ export function MarketStatus() {
             type="button"
             variant="outline"
             className="min-h-11"
-            aria-pressed={asTable}
             onClick={() => {
-              setAsTable((v) => !v);
+              setAsTable(!asTable);
             }}
           >
-            <TableIcon aria-hidden />
-            {t('showTable')}
+            {asTable ? <LayoutGridIcon aria-hidden /> : <TableIcon aria-hidden />}
+            {asTable ? t('showTiles') : t('showTable')}
           </Button>
         </CardAction>
       </CardHeader>

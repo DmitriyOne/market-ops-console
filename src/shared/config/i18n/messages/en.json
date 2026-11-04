@@ -198,8 +198,10 @@
     "changeProduct": "Product: {name}. Change product"
   },
   "header": {
-    "settings": "Settings: language and theme",
-    "settingsTitle": "Settings"
+    "settings": "Settings: language, theme, reset view",
+    "settingsTitle": "Settings",
+    "resetView": "Reset view",
+    "resetHint": "Portfolio, latest month, Executive"
   },
   "overview": {
     "summary": "{markets, plural, one {# market} other {# markets}} · {products, plural, one {# product} other {# products}} · latest data {period}"
@@ -242,7 +244,8 @@
     "attainment": "Attainment",
     "status": "Status",
     "caption": "Market status by region, {window}",
-    "perMarket": "Tiles show whole markets, not the chosen product."
+    "perMarket": "Tiles show whole markets, not the chosen product.",
+    "showTiles": "Show as tiles"
   },
   "topRisks": {
     "title": "Top risks",
@@ -263,7 +266,9 @@
     "anomalyMark": "anomaly",
     "window": "selected",
     "legend": "Legend",
-    "name": "Revenue trend"
+    "name": "Revenue trend",
+    "showChart": "Show as chart",
+    "windowRange": "{from} – {to}"
   },
   "topMovers": {
     "title": "Top movers",

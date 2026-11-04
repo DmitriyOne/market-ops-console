@@ -50,7 +50,10 @@ export function Sparkline({
       role={label ? 'img' : undefined}
       aria-label={label}
       aria-hidden={label ? undefined : true}
-      className={cn('w-full overflow-visible text-foreground', className)}
+      className={cn(
+        'w-full overflow-visible text-foreground motion-safe:animate-reveal-x',
+        className,
+      )}
     >
       {fill ? <polygon points={fill} className="fill-muted" /> : null}
       <polyline

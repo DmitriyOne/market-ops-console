@@ -48,7 +48,7 @@ function MoverList({
                   <span aria-hidden className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
                     <span
                       className={cn(
-                        'block h-full rounded-full',
+                        'block h-full origin-left rounded-full motion-safe:animate-grow-x',
                         // Chart tokens, not status ones: this is growth sign, not on/off track.
                         // The signed number next to it carries the meaning.
                         value < 0 ? 'bg-chart-4' : 'bg-chart-5',

@@ -1,11 +1,12 @@
 'use client';
 
-import { TableIcon } from 'lucide-react';
+import { ChartLineIcon, TableIcon } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useFormatter, useTranslations } from 'next-intl';
-import { useId, useState } from 'react';
+import { useId } from 'react';
 
 import { periodToDate, scopeLabel, trendView, useDashboard } from '@/entities/performance';
+import { useStoredFlag } from '@/shared/lib';
 import {
   Button,
   Card,
@@ -59,7 +60,7 @@ export function RevenueTrend() {
   const format = useFormatter();
   const titleId = useId();
   const { ds, state } = useDashboard();
-  const [asTable, setAsTable] = useState(false);
+  const [asTable, setAsTable] = useStoredFlag('mo:revenue-trend-table');
 
   const view = trendView(ds, state.scope, state.period, state.range);
   const period = (p: string) => format.dateTime(periodToDate(p), 'period');
@@ -102,13 +103,12 @@ export function RevenueTrend() {
             type="button"
             variant="outline"
             className="min-h-11"
-            aria-pressed={asTable}
             onClick={() => {
-              setAsTable((v) => !v);
+              setAsTable(!asTable);
             }}
           >
-            <TableIcon aria-hidden />
-            {t('showTable')}
+            {asTable ? <ChartLineIcon aria-hidden /> : <TableIcon aria-hidden />}
+            {asTable ? t('showChart') : t('showTable')}
           </Button>
         </CardAction>
       </CardHeader>

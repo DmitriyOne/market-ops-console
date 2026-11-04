@@ -14,7 +14,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 - KPI cards for the current view: revenue, forecast attainment, growth YoY and markets at risk ("6 of 13", "2 off track · 4 at risk"), each with a supporting line and a 12-month line; computed figures carry a "Calculated" badge that names the formula. Off the latest month the risk card says status exists for the latest month only and offers to jump there; a product says status is per market.
 - Scope title: "Veltrix · Germany" with the number of markets and products and the latest data month.
 - Period picker: a month grid with a year switch (months without data cannot be picked, arrow keys move between months) and the window 1 / 3 / 12 months; both go into the URL with a history entry.
-- Executive / Analyst switch; it replaces the URL entry instead of adding one, so Back skips it.
+- Executive / Analyst switch; each switch is a history entry, so Back returns to the previous mode.
+- The app name leads to the clean dashboard (portfolio, latest month, Executive) in one history step; on phones "Reset view" in the ⚙︎ sheet.
+- "Show as table" on market status and the revenue trend is remembered per browser, and the button then reads "Show as tiles" / "Show as chart".
+- Chart motion: the trend lines draw in and move to new values, sparklines reveal left to right, mover bars grow; all off under reduced motion.
 - Drill-down actions (portfolio, region, market, product) keep the period and range; a market brings its region.
 - shadcn `breadcrumb`, `chart` (trimmed to the frame; Recharts 3), `sheet`, `table`, `toggle-group`.
 - Dashboard URL state is checked against the data: a market brings its own region, a product needs a market, unknown ids, months, ranges and modes fall back to the default, and a bad link is corrected in place without a history entry.
@@ -24,6 +27,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 
 ### Fixed
 - Review of 0.5.0: market tiles' names start with the visible code ("DE Germany, …", WCAG 2.5.3); the "Calculated" badge is a 44px target that opens the formula on tap; the header steps aside when the dataset fails, so the page shows its single message; repeated `markets` keys are read; a product step clears highlights; tiles say they are whole markets when a product is chosen; the trend table shows whole dollars; the month picker keeps focus at the first and last year; Russian verb agreement in the risk split; table caption names the window.
+- Owner check of 0.5.0: a wide table no longer widens its card past the phone screen; screen-reader-only text no longer stretches the page below the tab bar; the "Calculated" badge has no grey box on hover and keeps its corner (a Σ sign in a narrow card); the selected month on the trend chart is a thin dashed line with its name (a light band for 3 / 12 months) instead of a thick grey bar; phone chart axes are shorter ("Jun 24", a tick a year); the mode and range switches have room around their labels; the phone period picker is as wide as its button; the phone Assistant tab hides the header; the active bottom tab has a filled pill; a source card no longer flashes in the screen corner after "Show on dashboard" on touch screens.
 - The 404 page has a skip link and a `main#main` landmark.
 - Switching language keeps repeated query keys (`markets=de&markets=es`) and the `#hash`.
 

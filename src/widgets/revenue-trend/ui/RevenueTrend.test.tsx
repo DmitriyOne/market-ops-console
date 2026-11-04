@@ -20,6 +20,7 @@ function setup(searchParams = '') {
 
 describe('RevenueTrend', () => {
   beforeEach(() => {
+    localStorage.clear();
     server.use(datasetHandler());
   });
 
@@ -69,5 +70,16 @@ describe('RevenueTrend', () => {
         .getAllByRole('columnheader')
         .map((th) => th.textContent),
     ).toEqual([t.month, t.actual, t.forecast, t.priorYear]);
+  });
+
+  it('the table choice is remembered and the button turns back to the chart', async () => {
+    const first = setup();
+    await first.user.click(await screen.findByRole('button', { name: t.showTable }));
+    first.unmount();
+    const { user } = setup();
+    expect(await screen.findByRole('table')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: t.showChart }));
+    expect(screen.queryByRole('table')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: t.showTable })).toBeInTheDocument();
   });
 });

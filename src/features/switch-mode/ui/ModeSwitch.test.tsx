@@ -18,7 +18,7 @@ describe('ModeSwitch', () => {
     );
   });
 
-  it('switching mode replaces the URL instead of adding a history step', async () => {
+  it('switching mode is a history step, so Back returns to the previous mode', async () => {
     const { user, lastUpdate } = renderWithProviders(<ModeSwitch />, {
       searchParams: '?market=de',
     });
@@ -26,7 +26,7 @@ describe('ModeSwitch', () => {
     await waitFor(() => {
       expect(lastUpdate()?.queryString).toBe('?market=de&mode=analyst');
     });
-    expect(lastUpdate()?.options.history).toBe('replace');
+    expect(lastUpdate()?.options.history).toBe('push');
   });
 
   it('back to Executive removes the param', async () => {

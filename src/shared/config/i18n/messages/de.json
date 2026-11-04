@@ -198,8 +198,10 @@
     "changeProduct": "Produkt: {name}. Produkt ändern"
   },
   "header": {
-    "settings": "Einstellungen: Sprache und Design",
-    "settingsTitle": "Einstellungen"
+    "settings": "Einstellungen: Sprache, Design, Ansicht zurücksetzen",
+    "settingsTitle": "Einstellungen",
+    "resetView": "Ansicht zurücksetzen",
+    "resetHint": "Portfolio, letzter Monat, Management"
   },
   "overview": {
     "summary": "{markets, plural, one {# Markt} other {# Märkte}} · {products, plural, one {# Produkt} other {# Produkte}} · neueste Daten {period}"
@@ -242,7 +244,8 @@
     "attainment": "Planerfüllung",
     "status": "Status",
     "caption": "Marktstatus nach Region, {window}",
-    "perMarket": "Die Kacheln zeigen ganze Märkte, nicht das gewählte Produkt."
+    "perMarket": "Die Kacheln zeigen ganze Märkte, nicht das gewählte Produkt.",
+    "showTiles": "Als Kacheln anzeigen"
   },
   "topRisks": {
     "title": "Größte Risiken",
@@ -263,7 +266,9 @@
     "anomalyMark": "Auffälligkeit",
     "window": "ausgewählt",
     "legend": "Legende",
-    "name": "Umsatzverlauf"
+    "name": "Umsatzverlauf",
+    "showChart": "Als Diagramm anzeigen",
+    "windowRange": "{from} – {to}"
   },
   "topMovers": {
     "title": "Größte Veränderungen",

@@ -14,7 +14,8 @@ import { TopRisks, TopRisksSkeleton } from '@/widgets/top-risks';
 
 const PAGE = 'flex flex-col gap-4 p-4';
 // Wide screens: the main widget takes two thirds, its companion one third.
-const ROW = 'grid gap-4 xl:grid-cols-3';
+// `min-w-0` on every cell: a wide table scrolls inside its card instead of widening the page.
+const ROW = 'grid gap-4 xl:grid-cols-3 *:min-w-0';
 const WIDE = 'xl:col-span-2';
 
 /** One widget: its own error (named) and its own skeleton. */

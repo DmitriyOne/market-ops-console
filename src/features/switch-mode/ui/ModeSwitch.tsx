@@ -8,8 +8,8 @@ import { cn } from '@/shared/lib';
 import { ToggleGroup, ToggleGroupItem } from '@/shared/ui';
 
 const modeParser = parseAsStringLiteral(MODES).withDefault('executive').withOptions({
-  // A different view of the same place, not a new place: no history step.
-  history: 'replace',
+  // Analyst is another screen to the user: Back returns to the previous mode.
+  history: 'push',
   clearOnDefault: true,
 });
 
@@ -28,14 +28,14 @@ export function ModeSwitch({ className }: { className?: string }) {
         if (isMode(next) && next !== mode) void setMode(next);
       }}
       aria-label={t('label')}
-      spacing={0}
-      className={cn('rounded-lg bg-muted p-0.5', className)}
+      spacing={1}
+      className={cn('rounded-xl bg-muted p-1', className)}
     >
       {MODES.map((m) => (
         <ToggleGroupItem
           key={m}
           value={m}
-          className="min-h-11 flex-1 px-3 data-[state=on]:bg-card data-[state=on]:shadow-sm"
+          className="min-h-11 flex-1 px-4 hover:bg-card/60 data-[state=on]:bg-card data-[state=on]:shadow-sm"
         >
           {t(m)}
         </ToggleGroupItem>

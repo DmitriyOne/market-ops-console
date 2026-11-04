@@ -19,6 +19,28 @@
   );
 }
 
+/* Chart entrances: lines draw left to right, bars grow from their start.
+   Used with `motion-safe:` so reduced motion shows the final state at once. */
+@theme {
+  --animate-reveal-x: reveal-x 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-grow-x: grow-x 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
+
+  @keyframes reveal-x {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+
+  @keyframes grow-x {
+    from {
+      transform: scaleX(0);
+    }
+  }
+}
+
 @theme inline {
   --font-sans: var(--font-space-grotesk), system-ui, sans-serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;

@@ -1,11 +1,12 @@
 'use client';
 
+import { SigmaIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
 import { useId } from 'react';
 
 import type { KpiValue } from '@/entities/performance';
-import { Button, Popover, PopoverContent, PopoverTrigger, Sparkline } from '@/shared/ui';
+import { Popover, PopoverContent, PopoverTrigger, Sparkline } from '@/shared/ui';
 
 type KpiCardProps = {
   label: string;
@@ -28,12 +29,13 @@ export function KpiCard({ label, value, detail, formula, source, spark }: KpiCar
     <div
       role="group"
       aria-labelledby={labelId}
-      className="flex min-w-0 flex-col gap-1 rounded-xl border border-border bg-card p-3"
+      className="@container flex min-w-0 flex-col gap-1 rounded-xl border border-border bg-card p-3"
     >
-      <div className="flex min-h-6 flex-wrap items-center justify-between gap-x-2 gap-y-1">
+      {/* No wrapping: the badge keeps its corner, a long label takes two lines. */}
+      <div className="flex min-h-6 items-start justify-between gap-2">
         <p
           id={labelId}
-          className="text-xs font-semibold tracking-wide text-muted-foreground uppercase"
+          className="min-w-0 py-0.5 text-xs font-semibold tracking-wide text-muted-foreground uppercase"
         >
           {label}
         </p>
@@ -41,16 +43,17 @@ export function KpiCard({ label, value, detail, formula, source, spark }: KpiCar
           // Popover, not a tooltip: a tap opens it, so phones can read the formula too.
           <Popover>
             <PopoverTrigger asChild>
-              <Button
+              <button
                 type="button"
-                variant="ghost"
-                className="-my-2.5 min-h-11 px-0 hover:bg-transparent"
+                className="group/calc -my-2.5 flex min-h-11 shrink-0 items-center outline-none"
                 aria-label={t('calculatedLabel', { formula })}
               >
-                <span className="rounded-md border border-dashed border-input px-1.5 py-0.5 text-xs text-muted-foreground">
-                  {t('calculated')}
+                <span className="flex h-6 items-center rounded-md border border-dashed border-input px-1.5 text-xs text-muted-foreground transition-colors group-hover/calc:border-foreground/40 group-hover/calc:text-foreground group-focus-visible/calc:ring-3 group-focus-visible/calc:ring-ring/50 group-aria-expanded/calc:border-foreground/40 group-aria-expanded/calc:text-foreground">
+                  {/* A narrow card gets the sign, a wide one the word. */}
+                  <SigmaIcon aria-hidden className="size-3.5 @min-[11rem]:hidden" />
+                  <span className="hidden @min-[11rem]:inline">{t('calculated')}</span>
                 </span>
-              </Button>
+              </button>
             </PopoverTrigger>
             <PopoverContent collisionPadding={15} className="w-64 text-xs">
               {t('calculatedLabel', { formula })}

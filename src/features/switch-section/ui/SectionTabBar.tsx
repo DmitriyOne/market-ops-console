@@ -32,18 +32,24 @@ export function SectionTabBar({ section, onChange, badge = 0 }: SectionTabBarPro
                 aria-current={active ? 'page' : undefined}
                 className={cn(
                   'flex min-h-14 w-full flex-col items-center justify-center gap-0.5 text-xs font-medium focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none',
-                  active ? 'text-foreground' : 'text-muted-foreground',
+                  active ? 'font-semibold text-foreground' : 'text-muted-foreground',
                 )}
                 onClick={() => {
                   onChange(s);
                 }}
               >
-                <span className="relative">
+                {/* The current section: a filled pill behind the icon, not colour alone. */}
+                <span
+                  className={cn(
+                    'relative flex h-7 w-14 items-center justify-center rounded-full transition-colors',
+                    active && 'bg-foreground text-background',
+                  )}
+                >
                   <Icon aria-hidden className="size-5" />
                   {s === 'assistant' && badge > 0 ? (
                     <span
                       aria-hidden
-                      className="absolute -top-1 -right-2 size-2.5 rounded-full bg-surface-ai-label"
+                      className="absolute top-0.5 right-3 size-2.5 rounded-full bg-surface-ai-label"
                     />
                   ) : null}
                 </span>

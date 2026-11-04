@@ -1,9 +1,10 @@
 'use client';
 
-import { SettingsIcon } from 'lucide-react';
+import { RotateCcwIcon, SettingsIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { Suspense } from 'react';
+import { Suspense, useState } from 'react';
 
+import { ResetViewLink } from '@/features/reset-view';
 import { LocaleSwitch } from '@/features/switch-locale';
 import { ThemeSwitch } from '@/features/switch-theme';
 import { cn } from '@/shared/lib';
@@ -17,13 +18,14 @@ import {
   SheetTrigger,
 } from '@/shared/ui';
 
-/** Phones: language and theme behind one ⚙︎ button (spec §6 Layout). */
+/** Phones: language, theme and reset behind one ⚙︎ button (spec §6 Layout). */
 export function SettingsSheet({ className }: { className?: string }) {
   const t = useTranslations('header');
   const tLocale = useTranslations('locale');
   const tTheme = useTranslations('theme');
+  const [open, setOpen] = useState(false);
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <Button
           type="button"
@@ -51,6 +53,21 @@ export function SettingsSheet({ className }: { className?: string }) {
             <span>{tTheme('label')}</span>
             <ThemeSwitch />
           </div>
+          {/* Reads search params, which static HTML does not have. */}
+          <Suspense>
+            <ResetViewLink
+              className="flex min-h-11 items-center gap-3 rounded-md outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+              onReset={() => {
+                setOpen(false);
+              }}
+            >
+              <RotateCcwIcon aria-hidden className="size-4 shrink-0" />
+              <span className="flex flex-col">
+                <span>{t('resetView')}</span>
+                <span className="text-xs text-muted-foreground">{t('resetHint')}</span>
+              </span>
+            </ResetViewLink>
+          </Suspense>
         </div>
       </SheetContent>
     </Sheet>

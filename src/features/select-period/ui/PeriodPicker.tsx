@@ -44,7 +44,12 @@ export function PeriodPicker({ className }: { className?: string }) {
           <span className="font-mono tabular-nums">{t('label', { period, range })}</span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="end" collisionPadding={15} className="w-80 gap-3">
+      {/* Phone: as wide as the full-width button above it. */}
+      <PopoverContent
+        align="end"
+        collisionPadding={15}
+        className="w-80 gap-3 max-lg:w-(--radix-popover-trigger-width)"
+      >
         <MonthPicker
           value={state.period}
           periods={ds.meta.periods}
@@ -60,14 +65,14 @@ export function PeriodPicker({ className }: { className?: string }) {
             if (isRange(next) && next !== state.range) setRange(next);
           }}
           aria-label={t('rangeLabel', { period })}
-          spacing={0}
-          className="w-full rounded-lg bg-muted p-0.5"
+          spacing={1}
+          className="w-full rounded-xl bg-muted p-1"
         >
           {RANGES.map((r) => (
             <ToggleGroupItem
               key={r}
               value={r}
-              className="min-h-11 flex-1 data-[state=on]:bg-card data-[state=on]:shadow-sm"
+              className="min-h-11 flex-1 px-3 hover:bg-card/60 data-[state=on]:bg-card data-[state=on]:shadow-sm"
             >
               {t(`range.${r}`)}
             </ToggleGroupItem>

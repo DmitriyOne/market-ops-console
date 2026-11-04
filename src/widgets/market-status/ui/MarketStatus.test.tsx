@@ -20,6 +20,7 @@ function setup(searchParams = '') {
 
 describe('MarketStatus', () => {
   beforeEach(() => {
+    localStorage.clear();
     server.use(datasetHandler());
   });
 
@@ -108,10 +109,18 @@ describe('MarketStatus', () => {
     expect(germany).toHaveTextContent('92.0%');
     expect(germany).toHaveTextContent('Off track');
     expect(within(table).getAllByRole('row')).toHaveLength(14);
-    expect(screen.getByRole('button', { name: t.showTable })).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    );
+    expect(screen.getByRole('button', { name: t.showTiles })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /^DE Germany,/ })).not.toBeInTheDocument();
+  });
+
+  it('the table choice is remembered and the button turns back to tiles', async () => {
+    const first = setup();
+    await first.user.click(await screen.findByRole('button', { name: t.showTable }));
+    first.unmount();
+    const { user } = setup();
+    expect(await screen.findByRole('table')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: t.showTiles }));
+    expect(screen.queryByRole('table')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: t.showTable })).toBeInTheDocument();
   });
 });

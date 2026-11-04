@@ -26,6 +26,10 @@ type AppShellProps = {
 };
 
 const FRAME = 'flex h-dvh flex-col bg-background';
+// `relative`: screen-reader-only text inside is placed against the scroll
+// area, not the page, so it cannot stretch the page below the tab bar.
+const HEADER = 'border-b border-border';
+const MAIN = 'relative min-w-0 flex-1 overflow-y-auto';
 const ASIDE =
   'flex min-h-0 flex-col border-border max-lg:flex-1 lg:w-96 lg:border-l lg:assistant-collapsed:w-14';
 
@@ -104,12 +108,13 @@ export function AppShell({ header, main, assistant }: AppShellProps) {
       >
         {tCommon('skipToContent')}
       </a>
-      <header className="border-b border-border">{header}</header>
+      {/* Phone assistant: the whole screen, as a chat app. */}
+      <header className={cn(HEADER, section === 'assistant' && 'max-lg:hidden')}>{header}</header>
       <div className="flex min-h-0 flex-1">
         <main
           id="main"
           className={cn(
-            'min-w-0 flex-1 overflow-y-auto',
+            MAIN,
             section === 'assistant' && 'max-lg:hidden',
           )}
         >
@@ -165,10 +170,10 @@ export function AppShellFallback({
   const t = useTranslations('shell');
   return (
     <div className={FRAME}>
-      <header className="border-b border-border">{header}</header>
+      <header className={cn(HEADER, 'max-lg:section-assistant:hidden')}>{header}</header>
       <div className="flex min-h-0 flex-1">
         {/* `section-assistant`: set before paint for `?tab=assistant` (ADR 0015). */}
-        <main id="main" className="min-w-0 flex-1 overflow-y-auto max-lg:section-assistant:hidden">
+        <main id="main" className={cn(MAIN, 'max-lg:section-assistant:hidden')}>
           {/* Each side fails on its own: a crash in one keeps the other. */}
           <WidgetBoundary>{main}</WidgetBoundary>
         </main>
