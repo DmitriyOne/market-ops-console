@@ -147,7 +147,7 @@ Rules: drill-down params are hierarchical (setting `market` sets its `region`; c
 - Message states: `streaming` → `done` | `stopped` | `error`. Stopped messages keep their partial text and show "Stopped — answer incomplete"; no citations/confidence are shown for them [call].
 - Input is disabled while streaming; the Send button becomes Stop. Esc also stops [call].
 - Auto-scroll only while the user is at the bottom; otherwise show "↓ New content" [call].
-- History lives for the session only (lost on reload) [call]. Each question is independent (fixtures are stateless).
+- History lives for the session only (lost on reload) **[owner, 2026-11-04]**: browser storage weighed and rejected, the reasons go to the README. "New chat" in the header clears it (disabled when empty). Each question is independent (fixtures are stateless).
 - The reference route is fixed so it stops enqueuing when the client aborts (otherwise it throws on a closed controller).
 
 ### Message anatomy [owner + call]
@@ -167,6 +167,7 @@ Rules: drill-down params are hierarchical (setting `market` sets its `region`; c
    - button "Show on dashboard" highlights the listed markets on the map and table **[owner]**.
    - Collapsed by default, also when a rule finds a gap; the header then shows "N markets not mentioned" **[owner, revised 2026-11-03]**. Hidden when the answer has no citations (e.g. `default`).
 5. **Can't answer** (`kind: abstain`, an answer with `low_confidence` and no citations, or a non-English question answered on the client with "I only understand English"): distinct style with the ⊘ icon, "I can't answer this from the data"; the suggested questions appear after two such replies in a row **[owner, revised 2026-11-03]**. The kind is known only at `done`, so while streaming the answer sits in a neutral frame (no AI colour yet) with "Sources and confidence appear when the answer is complete" **[owner, revised 2026-11-03]**.
+5a. **Answer actions** under a finished answer **[owner, 2026-11-04]**: Copy (text, sources, confidence and the AI label as plain text), 👍 Helpful / 👎 Not helpful with a reason (wrong numbers, didn't answer, missing markets or periods, something else); feedback is logged through `logEvent` without the question text.
 6. **Error** (`error` event or network failure): error style, a translated message for the cause (server, network, timeout, invalid data), Retry. The server's own text goes to the console log, not to the user.
 
 ### Empty state [call]

@@ -44,6 +44,12 @@ const answerDone = () =>
     expect(screen.getByText(t.answer.label)).toBeInTheDocument();
   });
 
+const tokensText = (id: string) =>
+  fixtureEvents(id)
+    .flatMap((e) => (e.type === 'token' ? [e.value] : []))
+    .join('')
+    .split('\n\n')[0] ?? '';
+
 const dataCheckToggle = () =>
   screen.queryByRole('button', { name: new RegExp(en.dataCheck.title) });
 
@@ -225,6 +231,68 @@ describe('AssistantPanel', () => {
     await user.hover(source);
     expect(await screen.findByText(en.errors.server)).toBeInTheDocument();
     expect(screen.queryByText(t.evidence.loading)).not.toBeInTheDocument();
+  });
+
+  it('New chat clears the conversation and is disabled when there is nothing to clear', async () => {
+    server.use(chatFromFixture('germany-dip'));
+    const { user } = setup();
+    const newChat = screen.getByRole('button', { name: t.panel.newChat });
+    expect(newChat).toBeDisabled();
+    await ask(user, 'Tell me about the German market');
+    await answerDone();
+    await user.click(newChat);
+    expect(screen.getByRole('heading', { name: t.panel.empty.title })).toBeInTheDocument();
+    expect(screen.queryByText('Tell me about the German market')).not.toBeInTheDocument();
+    expect(newChat).toBeDisabled();
+  });
+
+  it('Copy answer puts the text, its sources and confidence on the clipboard', async () => {
+    server.use(chatFromFixture('germany-dip'));
+    const { user } = setup();
+    await ask(user, 'Why did Germany dip?');
+    await answerDone();
+    await user.click(screen.getByRole('button', { name: t.actions.copy }));
+    const copied = await navigator.clipboard.readText();
+    const event = fixtureEvents('germany-dip').find((e) => e.type === 'done');
+    const labels = event?.type === 'done' ? event.citations.map((c) => c.label ?? '') : [];
+    expect(copied).toContain(tokensText('germany-dip'));
+    for (const label of labels) expect(copied).toContain(label);
+    expect(copied).toContain(t.answer.label);
+    expect(await screen.findByText(t.actions.copied)).toBeInTheDocument();
+  });
+
+  it('feedback: thumbs down asks why and logs the reason without the question text', async () => {
+    const info = vi.spyOn(console, 'info').mockImplementation(() => undefined);
+    server.use(chatFromFixture('germany-dip'));
+    const { user } = setup();
+    await ask(user, 'Why did Germany dip?');
+    await answerDone();
+    const down = screen.getByRole('button', { name: t.actions.notHelpful });
+    await user.click(down);
+    expect(down).toHaveAttribute('aria-pressed', 'true');
+    await user.click(screen.getByRole('button', { name: t.actions.reasons.wrongNumbers }));
+    expect(info).toHaveBeenCalledWith(
+      '[event] answer_feedback',
+      expect.objectContaining({ rating: 'down', reason: 'wrongNumbers', confidence: 'high' }),
+    );
+    expect(JSON.stringify(info.mock.calls)).not.toContain('Why did Germany dip?');
+    expect(screen.getByText(t.actions.thanks)).toBeInTheDocument();
+  });
+
+  it('feedback: thumbs up is logged at once', async () => {
+    const info = vi.spyOn(console, 'info').mockImplementation(() => undefined);
+    server.use(chatFromFixture('germany-dip'));
+    const { user } = setup();
+    await ask(user, 'Why did Germany dip?');
+    await answerDone();
+    await user.click(screen.getByRole('button', { name: t.actions.helpful }));
+    expect(info).toHaveBeenCalledWith(
+      '[event] answer_feedback',
+      expect.objectContaining({ rating: 'up' }),
+    );
+    expect(
+      screen.queryByRole('button', { name: t.actions.reasons.wrongNumbers }),
+    ).not.toBeInTheDocument();
   });
 
   it('stop mid-stream shows the stopped state and no sources', async () => {

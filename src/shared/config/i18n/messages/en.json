@@ -68,7 +68,8 @@
       },
       "youAsked": "You asked",
       "newContent": "New content",
-      "subtitle": "Answers in English"
+      "subtitle": "Answers in English",
+      "newChat": "New chat"
     },
     "answer": {
       "label": "AI answer · may be incomplete",
@@ -109,6 +110,22 @@
     },
     "declined": {
       "englishOnly": "I only understand English. Please ask your question in English."
+    },
+    "actions": {
+      "copy": "Copy answer",
+      "copied": "Copied",
+      "copyFailed": "Couldn't copy. Select the text instead.",
+      "copySources": "Sources: {list}",
+      "helpful": "Helpful",
+      "notHelpful": "Not helpful",
+      "reasonsTitle": "What was wrong?",
+      "reasons": {
+        "wrongNumbers": "Wrong numbers",
+        "offTopic": "Didn't answer the question",
+        "missing": "Missing markets or periods",
+        "other": "Something else"
+      },
+      "thanks": "Thanks for the feedback."
     }
   },
   "dataCheck": {
@@ -130,7 +147,8 @@
     "latestOnly": "latest only",
     "attention": "{needAttention, plural, one {# of {markets} markets needs} other {# of {markets} markets need}} attention; the answer names {named}.",
     "attentionRegion": "{needAttention, plural, one {# of {markets} markets in {region} needs} other {# of {markets} markets in {region} need}} attention; the answer names {named}.",
-    "gapNote": "{count, plural, one {# market not mentioned} other {# markets not mentioned}}"
+    "gapNote": "{count, plural, one {# market not mentioned} other {# markets not mentioned}}",
+    "statusNote": "Status is set for the latest month only."
   },
   "shell": {
     "assistant": "Assistant",

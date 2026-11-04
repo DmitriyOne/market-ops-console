@@ -122,6 +122,8 @@ export function DataCheckBlock({ check, ds, onHighlight }: DataCheckBlockProps) 
         <p className="text-xs text-muted-foreground">
           {t('header', { period: f.period(latest), updated })}
         </p>
+        {/* Questions may say "this quarter"; the data has a status for one month. */}
+        <p className="text-xs text-muted-foreground">{t('statusNote')}</p>
       </div>
       <CollapsibleContent className="flex flex-col text-xs">
         <table className="w-full border-collapse">

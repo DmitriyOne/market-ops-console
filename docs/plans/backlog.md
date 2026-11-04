@@ -20,7 +20,6 @@ Format: **Item**: what is wrong (file). Why it can wait. Where it goes.
 
 ## From the design pass (2026-11-03)
 
-- **Fallback checkpoint, dashboard D → A** (ADR 0014): when Plan 2 (assistant) is done, compare the days left to the D estimate. Not enough time means build dashboard A. **Before Plan 3** starts.
 - **D screens drawn on the canvas (2026-11-03)**: Analyst, phone (Overview / Assistant / Alerts), widget and assistant states. Builder calls to confirm in Plan 3: phone map has no labels (Top risks below carries the facts); heat-map cells show whole percent, one decimal on focus; heat map is calculated from the series, so it can differ from stored KPIs by a few tenths and says so; radar uses 4 token colours + 4 dash patterns, scaled worst-to-best across 13 markets; in Analyst the assistant is shown collapsed with a badge.
 - **Not drawn yet**: tablet, Alerts as a desktop sheet, evidence card on a source chip, product drill-down. **Plan 3**, from the drawn screens and the tokens.
 
@@ -37,3 +36,12 @@ Format: **Item**: what is wrong (file). Why it can wait. Where it goes.
 - **Phone `?tab=assistant` deep link paints Overview first** until hydration. Same fix as the panel (ADR 0015). **Plan 3**, with the phone layout.
 - **"Show on dashboard" keeps an earlier region/market filter** (`src/entities/performance/model/use-dashboard-focus.ts`, `highlight`): highlighted markets can fall outside the filtered scope. Nothing reads the URL yet, and whether to reset the scope is a dashboard decision. **Plan 3**, ask the owner when the dashboard reads `markets`.
 - **"New content" smooth scroll can stop short** while tokens keep arriving (PLAUSIBLE, not reproduced; `use-stick-to-bottom.ts`), and sending a question while scrolled up does not jump to it. **Plan 5**, with the Playwright happy path.
+
+## README notes (owner, 2026-11-04)
+
+Points the owner wants explained in the README, in his own words:
+
+- **Chat history is per session on purpose.** Production keeps threads on the server per user, with retention and real deletion; the brief forbids a real backend. Browser storage was weighed and rejected: XSS can read it, shared computers, ~5 MB quota, sync writes block the page, multi-tab races, old formats after a deploy, Safari wipes after 7 days. "New chat" clears the conversation.
+- **Citations are per answer, not per claim**: the contract has no positions in the text; guessing them means parsing AI text.
+- **Status is for the latest month only** in the data; the data block says so, while a question may say "this quarter".
+- **Answer feedback** (👍/👎 + reason) goes to `logEvent` (console now, analytics later); it never includes the question text.

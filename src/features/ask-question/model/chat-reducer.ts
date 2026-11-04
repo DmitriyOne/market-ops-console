@@ -31,11 +31,12 @@ export type ChatAction =
       confidence: Confidence;
     }
   | { type: 'failed'; id: string; error: ChatMessage['error'] }
-  | { type: 'stopped'; id: string };
+  | { type: 'stopped'; id: string }
+  | { type: 'reset' };
 
 function settle(
   message: ChatMessage,
-  action: Exclude<ChatAction, { type: 'started' | 'declined' }>,
+  action: Exclude<ChatAction, { type: 'started' | 'declined' | 'reset' }>,
 ): ChatMessage {
   switch (action.type) {
     case 'token':
@@ -63,6 +64,7 @@ function settle(
  * actions, so events of a stopped or failed stream change nothing.
  */
 export function chatReducer(state: ChatMessage[], action: ChatAction): ChatMessage[] {
+  if (action.type === 'reset') return [];
   if (action.type === 'started' || action.type === 'declined') {
     return [
       ...state,

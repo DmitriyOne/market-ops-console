@@ -134,12 +134,13 @@ Rules:
 
 ### Assistant building blocks (`src/widgets/assistant-panel/ui`)
 
-`AssistantPanel` (header "✦ Assistant · Answers in English", log, composer),
+`AssistantPanel` (header "✦ Assistant · Answers in English", New chat, log, composer),
 `Conversation` (`role="log"`, sticky bottom, "New content"), `AnswerMessage`
 (states below), `SourceButton` + `EvidenceCard` (numbers, status, 12-month
 chart with the anomaly marked), `DataCheckBlock` (table: Scope, Attain.,
 Growth, Status; "Not mentioned in the answer"; attention summary;
-"Show on dashboard"), `StatusChip`.
+"Show on dashboard"; status for the latest month only), `AnswerActions` (Copy,
+👍 / 👎 with a reason), `StatusChip`.
 
 Answer states, each from the "A · Assistant" board:
 

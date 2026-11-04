@@ -2,7 +2,15 @@
 
 import { ArrowUpIcon, SquareIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { type KeyboardEvent, type SubmitEvent, useEffect, useId, useRef, useState } from 'react';
+import {
+  type KeyboardEvent,
+  type RefObject,
+  type SubmitEvent,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+} from 'react';
 
 import { CHAT_QUESTION_MAX_LENGTH } from '@/shared/api';
 import { cn } from '@/shared/lib';
@@ -14,13 +22,16 @@ type ComposerProps = {
   isStreaming: boolean;
   onAsk: (question: string) => void;
   onStop: () => void;
+  /** Lets the panel return focus to the field (e.g. after New chat). */
+  inputRef?: RefObject<HTMLTextAreaElement | null>;
 };
 
-export function Composer({ isStreaming, onAsk, onStop }: ComposerProps) {
+export function Composer({ isStreaming, onAsk, onStop, inputRef }: ComposerProps) {
   const t = useTranslations('assistant.composer');
   const [value, setValue] = useState('');
   const reasonId = useId();
-  const fieldRef = useRef<HTMLTextAreaElement>(null);
+  const ownRef = useRef<HTMLTextAreaElement>(null);
+  const fieldRef = inputRef ?? ownRef;
   const wasStreaming = useRef(isStreaming);
 
   // Starting or ending a stream can pull the focused control away: the clicked
@@ -38,7 +49,7 @@ export function Composer({ isStreaming, onAsk, onStop }: ComposerProps) {
       active === document.body ||
       (active instanceof HTMLButtonElement && active.disabled);
     if (lost) fieldRef.current?.focus();
-  }, [isStreaming]);
+  }, [isStreaming, fieldRef]);
 
   const question = value.trim();
   const tooLong = question.length > CHAT_QUESTION_MAX_LENGTH;

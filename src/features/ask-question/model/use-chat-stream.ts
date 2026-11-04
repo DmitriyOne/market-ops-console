@@ -22,6 +22,8 @@ export type ChatStream = {
   ask: (question: string) => void;
   stop: () => void;
   retry: (id: string) => void;
+  /** Start over: stop any answer and clear the conversation. */
+  reset: () => void;
 };
 
 type Active = { id: string; controller: AbortController };
@@ -132,6 +134,13 @@ export function useChatStream(): ChatStream {
     current.controller.abort();
   }, []);
 
+  const reset = useCallback(() => {
+    const current = active.current;
+    active.current = null;
+    current?.controller.abort();
+    dispatch({ type: 'reset' });
+  }, []);
+
   const retry = useCallback(
     (id: string) => {
       const message = messages.find((m) => m.id === id);
@@ -153,5 +162,6 @@ export function useChatStream(): ChatStream {
     ask,
     stop,
     retry,
+    reset,
   };
 }

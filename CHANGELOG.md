@@ -12,6 +12,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 - App shell: assistant as a right panel on desktop (collapsible, remembered and applied before the first paint, ADR 0015, badge for unseen answers), Overview / Assistant tabs on phones. Dashboard and assistant each sit in their own error boundary.
 - Page title and description per locale; `noindex, nofollow` (internal console).
 - `AGENTS.md` (entry point for coding agents, keeps the `next dev` block) and `DESIGN.md` (tokens, type, spacing, inventory, checklist).
+- Answer actions: Copy (text with sources and confidence), 👍 / 👎 with a reason (logged through `logEvent`, never the question); "New chat" clears the conversation.
+- The data block says that status exists for the latest month only.
 - MSW test harness for the SSE chat stream and the data route.
 
 ### Changed

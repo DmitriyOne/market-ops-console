@@ -227,6 +227,41 @@ describe('useChatStream', () => {
     });
   });
 
+  it('reset clears the conversation and aborts a running stream', async () => {
+    let signal: AbortSignal | undefined;
+    server.use(
+      http.post('*/api/v1/chat', ({ request }) => {
+        signal = request.signal;
+        return new Response(new ReadableStream({ start: () => undefined }), {
+          headers: { 'Content-Type': 'text/event-stream' },
+        });
+      }),
+    );
+    const { result } = setup();
+    act(() => {
+      result.current.ask('Why Germany?');
+    });
+    await waitFor(() => {
+      expect(signal).toBeDefined();
+    });
+    act(() => {
+      result.current.reset();
+    });
+    expect(result.current.messages).toEqual([]);
+    expect(result.current.isStreaming).toBe(false);
+    await waitFor(() => {
+      expect(signal?.aborted).toBe(true);
+    });
+    server.use(chatFromFixture('at-risk'));
+    act(() => {
+      result.current.ask('Which markets are at risk?');
+    });
+    await waitFor(() => {
+      expect(result.current.messages[0]?.status).toBe('done');
+    });
+    expect(result.current.messages).toHaveLength(1);
+  });
+
   it('stop mid-stream keeps partial text as stopped', async () => {
     server.use(chatFromFixture('germany-dip', { stallAfter: 3 }));
     const { result } = setup();

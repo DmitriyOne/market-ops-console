@@ -4,7 +4,7 @@ import { BanIcon, SparklesIcon, SquareIcon, TriangleAlertIcon } from 'lucide-rea
 import { useTranslations } from 'next-intl';
 import { type ReactNode, useMemo } from 'react';
 
-import type { ResolvedCitation } from '@/entities/performance';
+import { resolveCitation, type ResolvedCitation } from '@/entities/performance';
 import type { ChatMessage } from '@/features/ask-question';
 import { SuggestedQuestions } from '@/features/ask-question';
 import type { Confidence, Dataset } from '@/shared/api';
@@ -12,6 +12,7 @@ import { cn } from '@/shared/lib';
 import { Button } from '@/shared/ui';
 
 import { buildDataCheck } from '../model/data-check';
+import { AnswerActions } from './AnswerActions';
 import { DataCheckBlock } from './DataCheckBlock';
 import { SourceButton } from './SourceButton';
 import { useKpiFormat } from './use-kpi-format';
@@ -230,6 +231,19 @@ export function AnswerMessage({
     );
   }
 
+  // Called on Copy only; the same labels the source buttons show.
+  const copyText = () => {
+    const labels = citations.map((c) => c.label ?? (ds ? f.scopeName(resolveCitation(ds, c)) : ''));
+    return [
+      text,
+      labels.length > 0 ? t('actions.copySources', { list: labels.join('; ') }) : null,
+      confidence ? t('answer.confidence', { level: t(`answer.${confidence}`) }) : null,
+      t('answer.label'),
+    ]
+      .filter((part) => part !== null)
+      .join('\n\n');
+  };
+
   return (
     <div className="flex flex-col gap-2">
       <AiSurface label={t('answer.label')}>
@@ -245,6 +259,7 @@ export function AnswerMessage({
           </ul>
         ) : null}
       </AiSurface>
+      <AnswerActions message={message} getCopyText={copyText} />
       {ds && check ? <DataCheckBlock check={check} ds={ds} onHighlight={onHighlight} /> : null}
     </div>
   );

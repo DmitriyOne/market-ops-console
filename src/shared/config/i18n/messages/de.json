@@ -68,7 +68,8 @@
       },
       "youAsked": "Ihre Frage",
       "newContent": "Neuer Inhalt",
-      "subtitle": "Antwortet auf Englisch"
+      "subtitle": "Antwortet auf Englisch",
+      "newChat": "Neuer Chat"
     },
     "answer": {
       "label": "KI-Antwort · möglicherweise unvollständig",
@@ -109,6 +110,22 @@
     },
     "declined": {
       "englishOnly": "Ich verstehe nur Englisch. Bitte stellen Sie Ihre Frage auf Englisch."
+    },
+    "actions": {
+      "copy": "Antwort kopieren",
+      "copied": "Kopiert",
+      "copyFailed": "Kopieren fehlgeschlagen. Bitte Text markieren.",
+      "copySources": "Quellen: {list}",
+      "helpful": "Hilfreich",
+      "notHelpful": "Nicht hilfreich",
+      "reasonsTitle": "Was war falsch?",
+      "reasons": {
+        "wrongNumbers": "Falsche Zahlen",
+        "offTopic": "Frage nicht beantwortet",
+        "missing": "Märkte oder Zeiträume fehlen",
+        "other": "Etwas anderes"
+      },
+      "thanks": "Danke für das Feedback."
     }
   },
   "dataCheck": {
@@ -130,7 +147,8 @@
     "latestOnly": "nur aktuell",
     "attention": "{needAttention, plural, one {# von {markets} Märkten braucht} other {# von {markets} Märkten brauchen}} Aufmerksamkeit; die Antwort nennt {named}.",
     "attentionRegion": "{needAttention, plural, one {# von {markets} Märkten in {region} braucht} other {# von {markets} Märkten in {region} brauchen}} Aufmerksamkeit; die Antwort nennt {named}.",
-    "gapNote": "{count, plural, one {# Markt nicht erwähnt} other {# Märkte nicht erwähnt}}"
+    "gapNote": "{count, plural, one {# Markt nicht erwähnt} other {# Märkte nicht erwähnt}}",
+    "statusNote": "Der Status gilt nur für den letzten Monat."
   },
   "shell": {
     "assistant": "Assistent",
