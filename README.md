@@ -4,14 +4,28 @@ A console for a commercial operations team: a **streaming AI assistant** that an
 
 Take-home assignment for the Frontend Engineer role at NewPage Solutions.
 
-> Status: `0.2.0`, foundation: tooling, data layer, mock API, i18n, theming, CI. Dashboard and assistant UI come next.
+> Status: `0.4.0`, the assistant. Done: foundation (0.2.0), design direction and tokens (0.3.0), assistant (0.4.0). Next: dashboard (map, radar, time series, heat map), alerts, end-to-end tests and deploy. Full list: `CHANGELOG.md`.
+
+## What works now
+
+- **Assistant** in a right panel on desktop (collapsible, remembered without a flash) and an Assistant tab on phones.
+- **Streamed answers** with Stop, Retry, confidence and the label "AI answer · may be incomplete". Answers without matching data say "I can't answer this from the data".
+- **Sources**: one button per citation. Hover, focus or tap shows an evidence card with the real numbers and a 12-month trend; a click focuses the dashboard through the URL.
+- **"What the data shows"** under each answer: the portfolio row, the cited rows and markets the answer did not mention, found by fixed rules (no AI). "Show on dashboard" highlights them.
+- **Answer actions**: Copy, 👍 / 👎 with a reason (once per answer), New chat.
+- **History** survives a reload of the same tab (`sessionStorage`) and ends with the tab.
+- 4 locales (en-GB, en-US, de-DE, ru-RU), light and dark themes, an offline screen, error boundaries per widget.
+
+Try it: run `pnpm dev`, open the assistant and pick a suggested question, or ask "Why did Germany dip in March?", "What will sales be next year?" (can't answer) or "force error" (error and Retry).
 
 ## Start here (5 minutes)
 
 1. **What we build:** `docs/STARTER_PACK.md` (starter pack) and `docs/CONTRACT.md` (data + streaming contract).
 2. **Why it is built this way:** `docs/decisions/` (one short file per decision).
 3. **How the code is organised:** [Project structure](#project-structure) below.
-4. **Working with an AI agent:** `CLAUDE.md` + `.claude/rules/`.
+4. **How it looks:** `DESIGN.md` (tokens, type, spacing, components).
+5. **Working with an AI agent:** `AGENTS.md`, `CLAUDE.md` + `.claude/rules/`.
+6. **What changed:** `CHANGELOG.md`.
 
 ## Quick start
 
@@ -31,18 +45,18 @@ pnpm test                    # Vitest
 
 ## Project structure
 
-Feature-Sliced Design v2.1. Layers import only downward.
+Feature-Sliced Design v2.1. Layers import only downward. Slices that exist today are listed by name; the rest are planned.
 
 ```
 app/                 Next.js routing only (page.tsx re-exports from src/pages)
 pages/               empty on purpose (see pages/README.md)
 src/
   app/               providers, global styles, design tokens
-  pages/             page composition, no logic
-  widgets/           screen blocks: map, radar, time series, heat map, chat panel
-  features/          user actions: drill-down, select period, ask, stop, alerts
-  entities/          market, region, product, citation, chat message
-  shared/            ui (shadcn, error boundaries), lib (cn, errors), api (HTTP client, SSE, contracts), config (env, API routes, i18n)
+  pages/             page composition, no logic (dashboard)
+  widgets/           screen blocks: app-shell, assistant-panel; planned: map, radar, time series, heat map
+  features/          user actions: ask-question (chat stream, composer, history), switch-section, switch-locale, switch-theme, network-status; planned: drill-down, period, alerts
+  entities/          performance (citations, evidence numbers, status, dashboard URL params)
+  shared/            ui (shadcn, error boundaries, toasts), lib (cn, errors, events, media), api (HTTP client, SSE, contracts, dataset), config (env, API routes, i18n)
 data/                data.json, fixtures.json (source of truth)
 docs/
   decisions/         architecture decision records

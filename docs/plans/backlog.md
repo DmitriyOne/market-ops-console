@@ -50,4 +50,4 @@ Points the owner wants explained in the README, in his own words:
 - **Status is for the latest month only** in the data; the data block says so, while a question may say "this quarter".
 - **Answer feedback** (👍/👎 + reason, once per answer) goes to `logEvent` (console now, analytics later); it never includes the question text.
 - **Rate limits belong on the server**: per user / IP in middleware or the platform firewall (e.g. Vercel WAF) for `/api/chat` and a future `/api/feedback`; the client only prevents accidental repeats (one stream at a time, one rating per answer).
-- **Stale lines in the README today**: the status line still says `0.2.0` ("Dashboard and assistant UI come next"); the structure block lists "chat message" under `entities`, but it lives in `features/ask-question`.
+- **An answer cut by a reload comes back empty**, as "Stopped" without its partial text (owner, 2026-11-04: keep it). Storage is written when a message starts or ends, not per token; a `pagehide` flush would keep the text if it is ever needed.
