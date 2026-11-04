@@ -256,7 +256,7 @@ Unit: SSE parsing, schemas, selectors, formatters, chat reducer, discrepancy rul
 ## 13. Dependencies beyond ADR 0002 **[owner approved]**
 
 - `world-atlas` (`countries-110m.json`, served locally, no CDN) for map shapes; `topojson-client` comes with `react-simple-maps`.
-- `sonner` (shadcn toast) for the rollback message.
+- `sonner` (shadcn toast) for the rollback message, answer-feedback thanks and a failed copy **[2026-11-04]**.
 
 ## 14. Cut line if time runs short **[owner]**
 

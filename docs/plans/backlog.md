@@ -28,7 +28,6 @@ Format: **Item**: what is wrong (file). Why it can wait. Where it goes.
 - **No live accessibility audit yet**: the Plan 2 audit was by code and contrast tests; no rendered axe/Lighthouse run or screen-reader pass of the panel (streaming announcements, `aria-busy` log). **Plan 5**, accessibility pass.
 - **`summary-long` scroll behaviour tested only at hook level** (`use-stick-to-bottom.test.tsx`); no test scrolls the real panel while it streams. **Plan 5**, in the Playwright happy path or manually.
 - **Source clicks on desktop write the URL but nothing reads it yet** (`region`, `market`, `period`, `markets`). **Plan 3**, dashboard reads `dashboardSearchParams`.
-- **`AGENTS.md` is re-created by `next dev`** (Next.js agent rules). Untracked; the owner decides whether to commit or ignore it.
 
 ## From the owner review of 0.4.0 (2026-11-03)
 
@@ -45,3 +44,4 @@ Points the owner wants explained in the README, in his own words:
 - **Status is for the latest month only** in the data; the data block says so, while a question may say "this quarter".
 - **Answer feedback** (👍/👎 + reason, once per answer) goes to `logEvent` (console now, analytics later); it never includes the question text.
 - **Rate limits belong on the server**: per user / IP in middleware or the platform firewall (e.g. Vercel WAF) for `/api/chat` and a future `/api/feedback`; the client only prevents accidental repeats (one stream at a time, one rating per answer).
+- **Stale lines in the README today**: the status line still says `0.2.0` ("Dashboard and assistant UI come next"); the structure block lists "chat message" under `entities`, but it lives in `features/ask-question`.
