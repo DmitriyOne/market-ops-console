@@ -4,6 +4,8 @@ import type { Formats } from 'next-intl';
 export const formats = {
   number: {
     currency: { style: 'currency', currency: 'USD' },
+    /** Whole dollars, for tables that stand in for a chart. */
+    wholeCurrency: { style: 'currency', currency: 'USD', maximumFractionDigits: 0 },
     compactCurrency: {
       style: 'currency',
       currency: 'USD',

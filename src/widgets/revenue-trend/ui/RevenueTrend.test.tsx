@@ -62,6 +62,8 @@ describe('RevenueTrend', () => {
     const march = within(table).getByRole('row', { name: /Mar 2026/ });
     expect(march).toHaveTextContent(t.anomalyMark);
     expect(march).toHaveTextContent(t.window);
+    // The table stands in for the chart: whole dollars, not "$1.7M".
+    expect(march).toHaveTextContent(/\$\d{1,3}(,\d{3})+/);
     expect(
       within(table)
         .getAllByRole('columnheader')

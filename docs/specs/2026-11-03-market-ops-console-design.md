@@ -123,7 +123,7 @@ Locale prefix `as-needed`: `/dashboard` is `en-GB`; `/de-DE/dashboard`, `/en-US/
 | `mode` | `executive` `analyst` | `executive` |
 | `kpi` | map/heat-map metric: `status` `growth` `attainment` `share` `revenue` | `status` |
 | `compare` | up to 4 market or region ids | none |
-| `markets` | multi-selection filter for the analyst table | none |
+| `markets` | multi-selection filter for the analyst table; repeated keys (`markets=de&markets=es`) | none |
 | `tab` | `overview` `assistant` `alerts` (phones only) [call] | `overview` |
 
 Product drill-down **[call]**: `product` is always the last step under a `market` (brief hierarchy: portfolio → region → market → product). Selecting a product narrows series-based views to that product: KPI strip, time series and evidence use the market × product rows; heat map and markets table show that product across the markets in scope (so the user can compare one product across markets); map keeps market-level status and highlights the selected market; share and status show "not available per product"; radar stays market/region level.

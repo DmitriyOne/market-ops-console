@@ -25,6 +25,33 @@ const CHART_HEIGHT = 224;
 
 type TrendChartProps = { view: TrendView; title: string };
 
+/** Tooltip for one month: the three values in the project's currency format. */
+function TrendTooltip({
+  active,
+  label,
+  byPeriod,
+}: Partial<Pick<TooltipContentProps, 'active' | 'label'>> & {
+  byPeriod: Map<string, TrendView['points'][number]>;
+}) {
+  const t = useTranslations('trend');
+  const format = useFormatter();
+  const point = typeof label === 'string' ? byPeriod.get(label) : undefined;
+  if (!active || !point) return null;
+  return (
+    <div className="rounded-lg border border-border bg-popover p-2 text-xs text-popover-foreground shadow-sm">
+      <p className="mb-1 font-semibold">{format.dateTime(periodToDate(point.period), 'period')}</p>
+      <dl className="grid grid-cols-2 gap-x-3 font-mono tabular-nums">
+        {KEYS.map((key) => (
+          <div key={key} className="contents">
+            <dt className="font-sans text-muted-foreground">{t(key)}</dt>
+            <dd className="text-right">{format.number(point[key], 'compactCurrency')}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  );
+}
+
 /**
  * Recharts line chart, loaded on its own so the first paint does not wait
  * for it. Keyboard: the chart takes focus and arrow keys move the tooltip
@@ -40,24 +67,6 @@ export function TrendChart({ view, title }: TrendChartProps) {
     .filter((_, i, all) => i % 6 === 0 || i === all.length - 1)
     .map((p) => p.period);
   const single = view.window.from === view.window.to;
-
-  const TooltipBody = ({ active, label }: TooltipContentProps) => {
-    const point = typeof label === 'string' ? byPeriod.get(label) : undefined;
-    if (!active || !point) return null;
-    return (
-      <div className="rounded-lg border border-border bg-popover p-2 text-xs text-popover-foreground shadow-sm">
-        <p className="mb-1 font-semibold">{period(point.period)}</p>
-        <dl className="grid grid-cols-2 gap-x-3 font-mono tabular-nums">
-          {KEYS.map((key) => (
-            <div key={key} className="contents">
-              <dt className="font-sans text-muted-foreground">{t(key)}</dt>
-              <dd className="text-right">{money(point[key])}</dd>
-            </div>
-          ))}
-        </dl>
-      </div>
-    );
-  };
 
   return (
     <ChartContainer className="h-56 w-full" height={CHART_HEIGHT}>
@@ -87,7 +96,10 @@ export function TrendChart({ view, title }: TrendChartProps) {
           axisLine={false}
           domain={['auto', 'auto']}
         />
-        <Tooltip content={TooltipBody} cursor={{ stroke: 'var(--color-border)' }} />
+        <Tooltip
+          content={<TrendTooltip byPeriod={byPeriod} />}
+          cursor={{ stroke: 'var(--color-border)' }}
+        />
         {KEYS.map((key) => (
           <Line
             key={key}

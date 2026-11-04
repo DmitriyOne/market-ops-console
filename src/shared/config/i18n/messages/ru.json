@@ -214,7 +214,7 @@
     "forecast": "План {value}",
     "priorYear": "Прошлый год {value}",
     "riskValue": "{count} из {total}",
-    "riskSplit": "{offTrack} отстают · {atRisk} под риском",
+    "riskSplit": "{offTrack, plural, one {# отстаёт} few {# отстают} many {# отстают} other {# отстают}} · {atRisk} под риском",
     "riskNone": "Все в плане",
     "latestOnly": "Статус есть только для последнего месяца.",
     "goLatest": "Показать {period}",
@@ -231,8 +231,8 @@
   "marketStatus": {
     "title": "Статус рынков",
     "showTable": "Показать таблицей",
-    "tile": "{name}, {status}, выполнение плана {value}",
-    "tileNoStatus": "{name}, выполнение плана {value}",
+    "tile": "{code} {name}, {status}, выполнение плана {value}",
+    "tileNoStatus": "{code} {name}, выполнение плана {value}",
     "highlighted": "отмечен ассистентом",
     "selected": "выбран",
     "hatched": "штриховка",
@@ -241,7 +241,8 @@
     "region": "Регион",
     "attainment": "Выполнение",
     "status": "Статус",
-    "caption": "Статус рынков по регионам, {period}"
+    "caption": "Статус рынков по регионам, {window}",
+    "perMarket": "Плитки показывают рынки целиком, а не выбранный продукт."
   },
   "topRisks": {
     "title": "Главные риски",

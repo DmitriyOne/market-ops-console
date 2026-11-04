@@ -36,7 +36,7 @@ export function useDrillDown(): DrillDown {
         void setParams({ region: regionId, market: marketId, product: null, markets: null });
       },
       toProduct: (productId) => {
-        void setParams({ product: productId });
+        void setParams({ product: productId, markets: null });
       },
     }),
     [ds, setParams],

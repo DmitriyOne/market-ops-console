@@ -43,6 +43,13 @@ describe('useDashboard', () => {
     expect(event?.options.history).toBe('replace');
   });
 
+  it('reads repeated markets keys, the form a shared link and the locale switch keep', async () => {
+    const { result } = setup('?markets=de&markets=es');
+    await waitFor(() => {
+      expect(result.current.state.highlighted).toEqual(['de', 'es']);
+    });
+  });
+
   it('leaves a valid URL untouched', async () => {
     const { result, onUrlUpdate } = setup('?region=eu');
     await waitFor(() => {

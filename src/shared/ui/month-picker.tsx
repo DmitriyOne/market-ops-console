@@ -2,7 +2,7 @@
 
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
-import { type KeyboardEvent, useState } from 'react';
+import { type KeyboardEvent, useRef, useState } from 'react';
 
 import { cn } from '@/shared/lib';
 
@@ -40,6 +40,15 @@ export function MonthPicker({ value, periods, onChange }: MonthPickerProps) {
   const t = useTranslations('monthPicker');
   const format = useFormatter();
   const [year, setYear] = useState(() => yearOf(value));
+  const prevRef = useRef<HTMLButtonElement>(null);
+  const nextRef = useRef<HTMLButtonElement>(null);
+  // A year button that becomes disabled would drop focus to <body>: hand it to the other one.
+  const step = (delta: number) => {
+    const next = year + delta;
+    setYear(next);
+    if (next <= firstYear) nextRef.current?.focus();
+    if (next >= lastYear) prevRef.current?.focus();
+  };
 
   const available = new Set(periods);
   const firstYear = yearOf(periods[0] ?? value);
@@ -66,10 +75,11 @@ export function MonthPicker({ value, periods, onChange }: MonthPickerProps) {
           type="button"
           variant="ghost"
           className="size-11"
+          ref={prevRef}
           aria-label={t('previousYear')}
           disabled={year <= firstYear}
           onClick={() => {
-            setYear((y) => y - 1);
+            step(-1);
           }}
         >
           <ChevronLeftIcon aria-hidden />
@@ -81,10 +91,11 @@ export function MonthPicker({ value, periods, onChange }: MonthPickerProps) {
           type="button"
           variant="ghost"
           className="size-11"
+          ref={nextRef}
           aria-label={t('nextYear')}
           disabled={year >= lastYear}
           onClick={() => {
-            setYear((y) => y + 1);
+            step(1);
           }}
         >
           <ChevronRightIcon aria-hidden />

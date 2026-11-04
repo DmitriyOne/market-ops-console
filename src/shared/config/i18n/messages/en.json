@@ -231,8 +231,8 @@
   "marketStatus": {
     "title": "Market status",
     "showTable": "Show as table",
-    "tile": "{name}, {status}, attainment {value}",
-    "tileNoStatus": "{name}, attainment {value}",
+    "tile": "{code} {name}, {status}, attainment {value}",
+    "tileNoStatus": "{code} {name}, attainment {value}",
     "highlighted": "highlighted from the assistant",
     "selected": "selected",
     "hatched": "hatched",
@@ -241,7 +241,8 @@
     "region": "Region",
     "attainment": "Attainment",
     "status": "Status",
-    "caption": "Market status by region, {period}"
+    "caption": "Market status by region, {window}",
+    "perMarket": "Tiles show whole markets, not the chosen product."
   },
   "topRisks": {
     "title": "Top risks",

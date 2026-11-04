@@ -6,7 +6,7 @@ in the URL (back/forward and shared links work), and Executive mode shows
 the four KPI cards, market status, top risks and the revenue trend for
 whatever is selected. Assistant source clicks now visibly move the dashboard.
 
-**Status:** built on `feature/0.5.0/dashboard-shell` (2026-11-04); review pending.
+**Status:** built on `feature/0.5.0/dashboard-shell` (2026-11-04); independent review done, findings 1–4 and 6–13 fixed with tests; 5 (Back after a mode switch) asked of the owner.
 
 **Spec:** `docs/specs/2026-11-03-market-ops-console-design.md` §5, §6, §8,
 §11, §11a. Decisions: ADR 0004, 0006, 0010, 0014 (checkpoint: variant A),

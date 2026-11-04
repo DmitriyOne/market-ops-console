@@ -55,6 +55,13 @@ describe('MonthPicker', () => {
     expect(screen.getByRole('group', { name: 'Months of 2025' })).toBeInTheDocument();
   });
 
+  it('focus stays on a year button when the pressed one hits the end', async () => {
+    const { user } = setup('2025-05');
+    await user.click(screen.getByRole('button', { name: 'Previous year' }));
+    expect(screen.getByRole('button', { name: 'Previous year' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Next year' })).toHaveFocus();
+  });
+
   it('arrow keys move between months that have data', async () => {
     const { user } = setup('2026-05');
     screen.getByRole('button', { name: 'May 2026' }).focus();

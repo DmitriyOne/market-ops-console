@@ -15,12 +15,20 @@ import { datasetQueryOptions } from '../api/dataset-query';
  * alert per widget. While the data is loading, the widgets show their own
  * skeletons.
  */
-export function DatasetGate({ children }: { children: ReactNode }) {
+export function DatasetGate({
+  children,
+  fallback,
+}: {
+  children: ReactNode;
+  /** Shown instead of the message, for parts that must stay quiet (the page shows it once). */
+  fallback?: ReactNode;
+}) {
   const t = useTranslations('errors');
   const errorMessage = useErrorMessage();
   const { error, refetch, isFetching } = useQuery(datasetQueryOptions);
 
   if (!error) return children;
+  if (fallback !== undefined) return fallback;
   const detail = errorMessage(error);
   return (
     <div

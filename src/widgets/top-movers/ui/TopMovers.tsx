@@ -49,8 +49,9 @@ function MoverList({
                     <span
                       className={cn(
                         'block h-full rounded-full',
-                        // Red only for a real decline; low but positive growth stays neutral.
-                        value < 0 ? 'bg-status-off-track' : 'bg-status-on-track',
+                        // Chart tokens, not status ones: this is growth sign, not on/off track.
+                        // The signed number next to it carries the meaning.
+                        value < 0 ? 'bg-chart-4' : 'bg-chart-5',
                       )}
                       // Data-driven length: the share of the largest move in this card.
                       style={{ width: `${String(max === 0 ? 0 : (Math.abs(value) / max) * 100)}%` }}

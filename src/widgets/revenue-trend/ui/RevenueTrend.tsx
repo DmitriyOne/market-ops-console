@@ -156,7 +156,7 @@ export function RevenueTrend() {
                     </TableCell>
                     {KEYS.map((key) => (
                       <TableCell key={key} className="text-right font-mono tabular-nums">
-                        {money(p[key])}
+                        {format.number(p[key], 'wholeCurrency')}
                       </TableCell>
                     ))}
                   </TableRow>

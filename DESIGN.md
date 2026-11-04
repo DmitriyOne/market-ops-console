@@ -151,6 +151,8 @@ Rules:
 `DashboardHeader` (path, `PeriodPicker`, `ModeSwitch`, language, theme; phone `SettingsSheet`), `ScopeTitle`, `KpiStrip` / `KpiCard`, `MarketStatus` / `StatusTile`, `TopRisks`, `RevenueTrend` (Recharts via `next/dynamic`). Entity UI shared with the assistant: `StatusChip`, `StatusIcon`, `useKpiFormat`, `DatasetGate` (one message when the dataset fails).
 
 - Status tiles: `bg-status-*-muted text-status-*`; off-track adds a `bg-hatch` band (utility in `globals.css`); no status → `bg-muted`; highlighted from the assistant → `ring-2 ring-ring`, and the accessible name says so.
+- "Calculated" badge: a 44px `Popover` trigger (tap opens the formula; a tooltip would never open on a phone), the dashed chip drawn inside it.
+- Top movers bars: `chart-5` for growth, `chart-4` for decline (chart tokens, not status ones); the signed number is the signal.
 - Line patterns in charts: actual solid `chart-1`, forecast dashed `chart-5`, prior year dotted `chart-3`, anomaly ring `chart-4`; the legend draws the pattern, not just the colour.
 
 ### Assistant building blocks (`src/widgets/assistant-panel/ui`)

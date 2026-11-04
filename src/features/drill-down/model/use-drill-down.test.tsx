@@ -56,7 +56,7 @@ describe('useDrillDown', () => {
   });
 
   it('a product is the last step under the market', async () => {
-    const { result, last } = await setup('?region=eu&market=de');
+    const { result, last } = await setup('?region=eu&market=de&markets=de');
     act(() => {
       result.current.toProduct('veltrix');
     });

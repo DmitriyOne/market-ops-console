@@ -45,6 +45,15 @@ describe('KpiStrip', () => {
     ).toBeInTheDocument();
   });
 
+  it('tapping "Calculated" shows the formula (no hover needed on a phone)', async () => {
+    const { user } = setup();
+    const revenue = await card(t.revenue);
+    await user.click(
+      within(revenue).getByRole('button', { name: `Calculated: ${t.formula.revenue}` }),
+    );
+    expect(await screen.findByRole('dialog')).toHaveTextContent(t.formula.revenue);
+  });
+
   it('a market in the latest month shows stored figures, without the badge', async () => {
     setup('?region=eu&market=de');
     const attainment = await card(t.attainment);

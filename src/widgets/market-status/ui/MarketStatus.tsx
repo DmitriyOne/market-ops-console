@@ -44,6 +44,7 @@ const STATUSES: Status[] = ['on_track', 'at_risk', 'off_track'];
  */
 export function MarketStatus() {
   const t = useTranslations('marketStatus');
+  const tPeriod = useTranslations('period');
   const f = useKpiFormat();
   const statusLabel = useStatusLabel();
   const titleId = useId();
@@ -84,7 +85,15 @@ export function MarketStatus() {
         {asTable ? (
           <Table>
             <TableCaption className="sr-only">
-              {t('caption', { period: f.period(state.period) })}
+              {t('caption', {
+                window:
+                  state.range === '1m'
+                    ? f.period(state.period)
+                    : tPeriod('label', {
+                        period: f.period(state.period),
+                        range: tPeriod(`range.${state.range}`),
+                      }),
+              })}
             </TableCaption>
             <TableHeader>
               <TableRow>
@@ -138,6 +147,9 @@ export function MarketStatus() {
             ))}
           </div>
         )}
+        {state.scope.productId ? (
+          <p className="text-xs text-muted-foreground">{t('perMarket')}</p>
+        ) : null}
         {hasStatus ? (
           <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
             {STATUSES.map((status) => (

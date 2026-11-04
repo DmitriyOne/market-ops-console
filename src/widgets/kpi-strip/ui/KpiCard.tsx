@@ -5,7 +5,7 @@ import type { ReactNode } from 'react';
 import { useId } from 'react';
 
 import type { KpiValue } from '@/entities/performance';
-import { Button, Sparkline, Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui';
+import { Button, Popover, PopoverContent, PopoverTrigger, Sparkline } from '@/shared/ui';
 
 type KpiCardProps = {
   label: string;
@@ -38,20 +38,24 @@ export function KpiCard({ label, value, detail, formula, source, spark }: KpiCar
           {label}
         </p>
         {source === 'calculated' && formula ? (
-          <Tooltip>
-            <TooltipTrigger asChild>
+          // Popover, not a tooltip: a tap opens it, so phones can read the formula too.
+          <Popover>
+            <PopoverTrigger asChild>
               <Button
                 type="button"
-                variant="outline"
-                size="xs"
-                className="border-dashed text-muted-foreground"
+                variant="ghost"
+                className="-my-2.5 min-h-11 px-0 hover:bg-transparent"
                 aria-label={t('calculatedLabel', { formula })}
               >
-                {t('calculated')}
+                <span className="rounded-md border border-dashed border-input px-1.5 py-0.5 text-xs text-muted-foreground">
+                  {t('calculated')}
+                </span>
               </Button>
-            </TooltipTrigger>
-            <TooltipContent className="max-w-64">{formula}</TooltipContent>
-          </Tooltip>
+            </PopoverTrigger>
+            <PopoverContent collisionPadding={15} className="w-64 text-xs">
+              {t('calculatedLabel', { formula })}
+            </PopoverContent>
+          </Popover>
         ) : null}
       </div>
       <p className="font-mono text-2xl font-semibold tabular-nums">{value}</p>

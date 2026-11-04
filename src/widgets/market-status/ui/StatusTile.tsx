@@ -11,7 +11,7 @@ const TONE = {
   off_track: 'bg-status-off-track-muted text-status-off-track',
 } as const;
 
-/** One market: code, status shape, attainment. Click drills in. */
+/** One market: code, status shape, attainment. Click drills in. The name starts with the visible code (label in name, WCAG 2.5.3). */
 export function StatusTile({ tile, onSelect }: { tile: MarketTile; onSelect: () => void }) {
   const t = useTranslations('marketStatus');
   const f = useKpiFormat();
@@ -20,8 +20,8 @@ export function StatusTile({ tile, onSelect }: { tile: MarketTile; onSelect: () 
 
   const name = [
     tile.status
-      ? t('tile', { name: tile.name, status: statusLabel(tile.status), value })
-      : t('tileNoStatus', { name: tile.name, value }),
+      ? t('tile', { code: tile.iso2, name: tile.name, status: statusLabel(tile.status), value })
+      : t('tileNoStatus', { code: tile.iso2, name: tile.name, value }),
     tile.highlighted ? t('highlighted') : null,
     tile.selected ? t('selected') : null,
   ]

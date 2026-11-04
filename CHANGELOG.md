@@ -23,6 +23,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 - A phone link to the Assistant tab (`?tab=assistant`) shows the assistant area from the first paint (inline script, ADR 0015) instead of flashing Overview.
 
 ### Fixed
+- Review of 0.5.0: market tiles' names start with the visible code ("DE Germany, …", WCAG 2.5.3); the "Calculated" badge is a 44px target that opens the formula on tap; the header steps aside when the dataset fails, so the page shows its single message; repeated `markets` keys are read; a product step clears highlights; tiles say they are whole markets when a product is chosen; the trend table shows whole dollars; the month picker keeps focus at the first and last year; Russian verb agreement in the risk split; table caption names the window.
 - The 404 page has a skip link and a `main#main` landmark.
 - Switching language keeps repeated query keys (`markets=de&markets=es`) and the `#hash`.
 

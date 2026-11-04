@@ -28,7 +28,7 @@ describe('MarketStatus', () => {
     const section = await screen.findByRole('region', { name: t.title });
     expect(within(section).getAllByRole('button', { name: /attainment/ })).toHaveLength(13);
     expect(
-      within(section).getByRole('button', { name: 'Germany, Off track, attainment 92.0%' }),
+      within(section).getByRole('button', { name: 'DE Germany, Off track, attainment 92.0%' }),
     ).toBeInTheDocument();
   });
 
@@ -54,7 +54,7 @@ describe('MarketStatus', () => {
 
   it('clicking a tile drills into that market', async () => {
     const { user, lastUpdate } = setup('?period=2026-05');
-    await user.click(await screen.findByRole('button', { name: /^Germany,/ }));
+    await user.click(await screen.findByRole('button', { name: /^DE Germany,/ }));
     await waitFor(() => {
       expect(Object.fromEntries(lastUpdate()?.searchParams ?? [])).toMatchObject({
         region: 'eu',
@@ -65,10 +65,10 @@ describe('MarketStatus', () => {
   });
 
   it('markets listed by the assistant are marked in the name, not by colour alone', async () => {
-    setup('?markets=es,fr');
+    setup('?markets=es&markets=fr');
     expect(
       await screen.findByRole('button', {
-        name: 'Spain, Off track, attainment 104.5% · highlighted from the assistant',
+        name: 'ES Spain, Off track, attainment 104.5% · highlighted from the assistant',
       }),
     ).toBeInTheDocument();
   });
@@ -77,7 +77,20 @@ describe('MarketStatus', () => {
     setup('?period=2026-03');
     expect(await screen.findByText(t.latestOnly)).toBeInTheDocument();
     expect(screen.queryByText(/Off track|At risk|On track/)).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /^Germany, attainment/ })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^DE Germany, attainment/ })).toBeInTheDocument();
+  });
+
+  it('with a product chosen, the card says the tiles are whole markets', async () => {
+    setup('?region=eu&market=de&product=veltrix');
+    expect(await screen.findByText(t.perMarket)).toBeInTheDocument();
+  });
+
+  it('the table caption names the window, not just a month', async () => {
+    const { user } = setup('?period=2026-03&range=3m');
+    await user.click(await screen.findByRole('button', { name: t.showTable }));
+    expect(
+      screen.getByRole('table', { name: 'Market status by region, Mar 2026 · 3 months' }),
+    ).toBeInTheDocument();
   });
 
   it('a region shows only its markets', async () => {
@@ -99,6 +112,6 @@ describe('MarketStatus', () => {
       'aria-pressed',
       'true',
     );
-    expect(screen.queryByRole('button', { name: /^Germany,/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /^DE Germany,/ })).not.toBeInTheDocument();
   });
 });

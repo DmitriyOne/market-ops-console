@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { Suspense } from 'react';
 
+import { DatasetGate } from '@/entities/performance';
 import { PeriodPicker } from '@/features/select-period';
 import { LocaleSwitch } from '@/features/switch-locale';
 import { ModeSwitch } from '@/features/switch-mode';
@@ -29,12 +30,22 @@ export function DashboardHeader() {
   return (
     <div className={ROW}>
       <AppName />
-      <DrillBreadcrumbs className="min-w-0 flex-1" />
+      {/* The path and period need the dataset: they wait with a skeleton, and
+          if it fails they step aside (the page says so once, ADR 0013). */}
+      <DatasetGate fallback={<div className="min-w-0 flex-1" />}>
+        <Suspense fallback={<PathSkeleton />}>
+          <DrillBreadcrumbs className="min-w-0 flex-1" />
+        </Suspense>
+      </DatasetGate>
       <SettingsSheet className="lg:hidden" />
-      <div className={CONTROLS}>
-        <PeriodPicker />
-        <ModeSwitch className="max-lg:w-full" />
-      </div>
+      <DatasetGate fallback={null}>
+        <div className={CONTROLS}>
+          <Suspense fallback={<ControlsSkeleton />}>
+            <PeriodPicker />
+            <ModeSwitch className="max-lg:w-full" />
+          </Suspense>
+        </div>
+      </DatasetGate>
       <div className="flex items-center gap-1 max-lg:hidden">
         {/* Reads search params, which static HTML does not have. */}
         <Suspense>
@@ -46,18 +57,32 @@ export function DashboardHeader() {
   );
 }
 
+function PathSkeleton() {
+  return (
+    <div aria-hidden className="flex min-h-11 min-w-0 flex-1 items-center">
+      <Skeleton className="h-5 w-44" />
+    </div>
+  );
+}
+
+function ControlsSkeleton() {
+  return (
+    <>
+      <Skeleton aria-hidden className="h-11 w-48 max-lg:w-full" />
+      <Skeleton aria-hidden className="h-11 w-44 max-lg:w-full" />
+    </>
+  );
+}
+
 /** The same row before the URL is read (static HTML): nothing moves when it arrives. */
 export function DashboardHeaderSkeleton() {
   return (
     <div className={ROW} aria-hidden>
       <AppName />
-      <div className="flex min-h-11 min-w-0 flex-1 items-center">
-        <Skeleton className="h-5 w-44" />
-      </div>
+      <PathSkeleton />
       <Skeleton className="size-11 lg:hidden" />
       <div className={CONTROLS}>
-        <Skeleton className="h-11 w-48 max-lg:w-full" />
-        <Skeleton className="h-11 w-44 max-lg:w-full" />
+        <ControlsSkeleton />
       </div>
       <div className="flex items-center gap-1 max-lg:hidden">
         <Skeleton className="size-9" />
