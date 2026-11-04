@@ -99,7 +99,11 @@ export function DrillBreadcrumbs({ className }: { className?: string }) {
       options: ds.markets.filter((m) => m.regionId === region.id),
       value: marketId,
       current: Boolean(market) && !product,
-      onPick: drill.toMarket,
+      // The current market again goes up from the product; another market keeps it.
+      onPick: (id) => {
+        if (id === marketId) drill.clearProduct();
+        else drill.toMarket(id);
+      },
     });
   }
   if (market) {

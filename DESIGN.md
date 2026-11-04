@@ -43,8 +43,8 @@ values** (`bg-[#fff]`, `w-[37px]`).
 | **AI-generated content** | `surface-ai` (background), `surface-ai-border`, `surface-ai-label` (label, accents) |
 | **Source-of-truth data** | `surface-data` (the "What the data shows" block, evidence) |
 | Status | `status-on-track`, `status-at-risk`, `status-off-track`, each with `-muted` for its chip background |
-| Map | `map-sea`, `map-land`, `map-hatch` |
-| Attainment scale | `scale-1` … `scale-7`, text on each step: `scale-N-foreground` |
+| Map | `map-sea` (= `muted`), `map-land` (= `card`), `map-hatch` |
+| Map and heat-map scales (0.6.0; heat map in M4) | diverging `scale-div-1` … `scale-div-6` (orange · grey · blue), sequential `scale-seq-1` … `scale-seq-5` (blue); SVG fills read these source tokens, not `--color-*` aliases |
 
 Rules:
 
@@ -130,9 +130,9 @@ Rules:
 | `Button` | every button; variants `default`, `outline`, `ghost`, `destructive`, `link` |
 | `Textarea` | the composer (`rows={1}`, grows with content) |
 | `HoverCard` | evidence card on fine pointers (hover and keyboard focus) |
-| `Popover` | the same card on coarse pointers (tap) |
+| `Popover` | the same card on coarse pointers (tap); the map tooltip (virtual anchor at the pointer or the country) |
 | `Collapsible` | "What the data shows" (closed by default) |
-| `DropdownMenu` | theme and locale switches |
+| `DropdownMenu` | theme and locale switches, breadcrumb steps, the map metric picker (`modal={false}`, one trigger width) |
 | `Tooltip` | the name of an icon-only control on hover and focus (New chat) |
 | `Skeleton` | content not known yet, in the shape of what replaces it (`ConversationSkeleton`: question bubble + answer frame); no pulse under reduced motion |
 | `Toaster` / `toast.success` / `toast.error` (sonner) | short confirmations and failures that are not tied to a field ("Thanks for the feedback", "Couldn't copy"); top centre, as wide as the text up to 28rem |
@@ -148,14 +148,16 @@ Rules:
 
 ### Dashboard building blocks (0.5.0)
 
-`DashboardHeader` (path, `PeriodPicker`, `ModeSwitch`, language, theme; phone `SettingsSheet`), `ScopeTitle`, `KpiStrip` / `KpiCard`, `MarketStatus` / `StatusTile`, `TopRisks`, `RevenueTrend` (Recharts via `next/dynamic`). Entity UI shared with the assistant: `StatusChip`, `StatusIcon`, `useKpiFormat`, `DatasetGate` (one message when the dataset fails).
+`DashboardHeader` (app name, path, `PeriodPicker`, `ModeSwitch`, language, theme; phone: name + `SettingsSheet`, then the path), `ScopeTitle`, `KpiStrip` / `KpiCard`, `MarketStatus` / `StatusTile` / `MarketMap` / `MapLegend` / `MapTooltip`, `MetricPicker`, `TopRisks`, `RevenueTrend` (Recharts via `next/dynamic`). Entity UI shared with the assistant: `StatusChip`, `StatusIcon`, `useKpiFormat`, `DatasetGate` (one message when the dataset fails).
 
 - Status tiles: `bg-status-*-muted text-status-*`; off-track adds a `bg-hatch` band (utility in `globals.css`); no status → `bg-muted`; highlighted from the assistant → `ring-2 ring-ring`, and the accessible name says so.
 - "Calculated" badge: a 44px `Popover` trigger (tap opens the formula; a tooltip would never open on a phone), the dashed chip drawn inside it with no background of its own; it keeps the top-right corner (the label wraps) and shows a calculator icon (Σ would read as a sum; most formulas are ratios) when the card's content box is under `11rem` (container query); a plain `<button>` with `min-h-11 min-w-11`, because `Button` paints a hover box around the whole target.
 - Phone tab bar (owner, variant E, 2026-11-04): the same segmented look: a `rounded-2xl bg-muted border p-1` track, the current section a `bg-card shadow-sm` chip (`rounded-xl`, `min-h-13`, semibold label); the unread dot has a `ring-muted` edge.
 - Skeletons are built from the same `Card` / `CardHeader` / `CardAction` / `CardContent` as the widget, so the title, the corner button and the body sit where the real card puts them.
 - Segmented switches (mode, range): `ToggleGroup` `spacing={1}` in a `rounded-xl bg-muted p-1` track; items `min-h-11 px-4`, on = `bg-card shadow-sm`.
-- Table/chart toggles: the button names the view it switches to ("Show as table" ↔ "Show as tiles" / "Show as chart"), no `aria-pressed`; the choice is remembered with `useStoredFlag` (`mo:market-status-table`, `mo:revenue-trend-table`).
+- Table/chart toggles: the button names the view it switches to ("Show as table" ↔ "Show as chart"), no `aria-pressed`; remembered with `useStoredFlag` (`mo:revenue-trend-table`).
+- Market status view switch (0.6.0): `Map / Tiles / Table` as a segmented `ToggleGroup` with icons, remembered with `useStoredChoice` (`mo:market-status-view`; the old `mo:market-status-table` flag still counts). Default: map from `md`, tiles on a phone.
+- Market map (0.6.0, `MarketMap` via `next/dynamic`): markets `role="button"` paths with a surface gap stroke, status by colour + pattern (dots at risk, hatching off track, in `card` colour), selected market a `foreground` outline, highlighted a dashed `ring`; plain land `map-land` with a `border` hairline on `map-sea`. Phones get a taller 800 × 428 frame. Zoom buttons under the map: 44px on desktop, 36px look with a 44px hit area (`after:-inset-1`) on phones. Legend: a swatch with the same pattern, the step as "from – to" through the app's number formats, and the count.
 - Chart motion: `motion-safe:animate-reveal-x` (sparklines), `motion-safe:animate-grow-x origin-left` (bars), Recharts line animation off under `prefers-reduced-motion`. Window marker: dashed `muted-foreground` line (1 month) or `muted` band (3 / 12 months), labelled above the plot.
 - Grid cells that hold a card get `min-w-0`, so a wide table scrolls inside its card.
 - Top movers bars: `chart-5` for growth, `chart-4` for decline (chart tokens, not status ones); the signed number is the signal.

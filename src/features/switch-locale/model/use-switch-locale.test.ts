@@ -29,6 +29,15 @@ describe('useSwitchLocale', () => {
     });
   });
 
+  it('keeps the map metric and the mode (Analyst stays on the same metric)', () => {
+    search = 'mode=analyst&kpi=growth&region=eu';
+    const { result } = renderHook(() => useSwitchLocale());
+    result.current('de-DE');
+    expect(replace).toHaveBeenCalledWith('/dashboard?mode=analyst&kpi=growth&region=eu', {
+      locale: 'de-DE',
+    });
+  });
+
   it('keeps repeated keys and the #hash', () => {
     search = 'markets=de&markets=es';
     window.location.hash = '#main';

@@ -53,7 +53,6 @@ function contrast(theme: Map<string, string>, front: string, back: string): numb
 }
 
 const statuses = ['on-track', 'at-risk', 'off-track'];
-const scaleSteps = ['1', '2', '3', '4', '5', '6', '7'];
 
 // [foreground, background, minimum ratio]: 4.5 for text, 3 for control borders and chart marks.
 const pairs: [string, string, number][] = [
@@ -78,7 +77,6 @@ const pairs: [string, string, number][] = [
     [`status-${s}`, `status-${s}-muted`, 4.5],
     [`status-${s}`, 'card', 4.5],
   ]),
-  ...scaleSteps.map((n): [string, string, number] => [`scale-${n}-foreground`, `scale-${n}`, 4.5]),
   ['input', 'background', 3],
   ['input', 'card', 3],
   ['ring', 'background', 3],
@@ -93,5 +91,52 @@ describe.each([':root', '.dark'])('design tokens in %s', (selector) => {
 
   it.each(pairs)('%s on %s meets %d:1', (front, back, min) => {
     expect(contrast(theme, front, back)).toBeGreaterThanOrEqual(min);
+  });
+});
+
+// OKLab distance ×100 (the dataviz skill's ΔE): 15 is the normal-vision floor.
+function deltaE(theme: Map<string, string>, x: string, y: string): number {
+  const lab = (name: string) => {
+    const match = /^oklch\(([\d.]+) ([\d.]+) ([\d.]+)\)$/.exec(resolve(theme, name));
+    if (!match) throw new Error(`Not an opaque oklch() colour: --${name}`);
+    const [l, c, h] = match.slice(1).map(Number) as [number, number, number];
+    return [l, c * Math.cos((h * Math.PI) / 180), c * Math.sin((h * Math.PI) / 180)];
+  };
+  const [p, q] = [lab(x), lab(y)];
+  return 100 * Math.hypot(...p.map((v, i) => v - (q[i] ?? 0)));
+}
+const lightness = (theme: Map<string, string>, name: string) =>
+  Number(/^oklch\(([\d.]+)/.exec(resolve(theme, name))?.[1]);
+
+const diverging = ['1', '2', '3', '4', '5', '6'].map((n) => `scale-div-${n}`);
+const sequential = ['1', '2', '3', '4', '5'].map((n) => `scale-seq-${n}`);
+
+describe.each([':root', '.dark'])('map scales in %s', (selector) => {
+  const theme = readTheme(selector);
+
+  it('every diverging step and the plain land differ by ΔE ≥ 15', () => {
+    const set = [...diverging, 'map-land'];
+    for (const [i, x] of set.entries()) {
+      for (const y of set.slice(i + 1)) {
+        expect(deltaE(theme, x, y), `${x} vs ${y}`).toBeGreaterThanOrEqual(15);
+      }
+    }
+  });
+
+  // The skill's ramp rule (validate_palette --ordinal): monotone lightness, ΔL ≥ 0.06 per step.
+  it('the sequential ramp is monotone with a visible gap per step', () => {
+    const l = sequential.map((name) => lightness(theme, name));
+    const sign = selector === ':root' ? -1 : 1; // light: more = darker; dark: more = lighter
+    for (const [i, next] of l.slice(1).entries()) {
+      expect(sign * (next - (l[i] ?? 0))).toBeGreaterThanOrEqual(0.06);
+    }
+  });
+
+  it('the faintest sequential step stands out from the land (≥ 2:1)', () => {
+    expect(contrast(theme, 'scale-seq-1', 'map-land')).toBeGreaterThanOrEqual(2);
+  });
+
+  it('the sea differs from the land', () => {
+    expect(deltaE(theme, 'map-sea', 'map-land')).toBeGreaterThan(2);
   });
 });

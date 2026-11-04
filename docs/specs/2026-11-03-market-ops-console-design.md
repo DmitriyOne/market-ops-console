@@ -2,7 +2,7 @@
 
 Status: approved by the owner · 2026-11-03 · Release `0.1.0` · Plan 1 (foundation) built from it in `0.2.0`
 
-Sources: brief (`Frontend Engineer - Assignment v1.docx`, summarised in `docs/STARTER_PACK.md`), contract `docs/CONTRACT.md`, data `data/data.json`, fixtures `data/fixtures.json`, decisions `docs/decisions/0001–0013`.
+Sources: brief (`Frontend Engineer - Assignment v1.docx`, summarised in `docs/STARTER_PACK.md`), contract `docs/CONTRACT.md`, data `data/data.json`, fixtures `data/fixtures.json`, decisions `docs/decisions/0001–0015`.
 
 Marking: **[owner]** = decided by the owner in conversation. **[call]** = Claude's call, open to owner correction. Unmarked = required by the brief or already in an ADR.
 
@@ -66,7 +66,7 @@ The submission is assessed on engineering quality, taste and the reasoning in th
 
 ## 3. Constraints
 
-- Due 2026-11-09. Stack, architecture, git flow and tooling are fixed by ADRs 0001–0013 and `CLAUDE.md`.
+- Due 2026-11-09. Stack, architecture, git flow and tooling are fixed by ADRs 0001–0015 and `CLAUDE.md`.
 - FSD v2.1; `src/pages` composes only (may read URL params and choose layout).
 - Static rendering per locale: `app/[locale]/…`, `generateStaticParams`, `next/root-params` (ADR 0010).
 - No string literals in markup; all formatting through next-intl global formats.
@@ -126,9 +126,9 @@ Locale prefix `as-needed`: `/dashboard` is `en-GB`; `/de-DE/dashboard`, `/en-US/
 | `markets` | multi-selection filter for the analyst table; repeated keys (`markets=de&markets=es`) | none |
 | `tab` | `overview` `assistant` `alerts` (phones only) [call] | `overview` |
 
-Product drill-down **[call]**: `product` is always the last step under a `market` (brief hierarchy: portfolio → region → market → product). Selecting a product narrows series-based views to that product: KPI strip, time series and evidence use the market × product rows; heat map and markets table show that product across the markets in scope (so the user can compare one product across markets); map keeps market-level status and highlights the selected market; share and status show "not available per product"; radar stays market/region level.
+Product drill-down **[call]**: `product` is always the last step under a `market` (brief hierarchy: portfolio → region → market → product). Selecting a product narrows series-based views to that product: KPI strip, time series and evidence use the market × product rows; map, market tiles and table, heat map and markets table show that product across the markets (so the user can compare one product across markets); status stays market level; share shows "not available per product" (the map falls back to attainment with a notice); radar stays market/region level. Moving to another market (map, tiles, top risks, top movers, breadcrumbs) **keeps the product**: every product is sold in every market; only picking the current market again in the breadcrumbs goes back up from the product **[owner, 2026-11-04]**.
 
-Rules: drill-down params are hierarchical (setting `market` sets its `region`; clearing `region` clears `market`/`product`). Drill-down, selection and `mode` changes push history (Analyst is another screen to the user, so Back returns to the previous mode **[owner, 2026-11-04]**); cosmetic changes (`kpi`) replace [call]. The app name links to the clean dashboard: one history step that resets every param (phone: "Reset view" in the ⚙︎ sheet) **[owner, 2026-11-04]**. Invalid params fall back to defaults silently, and the URL is corrected in place (no history entry) so a link has one spelling; defaults (`period` = latest, `range=1m`, `mode=executive`) are not written (`normalizeDashboardState`, 0.5.0).
+Rules: drill-down params are hierarchical (setting `market` sets its `region`; clearing `region` clears `market`/`product`). Drill-down, selection and `mode` changes push history (Analyst is another screen to the user, so Back returns to the previous mode **[owner, 2026-11-04]**); cosmetic changes (`kpi`) replace [call]. `kpi` is read in Analyst only; Executive always shows `status` but keeps a valid `kpi` in the URL for the way back **[owner, 2026-11-04]**. The app name links to the clean dashboard: one history step that resets every param (phone: "Reset view" in the ⚙︎ sheet) **[owner, 2026-11-04]**. Invalid params fall back to defaults silently, and the URL is corrected in place (no history entry) so a link has one spelling; defaults (`period` = latest, `range=1m`, `mode=executive`) are not written (`normalizeDashboardState`, 0.5.0).
 
 `range` label is "1 month / 3 months / 12 months", ending at `period`; never "quarter" (calendar Q2 2026 is incomplete) **[owner approved]**.
 
@@ -137,7 +137,7 @@ Rules: drill-down params are hierarchical (setting `market` sets its `region`; c
 - **Desktop** **[owner]**: header + dashboard; assistant is a **persistent right panel, collapsible**. Collapsed state is a per-browser preference (not in URL) [call]. A badge shows a new answer while collapsed [call]. Alerts open as a right-side sheet from the header [call].
 - **Tablet** [call]: same as desktop, assistant panel overlays when opened; navigation rail optional if needed.
 - **Phone** **[owner]**: bottom tab bar: **Overview · Assistant · Alerts** (labels always shown, 44×44 targets, badge on Assistant). Assistant is full screen (the header hides on that tab). Locale, theme and "Reset view" sit behind a ⚙︎ button in the header and open as a sheet. Period and filters open as short sheets with a Close button and back-gesture support. Default mode on phone is Executive [call].
-- **Header** (all sizes): drill-down breadcrumbs (each step lists its siblings; the product step appears under a market **[owner]**), period + range (a month grid with a year switch built from `Popover` + `Button`, no day grid **[owner, 2026-11-04]**), Executive/Analyst switch, alerts button with count, locale, theme. Phone: path and ⚙︎ on the first row, period and mode full width below.
+- **Header** (all sizes): drill-down breadcrumbs (each step lists its siblings; the product step appears under a market **[owner]**), period + range (a month grid with a year switch built from `Popover` + `Button`, no day grid **[owner, 2026-11-04]**), Executive/Analyst switch, alerts button with count, locale, theme. Phone: the app name and ⚙︎ on the first row, the path below, period and mode full width under it **[owner, 2026-11-04]**.
 
 ## 7. Assistant
 
@@ -186,10 +186,10 @@ Four suggested questions (buttons) taken from the brief: risks this quarter, Ger
 | Widget | Behaviour |
 | --- | --- |
 | KPI strip | values for current scope and period/range; 12-month sparkline; "Calculated" badge where applicable (its name carries the formula); off the latest month "Markets at risk" says why and offers the latest month |
-| Market status (0.5.0) | variant A tiles grouped by region: code, status shape, attainment; off-track hatched; markets from "Show on dashboard" ringed and named as highlighted; click = drill into market; a drill shows its region only; "Show as table" / "Show as tiles", remembered per browser; off the latest month attainment only with a notice **[owner: A tiles in M1, the map joins in M2]** |
+| Market status (0.5.0, map 0.6.0) | one card with a `Map / Tiles / Table` switch, remembered per browser (map from the md width, tiles on a phone). Tiles (variant A): code, status shape, attainment, off-track hatched. Markets from "Show on dashboard" ringed and named as highlighted; click = drill into market; a drill shows its region only (the map keeps every market, other regions as plain land with an outline); off the latest month attainment only with a notice; the table adds the map metric's column (the Analyst picker shows with the map and the table) **[owner: A tiles in M1, the map joins in M2]** |
 | Top movers | up to 3 highest and 3 lowest by YoY growth in the window, markets of the scope's region (a chosen market is marked among its neighbours; a product narrows each market to it); small regions are split so no market appears twice; labelled "highest / lowest growth" (a market can be lowest and still grow), red bar only for a decline; a row drills in (0.5.0) |
 | Top risks | non-on-track markets, sorted off-track first, then by attainment; markets flagged by alert rules included with 🔔 |
-| Market map | choropleth by `kpi`; pattern/icon per status so colour is not the only signal; click = drill into market; on past periods `status` is unavailable, so the map switches to `attainment` with a notice; table alternative; keyboard: each country focusable with an accessible name and value |
+| Market map (0.6.0) | choropleth by `kpi` (Analyst picker; Executive = `status`), Equal Earth without Antarctica, no labels. Stepped scales judged by the shown value (one decimal; an edge belongs to the upper step): attainment `<94 · 94–98 · 98–102 · 102–105 · ≥105 %`, growth `<−5 · −5…−1 · −1…+1 · 1–5 · 5–10 · ≥10 %`, share `<10 · 10–15 · 15–20 · 20–30 · ≥30 %`, revenue `<1 · 1–1.5 · 1.5–2 · 2–3 · ≥3 M$` per month × the months in the window; diverging orange · grey · blue, sequential blue (`--scale-div-*`, `--scale-seq-*`). Status: colour + pattern (at risk dotted, off track hatched); legend with counts for the scope. `status` or `share` off the latest 1-month view, or share with a product → attainment with a notice. Mouse: hover tooltip, click drills; touch: tap opens the tooltip with an "Open" button, one finger scrolls the page, pinch zooms; Ctrl/⌘ + wheel zooms; `+ / − / Whole world` buttons. A drill or the assistant's markets fly the map to fit; a hand-set zoom survives month, window and metric changes. Keyboard: markets in Tab order by region then name, accessible name with value and status, Enter drills, Esc hides the tooltip; countries without a market are not focusable **[owner, 2026-11-04]** |
 | Comparison radar | up to 4 markets or regions, axes: growth, attainment, share, revenue (normalised), momentum (3-month change); follows `period`/`range` (computed values labelled); add via "+ Compare" in table/map; table alternative |
 | Time series | actual vs forecast vs prior year for the current scope; anomalies from data marked with a labelled point (handles a list, not just one); the selected month a dashed labelled line, a 3/12-month window a labelled band **[owner, 2026-11-04]**; tooltip rows carry each line's sample; units in tooltip (M3); table alternative. Executive shows it as the revenue trend (0.5.0) |
 | Heat map | markets × 24 months, attainment on a diverging scale centred on 100%, values readable on focus; arrow-key navigation; click = select market + period; table alternative |
@@ -199,7 +199,7 @@ Four suggested questions (buttons) taken from the brief: risks this quarter, Ger
 
 - Map/table/heat-map click → drill into market (URL `market`).
 - Heat-map cell → also sets `period`; radar and time series follow `period`/`range`.
-- Multi-select markets on map or heat map (Shift+click / long-press) → `markets` param → table narrows (replaces the brief's "brush the scatter" example; heat map chosen over scatter, ADR 0004).
+- Multi-select markets on map or heat map (Shift+click / long-press) → `markets` param → table narrows (M3, with the markets table **[owner, 2026-11-04]**) (replaces the brief's "brush the scatter" example; heat map chosen over scatter, ADR 0004).
 - Citation click and "Show on dashboard" → same URL mechanisms.
 
 ### States
@@ -223,7 +223,7 @@ Four suggested questions (buttons) taken from the brief: risks this quarter, Ger
 - Dataset: `/api/v1/data` returns `data.json` validated by zod; fetched with TanStack Query; prefetched in the server component at build time and hydrated, so static HTML already contains the data. `staleTime: Infinity` (static data).
 - Alert rules: TanStack Query against `/api/v1/alerts`.
 - Selectors (pure functions in `entities/*/model`) compute every aggregate from the validated dataset; no component computes KPIs inline.
-- Market ↔ map join: `iso3 → numeric ISO` table in `entities/market`.
+- Market ↔ map join: `iso3 → numeric ISO` table in `entities/performance` (`ISO3_TO_NUMERIC`).
 
 ## 11. Cross-cutting
 
