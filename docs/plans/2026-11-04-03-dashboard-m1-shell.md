@@ -6,7 +6,7 @@ in the URL (back/forward and shared links work), and Executive mode shows
 the four KPI cards, market status, top risks and the revenue trend for
 whatever is selected. Assistant source clicks now visibly move the dashboard.
 
-**Status:** built on `feature/0.5.0/dashboard-shell` (2026-11-04); independent review done, findings 1–4 and 6–13 fixed with tests; 5 (Back after a mode switch) asked of the owner.
+**Status:** built on `feature/0.5.0/dashboard-shell` (2026-11-04); independent review done, findings 1–13 settled (5: owner chose a history step per mode switch); two rounds of owner checks fixed (see the end of this file).
 
 **Spec:** `docs/specs/2026-11-03-market-ops-console-design.md` §5, §6, §8,
 §11, §11a. Decisions: ADR 0004, 0006, 0010, 0014 (checkpoint: variant A),
@@ -66,7 +66,7 @@ My calls (open to correction):
 - **URL rules.** `market` always brings its `region`; a market outside the
   given region is corrected to its own region; a product without a market is
   dropped; unknown ids and periods fall back to defaults silently; drill and
-  period moves push history, `mode` replaces it.
+  period moves push history, `mode` replaces it (changed by the owner: `mode` pushes too).
 - **Status off the latest month** (past period or range 3m/12m): tiles show
   attainment only, Top risks and "Markets at risk" show "Status is
   available for the latest month only" with a link back to it (spec §5).
@@ -228,6 +228,20 @@ then one commit.
 - `StatusChip`, `useKpiFormat` moved from the assistant widget to `entities/performance/ui`; `Sparkline` to `shared/ui`.
 - "Show as table" is one toggle with a fixed label and `aria-pressed`. Changed after the owner check: the label names the view it switches to ("Show as tiles" / "Show as chart") and the choice is remembered per browser.
 - Top movers added to Executive in M1 (owner, 2026-11-04: the brief lists them under "health at a glance"); lists are "highest / lowest growth" because the lowest can still be positive.
+
+## Owner checks (2026-11-04)
+
+Changes asked by the owner after trying the build; each is in `CHANGELOG.md` under 0.5.0.
+
+- `mode` is a history step (Back returns to the previous mode); spec §6 updated.
+- Reset: the app name links to the clean dashboard (one history step, scroll to top); phones: "Reset view" in the ⚙︎ sheet, whose Language and Theme rows are whole targets.
+- Table toggles are remembered per browser (`useStoredFlag`), named after the view they switch to, and keep the skeleton until the choice is read.
+- Trend chart: dashed labelled line for the month, labelled band for 3/12 months, line samples in the tooltip, shorter phone axes, motion off under reduced motion; sparklines and mover bars animate in.
+- Assistant source / "Show on dashboard" scroll the dashboard to the top; the touch source card closes without a fade.
+- Phone: grid cells `min-w-0`, `main` is `relative`, header hidden on the Assistant tab, period picker full width, segmented tab bar (variant E chosen from a design canvas).
+- KPI "Calculated" badge: no hover box, fixed corner, calculator icon in narrow cards.
+- Skeletons for market status and revenue trend built from the card's own parts.
+- Favicon 404 left for later (`backlog.md`).
 
 ## Done when
 

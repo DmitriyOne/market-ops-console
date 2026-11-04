@@ -49,11 +49,7 @@ export function useStoredFlag(key: string): [boolean | null, (on: boolean) => vo
     },
     [key],
   );
-  const value = useSyncExternalStore<boolean | null>(
-    subscribe,
-    () => read(key),
-    getServerSnapshot,
-  );
+  const value = useSyncExternalStore<boolean | null>(subscribe, () => read(key), getServerSnapshot);
   const update = useCallback(
     (on: boolean) => {
       try {

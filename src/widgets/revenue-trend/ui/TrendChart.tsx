@@ -72,7 +72,8 @@ export function TrendChart({ view, title }: TrendChartProps) {
   const wide = useMediaQuery('(min-width: 40rem)');
   const still = useMediaQuery('(prefers-reduced-motion: reduce)');
   const period = (p: string) => format.dateTime(periodToDate(p), 'period');
-  const axisPeriod = (p: string) => format.dateTime(periodToDate(p), wide ? 'period' : 'periodShort');
+  const axisPeriod = (p: string) =>
+    format.dateTime(periodToDate(p), wide ? 'period' : 'periodShort');
   const money = (n: number) => format.number(n, 'compactCurrency');
   const byPeriod = new Map(view.points.map((p) => [p.period, p]));
   // A tick every half year; a phone gets one a year so labels do not collide.
