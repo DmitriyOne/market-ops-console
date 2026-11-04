@@ -5,10 +5,11 @@
 **Decision.**
 - Flow: `feature/X.Y.Z/NAME` (or `fix/X.Y.Z/NAME`) → `release/X.Y.Z` → `develop` → `master`. First release `0.1.0` (architecture/planning); submission is `1.0.0`.
 - No direct commits to `release/*`, `develop` or `master`. Work happens on `feature/X.Y.Z/NAME` branched from `release/X.Y.Z`, so every branch shows its release (not `release/X.Y.Z/NAME`: git ref conflict, and it would pass the `release/*` CI check); release branches only receive merges from them.
+- PR → `release/*`: one job: format check + lint + typecheck (pnpm cache), no tests. ~1 min. Catches a broken feature before the release PR.
 - PR → `develop`: one job: head must be `release/*` (else comment + auto-close), version check (`package.json` = top of `CHANGELOG.md` = branch number), format check + lint + typecheck + unit tests (pnpm cache). ~2 min.
 - PR → `master`: one job: head must be `develop` (else auto-close), version check. No install. ~15 s.
-- No workflows on push or feature branches. `concurrency` cancels superseded runs. Vercel builds previews on its own quota.
+- No workflows on push. `concurrency` cancels superseded runs. Vercel builds previews on its own quota.
 
 **Alternatives.** Full CI on every PR (burns minutes); husky hooks (rejected by owner); making the repo public (unlimited minutes + real branch protection) — possible later.
 
-**Consequences.** Auto-close is the only enforcement; the owner can still push directly to `master`/`develop`.
+**Consequences.** Auto-close is the only enforcement; a red check does not block the Merge button (no required checks on this plan); the owner can still push directly to `master`/`develop`.
