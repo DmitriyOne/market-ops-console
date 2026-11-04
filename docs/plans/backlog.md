@@ -12,12 +12,12 @@ Format: **Item**: what is wrong (file). Why it can wait. Where it goes.
 
 ## From the error-handling review (2026-11-03)
 
-- **TanStack `CancelledError` would be logged as a failure** (`src/app/providers/query-client.ts`). No `cancelQueries` in the code yet. **Plan 2**, if the assistant cancels queries; add a test.
+- **TanStack `CancelledError` would be logged as a failure** (`src/app/providers/query-client.ts`). No `cancelQueries` in the code (checked in 0.7.0; Plan 2 did not need it). **Hardening plan**, if anything starts cancelling queries; add a test.
 
 ## From the design pass (2026-11-03)
 
-- **D screens drawn on the canvas (2026-11-03)**: Analyst, phone (Overview / Assistant / Alerts), widget and assistant states. Builder calls to confirm in Plan 3: phone map has no labels (Top risks below carries the facts); heat-map cells show whole percent, one decimal on focus; heat map is calculated from the series, so it can differ from stored KPIs by a few tenths and says so; radar uses 4 token colours + 4 dash patterns, scaled worst-to-best across 13 markets; in Analyst the assistant is shown collapsed with a badge.
-- **Not drawn yet**: tablet, Alerts as a desktop sheet, evidence card on a source chip, product drill-down. **Plan 3**, from the drawn screens and the tokens.
+- **D screens drawn on the canvas (2026-11-03)**: Analyst, phone (Overview / Assistant / Alerts), widget and assistant states. Builder calls still open (Plan 3 built the shell without them; they belong to **M4** and the alerts plan): phone map has no labels (Top risks below carries the facts); heat-map cells show whole percent, one decimal on focus; heat map is calculated from the series, so it can differ from stored KPIs by a few tenths and says so; radar uses 4 token colours + 4 dash patterns, scaled worst-to-best across 13 markets; in Analyst the assistant is shown collapsed with a badge.
+- **Not drawn yet**: tablet, Alerts as a desktop sheet. **Alerts plan** (tablet is cut line 2, spec §14). The evidence card (0.4.0) and product drill-down (0.5.0–0.6.0) were built from the tokens without a board.
 
 ## From Plan 2 (assistant, 2026-11-03)
 
@@ -53,7 +53,7 @@ Points the owner wants explained in the README, in his own words:
 
 - **German compact currency does not shorten thousands** ("999.960 $"), so a revenue value within $50 under a 1 M$ × months break can show below the break while painted in the upper step (en/ru show "$1M"). Step rule follows the en/ru display. **Accepted**, near zero cases in the data.
 - **Heat map uses the map's scale** (owner, 2026-11-04): attainment cells take the map's attainment steps and `--scale-div-*` tones, so a value has one colour on both; add a text colour per step (`--scale-div-N-foreground`, checked in `tokens.test.ts`). The unused 7-step `--scale-1…7` was removed in 0.6.0. **M4**.
-- **Skeleton vs stored view**: before hydration the card shows a map-shaped block from md up and tiles on a phone; a desktop user who chose tiles sees one layout change on load (localStorage cannot be read before paint). Fix with ADR 0015's before-paint pattern if it shows in review. **Hardening plan**.
+- **Skeleton vs stored view**: before hydration the card shows a map-shaped block from md up and tiles on a phone; a desktop user who chose tiles sees one layout change on load. The mode already uses ADR 0015's before-paint pattern (`data-mode`, 0.7.0); the stored view can take the same (`localStorage` is readable in the head script). **Hardening plan**.
 - **Touch flow checked in unit tests and Chrome emulation only**, not on a real phone (pinch, tap tooltip, page scroll over the map). **Owner check**.
 - **Europe is small at world zoom** in the narrow card column; markets stay reachable by Tab, zoom buttons and the table. Revisit if the layout gives the map more width.
 - **Review of 0.6.0 map, deferred** (2026-11-04):
@@ -67,14 +67,12 @@ Points the owner wants explained in the README, in his own words:
 
 ## From the 0.7.0 markets table (2026-11-04)
 
-- **No table skeleton in the static HTML**: the page does not know the mode before hydration, so in Analyst the markets table appears under the map after load (below the fold on most screens). Fix with the mode read before paint if it shows in review. **Hardening plan**.
+- **Table skeleton is portfolio-shaped** (header, 13 rows, total): a region or a selection has fewer rows, so the page below the table moves up once on load. The row count is not known before the data. **Accepted**.
 - **Total row's sticky cell** is plain `bg-muted` while the footer row is `bg-muted/50` over the card, so the first cell is a shade darker. An opaque mixed token would fix it. **Design pass**.
 - **Shift+Enter on a tile** relies on the browser putting `shiftKey` on the click a key press makes (Chrome and Firefox do); the map handles Shift+Enter itself. **Hardening plan**, with the a11y pass.
 
 ## From the 0.7.0 branch review (2026-11-04)
 
-- **Row figures mix two sources at the latest month** (open question to the owner): with no product and `1m` at the latest month, revenue, attainment and growth are the stored `market.kpis`, while forecast, prior year and gap are summed from series. In the data they differ a little (India 103.1% shown vs 104.2% = revenue ÷ forecast in the same row; revenue − forecast ≠ gap by $1–2), and the Excel total attainment is a ratio of the columns, so it does not match the rows' figures. Choice: series everywhere in the table (tiles keep stored KPIs), or derive gap from the stored revenue. Not changed without the owner.
-- **Table slot outside its boundary**: `AnalystOnly` in `Overview.tsx` reads `useDashboard` outside the slot's `WidgetBoundary`, in a Suspense with no fallback. `DatasetGate` already guards the data, so the risk is low. Move the mode check inside the slot. **Hardening plan**.
 - **Excel has no share total** while the UI footer has one (a revenue-weighted share is not a column formula). Add as a value, or leave. **Design pass**.
 - **Back undoes one checkbox at a time** in the multi-pick menu (each pick is its own history entry, spec §6). Confirm or batch the menu's picks into one entry on close.
 - **Popups in the assistant's scroll area** (message list) have no scroll boundary yet (`PopperBoundary` covers `<main>` only): a source card's popup could follow its trigger over the panel header. Same fix if it shows. **Hardening plan**.

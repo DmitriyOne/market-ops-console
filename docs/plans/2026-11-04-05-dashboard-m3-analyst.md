@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: superpowers:executing-plans (owner's usual flow: build → owner check → review → owner check). Steps use `- [ ]`.
 
-**Status:** built on `feature/0.7.0/analyst-table` (2026-11-04), in review.
+**Status:** built on `feature/0.7.0/analyst-table` (2026-11-04); three owner checks and an independent branch review done (see Owner decisions); waiting for the owner's last look and push.
 
 **Goal.** Analyst mode gets the brief's "dense tables": a markets table with
 every KPI, sort, a markets filter fed by the map ("brush … and the table
@@ -18,7 +18,8 @@ filter. A new `sort` param keeps the order in shared links. New slices:
 
 **Tech stack.** Existing only: nuqs, next-intl, shadcn `Table` /
 `DropdownMenu` / `Button`, Vitest + RTL + MSW. **No new dependencies**
-(13 rows: no TanStack Table, no CSV library).
+(13 rows: no TanStack Table, no CSV library). Superseded at the owner
+check: ExcelJS for the Excel export (spec §13, ADR 0002).
 
 **Spec:** `docs/specs/2026-11-03-market-ops-console-design.md` §5, §6, §8
 (Markets table, Coordinated views), §11, §14. ADR 0006, 0008, 0014.
@@ -50,7 +51,7 @@ filter. A new `sort` param keeps the order in shared links. New slices:
   (`aria-current`), product = that product in each market.
 - **The filter intersects with the scope.** Selected markets outside the
   scope are kept in the URL but not shown. If nothing is left, the table
-  shows an empty state with `Clear selection`.
+  shows an empty state; the way back is `Clear all` in the filter menu.
 - **Default order** = the map's Tab order (region in data order, then
   name); no `sort` in the URL. Header click: first click descending for
   numbers, ascending for text; second click flips. Missing values always
@@ -84,7 +85,8 @@ filter. A new `sort` param keeps the order in shared links. New slices:
 - **Map flight (found while building):** a pick on the map keeps the map still (it would fly away from the pointer); a selection from the assistant or the table filter still flies the map to it.
 - **Owner check (2026-11-04):** CSV opened as one column in Excel with Russian regional settings and has no filters → `Export ▾` with Excel (.xlsx, ExcelJS, lazy) and CSV; filter row = button, "N of M selected", Clear, chips below; a selection bar on the Market status card in both modes.
 - **Owner check 2 (2026-11-04):** table gets forecast, prior year, country code and the anomaly from the data; Excel gets an Excel table, colours, a total that follows the filter, a months sheet and an About sheet; the filter menu gets "At risk or off track", region lines and "Clear all" (out of the row). ExcelJS drops custom table totals formulas, so the total is a hand-written row under the table. Radar = selection decided for M4.
-- **Empty state** uses the filter's own `Clear selection` above it (two buttons with one name would confuse a screen reader).
+- **Empty state** uses the filter menu's own `Clear all` above it (two buttons with one name would confuse a screen reader).
+- **Branch review + owner check 3 (2026-11-04):** popups in the dashboard stay within its scroll area (a menu slid over the header on scroll; `PopperBoundary`); every export failure is logged and shown, "Preparing…" while the workbook is made; an empty workbook keeps a data row and ratio totals are blank instead of `#DIV/0!`; CSV guard covers tab and CR; repeated markets in the URL are dropped; focus stays in the chips on removal. **Table rows: every figure from series** (a row adds up; share and status stored; tiles keep stored KPIs). **Analyst-shaped skeletons** before paint (`data-mode`, ADR 0015) so the table and the map card's controls do not jump in. Deferred findings in the backlog.
 - **Plan numbering:** this file is Plan 5. The backlog's "Plan 5"
   (hardening, a11y pass) is renamed **"Hardening plan"** in Task 6.
 
@@ -126,6 +128,11 @@ filter. A new `sort` param keeps the order in shared links. New slices:
 
 ---
 
+> The tasks below are kept as first built. Later changes are listed under
+> *Owner decisions*: `ExportMarketsButton` became the `Export ▾` menu
+> (`ExportMenu`, Excel + CSV), the empty state's way back is `Clear all`
+> in the filter menu, and row figures come from series, not `computeKpis`.
+
 ### Task 1: `marketsTable` selector and the `sort` param
 
 **Files:**
@@ -149,7 +156,7 @@ export function sortParam(sort: TableSort): string | null;     // inverse, null 
 ```
 `DashboardState` gains `sort: TableSort` and renames `highlighted` → `selected`; `RawDashboardParams` gains `sort`.
 
-- [ ] **Step 1: failing tests** in `markets-table.test.ts`:
+- [x] **Step 1: failing tests** in `markets-table.test.ts`:
   - portfolio, latest 1m → 13 rows in map Tab order; DE row revenue/growth/attainment/share `source: 'data'`, gap `source: 'calculated'`, `status: 'off_track'`.
   - region `eu` → 5 rows; market `de` → 5 rows, only DE `current`.
   - product `veltrix` under `de` → 5 EU rows, share `unavailable` for all, units = that product's units.
@@ -159,10 +166,10 @@ export function sortParam(sort: TableSort): string | null;     // inverse, null 
   - sort share on `3m` → order equals default order (all missing, stable); sort status asc → off_track rows first, then at_risk.
   - totals for portfolio latest: revenue = Σ rows, attainment = Σactual/Σforecast from series (within 0.05 of spec's 100.4).
   - `parseSort('-growth')` → desc growth; `'growth'` → asc; `'foo'`, `'--growth'`, `''` → `undefined`; `sortParam(null)` → `null`.
-- [ ] **Step 2:** `pnpm vitest run src/entities/performance/model/markets-table.test.ts` → FAIL (module missing).
-- [ ] **Step 3:** implement. Per-market KPIs through `computeKpis(ds, {regionId, marketId, productId?}, period, range)`; gap and totals from `rowsInScope` + `sumRows` over the shown market ids; default order reuses the map's ordering (extract it from `market-map.ts` into a shared helper rather than copying). Comparator: missing last regardless of `dir`, ties keep default order.
-- [ ] **Step 4:** `dashboard-state.test.ts`: invalid `sort` → `fix.sort = null`; valid kept; `markets` → `state.selected`. Update every caller of `highlighted` (map, tiles, `MarketStatus`) — behaviour unchanged.
-- [ ] **Step 5:** all tests green; commit `feat(table): marketsTable selector, sort param, one selection list`.
+- [x] **Step 2:** `pnpm vitest run src/entities/performance/model/markets-table.test.ts` → FAIL (module missing).
+- [x] **Step 3:** implement. Per-market KPIs through `computeKpis(ds, {regionId, marketId, productId?}, period, range)`; gap and totals from `rowsInScope` + `sumRows` over the shown market ids; default order reuses the map's ordering (extract it from `market-map.ts` into a shared helper rather than copying). Comparator: missing last regardless of `dir`, ties keep default order.
+- [x] **Step 4:** `dashboard-state.test.ts`: invalid `sort` → `fix.sort = null`; valid kept; `markets` → `state.selected`. Update every caller of `highlighted` (map, tiles, `MarketStatus`) — behaviour unchanged.
+- [x] **Step 5:** all tests green; commit `feat(table): marketsTable selector, sort param, one selection list`.
 
 ### Task 2: `features/select-markets` — filter, map and tiles
 
@@ -178,14 +185,14 @@ export function MarketFilter(): JSX.Element; // menu + chips + Clear; scope mark
 ```
 Map/tiles get an optional `onToggle?: (id: string) => void`; present only in Analyst. A click with `shiftKey` (or Shift+Enter) on an **in-scope** market calls `onToggle`; otherwise `onOpen` as today. Touch tooltip shows the second button when `onToggle` is set.
 
-- [ ] **Step 1: failing tests**
+- [x] **Step 1: failing tests**
   - hook: `toggle('de')` twice → `markets` gone; `set(['de','es'])` → `?markets=de&markets=es`; pushes history (nuqs test adapter `onUrlUpdate` options).
   - `MarketFilter`: menu lists scope markets as checkbox items grouped by region; checking two keeps the menu open and shows two chips; chip × removes one; `Clear` removes all and returns focus to the menu button.
   - `MarketStatus` (Analyst, map view): Shift+click on DE → URL `markets=de`, no drill; plain click drills; Shift+Enter on focused ES toggles; under region `eu`, Shift+click on JP drills (Review focus 5); touch tooltip shows `Add to filter`, after it `Remove from filter`; Executive: no hint, Shift+click drills.
   - tiles: Shift+click toggles in Analyst; selected tile accessible name contains "selected".
-- [ ] **Step 2:** run → FAIL.
-- [ ] **Step 3:** implement; i18n keys `marketFilter.{button,clear,remove,empty,count}`, `marketStatus.{addToFilter,removeFromFilter,hintPointer,hintTouch}`, rename `marketStatus.highlighted` → `selected` text ("selected" / "ausgewählt" / "выбран").
-- [ ] **Step 4:** tests green; commit `feat(select-markets): one selection from filter, map and tiles`.
+- [x] **Step 2:** run → FAIL.
+- [x] **Step 3:** implement; i18n keys `marketFilter.{button,clear,remove,empty,count}`, `marketStatus.{addToFilter,removeFromFilter,hintPointer,hintTouch}`, rename `marketStatus.highlighted` → `selected` text ("selected" / "ausgewählt" / "выбран").
+- [x] **Step 4:** tests green; commit `feat(select-markets): one selection from filter, map and tiles`.
 
 ### Task 3: `widgets/markets-table`
 
@@ -195,7 +202,7 @@ Map/tiles get an optional `onToggle?: (id: string) => void`; present only in Ana
 
 **Interfaces:** consumes `marketsTable`, `parseSort`/`sortParam`, `useMarketSelection`, `MarketFilter`, `ExportMarketsButton` (Task 4 — leave a slot, wired in Task 4), `useKpiFormat`, `StatusChip`, `useDrillDown`. Produces `MarketsTable`, `MarketsTableSkeleton`.
 
-- [ ] **Step 1: failing tests**
+- [x] **Step 1: failing tests**
   - Analyst: card "Markets" with 13 body rows + a totals row; Executive: card absent (`Overview.test.tsx`).
   - header button "Growth" → URL `sort=-growth`, header `aria-sort="descending"`, first row China; again → `sort=growth`, Germany first; history replaced.
   - `markets=de&markets=es` → 2 rows, filter chips visible, totals = those two.
@@ -203,9 +210,9 @@ Map/tiles get an optional `onToggle?: (id: string) => void`; present only in Ana
   - `range=3m` → status cells "—" and the "latest only" note once under the table.
   - market name is a button that drills (`toMarket`), current market row `aria-current="true"`.
   - caption (`sr-only`) names scope, period and window; numbers rendered through `useKpiFormat` (check one `en-GB` value).
-- [ ] **Step 2:** run → FAIL.
-- [ ] **Step 3:** implement. Sort headers are `<button>` inside `<th>` with `aria-sort` on the `th`; first column `sticky left-0 bg-card`; card body `overflow-x-auto`; totals in `<tfoot>`; skeleton in the card's real shape. Overview: Analyst inserts the table after the map row inside its own `Slot`.
-- [ ] **Step 4:** tests green; commit `feat(markets-table): Analyst markets table with sort, filter and totals`.
+- [x] **Step 2:** run → FAIL.
+- [x] **Step 3:** implement. Sort headers are `<button>` inside `<th>` with `aria-sort` on the `th`; first column `sticky left-0 bg-card`; card body `overflow-x-auto`; totals in `<tfoot>`; skeleton in the card's real shape. Overview: Analyst inserts the table after the map row inside its own `Slot`.
+- [x] **Step 4:** tests green; commit `feat(markets-table): Analyst markets table with sort, filter and totals`.
 
 ### Task 4: CSV export
 
@@ -220,26 +227,26 @@ export function downloadText(fileName: string, text: string, mime: string): void
 export function marketsCsv(view: MarketsTableView): string;
 export function marketsCsvName(period: Period, range: Range, productId?: string): string;
 ```
-- [ ] **Step 1: failing tests**
+- [x] **Step 1: failing tests**
   - `toCsv`: starts with `﻿`, lines end `\r\n`; `Côte, "d"` → `"Côte, ""d"""`; `=SUM(A1)` → `'=SUM(A1)`; `null` → empty; `1234.5` stays `1234.5` (no locale).
   - `marketsCsv` on portfolio latest: header exactly as in "My calls"; 13 lines; DE line has `off_track` and growth `-9.70`; order follows `view.rows`; no totals line.
   - `marketsCsvName('2026-05','1m')` → `markets-2026-05-1m.csv`; with product → `markets-2026-05-1m-veltrix.csv`.
   - button: click calls `downloadText` (spy) with that name and `text/csv;charset=utf-8`; disabled when no rows.
-- [ ] **Step 2:** run → FAIL. **Step 3:** implement. **Step 4:** green; commit `feat(export-markets): CSV of the rows as shown`.
+- [x] **Step 2:** run → FAIL. **Step 3:** implement. **Step 4:** green; commit `feat(export-markets): CSV of the rows as shown`.
 
 ### Task 5: Units in the time series (Analyst)
 
 **Files:** Modify `src/widgets/revenue-trend/ui/{RevenueTrend.tsx, TrendChart.tsx, RevenueTrend.test.tsx}`, `entities/performance/model/trend.ts` only if `TrendPoint` lacks `units`, i18n.
 
-- [ ] **Step 1: failing test:** Analyst table view has a "Units" column with the selected month's units; Executive has none.
-- [ ] **Step 2:** FAIL. **Step 3:** add the column and a units row in the chart tooltip (Analyst only; a prop from the widget's own `state.mode`, no new chart line — units have another scale, one axis only). **Step 4:** green; commit `feat(trend): units in Analyst`.
+- [x] **Step 1: failing test:** Analyst table view has a "Units" column with the selected month's units; Executive has none.
+- [x] **Step 2:** FAIL. **Step 3:** add the column and a units row in the chart tooltip (Analyst only; a prop from the widget's own `state.mode`, no new chart line — units have another scale, one axis only). **Step 4:** green; commit `feat(trend): units in Analyst`.
 
 ### Task 6: Docs, version, browser pass, review
 
-- [ ] `package.json` 0.7.0; CHANGELOG 0.7.0; README status + "What works now"; spec §6 (`markets` = selection, `sort` row, history), §8 (markets table row, coordinated views, layout); ADR 0006 URL example with `sort`; DESIGN.md (table, filter chips, sticky column); backlog: CSV currency decided (raw USD), "Plan 5" → "Hardening plan", remove items this plan closes.
-- [ ] Browser on :3000 — desktop 1440, phone 375, dark theme, keyboard only: Shift+click narrows the table; filter menu; sort; empty state; CSV opens with right columns; Back after a selection change.
-- [ ] Full checks; commit `docs: 0.7.0 analyst table`.
-- [ ] Code review of the branch (code-review skill + a fresh reviewer subagent), fixes or backlog entries, report to the owner.
+- [x] `package.json` 0.7.0; CHANGELOG 0.7.0; README status + "What works now"; spec §6 (`markets` = selection, `sort` row, history), §8 (markets table row, coordinated views, layout); ADR 0006 URL example with `sort`; DESIGN.md (table, filter chips, sticky column); backlog: CSV currency decided (raw USD), "Plan 5" → "Hardening plan", remove items this plan closes.
+- [x] Browser on :3000 — desktop 1440, phone 375, dark theme, keyboard only: Shift+click narrows the table; filter menu; sort; empty state; CSV opens with right columns; Back after a selection change.
+- [x] Full checks; commit `docs: 0.7.0 analyst table`.
+- [x] Code review of the branch (code-review skill + a fresh reviewer subagent), fixes or backlog entries, report to the owner.
 
 ## Not in this plan
 
