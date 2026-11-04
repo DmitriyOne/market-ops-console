@@ -368,6 +368,7 @@ function MarketTable({ groups, map }: { groups: TileGroup[]; map: MarketMapView 
 }
 
 /** The card's own frame: title, the view switch, a map-sized block on wide screens, tiles on a phone. */
+/** In the shape of the mode on screen: `mode-analyst` reads the <html> mark (features/switch-mode). */
 export function MarketStatusSkeleton() {
   return (
     <Card aria-hidden className={CARD}>
@@ -375,7 +376,11 @@ export function MarketStatusSkeleton() {
         <CardTitle>
           <Skeleton className="h-6 w-32" />
         </CardTitle>
-        <Skeleton className="h-13 w-64 rounded-xl" />
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Analyst: the metric picker next to the switch (map view, from md). */}
+          <Skeleton className="hidden h-11 w-40 rounded-lg md:mode-analyst:block" />
+          <Skeleton className="h-13 w-64 rounded-xl" />
+        </div>
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
         <div className="hidden md:block">
@@ -393,6 +398,8 @@ export function MarketStatusSkeleton() {
           ))}
         </div>
         <Skeleton className="h-4 w-64 max-w-full" />
+        {/* Analyst: the Shift+click hint under the map. */}
+        <Skeleton className="hidden h-4 w-72 max-w-full md:mode-analyst:block" />
       </CardContent>
     </Card>
   );

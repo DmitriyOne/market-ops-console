@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import { type ReactNode, Suspense } from 'react';
 
 import { DatasetGate, useDashboard } from '@/entities/performance';
+import { useModeAttribute } from '@/features/switch-mode';
 import { WidgetBoundary } from '@/shared/ui';
 import { ScopeTitle, ScopeTitleSkeleton } from '@/widgets/dashboard-header';
 import { KpiStrip, KpiStripSkeleton } from '@/widgets/kpi-strip';
@@ -42,12 +43,22 @@ function AnalystOnly({ children }: { children: ReactNode }) {
   return state.mode === 'analyst' ? children : null;
 }
 
+/** The table's skeleton, only where the URL says Analyst (the <html> mark). */
+function AnalystTableSkeleton() {
+  return (
+    <div className="hidden mode-analyst:block">
+      <MarketsTableSkeleton />
+    </div>
+  );
+}
+
 /**
  * Variant A (ADR 0014 checkpoint). Analyst adds the markets table under
  * the map, so a pick on the map narrows the table in view.
  */
 export function Overview() {
   const t = useTranslations();
+  useModeAttribute();
   return (
     <div className={PAGE}>
       <DatasetGate>
@@ -67,13 +78,12 @@ export function Overview() {
             <TopRisks />
           </Slot>
         </div>
-        <Suspense>
+        {/* The mode check is inside the slot: its error and its skeleton apply too. */}
+        <Slot name={t('marketsTable.title')} fallback={<AnalystTableSkeleton />}>
           <AnalystOnly>
-            <Slot name={t('marketsTable.title')} fallback={<MarketsTableSkeleton />}>
-              <MarketsTable />
-            </Slot>
+            <MarketsTable />
           </AnalystOnly>
-        </Suspense>
+        </Slot>
         <div className={ROW}>
           <div className={WIDE}>
             <Slot name={t('trend.name')} fallback={<RevenueTrendSkeleton />}>
@@ -89,6 +99,7 @@ export function Overview() {
   );
 }
 
+/** The static page's skeleton: Analyst parts show from the <html> mark set before paint. */
 export function OverviewSkeleton() {
   return (
     <div className={PAGE}>
@@ -100,6 +111,7 @@ export function OverviewSkeleton() {
         </div>
         <TopRisksSkeleton />
       </div>
+      <AnalystTableSkeleton />
       <div className={ROW}>
         <div className={WIDE}>
           <RevenueTrendSkeleton />

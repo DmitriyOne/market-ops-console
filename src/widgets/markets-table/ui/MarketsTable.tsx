@@ -256,17 +256,28 @@ function MarketRow({ row, onOpen }: { row: Row; onOpen: (id: string) => void }) 
 }
 
 /** The card's own frame: title, filter, a block of rows. */
+// Header, the portfolio's 13 markets and the total, each a 44 px row (the
+// common Analyst link). A region or a selection has fewer rows; the table
+// then ends sooner, below the skeleton's top.
+const SKELETON_ROWS = 15;
+
 export function MarketsTableSkeleton() {
   return (
     <Card aria-hidden className={CARD}>
-      <CardHeader>
+      <CardHeader className="flex flex-wrap items-center justify-between gap-2">
         <CardTitle>
           <Skeleton className="h-6 w-24" />
         </CardTitle>
+        <Skeleton className="h-11 w-28 rounded-lg" />
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
         <Skeleton className="h-11 w-32 rounded-lg" />
-        <Skeleton className="h-96 w-full rounded-md" />
+        <div className="flex flex-col gap-px">
+          {Array.from({ length: SKELETON_ROWS }, (_, i) => (
+            <Skeleton key={i} className="h-11 w-full rounded-sm" />
+          ))}
+        </div>
+        <Skeleton className="h-8 w-full max-w-xl" />
       </CardContent>
     </Card>
   );

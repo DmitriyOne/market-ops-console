@@ -6,7 +6,7 @@ import { resolveCitation, useDashboard, useDashboardFocus } from '@/entities/per
 import { enMessages as en } from '@/shared/config';
 import { datasetHandler, renderWithProviders, server } from '@/shared/lib/test';
 
-import { Overview } from './Overview';
+import { Overview, OverviewSkeleton } from './Overview';
 
 vi.mock('next/dynamic', () => ({
   // The Recharts chart is not under test here; its words and table are.
@@ -77,5 +77,23 @@ describe('Overview', () => {
     renderWithProviders(<Overview />);
     await screen.findByRole('heading', { level: 1, name: 'Portfolio' });
     expect(screen.queryByRole('region', { name: en.marketsTable.title })).not.toBeInTheDocument();
+  });
+
+  it('the <html> mark follows the mode, so later skeletons have its shape', async () => {
+    server.use(datasetHandler());
+    const { unmount } = renderWithProviders(<Overview />, { searchParams: '?mode=analyst' });
+    await screen.findByRole('region', { name: en.marketsTable.title });
+    expect(document.documentElement).toHaveAttribute('data-mode', 'analyst');
+    unmount();
+    renderWithProviders(<Overview />);
+    await screen.findByRole('heading', { level: 1, name: 'Portfolio' });
+    expect(document.documentElement).not.toHaveAttribute('data-mode');
+  });
+
+  it('the static skeleton has the table, shown only for an Analyst link (no jump)', () => {
+    const { container } = renderWithProviders(<OverviewSkeleton />);
+    const analystOnly = container.querySelectorAll('.mode-analyst\\:block');
+    expect(analystOnly).toHaveLength(1);
+    expect(analystOnly[0]?.className).toContain('hidden');
   });
 });
