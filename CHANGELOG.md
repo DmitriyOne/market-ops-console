@@ -2,6 +2,11 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/). The top version must match `package.json` and the `release/X.Y.Z` branch.
 
+## [0.6.0] - Unreleased
+
+### Added
+- CI on PRs into `release/*`: format check, lint (ESLint + Steiger) and typecheck, no tests (ADR 0007).
+
 ## [0.5.0] - Unreleased
 
 ### Added

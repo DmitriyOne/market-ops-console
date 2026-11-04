@@ -1,0 +1,38 @@
+# PR into a release branch: a quick gate on each feature (ADR 0007).
+# Format, lint and types only; unit tests run once, on the release → develop PR.
+name: PR → release
+
+on:
+  pull_request:
+    branches: ['release/**']
+    # `edited` catches a PR retargeted to a release branch; title/body edits are skipped below.
+    types: [opened, synchronize, reopened, edited]
+
+concurrency:
+  # Per workflow and PR. A title/body edit gets its own group so it cannot
+  # cancel a running check (its job is skipped anyway).
+  group: ${{ github.workflow }}-${{ github.event.number }}-${{ github.event.action == 'edited' && github.event.changes.base == null && 'edit' || 'run' }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    if: github.event.action != 'edited' || github.event.changes.base != null
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm format:check
+      - run: pnpm lint
+      - run: pnpm typecheck

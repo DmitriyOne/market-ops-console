@@ -12,7 +12,7 @@
   - `eslint-config-prettier` last, so ESLint never fights Prettier.
 - **Steiger** checks FSD boundaries (ADR 0005).
 - Scripts: `format` (`prettier --write .`), `format:check`, `lint` (`next typegen && eslint . && steiger src`), `typecheck` (`next typegen && tsc --noEmit`). `next typegen` comes first so a clean checkout (CI) has the generated route and root-param types.
-- CI (PR → `develop`) runs `format:check`, `lint`, `typecheck`, tests (ADR 0007).
+- CI runs `format:check`, `lint`, `typecheck` on PRs into `release/*`, and the same plus tests on PRs into `develop` (ADR 0007).
 
 **Exceptions (owner-approved, 2026-11-03).** Agents never relax a rule on their own (CLAUDE.md).
 - Prettier skips `*.md`: docs are hand-written, and the starter-pack files must stay byte-for-byte.
