@@ -232,7 +232,6 @@
   },
   "marketStatus": {
     "title": "Market status",
-    "showTable": "Show as table",
     "tile": "{code} {name}, {status}, attainment {value}",
     "tileNoStatus": "{code} {name}, attainment {value}",
     "highlighted": "highlighted from the assistant",
@@ -244,8 +243,40 @@
     "attainment": "Attainment",
     "status": "Status",
     "caption": "Market status by region, {window}",
-    "perMarket": "Tiles show whole markets, not the chosen product.",
-    "showTiles": "Show as tiles"
+    "view": "View",
+    "views": {
+      "map": "Map",
+      "tiles": "Tiles",
+      "table": "Table"
+    },
+    "metricTrigger": "Map colour: {metric}. Change",
+    "metricTitle": "Colour the map by",
+    "metric": {
+      "status": "Status",
+      "attainment": "Attainment",
+      "growth": "Growth YoY",
+      "share": "Market share",
+      "revenue": "Revenue"
+    },
+    "notice": {
+      "statusLatestOnly": "Status is set for the latest month only; the map shows forecast attainment.",
+      "shareLatestOnly": "Market share is set for the latest month only; the map shows forecast attainment.",
+      "sharePerProduct": "Market share is not set per product; the map shows forecast attainment."
+    },
+    "mapLabel": "World map of markets by {metric}",
+    "country": "{name}, {metric} {value}",
+    "countryStatus": "{name}, {metric} {value}, {status}",
+    "noData": "No data",
+    "openMarket": "Open {name}",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "wholeWorld": "Whole world",
+    "legend": "Legend",
+    "below": "below {to}",
+    "between": "{from} to {to}",
+    "above": "{from} and above",
+    "dotted": "dotted",
+    "perProduct": "Values are for {product}; status is set per market."
   },
   "topRisks": {
     "title": "Top risks",

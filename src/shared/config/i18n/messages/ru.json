@@ -232,7 +232,6 @@
   },
   "marketStatus": {
     "title": "Статус рынков",
-    "showTable": "Показать таблицей",
     "tile": "{code} {name}, {status}, выполнение плана {value}",
     "tileNoStatus": "{code} {name}, выполнение плана {value}",
     "highlighted": "отмечен ассистентом",
@@ -244,8 +243,40 @@
     "attainment": "Выполнение",
     "status": "Статус",
     "caption": "Статус рынков по регионам, {window}",
-    "perMarket": "Плитки показывают рынки целиком, а не выбранный продукт.",
-    "showTiles": "Показать плитками"
+    "view": "Вид",
+    "views": {
+      "map": "Карта",
+      "tiles": "Плитки",
+      "table": "Таблица"
+    },
+    "metricTrigger": "Цвет карты: {metric}. Изменить",
+    "metricTitle": "Цвет карты по",
+    "metric": {
+      "status": "Статус",
+      "attainment": "Выполнение плана",
+      "growth": "Рост к прошлому году",
+      "share": "Доля рынка",
+      "revenue": "Выручка"
+    },
+    "notice": {
+      "statusLatestOnly": "Статус есть только за последний месяц; карта показывает выполнение плана.",
+      "shareLatestOnly": "Доля рынка есть только за последний месяц; карта показывает выполнение плана.",
+      "sharePerProduct": "Доли рынка по продукту нет; карта показывает выполнение плана."
+    },
+    "mapLabel": "Карта мира с рынками: {metric}",
+    "country": "{name}, {metric} {value}",
+    "countryStatus": "{name}, {metric} {value}, {status}",
+    "noData": "Нет данных",
+    "openMarket": "Открыть {name}",
+    "zoomIn": "Приблизить",
+    "zoomOut": "Отдалить",
+    "wholeWorld": "Весь мир",
+    "legend": "Легенда",
+    "below": "меньше {to}",
+    "between": "от {from} до {to}",
+    "above": "{from} и больше",
+    "dotted": "точки",
+    "perProduct": "Значения по продукту {product}; статус задан для рынка."
   },
   "topRisks": {
     "title": "Главные риски",

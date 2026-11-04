@@ -22,7 +22,8 @@ export type TileGroup = { region: Region; tiles: MarketTile[] };
 /**
  * Market status tiles (variant A), grouped by region in data order. A drill
  * into a region or market shows that region only. Attainment follows the
- * period and range; status only at the latest month.
+ * period, range and product (one product compared across markets); status
+ * is market level and only at the latest month.
  */
 export function marketTiles(
   ds: Dataset,
@@ -42,8 +43,16 @@ export function marketTiles(
           id: m.id,
           name: m.name,
           iso2: m.iso2,
-          attainmentPct: computeKpis(ds, { regionId: region.id, marketId: m.id }, period, range)
-            .attainmentPct,
+          attainmentPct: computeKpis(
+            ds,
+            {
+              regionId: region.id,
+              marketId: m.id,
+              ...(scope.productId ? { productId: scope.productId } : {}),
+            },
+            period,
+            range,
+          ).attainmentPct,
           status: statusFor(ds, m.id, period, range),
           highlighted: marked.has(m.id),
           selected: m.id === scope.marketId,
