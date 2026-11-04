@@ -263,5 +263,12 @@
     "window": "selected",
     "legend": "Legend",
     "name": "Revenue trend"
+  },
+  "topMovers": {
+    "title": "Top movers",
+    "basis": "Growth YoY, {range} to {period}",
+    "risers": "Highest growth",
+    "fallers": "Lowest growth",
+    "empty": "Not enough markets to compare."
   }
 }

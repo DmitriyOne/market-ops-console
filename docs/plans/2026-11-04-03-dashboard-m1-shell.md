@@ -227,7 +227,7 @@ then one commit.
 - shadcn `card` added (widget frame); shadcn `chart` trimmed to the container (its tooltip/legend did not pass lint and wrote inline `<style>`).
 - `StatusChip`, `useKpiFormat` moved from the assistant widget to `entities/performance/ui`; `Sparkline` to `shared/ui`.
 - "Show as table" is one toggle with a fixed label and `aria-pressed`.
-- Top movers stay in M3 (spec puts them in Analyst; the brief lists them under "at a glance" — raised with the owner).
+- Top movers added to Executive in M1 (owner, 2026-11-04: the brief lists them under "health at a glance"); lists are "highest / lowest growth" because the lowest can still be positive.
 
 ## Done when
 

@@ -178,8 +178,8 @@ Four suggested questions (buttons) taken from the brief: risks this quarter, Ger
 
 ### Modes **[owner]**
 
-- **Executive**: KPI strip (revenue, forecast attainment, growth, markets at risk), market status, top risks, revenue trend (one chart). Minimal numbers. Layout = variant A (ADR 0014 checkpoint): title, KPI cards, market status (two thirds) next to top risks, trend below **[owner, 2026-11-04]**.
-- **Analyst**: everything above plus metric picker on the map, radar, time series with units, heat map, top movers, dense markets table with all KPIs, sort and filter.
+- **Executive**: KPI strip (revenue, forecast attainment, growth, markets at risk), market status, top risks, revenue trend (one chart). Minimal numbers. Layout = variant A (ADR 0014 checkpoint): title, KPI cards, market status (two thirds) next to top risks, trend (two thirds) next to top movers **[owner, 2026-11-04]**. Top movers are in Executive because the brief lists them under "health at a glance" **[owner, 2026-11-04]**.
+- **Analyst**: everything above plus metric picker on the map, radar, time series with units, heat map, dense markets table with all KPIs, sort and filter.
 
 ### Widgets [call unless noted]
 
@@ -187,7 +187,7 @@ Four suggested questions (buttons) taken from the brief: risks this quarter, Ger
 | --- | --- |
 | KPI strip | values for current scope and period/range; 12-month sparkline; "Calculated" badge where applicable (its name carries the formula); off the latest month "Markets at risk" says why and offers the latest month |
 | Market status (0.5.0) | variant A tiles grouped by region: code, status shape, attainment; off-track hatched; markets from "Show on dashboard" ringed and named as highlighted; click = drill into market; a drill shows its region only; "Show as table"; off the latest month attainment only with a notice **[owner: A tiles in M1, the map joins in M2]** |
-| Top movers | 3 biggest risers and fallers by YoY growth in the range (markets in scope) |
+| Top movers | up to 3 highest and 3 lowest by YoY growth in the window, markets of the scope's region (a chosen market is marked among its neighbours; a product narrows each market to it); small regions are split so no market appears twice; labelled "highest / lowest growth" (a market can be lowest and still grow), red bar only for a decline; a row drills in (0.5.0) |
 | Top risks | non-on-track markets, sorted off-track first, then by attainment; markets flagged by alert rules included with 🔔 |
 | Market map | choropleth by `kpi`; pattern/icon per status so colour is not the only signal; click = drill into market; on past periods `status` is unavailable, so the map switches to `attainment` with a notice; table alternative; keyboard: each country focusable with an accessible name and value |
 | Comparison radar | up to 4 markets or regions, axes: growth, attainment, share, revenue (normalised), momentum (3-month change); follows `period`/`range` (computed values labelled); add via "+ Compare" in table/map; table alternative |

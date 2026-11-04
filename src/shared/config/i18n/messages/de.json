@@ -263,5 +263,12 @@
     "window": "ausgewählt",
     "legend": "Legende",
     "name": "Umsatzverlauf"
+  },
+  "topMovers": {
+    "title": "Größte Veränderungen",
+    "basis": "Wachstum ggü. Vorjahr, {range} bis {period}",
+    "risers": "Höchstes Wachstum",
+    "fallers": "Niedrigstes Wachstum",
+    "empty": "Zu wenige Märkte für einen Vergleich."
   }
 }

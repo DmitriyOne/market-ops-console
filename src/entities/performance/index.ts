@@ -34,6 +34,7 @@ export {
 } from './model/scope';
 export { dashboardSearchParams } from './model/search-params';
 export { marketsAtRiskCount, nonOnTrackMarkets, statusFor } from './model/status';
+export { type Mover, type TopMovers, topMovers } from './model/top-movers';
 export { anomaliesInScope, type ScopedAnomaly, type TrendPoint, trendSeries } from './model/trend';
 export { type TrendAnomaly, type TrendView, trendView } from './model/trend-view';
 export { useDashboard } from './model/use-dashboard';
