@@ -88,6 +88,15 @@ describe('DashboardHeader', () => {
     });
   });
 
+  it('picking another market keeps the product', async () => {
+    const { user, lastUpdate } = setup('?region=eu&market=de&product=veltrix');
+    await user.click(await screen.findByRole('button', { name: 'Market: Germany. Change market' }));
+    await user.click(screen.getByRole('menuitemradio', { name: 'France' }));
+    await waitFor(() => {
+      expect(params(lastUpdate())).toEqual({ region: 'eu', market: 'fr', product: 'veltrix' });
+    });
+  });
+
   it('Portfolio is a link back up when deeper', async () => {
     const { user, lastUpdate } = setup('?region=eu&period=2026-02');
     await user.click(await screen.findByRole('button', { name: t.portfolio }));

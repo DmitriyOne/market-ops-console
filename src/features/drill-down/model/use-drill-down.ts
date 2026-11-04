@@ -8,8 +8,13 @@ import { dashboardSearchParams, getMarket, useDashboard } from '@/entities/perfo
 export type DrillDown = {
   toPortfolio: () => void;
   toRegion: (regionId: string) => void;
-  /** Also sets the market's own region (spec §6). */
+  /**
+   * Also sets the market's own region (spec §6) and keeps the product:
+   * every product is sold in every market, so one product can be compared.
+   */
   toMarket: (marketId: string) => void;
+  /** Back up from the product to its market (breadcrumbs only). */
+  clearProduct: () => void;
   /** The last step, under the current market. */
   toProduct: (productId: string) => void;
 };
@@ -33,7 +38,10 @@ export function useDrillDown(): DrillDown {
       },
       toMarket: (marketId) => {
         const regionId = getMarket(ds, marketId)?.regionId ?? null;
-        void setParams({ region: regionId, market: marketId, product: null, markets: null });
+        void setParams({ region: regionId, market: marketId, markets: null });
+      },
+      clearProduct: () => {
+        void setParams({ product: null, markets: null });
       },
       toProduct: (productId) => {
         void setParams({ product: productId, markets: null });

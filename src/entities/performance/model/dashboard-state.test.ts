@@ -11,6 +11,7 @@ const EMPTY: RawDashboardParams = {
   range: null,
   mode: null,
   markets: null,
+  kpi: null,
 };
 
 const normalize = (raw: Partial<RawDashboardParams>) =>
@@ -24,8 +25,29 @@ describe('normalizeDashboardState', () => {
       period: '2026-05',
       range: '1m',
       mode: 'executive',
+      kpi: 'status',
       highlighted: [],
     });
+    expect(fix).toBeNull();
+  });
+
+  it('Analyst keeps a valid map metric', () => {
+    const { state, fix } = normalize({ mode: 'analyst', kpi: 'growth' });
+    expect(state.kpi).toBe('growth');
+    expect(fix).toBeNull();
+  });
+
+  it('an unknown metric or the default is removed from the URL', () => {
+    expect(normalize({ mode: 'analyst', kpi: 'profit' })).toMatchObject({
+      state: { kpi: 'status' },
+      fix: { kpi: null },
+    });
+    expect(normalize({ mode: 'analyst', kpi: 'status' }).fix).toEqual({ kpi: null });
+  });
+
+  it('Executive always shows status but keeps the metric for Analyst', () => {
+    const { state, fix } = normalize({ kpi: 'growth' });
+    expect(state.kpi).toBe('status');
     expect(fix).toBeNull();
   });
 

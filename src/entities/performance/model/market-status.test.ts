@@ -37,6 +37,21 @@ describe('marketTiles', () => {
     expect(de?.attainmentPct.source).toBe('calculated');
   });
 
+  it('a product gives every tile the attainment of that product; status stays market level', () => {
+    const scope = { regionId: 'eu', marketId: 'de', productId: 'veltrix' };
+    const fr = marketTiles(ds, scope, '2026-05', '1m', [])
+      .flatMap((g) => g.tiles)
+      .find((t) => t.id === 'fr');
+    const rows = ds.series.filter(
+      (r) => r.marketId === 'fr' && r.productId === 'veltrix' && r.period === '2026-05',
+    );
+    const expected =
+      (rows.reduce((n, r) => n + r.actual, 0) / rows.reduce((n, r) => n + r.forecast, 0)) * 100;
+    expect(fr?.attainmentPct.source).toBe('calculated');
+    expect(fr?.attainmentPct.value).toBeCloseTo(expected, 6);
+    expect(fr?.status).toBe('at_risk');
+  });
+
   it('markets from the assistant are highlighted', () => {
     const tiles = marketTiles(ds, {}, '2026-05', '1m', ['es', 'fr']).flatMap((g) => g.tiles);
     expect(tiles.filter((t) => t.highlighted).map((t) => t.id)).toEqual(['fr', 'es']);
