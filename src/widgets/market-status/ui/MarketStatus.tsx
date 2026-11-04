@@ -58,7 +58,12 @@ const isView = (v: string): v is View => VIEWS.some((view) => view === v);
 
 /** The map's own frame (800 × 356), so nothing moves when the chunk arrives. */
 function MapSkeleton() {
-  return <Skeleton className="aspect-[800/356] w-full rounded-md" />;
+  return (
+    <div>
+      <Skeleton className="aspect-[800/356] w-full rounded-md" />
+      <Skeleton className="mt-2 ml-auto h-11 w-48 rounded-lg" />
+    </div>
+  );
 }
 
 /**

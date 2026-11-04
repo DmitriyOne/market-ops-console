@@ -126,7 +126,7 @@ export function MarketMap({ view, fitIds, onOpen }: MarketMapProps) {
   };
 
   return (
-    <div className="relative">
+    <div>
       <ComposableMap
         width={MAP_SIZE.width}
         height={MAP_SIZE.height}
@@ -147,12 +147,12 @@ export function MarketMap({ view, fitIds, onOpen }: MarketMapProps) {
           onTip={setTip}
         />
       </ComposableMap>
-      <div className="absolute right-1.5 bottom-1.5 flex gap-1">
+      <div className="mt-2 flex justify-end gap-1">
         <Button
           type="button"
           variant="outline"
           size="icon"
-          className="size-11 bg-card"
+          className="size-11"
           aria-label={t('zoomOut')}
           disabled={pos.zoom <= 1.01}
           onClick={() => {
@@ -165,7 +165,7 @@ export function MarketMap({ view, fitIds, onOpen }: MarketMapProps) {
           type="button"
           variant="outline"
           size="icon"
-          className="size-11 bg-card"
+          className="size-11"
           aria-label={t('zoomIn')}
           disabled={pos.zoom >= MAX_ZOOM - 0.01}
           onClick={() => {
@@ -177,7 +177,7 @@ export function MarketMap({ view, fitIds, onOpen }: MarketMapProps) {
         <Button
           type="button"
           variant="outline"
-          className="min-h-11 bg-card"
+          className="min-h-11"
           disabled={pos.zoom <= 1.01}
           onClick={() => {
             flyTo(WORLD);
@@ -284,7 +284,7 @@ function Patterns({ zoom }: { zoom: number }) {
         patternUnits="userSpaceOnUse"
         patternTransform={scale}
       >
-        <circle cx={2} cy={2} r={0.9} fill="var(--color-card)" fillOpacity={0.85} />
+        <circle cx={2} cy={2} r={0.9} fill="var(--card)" fillOpacity={0.85} />
       </pattern>
       <pattern
         id={HATCH}
@@ -293,7 +293,7 @@ function Patterns({ zoom }: { zoom: number }) {
         patternUnits="userSpaceOnUse"
         patternTransform={`${scale} rotate(45)`}
       >
-        <rect width={1.4} height={4} fill="var(--color-card)" fillOpacity={0.85} />
+        <rect width={1.4} height={4} fill="var(--card)" fillOpacity={0.85} />
       </pattern>
     </defs>
   );
@@ -337,8 +337,8 @@ const Countries = memo(function Countries({ view, shapes, onOpen, onTip }: Count
             <path
               key={g.rsmKey}
               d={g.svgPath ?? undefined}
-              fill="var(--color-map-land)"
-              stroke="var(--color-border)"
+              fill="var(--map-land)"
+              stroke="var(--border)"
               strokeWidth={0.5}
               style={NON_SCALING}
             />
@@ -354,7 +354,7 @@ const Countries = memo(function Countries({ view, shapes, onOpen, onTip }: Count
             aria-label={m.countryName(item, view.metric)}
             fill={itemFill(item, view)}
             // A thin surface gap between neighbours; markets outside the region keep an outline.
-            stroke={item.inScope ? 'var(--color-card)' : 'var(--color-muted-foreground)'}
+            stroke={item.inScope ? 'var(--card)' : 'var(--muted-foreground)'}
             strokeWidth={item.inScope ? 0.75 : 0.6}
             style={NON_SCALING}
             className="cursor-pointer outline-none focus-visible:stroke-foreground focus-visible:[stroke-width:2.5]"
@@ -405,7 +405,7 @@ const Countries = memo(function Countries({ view, shapes, onOpen, onTip }: Count
                 <path
                   d={d}
                   fill="none"
-                  stroke="var(--color-ring)"
+                  stroke="var(--ring)"
                   strokeWidth={2}
                   strokeDasharray="4 3"
                   style={NON_SCALING}
@@ -415,7 +415,7 @@ const Countries = memo(function Countries({ view, shapes, onOpen, onTip }: Count
                 <path
                   d={d}
                   fill="none"
-                  stroke="var(--color-foreground)"
+                  stroke="var(--foreground)"
                   strokeWidth={2}
                   style={NON_SCALING}
                 />

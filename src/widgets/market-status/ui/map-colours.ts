@@ -1,17 +1,17 @@
 import { MAP_SCALES, type MapItem, type MarketMapView } from '@/entities/performance';
 import type { MarketStatus } from '@/shared/api';
 
-const LAND = 'var(--color-map-land)';
+const LAND = 'var(--map-land)';
 
 export const STATUS_FILL: Record<MarketStatus, string> = {
-  on_track: 'var(--color-status-on-track)',
-  at_risk: 'var(--color-status-at-risk)',
-  off_track: 'var(--color-status-off-track)',
+  on_track: 'var(--status-on-track)',
+  at_risk: 'var(--status-at-risk)',
+  off_track: 'var(--status-off-track)',
 };
 
 /** CSS colour of a scale step's palette slot. */
 export function toneFill(scale: 'diverging' | 'sequential', tone: number): string {
-  return `var(--color-scale-${scale === 'diverging' ? 'div' : 'seq'}-${String(tone)})`;
+  return `var(--scale-${scale === 'diverging' ? 'div' : 'seq'}-${String(tone)})`;
 }
 
 /** A market's fill: plain land outside the drilled region or without a value. */

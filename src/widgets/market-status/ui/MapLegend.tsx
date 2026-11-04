@@ -26,9 +26,9 @@ function Swatch({ fill, pattern }: { fill: string; pattern?: 'dots' | 'hatch' })
             patternTransform={pattern === 'hatch' ? 'rotate(45)' : undefined}
           >
             {pattern === 'dots' ? (
-              <circle cx={2} cy={2} r={0.9} fill="var(--color-card)" fillOpacity={0.85} />
+              <circle cx={2} cy={2} r={0.9} fill="var(--card)" fillOpacity={0.85} />
             ) : (
-              <rect width={1.4} height={4} fill="var(--color-card)" fillOpacity={0.85} />
+              <rect width={1.4} height={4} fill="var(--card)" fillOpacity={0.85} />
             )}
           </pattern>
         </defs>
