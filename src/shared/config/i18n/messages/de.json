@@ -276,7 +276,11 @@
     "between": "{from} – {to}",
     "above": "ab {from}",
     "dotted": "gepunktet",
-    "perProduct": "Werte für {product}; der Status gilt je Markt."
+    "perProduct": "Werte für {product}; der Status gilt je Markt.",
+    "addToFilter": "Zum Filter hinzufügen",
+    "removeFromFilter": "Aus dem Filter entfernen",
+    "hintPointer": "Umschalt+Klick auf einen Markt fügt ihn dem Tabellenfilter hinzu.",
+    "hintTouch": "Tippen Sie auf einen Markt, dann auf „Zum Filter hinzufügen“."
   },
   "topRisks": {
     "title": "Größte Risiken",
@@ -307,5 +311,12 @@
     "risers": "Höchstes Wachstum",
     "fallers": "Niedrigstes Wachstum",
     "empty": "Zu wenige Märkte für einen Vergleich."
+  },
+  "marketFilter": {
+    "button": "Märkte",
+    "buttonCount": "Märkte ({count})",
+    "title": "Nur diese Märkte zeigen",
+    "clear": "Auswahl aufheben",
+    "remove": "{name} entfernen"
   }
 }

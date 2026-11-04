@@ -11,8 +11,20 @@ const TONE = {
   off_track: 'bg-status-off-track-muted text-status-off-track',
 } as const;
 
-/** One market: code, status shape, attainment. Click drills in. The name starts with the visible code (label in name, WCAG 2.5.3). */
-export function StatusTile({ tile, onSelect }: { tile: MarketTile; onSelect: () => void }) {
+/**
+ * One market: code, status shape, attainment. Click drills in; in Analyst
+ * Shift+click adds it to the selection. The name starts with the visible
+ * code (label in name, WCAG 2.5.3).
+ */
+export function StatusTile({
+  tile,
+  onOpen,
+  onToggle,
+}: {
+  tile: MarketTile;
+  onOpen: () => void;
+  onToggle?: () => void;
+}) {
   const t = useTranslations('marketStatus');
   const f = useKpiFormat();
   const statusLabel = useStatusLabel();
@@ -32,7 +44,10 @@ export function StatusTile({ tile, onSelect }: { tile: MarketTile; onSelect: () 
     <button
       type="button"
       aria-label={name}
-      onClick={onSelect}
+      onClick={(e) => {
+        if (e.shiftKey && onToggle) onToggle();
+        else onOpen();
+      }}
       className={cn(
         'relative flex min-h-14 flex-col items-start justify-center gap-0.5 overflow-hidden rounded-lg border border-transparent px-2 py-1.5 text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
         tile.status ? TONE[tile.status] : 'bg-muted text-foreground',

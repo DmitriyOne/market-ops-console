@@ -106,6 +106,8 @@ export type MarketMapProps = {
   /** Markets the view should fit: the drilled region or the assistant's list; none = world. */
   fitIds: readonly string[];
   onOpen: (marketId: string) => void;
+  /** Analyst: Shift+click, Shift+Enter or the touch tooltip add or remove a market of the scope. */
+  onToggle?: (marketId: string) => void;
 };
 
 /**
@@ -115,7 +117,7 @@ export type MarketMapProps = {
  * each market is a button in Tab order, Enter opens it; Esc hides the
  * tooltip (the popover's own dismiss).
  */
-export function MarketMap({ view, tall = false, fitIds, onOpen }: MarketMapProps) {
+export function MarketMap({ view, tall = false, fitIds, onOpen, onToggle }: MarketMapProps) {
   const frame: MapFrame = tall ? FRAMES.tall : FRAMES.wide;
   const t = useTranslations('marketStatus');
   const m = useMapFormat();
@@ -163,6 +165,7 @@ export function MarketMap({ view, tall = false, fitIds, onOpen }: MarketMapProps
           onGesture={stop}
           flyTo={flyTo}
           onOpen={onOpen}
+          onToggle={onToggle}
           onTip={setTip}
         />
       </ComposableMap>
@@ -211,6 +214,7 @@ export function MarketMap({ view, tall = false, fitIds, onOpen }: MarketMapProps
           metric={view.metric}
           tip={tip}
           onOpen={onOpen}
+          onToggle={item.inScope ? onToggle : undefined}
           onClose={() => {
             setTip(null);
           }}
@@ -220,7 +224,7 @@ export function MarketMap({ view, tall = false, fitIds, onOpen }: MarketMapProps
   );
 }
 
-type MapLayersProps = Pick<MarketMapProps, 'view' | 'fitIds' | 'onOpen'> & {
+type MapLayersProps = Pick<MarketMapProps, 'view' | 'fitIds' | 'onOpen' | 'onToggle'> & {
   frame: MapFrame;
   pos: MapView;
   onMoveEnd: (pos: MapView) => void;
@@ -242,6 +246,7 @@ function MapLayers({
   onGesture,
   flyTo,
   onOpen,
+  onToggle,
   onTip,
 }: MapLayersProps) {
   const { projection } = useMapContext();
@@ -285,7 +290,7 @@ function MapLayers({
       }}
     >
       <Patterns zoom={pos.zoom} />
-      <Countries view={view} shapes={shapes} onOpen={onOpen} onTip={onTip} />
+      <Countries view={view} shapes={shapes} onOpen={onOpen} onToggle={onToggle} onTip={onTip} />
     </ZoomableGroup>
   );
 }
@@ -324,11 +329,18 @@ type CountriesProps = {
   view: MarketMapView;
   shapes: ReadonlyMap<string, Geography>;
   onOpen: (marketId: string) => void;
+  onToggle: MarketMapProps['onToggle'];
   onTip: (update: (prev: TooltipState | null) => TooltipState | null) => void;
 };
 
 /** Every country: plain land, then the markets in Tab order, then patterns and rings on top. */
-const Countries = memo(function Countries({ view, shapes, onOpen, onTip }: CountriesProps) {
+const Countries = memo(function Countries({
+  view,
+  shapes,
+  onOpen,
+  onToggle,
+  onTip,
+}: CountriesProps) {
   const m = useMapFormat();
   const { projection } = useMapContext();
   // Above the main part of the country (not France with French Guiana, the US with Alaska).
@@ -353,6 +365,11 @@ const Countries = memo(function Countries({ view, shapes, onOpen, onTip }: Count
   };
   const hideIf = (match: (prev: TooltipState) => boolean) => {
     onTip((prev) => (prev && match(prev) ? null : prev));
+  };
+  // Shift picks a market of the scope for the table; anything else opens it.
+  const act = (item: MapItem, shift: boolean) => {
+    if (shift && onToggle && item.inScope) onToggle(item.id);
+    else onOpen(item.id);
   };
   const pattern = (item: MapItem) =>
     view.metric !== 'status' || !item.inScope
@@ -413,7 +430,7 @@ const Countries = memo(function Countries({ view, shapes, onOpen, onTip }: Count
             }}
             onClick={(e) => {
               if (pointer.current.type === 'touch') show(item.id, [e.clientX, e.clientY], 'touch');
-              else onOpen(item.id);
+              else act(item, e.shiftKey);
             }}
             onFocus={(e) => {
               // A press focuses too; the tooltip on focus is for the keyboard.
@@ -426,7 +443,7 @@ const Countries = memo(function Countries({ view, shapes, onOpen, onTip }: Count
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                onOpen(item.id);
+                act(item, e.shiftKey);
               }
             }}
           />

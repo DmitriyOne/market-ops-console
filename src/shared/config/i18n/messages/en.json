@@ -276,7 +276,11 @@
     "between": "{from} – {to}",
     "above": "{from} and above",
     "dotted": "dotted",
-    "perProduct": "Values are for {product}; status is set per market."
+    "perProduct": "Values are for {product}; status is set per market.",
+    "addToFilter": "Add to filter",
+    "removeFromFilter": "Remove from filter",
+    "hintPointer": "Shift+click a market to add it to the table filter.",
+    "hintTouch": "Tap a market, then Add to filter."
   },
   "topRisks": {
     "title": "Top risks",
@@ -307,5 +311,12 @@
     "risers": "Highest growth",
     "fallers": "Lowest growth",
     "empty": "Not enough markets to compare."
+  },
+  "marketFilter": {
+    "button": "Markets",
+    "buttonCount": "Markets ({count})",
+    "title": "Show only these markets",
+    "clear": "Clear selection",
+    "remove": "Remove {name}"
   }
 }

@@ -3,7 +3,7 @@
 import { GlobeIcon, LayoutGridIcon, TableIcon } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
-import { useId, useMemo } from 'react';
+import { useId, useMemo, useState } from 'react';
 
 import {
   getProduct,
@@ -19,6 +19,7 @@ import {
   useStatusLabel,
 } from '@/entities/performance';
 import { useDrillDown } from '@/features/drill-down';
+import { useMarketSelection } from '@/features/select-markets';
 import { MetricPicker } from '@/features/select-metric';
 import { LatestOnlyNotice } from '@/features/select-period';
 import type { MarketStatus as Status } from '@/shared/api';
@@ -76,7 +77,9 @@ export function MarketStatus() {
   const titleId = useId();
   const { ds, state } = useDashboard();
   const { toMarket } = useDrillDown();
+  const { toggle } = useMarketSelection();
   const wide = useMediaQuery('(min-width: 48rem)');
+  const coarse = useMediaQuery('(pointer: coarse)');
   // The view used to be an on/off table flag; a stored "table" still counts.
   const [legacyTable] = useStoredFlag('mo:market-status-table');
   const [view, setView] = useStoredChoice(
@@ -86,12 +89,14 @@ export function MarketStatus() {
   );
 
   const { scope, period, range, kpi, selected } = state;
+  const analyst = state.mode === 'analyst';
   const map = useMemo(
     () => marketMap(ds, scope, period, range, kpi, selected),
     [ds, scope, period, range, kpi, selected],
   );
-  // A drill fits its region (a market: its region, outlined); the assistant's markets win.
-  const fitIds = useMemo(
+  // A drill fits its region (a market: its region, outlined); a selection
+  // (assistant, table filter) wins.
+  const autoFit = useMemo(
     () =>
       selected.length > 0
         ? selected
@@ -100,6 +105,16 @@ export function MarketStatus() {
           : [],
     [selected, map.items, scope.regionId],
   );
+  // A pick on the map itself keeps the map still: it must not fly away from the pointer.
+  const [mapPick, setMapPick] = useState<{ selection: string; fit: readonly string[] } | null>(
+    null,
+  );
+  const fitIds = mapPick?.selection === selected.join(',') ? mapPick.fit : autoFit;
+  const toggleOnMap = (id: string) => {
+    const next = selected.includes(id) ? selected.filter((s) => s !== id) : [...selected, id];
+    setMapPick({ selection: next.join(','), fit: fitIds });
+    toggle(id);
+  };
 
   // The remembered view is read after hydration: keep the skeleton until then.
   if (view === null || legacyTable === null) return <MarketStatusSkeleton />;
@@ -116,7 +131,7 @@ export function MarketStatus() {
           </h2>
         </CardTitle>
         <div className="flex flex-wrap items-center gap-2">
-          {state.mode === 'analyst' && view !== 'tiles' ? <MetricPicker /> : null}
+          {analyst && view !== 'tiles' ? <MetricPicker /> : null}
           <ToggleGroup
             type="single"
             value={view}
@@ -145,11 +160,18 @@ export function MarketStatus() {
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
         {view === 'map' ? (
-          <MapView map={map} tall={!wide} fitIds={fitIds} onOpen={toMarket} />
+          <MapView
+            map={map}
+            tall={!wide}
+            fitIds={fitIds}
+            onOpen={toMarket}
+            onToggle={analyst ? toggleOnMap : undefined}
+            hint={analyst ? t(coarse ? 'hintTouch' : 'hintPointer') : null}
+          />
         ) : view === 'table' ? (
           <MarketTable groups={groups} map={map} />
         ) : (
-          <Tiles groups={groups} onOpen={toMarket} />
+          <Tiles groups={groups} onOpen={toMarket} onToggle={analyst ? toggle : undefined} />
         )}
         {product ? (
           <p className="text-xs text-muted-foreground">
@@ -177,17 +199,22 @@ function MapView({
   tall,
   fitIds,
   onOpen,
+  onToggle,
+  hint,
 }: {
   map: MarketMapView;
   tall: boolean;
   fitIds: readonly string[];
   onOpen: (id: string) => void;
+  onToggle: ((id: string) => void) | undefined;
+  hint: string | null;
 }) {
   return (
     <>
       <Notice map={map} />
-      <MarketMap view={map} tall={tall} fitIds={fitIds} onOpen={onOpen} />
+      <MarketMap view={map} tall={tall} fitIds={fitIds} onOpen={onOpen} onToggle={onToggle} />
       <MapLegend view={map} />
+      {hint ? <p className="text-xs text-muted-foreground">{hint}</p> : null}
     </>
   );
 }
@@ -215,7 +242,15 @@ function StatusLegend({ groups }: { groups: TileGroup[] }) {
   );
 }
 
-function Tiles({ groups, onOpen }: { groups: TileGroup[]; onOpen: (id: string) => void }) {
+function Tiles({
+  groups,
+  onOpen,
+  onToggle,
+}: {
+  groups: TileGroup[];
+  onOpen: (id: string) => void;
+  onToggle: ((id: string) => void) | undefined;
+}) {
   // A drill into one region gives it the whole width.
   const single = groups.length === 1;
   return (
@@ -233,9 +268,16 @@ function Tiles({ groups, onOpen }: { groups: TileGroup[]; onOpen: (id: string) =
                 <StatusTile
                   key={tile.id}
                   tile={tile}
-                  onSelect={() => {
+                  onOpen={() => {
                     onOpen(tile.id);
                   }}
+                  onToggle={
+                    onToggle
+                      ? () => {
+                          onToggle(tile.id);
+                        }
+                      : undefined
+                  }
                 />
               ))}
             </div>
