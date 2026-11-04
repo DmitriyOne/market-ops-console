@@ -15,7 +15,7 @@ const STATUSES: MarketStatus[] = ['on_track', 'at_risk', 'off_track'];
 function Swatch({ fill, pattern }: { fill: string; pattern?: 'dots' | 'hatch' }) {
   const id = useId();
   return (
-    <svg aria-hidden width={14} height={14} className="shrink-0 rounded-[3px]">
+    <svg aria-hidden width={14} height={14} className="shrink-0 rounded-xs">
       {pattern ? (
         <defs>
           <pattern

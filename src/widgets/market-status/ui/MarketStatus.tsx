@@ -116,7 +116,7 @@ export function MarketStatus() {
           </h2>
         </CardTitle>
         <div className="flex flex-wrap items-center gap-2">
-          {state.mode === 'analyst' && view === 'map' ? <MetricPicker /> : null}
+          {state.mode === 'analyst' && view !== 'tiles' ? <MetricPicker /> : null}
           <ToggleGroup
             type="single"
             value={view}

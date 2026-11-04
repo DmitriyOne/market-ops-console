@@ -28,14 +28,22 @@ export const MAP_SCALES: Record<ScaleMetric, MapScale> = {
   },
 };
 
+// The percent format of the UI (formats.ts), in en: only its rounding matters here.
+const PERCENT = new Intl.NumberFormat('en', {
+  style: 'percent',
+  minimumFractionDigits: 1,
+  maximumFractionDigits: 1,
+  useGrouping: false,
+});
+
 /**
  * The value as the UI prints it, in whole units the breaks are exact in:
  * tenths of a percent, or dollars for revenue ("$999.9K", "$1.5M").
- * Percent: `toFixed` on the fraction the formatter gets rounds half away
- * from zero exactly as `Intl.NumberFormat` does (−1.05 → "−1.1 %").
+ * Percent goes through Intl itself: it rounds the shortest decimal form
+ * (0.95 → "1.0 %"), which `toFixed` on the binary value does not.
  */
 function shown(metric: ScaleMetric, value: number): number {
-  if (metric !== 'revenue') return Math.round(Number((value / 100).toFixed(3)) * 1000);
+  if (metric !== 'revenue') return Math.round(parseFloat(PERCENT.format(value / 100)) * 10);
   // Revenue is positive: Math.round halves up, as Intl does ("$1.45M" → "$1.5M").
   const hundreds = Math.round(value / 100) * 100;
   return hundreds < 1_000_000 ? hundreds : Math.round(value / 100_000) * 100_000;

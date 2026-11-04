@@ -35,11 +35,11 @@ export function useMapFormat() {
   const countryName = (item: MapItem, metric: MapMetric) => {
     const args = {
       name: item.name,
-      metric: metricLabel(valueMetric(metric)).toLowerCase(),
+      metric: metricLabel(valueMetric(metric)),
       value: value(metric, item.value),
     };
     return item.status
-      ? t('countryStatus', { ...args, status: statusLabel(item.status).toLowerCase() })
+      ? t('countryStatus', { ...args, status: statusLabel(item.status) })
       : t('country', args);
   };
   return { metricLabel, valueMetric, value, bound, countryName };

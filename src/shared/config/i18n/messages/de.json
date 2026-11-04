@@ -263,7 +263,7 @@
       "shareLatestOnly": "Der Marktanteil gilt nur für den letzten Monat; die Karte zeigt die Zielerreichung.",
       "sharePerProduct": "Einen Marktanteil gibt es nicht je Produkt; die Karte zeigt die Zielerreichung."
     },
-    "mapLabel": "Weltkarte der Märkte nach {metric}",
+    "mapLabel": "Weltkarte der Märkte: {metric}",
     "country": "{name}, {metric} {value}",
     "countryStatus": "{name}, {metric} {value}, {status}",
     "noData": "Keine Daten",

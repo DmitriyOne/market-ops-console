@@ -263,7 +263,7 @@
       "shareLatestOnly": "Market share is set for the latest month only; the map shows forecast attainment.",
       "sharePerProduct": "Market share is not set per product; the map shows forecast attainment."
     },
-    "mapLabel": "World map of markets by {metric}",
+    "mapLabel": "World map of markets: {metric}",
     "country": "{name}, {metric} {value}",
     "countryStatus": "{name}, {metric} {value}, {status}",
     "noData": "No data",

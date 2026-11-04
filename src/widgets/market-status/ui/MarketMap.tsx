@@ -120,6 +120,20 @@ export function MarketMap({ view, fitIds, onOpen }: MarketMapProps) {
   const { pos, setPos, flyTo, stop } = useMapPosition();
   const [tip, setTip] = useState<TooltipState | null>(null);
   const item = tip ? view.items.find((i) => i.id === tip.id) : undefined;
+  const touchTip = tip?.via === 'touch';
+
+  // A tap tooltip points at a spot on screen: scrolling the page closes it
+  // rather than leave its "Open" button over other cards.
+  useEffect(() => {
+    if (!touchTip) return;
+    const close = () => {
+      setTip(null);
+    };
+    window.addEventListener('scroll', close, { passive: true, once: true });
+    return () => {
+      window.removeEventListener('scroll', close);
+    };
+  }, [touchTip]);
 
   const zoomBy = (factor: number) => {
     flyTo({ center: pos.center, zoom: Math.min(MAX_ZOOM, Math.max(1, pos.zoom * factor)) });
@@ -133,7 +147,7 @@ export function MarketMap({ view, fitIds, onOpen }: MarketMapProps) {
         projection="geoEqualEarth"
         projectionConfig={PROJECTION}
         role="group"
-        aria-label={t('mapLabel', { metric: m.metricLabel(view.metric).toLowerCase() })}
+        aria-label={t('mapLabel', { metric: m.metricLabel(view.metric) })}
         className="block h-auto w-full touch-pan-x touch-pan-y rounded-md bg-map-sea select-none"
       >
         <MapLayers
@@ -152,11 +166,11 @@ export function MarketMap({ view, fitIds, onOpen }: MarketMapProps) {
           type="button"
           variant="outline"
           size="icon"
-          className="size-11"
+          className="size-11 aria-disabled:opacity-50"
           aria-label={t('zoomOut')}
-          disabled={pos.zoom <= 1.01}
+          aria-disabled={pos.zoom <= 1.01}
           onClick={() => {
-            zoomBy(1 / ZOOM_STEP);
+            if (pos.zoom > 1.01) zoomBy(1 / ZOOM_STEP);
           }}
         >
           <MinusIcon aria-hidden />
@@ -165,11 +179,11 @@ export function MarketMap({ view, fitIds, onOpen }: MarketMapProps) {
           type="button"
           variant="outline"
           size="icon"
-          className="size-11"
+          className="size-11 aria-disabled:opacity-50"
           aria-label={t('zoomIn')}
-          disabled={pos.zoom >= MAX_ZOOM - 0.01}
+          aria-disabled={pos.zoom >= MAX_ZOOM - 0.01}
           onClick={() => {
-            zoomBy(ZOOM_STEP);
+            if (pos.zoom < MAX_ZOOM - 0.01) zoomBy(ZOOM_STEP);
           }}
         >
           <PlusIcon aria-hidden />
@@ -177,10 +191,10 @@ export function MarketMap({ view, fitIds, onOpen }: MarketMapProps) {
         <Button
           type="button"
           variant="outline"
-          className="min-h-11"
-          disabled={pos.zoom <= 1.01}
+          className="min-h-11 aria-disabled:opacity-50"
+          aria-disabled={pos.zoom <= 1.01}
           onClick={() => {
-            flyTo(WORLD);
+            if (pos.zoom > 1.01) flyTo(WORLD);
           }}
         >
           {t('wholeWorld')}
@@ -309,6 +323,20 @@ type CountriesProps = {
 /** Every country: plain land, then the markets in Tab order, then patterns and rings on top. */
 const Countries = memo(function Countries({ view, shapes, onOpen, onTip }: CountriesProps) {
   const m = useMapFormat();
+  const { projection } = useMapContext();
+  // Above the main part of the country (not France with French Guiana, the US with Alaska).
+  const focusPoint = (path: SVGPathElement, item: MapItem): [number, number] => {
+    const geometry = shapes.get(item.numericIso)?.geometry;
+    const box =
+      geometry && isArea(geometry) ? mainBox(geometry, (p) => projection(p) ?? null) : null;
+    const ctm = box && typeof path.getScreenCTM === 'function' ? path.getScreenCTM() : null;
+    if (box && ctm) {
+      const p = new DOMPoint((box[0][0] + box[1][0]) / 2, box[0][1]).matrixTransform(ctm);
+      return [p.x, p.y];
+    }
+    const r = path.getBoundingClientRect();
+    return [r.left + r.width / 2, r.top];
+  };
   // Whether the next click and focus come from a finger, and whether a press is under way.
   const pointer = useRef({ type: 'mouse', down: false });
   const iso = new Set(view.items.map((i) => i.numericIso));
@@ -358,11 +386,15 @@ const Countries = memo(function Countries({ view, shapes, onOpen, onTip }: Count
             strokeWidth={item.inScope ? 0.75 : 0.6}
             style={NON_SCALING}
             className="cursor-pointer outline-none focus-visible:stroke-foreground focus-visible:[stroke-width:2.5]"
+            data-market={item.id}
             onPointerDown={(e) => {
               pointer.current = { type: e.pointerType, down: true };
-            }}
-            onPointerUp={() => {
-              pointer.current.down = false;
+              // Released anywhere (a drag, a scroll that ends in pointercancel): the press is over.
+              const release = () => {
+                pointer.current.down = false;
+              };
+              window.addEventListener('pointerup', release, { once: true });
+              window.addEventListener('pointercancel', release, { once: true });
             }}
             onPointerMove={(e) => {
               if (e.pointerType !== 'touch') show(item.id, [e.clientX, e.clientY], 'pointer');
@@ -379,8 +411,7 @@ const Countries = memo(function Countries({ view, shapes, onOpen, onTip }: Count
             onFocus={(e) => {
               // A press focuses too; the tooltip on focus is for the keyboard.
               if (pointer.current.down) return;
-              const r = e.currentTarget.getBoundingClientRect();
-              show(item.id, [r.left + r.width / 2, r.top], 'focus');
+              show(item.id, focusPoint(e.currentTarget, item), 'focus');
             }}
             onBlur={() => {
               hideIf((prev) => prev.via === 'focus');

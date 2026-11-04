@@ -29,6 +29,13 @@ describe('stepFor', () => {
     expect(stepFor('growth', 18, 1)).toBe(5);
   });
 
+  it('follows Intl where binary rounding differs: 0.95 % reads "+1.0 %", 29.95 % reads "30.0 %"', () => {
+    const pct = new Intl.NumberFormat('en', { style: 'percent', minimumFractionDigits: 1 });
+    expect(pct.format(0.0095)).toBe('1.0%');
+    expect(stepFor('growth', 0.95, 1)).toBe(3);
+    expect(stepFor('share', 29.95, 1)).toBe(4);
+  });
+
   it('share: five steps', () => {
     expect(stepFor('share', 9.9, 1)).toBe(0);
     expect(stepFor('share', 30, 1)).toBe(4);

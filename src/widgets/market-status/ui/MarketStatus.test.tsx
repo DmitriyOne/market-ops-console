@@ -170,7 +170,7 @@ describe('MarketStatus map', () => {
       'Brazil',
       'Mexico',
     ]);
-    expect(names).toContain('Germany, attainment 92.0%, off track');
+    expect(names).toContain('Germany, Attainment 92.0%, Off track');
   });
 
   it('countries without a market are plain land, not focusable', async () => {
@@ -217,6 +217,46 @@ describe('MarketStatus map', () => {
     });
   });
 
+  const tap = (el: Element) => {
+    fireEvent.pointerDown(el, { pointerType: 'touch' });
+    fireEvent.pointerUp(el, { pointerType: 'touch' });
+    fireEvent.click(el);
+  };
+
+  it('a tap on another market moves the tooltip there in one tap', async () => {
+    setup();
+    const map = await mapGroup();
+    tap(await within(map).findByRole('button', { name: /^Spain,/ }));
+    await screen.findByRole('button', { name: 'Open Spain' });
+    const italy = within(map).getByRole('button', { name: /^Italy,/ });
+    fireEvent.pointerDown(italy, { pointerType: 'touch' });
+    fireEvent.pointerUp(italy, { pointerType: 'touch' });
+    fireEvent.click(italy);
+    expect(await screen.findByRole('button', { name: 'Open Italy' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Open Spain' })).not.toBeInTheDocument();
+  });
+
+  it('the tap tooltip closes when the page scrolls', async () => {
+    setup();
+    tap(await within(await mapGroup()).findByRole('button', { name: /^Spain,/ }));
+    await screen.findByRole('button', { name: 'Open Spain' });
+    fireEvent.scroll(window);
+    await waitFor(() => {
+      expect(screen.queryByRole('button', { name: 'Open Spain' })).not.toBeInTheDocument();
+    });
+  });
+
+  it('Executive ignores kpi in the URL and colours by status', async () => {
+    setup('?kpi=growth');
+    const legend = await screen.findByRole('list', { name: t.legend });
+    expect(legend).toHaveTextContent('On track');
+    expect(
+      await within(await mapGroup()).findByRole('button', {
+        name: 'Germany, Attainment 92.0%, Off track',
+      }),
+    ).toBeInTheDocument();
+  });
+
   it('keyboard focus shows the tooltip; Esc hides it', async () => {
     const { user } = setup();
     const germany = await within(await mapGroup()).findByRole('button', { name: /^Germany,/ });
@@ -237,7 +277,7 @@ describe('MarketStatus map', () => {
     const names = (await within(await mapGroup()).findAllByRole('button')).map((b) =>
       b.getAttribute('aria-label'),
     );
-    expect(names.some((n) => /track|risk/.test(n ?? ''))).toBe(false);
+    expect(names.some((n) => /track|risk/i.test(n ?? ''))).toBe(false);
     expect(screen.getByRole('list', { name: t.legend }).children).toHaveLength(5);
   });
 

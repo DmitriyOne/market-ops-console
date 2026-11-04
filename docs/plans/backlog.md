@@ -56,3 +56,8 @@ Points the owner wants explained in the README, in his own words:
 - **Skeleton vs stored view**: before hydration the card shows a map-shaped block from md up and tiles on a phone; a desktop user who chose tiles sees one layout change on load (localStorage cannot be read before paint). Fix with ADR 0015's before-paint pattern if it shows in review. **Plan 5**.
 - **Touch flow checked in unit tests and Chrome emulation only**, not on a real phone (pinch, tap tooltip, page scroll over the map). **Owner check**.
 - **Europe is small at world zoom** in the narrow card column; markets stay reachable by Tab, zoom buttons and the table. Revisit if the layout gives the map more width.
+- **Review of 0.6.0 map, deferred** (2026-11-04):
+  - Focus ring on a market is partly covered by neighbours and the pattern layer drawn later; draw a separate focus outline on top. **Plan 5**, a11y polish.
+  - When zoomed in, Tab can focus a market outside the view; fly to it on focus if off-screen. **Plan 5**.
+  - Status metric with a product: tooltip shows the product's attainment next to the market's status; only the note under the card says status is per market. Owner decision №9; add the note to the tooltip if users misread it.
+  - Not covered by tests yet: "Back returns to the old market with the product" (URL history), locale switch keeping `kpi` (the switch keeps the whole query, tested in `use-switch-locale`). **Plan 5**, E2E.

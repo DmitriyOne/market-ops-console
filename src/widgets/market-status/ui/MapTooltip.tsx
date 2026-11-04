@@ -62,6 +62,10 @@ export function MapTooltip({ item, metric, tip, onOpen, onClose }: MapTooltipPro
         onCloseAutoFocus={(e) => {
           e.preventDefault();
         }}
+        // A tap on another market moves the tooltip (its own click), not just closes it.
+        onInteractOutside={(e) => {
+          if (e.target instanceof Element && e.target.closest('[data-market]')) e.preventDefault();
+        }}
         className={cn('w-auto max-w-64 gap-1.5 p-2 text-xs', !touch && 'pointer-events-none')}
       >
         <p className="text-sm font-semibold">{item.name}</p>
