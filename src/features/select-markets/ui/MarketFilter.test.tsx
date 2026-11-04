@@ -20,6 +20,11 @@ function setup(searchParams = '?mode=analyst') {
   );
 }
 
+async function openMenu(user: ReturnType<typeof setup>['user']) {
+  await user.click(await screen.findByRole('button', { name: new RegExp(`^${t.button}`) }));
+  return screen.findByRole('menu');
+}
+
 describe('MarketFilter', () => {
   beforeEach(() => {
     server.use(datasetHandler());
@@ -27,9 +32,8 @@ describe('MarketFilter', () => {
 
   it('lists the markets of the scope by region; checking two keeps the menu open', async () => {
     const { user, lastUpdate } = setup('?mode=analyst&region=eu');
-    await user.click(await screen.findByRole('button', { name: t.button }));
-    const menu = await screen.findByRole('menu');
-    expect(within(menu).getAllByRole('menuitemcheckbox')).toHaveLength(5);
+    const menu = await openMenu(user);
+    expect(within(menu).getAllByRole('menuitemcheckbox', { name: /^(?!All )/ })).toHaveLength(5);
     await user.click(within(menu).getByRole('menuitemcheckbox', { name: 'Germany' }));
     await user.click(within(menu).getByRole('menuitemcheckbox', { name: 'Spain' }));
     expect(screen.getByRole('menu')).toBeInTheDocument();
@@ -37,30 +41,73 @@ describe('MarketFilter', () => {
     expect(lastUpdate()?.queryString).toBe('?mode=analyst&region=eu&markets=de&markets=es');
   });
 
-  it('counts the selected markets of the scope; Clear removes all and focuses the menu button', async () => {
+  it('a region line selects all its markets, then none; part of them shows as mixed', async () => {
+    const { user, lastUpdate } = setup('?mode=analyst&markets=fr');
+    const menu = await openMenu(user);
+    const europe = within(menu).getByRole('menuitemcheckbox', { name: 'All of Europe' });
+    expect(europe).toHaveAttribute('aria-checked', 'mixed');
+    // A dash for part of the region, not the tick a full region gets.
+    expect(europe.querySelector('.lucide-minus')).not.toBeNull();
+    expect(europe.querySelector('.lucide-check')).toBeNull();
+    await user.click(europe);
+    await waitFor(() => {
+      expect(lastUpdate()?.queryString).toBe(
+        '?mode=analyst&markets=fr&markets=de&markets=it&markets=es&markets=gb',
+      );
+    });
+    await user.click(within(menu).getByRole('menuitemcheckbox', { name: 'All of Europe' }));
+    await waitFor(() => {
+      expect(lastUpdate()?.queryString).toBe('?mode=analyst');
+    });
+  });
+
+  it('"At risk or off track" selects them (latest month); off the latest month it is disabled', async () => {
+    const { user, lastUpdate, unmount } = setup();
+    await user.click(within(await openMenu(user)).getByRole('menuitem', { name: t.atRisk }));
+    await waitFor(() => {
+      expect(new URLSearchParams(lastUpdate()?.queryString).getAll('markets').sort()).toEqual([
+        'br',
+        'de',
+        'es',
+        'fr',
+        'gb',
+        'it',
+      ]);
+    });
+    unmount();
+    const again = setup('?mode=analyst&range=3m');
+    const menu = await openMenu(again.user);
+    expect(within(menu).getByRole('menuitem', { name: new RegExp(t.atRisk) })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
+  });
+
+  it('counts the selected markets of the scope; "Clear all" sits in the menu', async () => {
     const { user, lastUpdate } = setup('?mode=analyst&region=eu&markets=de&markets=jp');
     expect(await screen.findByText('1 of 5 selected')).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: t.clear }));
+    expect(screen.queryByRole('button', { name: t.clear })).not.toBeInTheDocument();
+    await user.click(within(await openMenu(user)).getByRole('menuitem', { name: t.clearAll }));
     await waitFor(() => {
       expect(lastUpdate()?.queryString).toBe('?mode=analyst&region=eu');
     });
-    expect(screen.getByRole('button', { name: t.button })).toHaveFocus();
   });
 
   it('chips name the selection; × removes one', async () => {
     const { user, lastUpdate } = setup('?mode=analyst&markets=de&markets=es');
-    const remove = await screen.findByRole('button', { name: 'Remove Germany' });
-    expect(screen.getByRole('button', { name: 'Remove Spain' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: `${t.button} (2)` })).toBeInTheDocument();
-    await user.click(remove);
+    await user.click(await screen.findByRole('button', { name: 'Remove Germany' }));
     await waitFor(() => {
       expect(lastUpdate()?.queryString).toBe('?mode=analyst&markets=es');
     });
   });
 
-  it('no selection: no chips and no Clear', async () => {
-    setup();
-    await screen.findByRole('button', { name: t.button });
-    expect(screen.queryByRole('button', { name: t.clear })).not.toBeInTheDocument();
+  it('nothing selected: no count, "Clear all" disabled', async () => {
+    const { user } = setup();
+    const menu = await openMenu(user);
+    expect(within(menu).getByRole('menuitem', { name: t.clearAll })).toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
+    expect(screen.queryByText(/selected$/)).not.toBeInTheDocument();
   });
 });

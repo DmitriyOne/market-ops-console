@@ -320,7 +320,11 @@
     "clear": "Auswahl aufheben",
     "remove": "{name} entfernen",
     "count": "{selected} von {total} ausgewählt",
-    "selected": "Ausgewählt"
+    "selected": "Ausgewählt",
+    "region": "Ganz {region}",
+    "atRisk": "Gefährdet oder nicht im Plan",
+    "atRiskLatestOnly": "Nur für den letzten Monat",
+    "clearAll": "Alle entfernen"
   },
   "marketsTable": {
     "title": "Märkte",
@@ -332,8 +336,10 @@
       "market": "Markt",
       "region": "Region",
       "revenue": "Umsatz",
+      "forecast": "Prognose",
       "gap": "Abstand zur Prognose",
       "attainment": "Zielerreichung",
+      "priorYear": "Vorjahr",
       "growth": "Wachstum ggü. Vj.",
       "share": "Marktanteil",
       "units": "Stück",
@@ -342,7 +348,8 @@
     "empty": "Keiner der ausgewählten Märkte ist in dieser Ansicht. Heben Sie die Auswahl auf, um alle Märkte zu sehen.",
     "noteLatest": "Status und Marktanteil gibt es nur für den letzten Monat.",
     "notePerProduct": "Marktanteil gibt es nicht pro Produkt.",
-    "noteCalculated": "Abstand zur Prognose, Stückzahlen und Summe sind aus Monatsdaten berechnet."
+    "noteCalculated": "Prognose, Abstand zur Prognose, Vorjahr, Stückzahlen und Summe sind aus Monatsdaten berechnet.",
+    "anomaly": "Anomalie, {period}: {note}"
   },
   "exportMarkets": {
     "button": "Exportieren",
@@ -351,6 +358,33 @@
     "excelHint": "Formatiert, mit Filtern",
     "csv": "CSV",
     "csvHint": "Rohwerte in USD, für andere Programme",
-    "failed": "Datei konnte nicht erstellt werden. Bitte erneut versuchen."
+    "failed": "Datei konnte nicht erstellt werden. Bitte erneut versuchen.",
+    "sheet": {
+      "markets": "Märkte",
+      "months": "Nach Monat",
+      "about": "Info",
+      "total": "Summe",
+      "code": "Code",
+      "anomaly": "Anomalie",
+      "month": "Monat",
+      "actual": "Ist"
+    },
+    "about": {
+      "source": "Quelle",
+      "sourceValue": "data.json, erstellt am {date}; Beträge in USD",
+      "view": "Ansicht",
+      "product": "Produkt",
+      "selection": "Ausgewählte Märkte",
+      "selectionAll": "Alle Märkte der Ansicht",
+      "sort": "Reihenfolge",
+      "sortDefault": "Region, dann Markt",
+      "asc": "{column}, aufsteigend",
+      "desc": "{column}, absteigend",
+      "calculated": "Wie Werte entstehen",
+      "calculatedValue": "Gespeicherte Werte für einen Markt im letzten Monat; alles andere wird aus Monatsdaten berechnet (Umsatz = Σ Ist, Zielerreichung = Σ Ist ÷ Σ Prognose, Wachstum = Σ Ist ÷ Σ Vorjahr − 1). Summen folgen dem Excel-Filter.",
+      "status": "Status",
+      "statusValue": "In den Daten nur für den letzten Monat gesetzt.",
+      "link": "Diese Ansicht öffnen"
+    }
   }
 }

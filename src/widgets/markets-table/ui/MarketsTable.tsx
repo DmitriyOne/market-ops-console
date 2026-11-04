@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon } from 'lucide-react';
+import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon, TriangleAlertIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useId, useMemo } from 'react';
 
@@ -35,6 +35,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from '@/shared/ui';
 
 import { useTableSort } from '../model/use-table-sort';
@@ -48,8 +51,10 @@ type NumberColumn = Exclude<TableColumn, 'market' | 'region' | 'status'>;
 type Kind = 'currency' | 'signedCurrency' | 'percent' | 'signedPercent' | 'integer';
 const NUMBERS: { column: NumberColumn; key: keyof TableTotals; kind: Kind }[] = [
   { column: 'revenue', key: 'revenue', kind: 'currency' },
+  { column: 'forecast', key: 'forecast', kind: 'currency' },
   { column: 'gap', key: 'gap', kind: 'signedCurrency' },
   { column: 'attainment', key: 'attainmentPct', kind: 'percent' },
+  { column: 'priorYear', key: 'priorYear', kind: 'currency' },
   { column: 'growth', key: 'growthPct', kind: 'signedPercent' },
   { column: 'share', key: 'sharePct', kind: 'percent' },
   { column: 'units', key: 'units', kind: 'integer' },
@@ -185,20 +190,43 @@ export function MarketsTable() {
 }
 
 function MarketRow({ row, onOpen }: { row: Row; onOpen: (id: string) => void }) {
+  const t = useTranslations('marketsTable');
   const f = useKpiFormat();
   return (
     <TableRow aria-current={row.current ? 'true' : undefined}>
       <TableCell className={cn(STICKY, 'p-0 font-medium')}>
-        <Button
-          type="button"
-          variant="ghost"
-          className={cn('min-h-11 w-full justify-start px-2', row.current && 'font-semibold')}
-          onClick={() => {
-            onOpen(row.id);
-          }}
-        >
-          {row.name}
-        </Button>
+        <div className="flex items-center">
+          <Button
+            type="button"
+            variant="ghost"
+            className={cn('min-h-11 flex-1 justify-start px-2', row.current && 'font-semibold')}
+            onClick={() => {
+              onOpen(row.id);
+            }}
+          >
+            {/* The code as on the tiles; part of the name (label in name, WCAG 2.5.3). */}
+            <span className="font-mono text-xs text-muted-foreground">{row.code}</span> {row.name}
+          </Button>
+          {row.anomalies.map((a) => {
+            const label = t('anomaly', { period: f.period(a.period), note: a.note });
+            return (
+              <Tooltip key={a.period}>
+                <TooltipTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon-sm"
+                    aria-label={label}
+                    className="text-status-off-track"
+                  >
+                    <TriangleAlertIcon aria-hidden />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-64">{label}</TooltipContent>
+              </Tooltip>
+            );
+          })}
+        </div>
       </TableCell>
       <TableCell className="text-muted-foreground">{row.regionName}</TableCell>
       {NUMBERS.map((n) => (

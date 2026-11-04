@@ -56,12 +56,12 @@ describe('MarketsTable', () => {
       'aria-sort',
       'descending',
     );
-    expect(await firstMarket()).toBe('China');
+    expect(await firstMarket()).toBe('CN China');
     await user.click(screen.getByRole('button', { name: t.column.growth }));
     await waitFor(() => {
       expect(lastUpdate()?.queryString).toBe('?mode=analyst&sort=growth');
     });
-    expect(await firstMarket()).toBe('Germany');
+    expect(await firstMarket()).toBe('DE Germany');
   });
 
   it('text columns start ascending', async () => {
@@ -70,18 +70,16 @@ describe('MarketsTable', () => {
     await waitFor(() => {
       expect(lastUpdate()?.queryString).toBe('?mode=analyst&sort=market');
     });
-    expect(await firstMarket()).toBe('Australia');
+    expect(await firstMarket()).toBe('AU Australia');
   });
 
   it('the selection narrows the rows and the total', async () => {
     setup('?mode=analyst&markets=de&markets=es');
     expect(await bodyRows()).toHaveLength(2);
-    // Filter, count and Clear on one row; the chips on the row below.
+    // The filter and its count on one row; the chips on the row below.
     const count = screen.getByText('2 of 13 selected');
     const chip = screen.getByRole('button', { name: 'Remove Germany' });
-    expect(count.parentElement).toContainElement(
-      screen.getByRole('button', { name: en.marketFilter.clear }),
-    );
+    expect(count.parentElement).toContainElement(screen.getByRole('button', { name: /^Markets/ }));
     expect(count.parentElement).not.toContainElement(chip);
   });
 
@@ -89,7 +87,8 @@ describe('MarketsTable', () => {
     const { user, lastUpdate } = setup('?mode=analyst&region=apac&markets=de');
     expect(await screen.findByText(t.empty)).toBeInTheDocument();
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: en.marketFilter.clear }));
+    await user.click(screen.getByRole('button', { name: /^Markets/ }));
+    await user.click(await screen.findByRole('menuitem', { name: en.marketFilter.clearAll }));
     await waitFor(() => {
       expect(lastUpdate()?.queryString).toBe('?mode=analyst&region=apac');
     });
@@ -109,7 +108,7 @@ describe('MarketsTable', () => {
       'aria-current',
       'true',
     );
-    await user.click(screen.getByRole('button', { name: 'Germany' }));
+    await user.click(screen.getByRole('button', { name: 'DE Germany' }));
     await waitFor(() => {
       expect(Object.fromEntries(lastUpdate()?.searchParams ?? [])).toMatchObject({ market: 'de' });
     });
@@ -121,5 +120,19 @@ describe('MarketsTable', () => {
     const caption = (await table()).querySelector('caption');
     expect(caption).toHaveTextContent('Europe');
     expect(caption).toHaveTextContent('3 months');
+  });
+
+  it('forecast and prior year columns; the anomaly in the window is marked with its note', async () => {
+    setup('?mode=analyst&period=2026-03');
+    expect(
+      await screen.findByRole('columnheader', { name: t.column.forecast }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: t.column.priorYear })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', {
+        name: 'Anomaly, Mar 2026: Revenue fell 27% versus the prior month.',
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: /^Anomaly/ })).toHaveLength(1);
   });
 });

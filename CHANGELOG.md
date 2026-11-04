@@ -5,13 +5,14 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 ## [0.7.0] - Unreleased
 
 ### Added
-- Markets table in Analyst, full width under the map: every KPI per market of the scope (revenue, gap to forecast, attainment, growth, share, units, status), a total of the rows shown, headers that sort (in the URL as `sort`, no history entry), a sticky market column on small screens, a market name that opens the market.
-- `Markets ▾` filter with "N of M selected" and Clear on one row and removable chips below; in Analyst, Shift+click or Shift+Enter on the map or the tiles, or "Add to filter" in the touch tooltip, adds a market. A hint under the map says how. A pick on the map keeps the map still.
-- `Export ▾` of the table as shown: Excel (.xlsx: number formats, title row, bold frozen header with a filter, frozen market column, words in the UI language; ExcelJS loads only on export) and CSV for tools (raw USD and percent numbers, English headers, UTF-8 BOM, formula-injection guard). Files `markets-<period>-<range>[-<product>].xlsx/.csv`.
+- Markets table in Analyst, full width under the map: every KPI per market of the scope (revenue, forecast, gap to forecast, attainment, prior year, growth, share, units, status), the country code, a ⚠ with the data's note when an anomaly falls in the window, a total of the rows shown, headers that sort (in the URL as `sort`, no history entry), a sticky market column on small screens, a market name that opens the market.
+- `Markets ▾` filter: "At risk or off track", all or none of a region (a dash when part of it), a checkbox per market and "Clear all" in the menu, "N of M selected" next to it, removable chips below; in Analyst, Shift+click or Shift+Enter on the map or the tiles, or "Add to filter" in the touch tooltip, adds a market. A hint under the map says how. A pick on the map keeps the map still.
+- `Export ▾` of the table as shown: Excel (.xlsx with three sheets: the markets as an Excel table with filters, banding, frozen header and market column, $ and % formats, status and negative values coloured and a total that follows the filter; the months behind it; an About sheet with source, view, selection, order and a link back; ExcelJS loads only on export) and CSV for tools (raw USD and percent numbers, English headers, UTF-8 BOM, formula-injection guard). Files `markets-<period>-<range>[-<product>].xlsx/.csv`.
 - Selection bar on the Market status card in both modes: "Selected", chips, Clear.
 - Units in the revenue trend in Analyst (table column and chart tooltip).
 
 ### Changed
+- Checkbox items in menus show a dash, not a tick, when only part of a group is picked.
 - `markets` is one selection list for the assistant, the map, the tiles and the filter; "highlighted from the assistant" now reads "selected", and the open market reads "open now".
 
 ## [0.6.0] - Unreleased

@@ -3,13 +3,7 @@
 import { ChevronDownIcon, DownloadIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
-import {
-  marketsTable,
-  scopeLabel,
-  useDashboard,
-  useKpiFormat,
-  useStatusLabel,
-} from '@/entities/performance';
+import { marketsMonthly, marketsTable, useDashboard } from '@/entities/performance';
 import { downloadBlob, downloadText, logError } from '@/shared/lib';
 import {
   Button,
@@ -22,40 +16,26 @@ import {
 } from '@/shared/ui';
 
 import { marketsCsv, marketsCsvName } from '../model/markets-csv';
-import { type MarketsSheetLabels, marketsXlsx, marketsXlsxName } from '../model/markets-xlsx';
+import { marketsXlsx, marketsXlsxName } from '../model/markets-xlsx';
+import { useSheetLabels } from './use-sheet-labels';
 
 /**
  * Saves the markets table as shown (filter, sort, period, window): Excel
- * for people (formats, filters, words in the UI language), CSV for tools
- * (raw USD numbers, machine headers).
+ * for people (formats, filters, months, words in the UI language), CSV for
+ * tools (raw USD numbers, machine headers).
  */
 export function ExportMenu() {
   const t = useTranslations('exportMarkets');
-  const tTable = useTranslations('marketsTable');
-  const tDrill = useTranslations('drill');
-  const tPeriod = useTranslations('period');
-  const f = useKpiFormat();
-  const statusLabel = useStatusLabel();
   const { ds, state } = useDashboard();
   const { scope, period, range, selected, sort } = state;
   const view = marketsTable(ds, scope, period, range, selected, sort);
-  const window =
-    range === '1m'
-      ? f.period(period)
-      : tPeriod('label', { period: f.period(period), range: tPeriod(`range.${range}`) });
+  const sheetLabels = useSheetLabels();
 
   const saveExcel = async () => {
-    const labels: MarketsSheetLabels = {
-      sheet: tTable('title'),
-      title: [tTable('title'), scopeLabel(ds, scope) ?? tDrill('portfolio'), window].join(' · '),
-      header: (column) => tTable(`column.${column}`),
-      status: statusLabel,
-    };
     try {
-      downloadBlob(
-        marketsXlsxName(period, range, scope.productId),
-        await marketsXlsx(view, labels),
-      );
+      const months = marketsMonthly(ds, view, scope, period, range);
+      const blob = await marketsXlsx(view, months, sheetLabels(window.location.href));
+      downloadBlob(marketsXlsxName(period, range, scope.productId), blob);
     } catch (error) {
       logError(error, { scope: 'ui', action: 'export_xlsx' });
       toast.error(t('failed'));

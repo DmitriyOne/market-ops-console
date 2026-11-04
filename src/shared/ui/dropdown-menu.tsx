@@ -1,7 +1,7 @@
 'use client';
 
 import { cn } from 'cn';
-import { CheckIcon, ChevronRightIcon } from 'lucide-react';
+import { CheckIcon, ChevronRightIcon, MinusIcon } from 'lucide-react';
 import { DropdownMenu as DropdownMenuPrimitive } from 'radix-ui';
 import * as React from 'react';
 
@@ -95,7 +95,8 @@ function DropdownMenuCheckboxItem({
         data-slot="dropdown-menu-checkbox-item-indicator"
       >
         <DropdownMenuPrimitive.ItemIndicator>
-          <CheckIcon />
+          {/* Part of a group picked: a dash, not a tick. */}
+          {checked === 'indeterminate' ? <MinusIcon /> : <CheckIcon />}
         </DropdownMenuPrimitive.ItemIndicator>
       </span>
       {children}

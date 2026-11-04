@@ -15,21 +15,26 @@ describe('marketsCsv', () => {
     const [header, ...rows] = lines(marketsCsv(view));
     expect(header).toBe(MARKETS_CSV_HEADER.join(','));
     expect(header).toBe(
-      'market_id,market,region,revenue_usd,gap_to_forecast_usd,attainment_pct,growth_pct,share_pct,units,status',
+      'market_id,iso2,market,region,revenue_usd,forecast_usd,gap_to_forecast_usd,attainment_pct,prior_year_usd,growth_pct,share_pct,units,status,anomaly',
     );
     expect(rows).toHaveLength(13);
     const de = rows[0]?.split(',');
-    expect(de?.slice(0, 3)).toEqual(['de', 'Germany', 'Europe']);
-    expect(de?.[6]).toBe('-9.7');
-    expect(de?.[9]).toBe('off_track');
-    expect(Number(de?.[3])).toBe(Math.round(Number(de?.[3])));
+    expect(de?.slice(0, 4)).toEqual(['de', 'DE', 'Germany', 'Europe']);
+    expect(de?.[9]).toBe('-9.7');
+    expect(de?.[12]).toBe('off_track');
+    expect(de?.[13]).toBe('');
+    expect(Number(de?.[4])).toBe(Math.round(Number(de?.[4])));
   });
 
   it('values the view does not have are empty cells', () => {
     const view = marketsTable(ds, {}, '2026-05', '3m', ['de'], null);
     const de = lines(marketsCsv(view))[1]?.split(',');
-    expect(de?.[7]).toBe('');
-    expect(de?.[9]).toBe('');
+    expect(de?.[10]).toBe('');
+    expect(de?.[12]).toBe('');
+    // The March dip is in the 3 months to May.
+    expect(lines(marketsCsv(view))[1]).toMatch(
+      /,"?2026-03: Revenue fell 27% versus the prior month\."?$/,
+    );
   });
 });
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { marketsTable, parseSort, sortParam } from './markets-table';
+import { marketsMonthly, marketsTable, parseSort, sortParam } from './markets-table';
 import { ds } from './test-dataset';
 
 const ids = (view: ReturnType<typeof marketsTable>) => view.rows.map((r) => r.id);
@@ -127,5 +127,70 @@ describe('parseSort / sortParam', () => {
     expect(sortParam({ column: 'units', dir: 'desc' })).toBe('-units');
     expect(sortParam({ column: 'market', dir: 'asc' })).toBe('market');
     expect(sortParam(null)).toBeNull();
+  });
+});
+
+describe('marketsTable: plan, last year, code and anomalies', () => {
+  const de = (period = '2026-05', range: '1m' | '3m' | '12m' = '1m') =>
+    marketsTable(ds, {}, period, range, ['de'], null).rows[0];
+
+  it('forecast and prior year are the window sums from series, calculated', () => {
+    const row = de();
+    expect(row?.forecast).toEqual({ value: sum(['de'], 'forecast'), source: 'calculated' });
+    const prior = ds.series
+      .filter((r) => r.marketId === 'de' && r.period === '2026-05')
+      .reduce((total, r) => total + r.priorYear, 0);
+    expect(row?.priorYear).toEqual({ value: prior, source: 'calculated' });
+    expect(row?.code).toBe('DE');
+  });
+
+  it('an anomaly shows while its month is in the window', () => {
+    expect(de('2026-03')?.anomalies).toEqual([
+      { period: '2026-03', type: 'dip', note: 'Revenue fell 27% versus the prior month.' },
+    ]);
+    expect(de('2026-05', '3m')?.anomalies).toHaveLength(1);
+    expect(de('2026-05')?.anomalies).toEqual([]);
+  });
+
+  it('totals add forecast and prior year; sort by them works', () => {
+    const view = marketsTable(ds, {}, '2026-05', '1m', ['de', 'es'], {
+      column: 'priorYear',
+      dir: 'desc',
+    });
+    expect(view.totals.forecast.value).toBeCloseTo(sum(['de', 'es'], 'forecast'));
+    expect(view.rows.map((r) => r.id)).toEqual(['de', 'es']);
+    expect(parseSort('-forecast')).toEqual({ column: 'forecast', dir: 'desc' });
+  });
+});
+
+describe('marketsMonthly', () => {
+  it('one row per market and month of the window, in table order then month', () => {
+    const view = marketsTable(ds, {}, '2026-05', '3m', ['es', 'de'], null);
+    const rows = marketsMonthly(ds, view, {}, '2026-05', '3m');
+    expect(rows.map((r) => `${r.id} ${r.period}`)).toEqual([
+      'de 2026-03',
+      'de 2026-04',
+      'de 2026-05',
+      'es 2026-03',
+      'es 2026-04',
+      'es 2026-05',
+    ]);
+    const march = ds.series.filter((r) => r.marketId === 'de' && r.period === '2026-03');
+    expect(rows[0]).toMatchObject({
+      code: 'DE',
+      regionName: 'Europe',
+      actual: march.reduce((t, r) => t + r.actual, 0),
+      units: march.reduce((t, r) => t + r.units, 0),
+    });
+  });
+
+  it('a product narrows each month to it', () => {
+    const scope = { regionId: 'eu', marketId: 'de', productId: 'veltrix' };
+    const view = marketsTable(ds, scope, '2026-05', '1m', ['de'], null);
+    const [row] = marketsMonthly(ds, view, scope, '2026-05', '1m');
+    const one = ds.series.find(
+      (r) => r.marketId === 'de' && r.productId === 'veltrix' && r.period === '2026-05',
+    );
+    expect(row?.actual).toBe(one?.actual);
   });
 });

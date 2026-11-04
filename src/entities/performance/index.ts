@@ -38,8 +38,10 @@ export {
   topRisks,
 } from './model/market-status';
 export {
+  marketsMonthly,
   marketsTable,
   type MarketsTableView,
+  type MonthlyRow,
   parseSort,
   sortParam,
   TABLE_COLUMNS,

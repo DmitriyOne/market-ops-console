@@ -1,4 +1,4 @@
-import type { Dataset, MarketStatus, Period } from '@/shared/api';
+import type { Anomaly, Dataset, MarketStatus, Period } from '@/shared/api';
 
 import { computeKpis, type KpiValue } from './kpis';
 import { getRegion } from './reference';
@@ -10,8 +10,10 @@ export const TABLE_COLUMNS = [
   'market',
   'region',
   'revenue',
+  'forecast',
   'gap',
   'attainment',
+  'priorYear',
   'growth',
   'share',
   'units',
@@ -23,6 +25,10 @@ export type TableSort = { column: TableColumn; dir: 'asc' | 'desc' } | null;
 
 export type TableTotals = {
   revenue: KpiValue;
+  /** Σ forecast in the window, from series. */
+  forecast: KpiValue;
+  /** Σ prior-year actual in the window, from series. */
+  priorYear: KpiValue;
   /** Actual − forecast in the window, always from series. */
   gap: KpiValue;
   attainmentPct: KpiValue;
@@ -33,6 +39,8 @@ export type TableTotals = {
 
 export type TableRow = TableTotals & {
   id: string;
+  /** ISO 3166 alpha-2, as on the tiles. */
+  code: string;
   name: string;
   regionId: string;
   regionName: string;
@@ -40,6 +48,8 @@ export type TableRow = TableTotals & {
   status: MarketStatus | null;
   /** The market the dashboard is drilled into. */
   current: boolean;
+  /** Anomaly markers from the data whose month is in the window. */
+  anomalies: Anomaly[];
 };
 
 export type MarketsTableView = {
@@ -83,8 +93,12 @@ function sortKey(row: TableRow, column: TableColumn): number | string | null {
       return row.status === null ? null : STATUS_ORDER[row.status];
     case 'revenue':
       return row.revenue.value;
+    case 'forecast':
+      return row.forecast.value;
     case 'gap':
       return row.gap.value;
+    case 'priorYear':
+      return row.priorYear.value;
     case 'attainment':
       return row.attainmentPct.value;
     case 'growth':
@@ -128,6 +142,8 @@ function totalsOf(
   if (series.length === 0) {
     return {
       revenue: UNAVAILABLE,
+      forecast: UNAVAILABLE,
+      priorYear: UNAVAILABLE,
       gap: UNAVAILABLE,
       attainmentPct: UNAVAILABLE,
       growthPct: UNAVAILABLE,
@@ -149,6 +165,8 @@ function totalsOf(
   }
   return {
     revenue: calculated(t.actual),
+    forecast: calculated(t.forecast),
+    priorYear: calculated(t.priorYear),
     gap: calculated(t.actual - t.forecast),
     attainmentPct: calculated(ratioPct(t.actual, t.forecast)),
     growthPct: calculated(growth === null ? null : growth - 100),
@@ -179,6 +197,7 @@ export function marketsTable(
   const filtered = chosen.size > 0;
   const shown = filtered ? inScope.filter((m) => chosen.has(m.id)) : inScope;
 
+  const inWindow = new Set(periods);
   const rows = shown.map((m): TableRow => {
     const kpis = computeKpis(
       ds,
@@ -197,19 +216,24 @@ export function marketsTable(
         periods,
       ),
     );
+    const none = periods.length === 0;
     return {
       id: m.id,
+      code: m.iso2,
       name: m.name,
       regionId: m.regionId,
       regionName: getRegion(ds, m.regionId)?.name ?? m.regionId,
       revenue: kpis.revenue,
-      gap: periods.length === 0 ? UNAVAILABLE : calculated(totals.actual - totals.forecast),
+      forecast: none ? UNAVAILABLE : calculated(totals.forecast),
+      priorYear: none ? UNAVAILABLE : calculated(totals.priorYear),
+      gap: none ? UNAVAILABLE : calculated(totals.actual - totals.forecast),
       attainmentPct: kpis.attainmentPct,
       growthPct: kpis.growthPct,
       sharePct: kpis.sharePct,
       units: kpis.units,
       status: statusFor(ds, m.id, period, range),
       current: m.id === scope.marketId,
+      anomalies: m.kpis.anomalies.filter((a) => inWindow.has(a.period)),
     };
   });
 
@@ -219,4 +243,46 @@ export function marketsTable(
     inScope: inScope.length,
     filtered,
   };
+}
+
+export type MonthlyRow = {
+  id: string;
+  code: string;
+  name: string;
+  regionName: string;
+  period: Period;
+  actual: number;
+  forecast: number;
+  priorYear: number;
+  units: number;
+};
+
+/**
+ * The months behind the table: one row per market shown (table order) and
+ * month of the window, summed over products or for the chosen product.
+ */
+export function marketsMonthly(
+  ds: Dataset,
+  view: MarketsTableView,
+  scope: Scope,
+  period: Period,
+  range: Range,
+): MonthlyRow[] {
+  const periods = periodsInRange(ds.meta.periods, period, range);
+  return view.rows.flatMap((row) =>
+    periods.map((p) => ({
+      id: row.id,
+      code: row.code,
+      name: row.name,
+      regionName: row.regionName,
+      period: p,
+      ...sumRows(
+        rowsInScope(
+          ds,
+          { marketId: row.id, ...(scope.productId ? { productId: scope.productId } : {}) },
+          [p],
+        ),
+      ),
+    })),
+  );
 }

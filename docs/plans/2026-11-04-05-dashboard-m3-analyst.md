@@ -83,6 +83,7 @@ filter. A new `sort` param keeps the order in shared links. New slices:
 - **History:** selection changes push (spec §6); sort replaces.
 - **Map flight (found while building):** a pick on the map keeps the map still (it would fly away from the pointer); a selection from the assistant or the table filter still flies the map to it.
 - **Owner check (2026-11-04):** CSV opened as one column in Excel with Russian regional settings and has no filters → `Export ▾` with Excel (.xlsx, ExcelJS, lazy) and CSV; filter row = button, "N of M selected", Clear, chips below; a selection bar on the Market status card in both modes.
+- **Owner check 2 (2026-11-04):** table gets forecast, prior year, country code and the anomaly from the data; Excel gets an Excel table, colours, a total that follows the filter, a months sheet and an About sheet; the filter menu gets "At risk or off track", region lines and "Clear all" (out of the row). ExcelJS drops custom table totals formulas, so the total is a hand-written row under the table. Radar = selection decided for M4.
 - **Empty state** uses the filter's own `Clear selection` above it (two buttons with one name would confuse a screen reader).
 - **Plan numbering:** this file is Plan 5. The backlog's "Plan 5"
   (hardening, a11y pass) is renamed **"Hardening plan"** in Task 6.

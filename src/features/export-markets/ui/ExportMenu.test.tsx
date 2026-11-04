@@ -42,7 +42,7 @@ describe('ExportMenu', () => {
     await user.click(await screen.findByRole('menuitem', { name: /^CSV/ }));
     expect(downloadText).toHaveBeenCalledWith(
       'markets-2026-05-3m.csv',
-      expect.stringContaining('\r\nde,Germany,'),
+      expect.stringContaining('\r\nde,DE,Germany,'),
       'text/csv;charset=utf-8',
     );
     expect(String(downloadText.mock.calls[0]?.[1]).trimEnd().split('\r\n')).toHaveLength(3);

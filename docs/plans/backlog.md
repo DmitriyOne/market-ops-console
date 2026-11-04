@@ -71,6 +71,10 @@ Points the owner wants explained in the README, in his own words:
 - **Total row's sticky cell** is plain `bg-muted` while the footer row is `bg-muted/50` over the card, so the first cell is a shade darker. An opaque mixed token would fix it. **Design pass**.
 - **Shift+Enter on a tile** relies on the browser putting `shiftKey` on the click a key press makes (Chrome and Firefox do); the map handles Shift+Enter itself. **Hardening plan**, with the a11y pass.
 
+## For M4 (owner, 2026-11-04)
+
+- **Radar = selection**: the radar compares the selected markets (`markets`, first 4); with nothing selected it compares regions. No `compare` param and no "+ Compare" buttons. The heat map's multi-select changes the same list.
+
 ## Currency picker (owner, 2026-11-04) — after the required work, its own release before the README
 
 - Money everywhere shows a plain `$` (`currencyDisplay: 'narrowSymbol'` in `formats.ts`), not `US$`.

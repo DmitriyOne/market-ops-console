@@ -320,7 +320,11 @@
     "clear": "Clear selection",
     "remove": "Remove {name}",
     "count": "{selected} of {total} selected",
-    "selected": "Selected"
+    "selected": "Selected",
+    "region": "All of {region}",
+    "atRisk": "At risk or off track",
+    "atRiskLatestOnly": "Latest month only",
+    "clearAll": "Clear all"
   },
   "marketsTable": {
     "title": "Markets",
@@ -332,8 +336,10 @@
       "market": "Market",
       "region": "Region",
       "revenue": "Revenue",
+      "forecast": "Forecast",
       "gap": "Gap to forecast",
       "attainment": "Attainment",
+      "priorYear": "Prior year",
       "growth": "Growth YoY",
       "share": "Share",
       "units": "Units",
@@ -342,7 +348,8 @@
     "empty": "None of the selected markets is in this view. Clear the selection to see every market.",
     "noteLatest": "Status and share are set for the latest month only.",
     "notePerProduct": "Share is not available per product.",
-    "noteCalculated": "Gap to forecast, units and the total are calculated from monthly data."
+    "noteCalculated": "Forecast, gap to forecast, prior year, units and the total are calculated from monthly data.",
+    "anomaly": "Anomaly, {period}: {note}"
   },
   "exportMarkets": {
     "button": "Export",
@@ -351,6 +358,33 @@
     "excelHint": "Formatted, with filters",
     "csv": "CSV",
     "csvHint": "Raw numbers in USD, for other tools",
-    "failed": "Couldn't create the file. Try again."
+    "failed": "Couldn't create the file. Try again.",
+    "sheet": {
+      "markets": "Markets",
+      "months": "By month",
+      "about": "About",
+      "total": "Total",
+      "code": "Code",
+      "anomaly": "Anomaly",
+      "month": "Month",
+      "actual": "Actual"
+    },
+    "about": {
+      "source": "Source",
+      "sourceValue": "data.json, generated {date}; amounts in USD",
+      "view": "View",
+      "product": "Product",
+      "selection": "Selected markets",
+      "selectionAll": "All markets in the view",
+      "sort": "Order",
+      "sortDefault": "Region, then market",
+      "asc": "{column}, ascending",
+      "desc": "{column}, descending",
+      "calculated": "How values are made",
+      "calculatedValue": "Stored figures for a market at the latest month; everything else is calculated from monthly data (revenue = Σ actual, attainment = Σ actual ÷ Σ forecast, growth = Σ actual ÷ Σ prior year − 1). Totals follow the Excel filter.",
+      "status": "Status",
+      "statusValue": "Set in the data for the latest month only.",
+      "link": "Open this view"
+    }
   }
 }
