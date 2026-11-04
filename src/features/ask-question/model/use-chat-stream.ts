@@ -174,15 +174,20 @@ export function useChatStream(): ChatStream {
     [],
   );
 
-  // Write when a message starts or ends (ids and statuses), not on every token;
-  // what was just loaded is not written back.
-  const saved = useRef(storageKey(messages));
+  // Write when a message starts or ends (ids and statuses), not on every token.
+  // The first ready commit holds exactly what was restored: remember it, don't write it back.
+  const saved = useRef<string | null>(null);
   useEffect(() => {
+    if (!ready) return;
     const key = storageKey(messages);
+    if (saved.current === null) {
+      saved.current = key;
+      return;
+    }
     if (key === saved.current) return;
     saved.current = key;
     saveChat(messages);
-  }, [messages]);
+  }, [ready, messages]);
 
   return {
     messages,

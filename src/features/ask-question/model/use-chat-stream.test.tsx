@@ -300,6 +300,30 @@ describe('useChatStream', () => {
     );
   });
 
+  it('does not write back the conversation it just restored', () => {
+    const stored = {
+      v: 1,
+      messages: [
+        {
+          id: 'a1',
+          question: 'Why Germany?',
+          text: 'Because.',
+          status: 'done',
+          kind: 'normal',
+          citations: [],
+          confidence: 'high',
+          error: null,
+          notice: null,
+        },
+      ],
+    };
+    sessionStorage.setItem('mo:chat:v1', JSON.stringify(stored));
+    const setItem = vi.spyOn(Storage.prototype, 'setItem');
+    const { result } = setup();
+    expect(result.current.messages).toHaveLength(1);
+    expect(setItem.mock.calls.filter(([key]) => key === 'mo:chat:v1')).toHaveLength(0);
+  });
+
   it('reset also clears the stored conversation', async () => {
     server.use(chatFromFixture('germany-dip'));
     const first = setup();

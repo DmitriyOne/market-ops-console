@@ -2,7 +2,7 @@
 
 import { CheckIcon, CopyIcon, ThumbsDownIcon, ThumbsUpIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useId, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 
 import type { ChatMessage } from '@/features/ask-question';
 import { logEvent } from '@/shared/lib';
@@ -29,6 +29,14 @@ export function AnswerActions({ message, getCopyText }: AnswerActionsProps) {
   // The reason buttons disappear once one is picked; focus returns here.
   const downRef = useRef<HTMLButtonElement>(null);
   const [copy, setCopy] = useState<'idle' | 'copied'>('idle');
+  // One timer: a second Copy restarts the 2 s instead of being cut short by the first.
+  const copiedTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  useEffect(
+    () => () => {
+      clearTimeout(copiedTimer.current);
+    },
+    [],
+  );
   const [rating, setRating] = useState<Rating | null>(null);
   const [reason, setReason] = useState<Reason | null>(null);
   // One rating per answer (owner, 2026-11-04): locked once it is logged.
@@ -51,7 +59,8 @@ export function AnswerActions({ message, getCopyText }: AnswerActionsProps) {
     try {
       await navigator.clipboard.writeText(getCopyText());
       setCopy('copied');
-      setTimeout(() => {
+      clearTimeout(copiedTimer.current);
+      copiedTimer.current = setTimeout(() => {
         setCopy('idle');
       }, COPIED_MS);
     } catch {
