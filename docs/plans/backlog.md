@@ -38,6 +38,7 @@ Format: **Item**: what is wrong (file). Why it can wait. Where it goes.
 ## From the 0.4.0 answer-actions review (2026-11-04)
 
 - **Copied text can hold empty source labels** when a citation has no `label` and the dataset failed to load (`copyText` in `AnswerMessage.tsx` gives `''`, so "Sources: ; Germany"). Needs a failed dataset and a fixture without labels; none today. **Plan 5**, hardening.
+- **Skeleton test queries `data-skeleton` attributes** (`AssistantPanel.test.tsx`, SSR test), not roles, against `.claude/rules/testing.md`. The skeleton has no roles to query apart from `aria-busy`. **Plan 5**, test pass.
 - **Rating is not kept across a reload** of the tab (state in `AnswerActions`), so a restored answer can be rated again. Owner accepted on 2026-11-04; the server would dedupe by `answerId`. **README notes** if feedback goes to a real endpoint.
 
 ## README notes (owner, 2026-11-04)

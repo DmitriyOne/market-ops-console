@@ -238,6 +238,7 @@ export function AnswerMessage({
       text,
       labels.length > 0 ? t('actions.copySources', { list: labels.join('; ') }) : null,
       confidence ? t('answer.confidence', { level: t(`answer.${confidence}`) }) : null,
+      confidence === 'low' ? t('answer.directional') : null,
       t('answer.label'),
     ]
       .filter((part) => part !== null)

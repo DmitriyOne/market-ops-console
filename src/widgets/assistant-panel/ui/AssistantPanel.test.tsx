@@ -5,7 +5,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { NuqsTestingAdapter, type UrlUpdateEvent } from 'nuqs/adapters/testing';
 import { renderToString } from 'react-dom/server';
 import { Toaster } from 'sonner';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { enMessages as en, formats } from '@/shared/config';
 import {
@@ -63,6 +63,11 @@ describe('AssistantPanel', () => {
   beforeEach(() => {
     sessionStorage.clear();
     server.use(datasetHandler());
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
   });
 
   it('server HTML shows a loading conversation, not the empty state (history is client-only)', () => {
@@ -277,6 +282,53 @@ describe('AssistantPanel', () => {
     expect(screen.getByRole('heading', { name: t.panel.empty.title })).toBeInTheDocument();
   });
 
+  it('New chat moves focus to the composer', async () => {
+    server.use(chatFromFixture('germany-dip'));
+    const { user } = setup();
+    await ask(user, 'Tell me about the German market');
+    await answerDone();
+    await user.click(screen.getByRole('button', { name: t.panel.newChat }));
+    expect(screen.getByRole('textbox', { name: t.composer.label })).toHaveFocus();
+  });
+
+  it('touch: New chat does not focus the composer (no on-screen keyboard)', async () => {
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn((query: string) => ({
+        matches: query === '(pointer: coarse)',
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      })),
+    );
+    server.use(chatFromFixture('germany-dip'));
+    const { user } = setup();
+    await ask(user, 'Tell me about the German market');
+    await answerDone();
+    const newChat = screen.getByRole('button', { name: t.panel.newChat });
+    await user.click(newChat);
+    expect(screen.getByRole('textbox', { name: t.composer.label })).not.toHaveFocus();
+  });
+
+  it('Copy of a low-confidence answer keeps "Treat as directional"', async () => {
+    server.use(chatFromFixture('forecast-miss'));
+    const { user } = setup();
+    await ask(user, 'Where did we miss the forecast?');
+    await answerDone();
+    await user.click(screen.getByRole('button', { name: t.actions.copy }));
+    expect(await navigator.clipboard.readText()).toContain(t.answer.directional);
+  });
+
+  it('Copy that the browser blocks shows an error toast', async () => {
+    server.use(chatFromFixture('germany-dip'));
+    const { user } = setup();
+    await ask(user, 'Why did Germany dip?');
+    await answerDone();
+    vi.spyOn(navigator.clipboard, 'writeText').mockRejectedValueOnce(new Error('denied'));
+    await user.click(screen.getByRole('button', { name: t.actions.copy }));
+    expect(await screen.findByText(t.actions.copyFailed)).toBeInTheDocument();
+    expect(screen.queryByText(t.actions.copied)).not.toBeInTheDocument();
+  });
+
   it('Copy answer puts the text, its sources and confidence on the clipboard', async () => {
     server.use(chatFromFixture('germany-dip'));
     const { user } = setup();
@@ -309,6 +361,8 @@ describe('AssistantPanel', () => {
     await user.click(down);
     expect(down).toHaveAttribute('aria-pressed', 'true');
     await user.click(screen.getByRole('button', { name: t.actions.reasons.wrongNumbers }));
+    // The reasons are gone; keyboard focus goes back to the button that opened them.
+    expect(down).toHaveFocus();
     expect(info).toHaveBeenCalledWith(
       '[event] answer_feedback',
       expect.objectContaining({ rating: 'down', reason: 'wrongNumbers', confidence: 'high' }),

@@ -12,6 +12,7 @@ import {
 } from '@/entities/performance';
 import { Composer, SuggestedQuestions, useChatStream } from '@/features/ask-question';
 import { useErrorMessage } from '@/shared/api';
+import { useMediaQuery } from '@/shared/lib';
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui';
 
 import { AnswerMessage, isCantAnswer } from './AnswerMessage';
@@ -37,6 +38,7 @@ export function AssistantPanel({
 }: AssistantPanelProps) {
   const t = useTranslations('assistant.panel');
   const chat = useChatStream();
+  const coarse = useMediaQuery('(pointer: coarse)');
   // Not suspense: the chat works even if the dataset fails to load.
   const { data: ds, error: dsError } = useQuery(datasetQueryOptions);
   // Logged by the query cache; here it only replaces "Loading data…".
@@ -96,7 +98,8 @@ export function AssistantPanel({
               onClick={() => {
                 if (chat.messages.length === 0) return;
                 chat.reset();
-                inputRef.current?.focus();
+                // Not on touch: focusing the field would open the on-screen keyboard (owner, 2026-11-04).
+                if (!coarse) inputRef.current?.focus();
               }}
             >
               <SquarePenIcon aria-hidden />

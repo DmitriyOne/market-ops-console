@@ -40,13 +40,17 @@ const messageSchema = z.object({
 // A new shape gets a new version; an old one is dropped, not migrated.
 const storedSchema = z.object({ v: z.literal(1), messages: z.array(messageSchema) });
 
+const asSettled = (m: ChatMessage): ChatMessage =>
+  m.status === 'streaming' ? { ...m, status: 'stopped' } : m;
+
 /** The stored conversation, or none when it is missing, unreadable or old. */
 export function loadChat(): ChatMessage[] {
   try {
     const raw = sessionStorage.getItem(CHAT_STORAGE_KEY);
     if (raw === null) return [];
     const parsed = storedSchema.safeParse(JSON.parse(raw));
-    return parsed.success ? parsed.data.messages : [];
+    // Nothing streams after a reload; an edited or future "streaming" would lock the composer.
+    return parsed.success ? parsed.data.messages.map(asSettled) : [];
   } catch {
     return [];
   }
@@ -55,9 +59,7 @@ export function loadChat(): ChatMessage[] {
 /** Stores the last messages; an answer still streaming is kept as stopped. */
 export function saveChat(messages: ChatMessage[]): void {
   try {
-    const kept = messages
-      .slice(-MAX_STORED_MESSAGES)
-      .map((m) => (m.status === 'streaming' ? { ...m, status: 'stopped' as const } : m));
+    const kept = messages.slice(-MAX_STORED_MESSAGES).map(asSettled);
     sessionStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify({ v: 1, messages: kept }));
   } catch {
     // Blocked or full storage: the chat still works, it just won't survive a reload.

@@ -295,9 +295,8 @@ describe('useChatStream', () => {
       expect(result.current.messages[0]?.status).toBe('done');
     });
     expect(tokensOf('germany-dip').length).toBeGreaterThan(5);
-    expect(setItem.mock.calls.filter(([key]) => key === 'mo:chat:v1').length).toBeLessThanOrEqual(
-      2,
-    );
+    // Once when the question starts, once when the answer is done.
+    expect(setItem.mock.calls.filter(([key]) => key === 'mo:chat:v1')).toHaveLength(2);
   });
 
   it('does not write back the conversation it just restored', () => {
@@ -322,6 +321,29 @@ describe('useChatStream', () => {
     const { result } = setup();
     expect(result.current.messages).toHaveLength(1);
     expect(setItem.mock.calls.filter(([key]) => key === 'mo:chat:v1')).toHaveLength(0);
+  });
+
+  it('a stored answer marked streaming comes back stopped and does not lock the composer', () => {
+    const stored = {
+      v: 1,
+      messages: [
+        {
+          id: 'a1',
+          question: 'Why Germany?',
+          text: 'Because',
+          status: 'streaming',
+          kind: null,
+          citations: [],
+          confidence: null,
+          error: null,
+          notice: null,
+        },
+      ],
+    };
+    sessionStorage.setItem('mo:chat:v1', JSON.stringify(stored));
+    const { result } = setup();
+    expect(result.current.messages[0]?.status).toBe('stopped');
+    expect(result.current.isStreaming).toBe(false);
   });
 
   it('reset also clears the stored conversation', async () => {
