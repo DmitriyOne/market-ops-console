@@ -273,7 +273,7 @@
     "wholeWorld": "Whole world",
     "legend": "Legend",
     "below": "below {to}",
-    "between": "{from} to {to}",
+    "between": "{from} – {to}",
     "above": "{from} and above",
     "dotted": "dotted",
     "perProduct": "Values are for {product}; status is set per market."

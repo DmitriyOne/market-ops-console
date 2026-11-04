@@ -56,12 +56,12 @@ const ICON = { map: GlobeIcon, tiles: LayoutGridIcon, table: TableIcon } as cons
 const CARD = 'gap-3 border border-border ring-0';
 const isView = (v: string): v is View => VIEWS.some((view) => view === v);
 
-/** The map's own frame (800 × 356), so nothing moves when the chunk arrives. */
+/** The map's own frame (800 × 356, phones 800 × 428), so nothing moves when the chunk arrives. */
 function MapSkeleton() {
   return (
     <div>
-      <Skeleton className="aspect-[800/356] w-full rounded-md" />
-      <Skeleton className="mt-2 ml-auto h-11 w-48 rounded-lg" />
+      <Skeleton className="aspect-[800/428] w-full rounded-md md:aspect-[800/356]" />
+      <Skeleton className="mt-2 ml-auto h-9 w-44 rounded-lg md:h-11 md:w-48" />
     </div>
   );
 }
@@ -145,7 +145,7 @@ export function MarketStatus() {
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
         {view === 'map' ? (
-          <MapView map={map} fitIds={fitIds} onOpen={toMarket} />
+          <MapView map={map} tall={!wide} fitIds={fitIds} onOpen={toMarket} />
         ) : view === 'table' ? (
           <MarketTable groups={groups} map={map} />
         ) : (
@@ -174,17 +174,19 @@ function Notice({ map }: { map: MarketMapView }) {
 
 function MapView({
   map,
+  tall,
   fitIds,
   onOpen,
 }: {
   map: MarketMapView;
+  tall: boolean;
   fitIds: readonly string[];
   onOpen: (id: string) => void;
 }) {
   return (
     <>
       <Notice map={map} />
-      <MarketMap view={map} fitIds={fitIds} onOpen={onOpen} />
+      <MarketMap view={map} tall={tall} fitIds={fitIds} onOpen={onOpen} />
       <MapLegend view={map} />
     </>
   );

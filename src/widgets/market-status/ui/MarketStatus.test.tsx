@@ -1,6 +1,6 @@
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { Suspense } from 'react';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { enMessages as en } from '@/shared/config';
 import { datasetHandler, renderWithProviders, server } from '@/shared/lib/test';
@@ -301,12 +301,38 @@ describe('MarketStatus map', () => {
     const items = within(legend).getAllByRole('listitem');
     expect(items.map((li) => li.textContent)).toEqual([
       'below -5.0%1',
-      '-5.0% to -1.0%1',
-      '-1.0% to +1.0%1',
-      '+1.0% to +5.0%3',
-      '+5.0% to +10.0%3',
+      '-5.0% – -1.0%1',
+      '-1.0% – +1.0%1',
+      '+1.0% – +5.0%3',
+      '+5.0% – +10.0%3',
       '+10.0% and above4',
     ]);
+  });
+
+  it('revenue steps read as compact ranges', async () => {
+    setup('?mode=analyst&kpi=revenue');
+    const legend = await screen.findByRole('list', { name: t.legend });
+    const items = within(legend)
+      .getAllByRole('listitem')
+      .map((li) => li.textContent);
+    expect(items[0]).toMatch(/^below US\$1m\d+$/);
+    expect(items[1]).toMatch(/^US\$1–1\.5m\d+$/);
+  });
+
+  it('Open in the tap tooltip brings the page back to its top', async () => {
+    const main = document.createElement('main');
+    main.id = 'main';
+    const scrollTo = vi.fn();
+    main.scrollTo = scrollTo;
+    document.body.append(main);
+    const { user } = setup();
+    const spain = await within(await mapGroup()).findByRole('button', { name: /^Spain,/ });
+    fireEvent.pointerDown(spain, { pointerType: 'touch' });
+    fireEvent.pointerUp(spain, { pointerType: 'touch' });
+    fireEvent.click(spain);
+    await user.click(await screen.findByRole('button', { name: 'Open Spain' }));
+    expect(scrollTo).toHaveBeenCalledWith(expect.objectContaining({ top: 0 }));
+    main.remove();
   });
 
   it('markets from the assistant zoom the map in', async () => {

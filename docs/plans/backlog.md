@@ -61,3 +61,4 @@ Points the owner wants explained in the README, in his own words:
   - When zoomed in, Tab can focus a market outside the view; fly to it on focus if off-screen. **Plan 5**.
   - Status metric with a product: tooltip shows the product's attainment next to the market's status; only the note under the card says status is per market. Owner decision №9; add the note to the tooltip if users misread it.
   - Not covered by tests yet: "Back returns to the old market with the product" (URL history), locale switch keeping `kpi` (the switch keeps the whole query, tested in `use-switch-locale`). **Plan 5**, E2E.
+- **Dev warning "Encountered a script tag while rendering React component"** comes from `@wrksz/themes` (its anti-flash `ThemeScript` sits in the tree and React warns when that tree renders on the client). Dev only, no effect on the theme or production. Check the library for a head-only script option. **Plan 5**.

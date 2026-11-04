@@ -7,10 +7,42 @@ export type Point = [number, number];
 export type Box = [Point, Point];
 export type MapView = { center: Point; zoom: number };
 
-/** Equal Earth fitted to the world without Antarctica in an 800 × 356 box (d3 fitExtent, 4px pad). */
-export const MAP_SIZE = { width: 800, height: 356 } as const;
-export const PROJECTION = { scale: 149.1, center: [0, 6.886] as Point };
-export const WORLD: MapView = { center: PROJECTION.center, zoom: 1 };
+export type MapFrame = {
+  width: number;
+  height: number;
+  /** Equal Earth scale; the centre is shared. */
+  scale: number;
+  /** How far the map can be panned (the world may be wider than the frame). */
+  extent: [Point, Point];
+};
+
+const CENTER: Point = [0, 6.886];
+/**
+ * `wide`: the world without Antarctica fitted to 800 × 356 (d3 fitExtent,
+ * 4px pad). `tall` (phones): land fills a 428-high frame and the Pacific
+ * edges fall outside; every market stays in view (Australia ends at 795).
+ */
+export const FRAMES = {
+  wide: {
+    width: 800,
+    height: 356,
+    scale: 149.1,
+    extent: [
+      [0, 0],
+      [800, 356],
+    ],
+  },
+  tall: {
+    width: 800,
+    height: 428,
+    scale: 180.1,
+    extent: [
+      [-79, 0],
+      [879, 428],
+    ],
+  },
+} as const satisfies Record<string, MapFrame>;
+export const WORLD: MapView = { center: CENTER, zoom: 1 };
 export const MAX_ZOOM = 8;
 /** A fit leaves room around the markets and never zooms in so far that the context is lost. */
 const FIT_MARGIN = 0.8;

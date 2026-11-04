@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import { useMemo } from 'react';
 
 import { type MapItem, type MapMetric, StatusChip } from '@/entities/performance';
-import { cn } from '@/shared/lib';
+import { cn, scrollMainToTop } from '@/shared/lib';
 import { Button, Popover, PopoverAnchor, PopoverContent } from '@/shared/ui';
 
 import { useMapFormat } from './use-map-format';
@@ -87,6 +87,8 @@ export function MapTooltip({ item, metric, tip, onOpen, onClose }: MapTooltipPro
             className="min-h-11 w-full"
             onClick={() => {
               onOpen(item.id);
+              // The market opens at the top of the page (title, KPIs): bring it into view.
+              scrollMainToTop();
               onClose();
             }}
           >

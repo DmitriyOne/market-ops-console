@@ -25,19 +25,21 @@ export function MetricPicker() {
   const select = useSelectMetric();
   const current = t(`metric.${state.kpi}`);
   return (
-    <DropdownMenu>
+    // Not modal: no scroll lock on the page, which made the card flash on open and close.
+    <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
         <Button
           type="button"
           variant="outline"
-          className="min-h-11 gap-1"
+          // One width for every metric, so the header does not reflow on a change.
+          className="min-h-11 min-w-40 justify-between gap-1"
           aria-label={t('metricTrigger', { metric: current })}
         >
           {current}
           <ChevronDownIcon aria-hidden />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" collisionPadding={15}>
+      <DropdownMenuContent align="start" collisionPadding={15} className="min-w-48">
         <DropdownMenuLabel>{t('metricTitle')}</DropdownMenuLabel>
         <DropdownMenuRadioGroup
           value={state.kpi}

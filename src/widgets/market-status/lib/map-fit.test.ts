@@ -36,7 +36,7 @@ describe('mainBox', () => {
 });
 
 describe('fitView', () => {
-  const size = { width: 800, height: 356 };
+  const size = { width: 800, height: 356 }; // FRAMES.wide
 
   it('no boxes is the whole world', () => {
     expect(fitView([], size, invert)).toEqual(WORLD);

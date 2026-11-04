@@ -14,14 +14,14 @@ import { Button } from '@/shared/ui';
 import {
   type Box,
   fitView,
+  FRAMES,
   mainBox,
-  MAP_SIZE,
+  type MapFrame,
   type MapView,
   MAX_ZOOM,
   type MultiPolygon,
   type Point,
   type Polygon,
-  PROJECTION,
   WORLD,
 } from '../lib/map-fit';
 import { itemFill } from './map-colours';
@@ -35,10 +35,6 @@ const ANTARCTICA = '010';
 const ZOOM_STEP = 1.5;
 const FLY_MS = 450;
 const TOPOLOGY = topology as unknown as GeographyInput;
-const EXTENT: [number, number][] = [
-  [0, 0],
-  [MAP_SIZE.width, MAP_SIZE.height],
-];
 const NON_SCALING = { vectorEffect: 'non-scaling-stroke' } as const;
 
 const dropAntarctica = <T extends { id?: string | number }>(features: T[]) =>
@@ -102,6 +98,8 @@ function useMapPosition() {
 
 export type MarketMapProps = {
   view: MarketMapView;
+  /** Phones: a taller frame, so the map is not a thin strip. */
+  tall?: boolean;
   /** Markets the view should fit: the drilled region or the assistant's list; none = world. */
   fitIds: readonly string[];
   onOpen: (marketId: string) => void;
@@ -114,7 +112,8 @@ export type MarketMapProps = {
  * each market is a button in Tab order, Enter opens it; Esc hides the
  * tooltip (the popover's own dismiss).
  */
-export function MarketMap({ view, fitIds, onOpen }: MarketMapProps) {
+export function MarketMap({ view, tall = false, fitIds, onOpen }: MarketMapProps) {
+  const frame: MapFrame = tall ? FRAMES.tall : FRAMES.wide;
   const t = useTranslations('marketStatus');
   const m = useMapFormat();
   const { pos, setPos, flyTo, stop } = useMapPosition();
@@ -142,15 +141,18 @@ export function MarketMap({ view, fitIds, onOpen }: MarketMapProps) {
   return (
     <div>
       <ComposableMap
-        width={MAP_SIZE.width}
-        height={MAP_SIZE.height}
+        // A new frame is a new projection: remount and fit again.
+        key={tall ? 'tall' : 'wide'}
+        width={frame.width}
+        height={frame.height}
         projection="geoEqualEarth"
-        projectionConfig={PROJECTION}
+        projectionConfig={{ scale: frame.scale, center: WORLD.center }}
         role="group"
         aria-label={t('mapLabel', { metric: m.metricLabel(view.metric) })}
         className="block h-auto w-full touch-pan-x touch-pan-y rounded-md bg-map-sea select-none"
       >
         <MapLayers
+          frame={frame}
           view={view}
           fitIds={fitIds}
           pos={pos}
@@ -161,12 +163,12 @@ export function MarketMap({ view, fitIds, onOpen }: MarketMapProps) {
           onTip={setTip}
         />
       </ComposableMap>
-      <div className="mt-2 flex justify-end gap-1">
+      <div className="mt-2 flex justify-end gap-2 md:gap-1">
         <Button
           type="button"
           variant="outline"
           size="icon"
-          className="size-11 aria-disabled:opacity-50"
+          className="relative size-9 after:absolute after:-inset-1 aria-disabled:opacity-50 md:size-11 md:after:hidden"
           aria-label={t('zoomOut')}
           aria-disabled={pos.zoom <= 1.01}
           onClick={() => {
@@ -179,7 +181,7 @@ export function MarketMap({ view, fitIds, onOpen }: MarketMapProps) {
           type="button"
           variant="outline"
           size="icon"
-          className="size-11 aria-disabled:opacity-50"
+          className="relative size-9 after:absolute after:-inset-1 aria-disabled:opacity-50 md:size-11 md:after:hidden"
           aria-label={t('zoomIn')}
           aria-disabled={pos.zoom >= MAX_ZOOM - 0.01}
           onClick={() => {
@@ -191,7 +193,7 @@ export function MarketMap({ view, fitIds, onOpen }: MarketMapProps) {
         <Button
           type="button"
           variant="outline"
-          className="min-h-11 aria-disabled:opacity-50"
+          className="relative h-9 px-3 text-xs after:absolute after:-inset-1 aria-disabled:opacity-50 md:min-h-11 md:text-sm md:after:hidden"
           aria-disabled={pos.zoom <= 1.01}
           onClick={() => {
             if (pos.zoom > 1.01) flyTo(WORLD);
@@ -216,6 +218,7 @@ export function MarketMap({ view, fitIds, onOpen }: MarketMapProps) {
 }
 
 type MapLayersProps = Pick<MarketMapProps, 'view' | 'fitIds' | 'onOpen'> & {
+  frame: MapFrame;
   pos: MapView;
   onMoveEnd: (pos: MapView) => void;
   onGesture: () => void;
@@ -228,6 +231,7 @@ type MapLayersProps = Pick<MarketMapProps, 'view' | 'fitIds' | 'onOpen'> & {
  * set by hand survives a month, window or metric change; the first fit is instant.
  */
 function MapLayers({
+  frame,
   view,
   fitIds,
   pos,
@@ -256,10 +260,10 @@ function MapLayers({
         return box ? [box] : [];
       });
     flyTo(
-      fitView(boxes, MAP_SIZE, (p) => projection.invert?.(p) ?? null),
+      fitView(boxes, frame, (p) => projection.invert?.(p) ?? null),
       first,
     );
-  }, [fitIds, flyTo, key, projection, shapes, view.items]);
+  }, [fitIds, flyTo, frame, key, projection, shapes, view.items]);
 
   return (
     <ZoomableGroup
@@ -267,7 +271,7 @@ function MapLayers({
       zoom={pos.zoom}
       minZoom={1}
       maxZoom={MAX_ZOOM}
-      translateExtent={EXTENT}
+      translateExtent={frame.extent.map((p) => [...p])}
       filterZoomEvent={(event) => allowGesture(event, pos.zoom)}
       onMoveStart={(_, event) => {
         // A gesture takes over from a flight in progress.
