@@ -7,7 +7,40 @@
 /* Desktop assistant collapsed: set on <html> before first paint (widgets/app-shell). */
 @custom-variant assistant-collapsed (&:where([data-assistant-collapsed] *));
 /* Hover and press feedback only for controls that can act (DESIGN.md §4). */
+@custom-variant section-assistant (&:where([data-section='assistant'] *));
 @custom-variant interactive (&:not(:disabled, [aria-disabled='true']));
+
+/* Off-track pattern: a second signal next to the ■ shape and the word (never colour alone). */
+@utility bg-hatch {
+  background-image: repeating-linear-gradient(
+    135deg,
+    var(--color-map-hatch) 0 2px,
+    transparent 2px 6px
+  );
+}
+
+/* Chart entrances: lines draw left to right, bars grow from their start.
+   Used with `motion-safe:` so reduced motion shows the final state at once. */
+@theme {
+  /* `backwards`: the clip is dropped once drawn, so overflowing marks show. */
+  --animate-reveal-x: reveal-x 700ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  --animate-grow-x: grow-x 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
+
+  @keyframes reveal-x {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+
+  @keyframes grow-x {
+    from {
+      transform: scaleX(0);
+    }
+  }
+}
 
 @theme inline {
   --font-sans: var(--font-space-grotesk), system-ui, sans-serif;

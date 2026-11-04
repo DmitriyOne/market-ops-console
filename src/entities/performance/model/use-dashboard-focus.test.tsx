@@ -20,7 +20,7 @@ function setup(searchParams = '') {
 
 describe('useDashboardFocus', () => {
   it('focus writes the cited scope and period with a history entry', async () => {
-    const { result, onUrlUpdate } = setup('?markets=es,fr&product=nuvora&range=3m');
+    const { result, onUrlUpdate } = setup('?markets=es&markets=fr&product=nuvora&range=3m');
     act(() => {
       result.current.focus(resolveCitation(ds, { marketId: 'de', period: '2026-03' }));
     });
@@ -41,7 +41,7 @@ describe('useDashboardFocus', () => {
       expect(onUrlUpdate).toHaveBeenCalled();
     });
     const event = onUrlUpdate.mock.calls.at(-1)?.[0];
-    expect(event?.searchParams.get('markets')).toBe('es,fr');
+    expect(event?.searchParams.getAll('markets')).toEqual(['es', 'fr']);
     expect(event?.options.history).toBe('push');
   });
 
@@ -56,6 +56,6 @@ describe('useDashboardFocus', () => {
       expect(onUrlUpdate).toHaveBeenCalled();
     });
     // The data block it comes from is the whole portfolio in the latest month.
-    expect(onUrlUpdate.mock.calls.at(-1)?.[0].queryString).toBe('?markets=es,fr');
+    expect(onUrlUpdate.mock.calls.at(-1)?.[0].queryString).toBe('?markets=es&markets=fr');
   });
 });

@@ -3,8 +3,11 @@
 import { useFormatter, useTranslations } from 'next-intl';
 import { useCallback } from 'react';
 
-import { type KpiValue, periodToDate, type ResolvedCitation } from '@/entities/performance';
 import type { Period } from '@/shared/api';
+
+import type { ResolvedCitation } from '../model/citation';
+import type { KpiValue } from '../model/kpis';
+import { periodToDate } from '../model/period';
 
 /** Formatters for KPI values (stored as percent numbers, e.g. 92.0) and periods. */
 export function useKpiFormat() {

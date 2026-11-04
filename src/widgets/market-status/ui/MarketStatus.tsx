@@ -1,0 +1,204 @@
+'use client';
+
+import { LayoutGridIcon, TableIcon } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { useId } from 'react';
+
+import {
+  marketTiles,
+  StatusChip,
+  StatusIcon,
+  useDashboard,
+  useKpiFormat,
+  useStatusLabel,
+} from '@/entities/performance';
+import { useDrillDown } from '@/features/drill-down';
+import { LatestOnlyNotice } from '@/features/select-period';
+import type { MarketStatus as Status } from '@/shared/api';
+import { cn, useStoredFlag } from '@/shared/lib';
+import {
+  Button,
+  Card,
+  CardAction,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Skeleton,
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/shared/ui';
+
+import { StatusTile } from './StatusTile';
+
+const STATUSES: Status[] = ['on_track', 'at_risk', 'off_track'];
+const CARD = 'gap-3 border border-border ring-0';
+
+/**
+ * Markets as tiles grouped by region (variant A): status by shape, word and
+ * colour, off-track hatched; attainment follows the period. A table gives
+ * the same facts.
+ */
+export function MarketStatus() {
+  const t = useTranslations('marketStatus');
+  const tPeriod = useTranslations('period');
+  const f = useKpiFormat();
+  const statusLabel = useStatusLabel();
+  const titleId = useId();
+  const { ds, state } = useDashboard();
+  const { toMarket } = useDrillDown();
+  const [asTable, setAsTable] = useStoredFlag('mo:market-status-table');
+  // The remembered view is read after hydration: keep the skeleton until then.
+  if (asTable === null) return <MarketStatusSkeleton />;
+
+  const groups = marketTiles(ds, state.scope, state.period, state.range, state.highlighted);
+  const tiles = groups.flatMap((g) => g.tiles);
+  const hasStatus = tiles.some((tile) => tile.status !== null);
+  // A drill into one region gives it the whole width.
+  const single = groups.length === 1;
+
+  return (
+    <Card aria-labelledby={titleId} role="region" className={CARD}>
+      <CardHeader>
+        <CardTitle>
+          <h2 id={titleId} className="text-base font-semibold">
+            {t('title')}
+          </h2>
+        </CardTitle>
+        <CardAction>
+          <Button
+            type="button"
+            variant="outline"
+            className="min-h-11"
+            onClick={() => {
+              setAsTable(!asTable);
+            }}
+          >
+            {asTable ? <LayoutGridIcon aria-hidden /> : <TableIcon aria-hidden />}
+            {asTable ? t('showTiles') : t('showTable')}
+          </Button>
+        </CardAction>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-3">
+        {asTable ? (
+          <Table>
+            <TableCaption className="sr-only">
+              {t('caption', {
+                window:
+                  state.range === '1m'
+                    ? f.period(state.period)
+                    : tPeriod('label', {
+                        period: f.period(state.period),
+                        range: tPeriod(`range.${state.range}`),
+                      }),
+              })}
+            </TableCaption>
+            <TableHeader>
+              <TableRow>
+                <TableHead>{t('market')}</TableHead>
+                <TableHead>{t('region')}</TableHead>
+                <TableHead className="text-right">{t('attainment')}</TableHead>
+                <TableHead>{t('status')}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {groups.flatMap((g) =>
+                g.tiles.map((tile) => (
+                  <TableRow key={tile.id}>
+                    <TableCell className="font-medium">{tile.name}</TableCell>
+                    <TableCell>{g.region.name}</TableCell>
+                    <TableCell className="text-right font-mono tabular-nums">
+                      {f.value(tile.attainmentPct, 'percent')}
+                    </TableCell>
+                    <TableCell>
+                      {tile.status ? <StatusChip status={tile.status} /> : t('latestOnly')}
+                    </TableCell>
+                  </TableRow>
+                )),
+              )}
+            </TableBody>
+          </Table>
+        ) : (
+          <div className={cn('grid gap-4', single ? '' : 'sm:grid-cols-2 xl:grid-cols-4')}>
+            {groups.map((g) => (
+              <div key={g.region.id} className="flex flex-col gap-1.5">
+                <p className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+                  {g.region.name}
+                </p>
+                <div
+                  className={cn(
+                    'grid gap-1.5',
+                    single ? 'grid-cols-3 sm:grid-cols-5' : 'grid-cols-2',
+                  )}
+                >
+                  {g.tiles.map((tile) => (
+                    <StatusTile
+                      key={tile.id}
+                      tile={tile}
+                      onSelect={() => {
+                        toMarket(tile.id);
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        {state.scope.productId ? (
+          <p className="text-xs text-muted-foreground">{t('perMarket')}</p>
+        ) : null}
+        {hasStatus ? (
+          <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+            {STATUSES.map((status) => (
+              <li key={status} className="flex items-center gap-1.5">
+                <StatusIcon status={status} />
+                {statusLabel(status)}
+                <span className="font-mono tabular-nums">
+                  {tiles.filter((tile) => tile.status === status).length}
+                </span>
+                {status === 'off_track' ? `· ${t('hatched')}` : null}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <LatestOnlyNotice text={t('latestOnly')} />
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+/** The card's own frame: title, the table button in the corner, region groups, legend. */
+export function MarketStatusSkeleton() {
+  return (
+    <Card aria-hidden className={CARD}>
+      <CardHeader>
+        <CardTitle>
+          <Skeleton className="h-6 w-32" />
+        </CardTitle>
+        <CardAction>
+          <Skeleton className="h-11 w-36 rounded-lg" />
+        </CardAction>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-3">
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {[0, 1, 2, 3].map((i) => (
+            <div key={i} className="flex flex-col gap-1.5">
+              <Skeleton className="h-4 w-24" />
+              <div className="grid grid-cols-2 gap-1.5">
+                <Skeleton className="h-14 rounded-lg" />
+                <Skeleton className="h-14 rounded-lg" />
+              </div>
+            </div>
+          ))}
+        </div>
+        <Skeleton className="h-4 w-64 max-w-full" />
+      </CardContent>
+    </Card>
+  );
+}

@@ -1,8 +1,9 @@
 'use client';
 
 import { useTheme } from '@wrksz/themes/client';
-import { MonitorIcon, MoonIcon, SunIcon } from 'lucide-react';
+import { ChevronRightIcon, MonitorIcon, MoonIcon, SunIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import type { ReactNode } from 'react';
 
 import {
   Button,
@@ -19,24 +20,14 @@ const THEMES = [
   { value: 'system', Icon: MonitorIcon },
 ] as const;
 
-export function ThemeSwitch() {
+/** The theme menu; `children` is its trigger. */
+function ThemeMenu({ children }: { children: ReactNode }) {
   const t = useTranslations('theme');
-  // Both are undefined on the server and in the first client render (library docs).
-  const { theme, resolvedTheme, forcedTheme, setTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label={t('label')}
-          disabled={!resolvedTheme || Boolean(forcedTheme)}
-        >
-          <SunIcon aria-hidden className="dark:hidden" />
-          <MoonIcon aria-hidden className="hidden dark:block" />
-        </Button>
-      </DropdownMenuTrigger>
+      <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuRadioGroup
           value={theme ?? 'system'}
@@ -54,5 +45,45 @@ export function ThemeSwitch() {
         </DropdownMenuRadioGroup>
       </DropdownMenuContent>
     </DropdownMenu>
+  );
+}
+
+// Both are undefined on the server and in the first client render (library
+// docs): the trigger waits, so it never offers a choice it cannot show.
+const useThemeReady = () => {
+  const { resolvedTheme, forcedTheme } = useTheme();
+  return Boolean(resolvedTheme) && !forcedTheme;
+};
+
+/** Header: an icon button. */
+export function ThemeSwitch() {
+  const t = useTranslations('theme');
+  const ready = useThemeReady();
+  return (
+    <ThemeMenu>
+      <Button variant="ghost" size="icon" aria-label={t('label')} disabled={!ready}>
+        <SunIcon aria-hidden className="dark:hidden" />
+        <MoonIcon aria-hidden className="hidden dark:block" />
+      </Button>
+    </ThemeMenu>
+  );
+}
+
+/** Settings sheet: the whole row opens the menu and shows the current theme. */
+export function ThemeSwitchRow({ className }: { className?: string }) {
+  const t = useTranslations('theme');
+  const ready = useThemeReady();
+  const { theme } = useTheme();
+  const current = THEMES.find((c) => c.value === theme) ?? THEMES[2];
+  return (
+    <ThemeMenu>
+      <button type="button" className={className} disabled={!ready}>
+        <span>{t('label')}</span>{' '}
+        <span className="flex items-center gap-1 text-muted-foreground">
+          {ready ? t(current.value) : null}
+          <ChevronRightIcon aria-hidden className="size-4" />
+        </span>
+      </button>
+    </ThemeMenu>
   );
 }

@@ -2,7 +2,8 @@
   "common": {
     "appName": "Market Ops Console",
     "skipToContent": "Skip to content",
-    "description": "Sales performance by market, product and period, with an AI assistant that shows its sources."
+    "description": "Sales performance by market, product and period, with an AI assistant that shows its sources.",
+    "close": "Close"
   },
   "errors": {
     "timeout": "The request took too long. Please try again.",
@@ -11,7 +12,10 @@
     "invalidData": "We received data in an unexpected format.",
     "unknown": "Something went wrong.",
     "sectionTitle": "This section couldn't load.",
-    "retry": "Try again"
+    "retry": "Try again",
+    "widgetTitle": "Couldn't load {name}",
+    "retryWidget": "Try again: {name}",
+    "dataFailed": "The dashboard data couldn't load. Each section has a Try again button."
   },
   "offline": {
     "title": "You're offline",
@@ -39,9 +43,6 @@
     "en-US": "English (US)",
     "de-DE": "Deutsch",
     "ru-RU": "Русский"
-  },
-  "dashboard": {
-    "marketCount": "{count, plural, one {# market} other {# markets}}"
   },
   "assistant": {
     "composer": {
@@ -161,5 +162,119 @@
     "collapse": "Hide assistant",
     "expand": "Show assistant",
     "newAnswers": "{count, plural, one {# new answer} other {# new answers}}"
+  },
+  "monthPicker": {
+    "previousYear": "Previous year",
+    "nextYear": "Next year",
+    "months": "Months of {year}"
+  },
+  "period": {
+    "trigger": "Period: {period}, {range}. Change period",
+    "label": "{period} · {range}",
+    "title": "Period",
+    "range": {
+      "1m": "1 month",
+      "3m": "3 months",
+      "12m": "12 months"
+    },
+    "rangeLabel": "Months ending in {period}"
+  },
+  "mode": {
+    "label": "View",
+    "executive": "Executive",
+    "analyst": "Analyst"
+  },
+  "drill": {
+    "label": "Drill-down",
+    "portfolio": "Portfolio",
+    "chooseRegion": "Choose a region",
+    "chooseMarket": "Choose a market",
+    "chooseProduct": "Choose a product",
+    "region": "Region",
+    "market": "Market",
+    "product": "Product",
+    "changeRegion": "Region: {name}. Change region",
+    "changeMarket": "Market: {name}. Change market",
+    "changeProduct": "Product: {name}. Change product"
+  },
+  "header": {
+    "settings": "Settings: language, theme, reset view",
+    "settingsTitle": "Settings",
+    "resetView": "Reset view",
+    "resetHint": "Portfolio, latest month, Executive"
+  },
+  "overview": {
+    "summary": "{markets, plural, one {# market} other {# markets}} · {products, plural, one {# product} other {# products}} · latest data {period}"
+  },
+  "kpi": {
+    "title": "Key figures",
+    "revenue": "Revenue",
+    "attainment": "Forecast attainment",
+    "growth": "Growth YoY",
+    "atRisk": "Markets at risk",
+    "vsPriorYear": "{value} vs prior year",
+    "forecast": "Forecast {value}",
+    "priorYear": "Prior year {value}",
+    "riskValue": "{count} of {total}",
+    "riskSplit": "{offTrack} off track · {atRisk} at risk",
+    "riskNone": "All on track",
+    "latestOnly": "Status is set for the latest month only.",
+    "goLatest": "Show {period}",
+    "perProduct": "Status is set per market, not per product.",
+    "calculated": "Calculated",
+    "calculatedLabel": "Calculated: {formula}",
+    "formula": {
+      "revenue": "sum of monthly actual revenue over the selected months.",
+      "attainment": "actual ÷ forecast over the selected months; can differ from a market's stored figure by about 1 point.",
+      "growth": "actual ÷ prior-year actual over the selected months, minus 100%."
+    },
+    "unavailable": "—"
+  },
+  "marketStatus": {
+    "title": "Market status",
+    "showTable": "Show as table",
+    "tile": "{code} {name}, {status}, attainment {value}",
+    "tileNoStatus": "{code} {name}, attainment {value}",
+    "highlighted": "highlighted from the assistant",
+    "selected": "selected",
+    "hatched": "hatched",
+    "latestOnly": "Status is set for the latest month only; tiles show forecast attainment.",
+    "market": "Market",
+    "region": "Region",
+    "attainment": "Attainment",
+    "status": "Status",
+    "caption": "Market status by region, {window}",
+    "perMarket": "Tiles show whole markets, not the chosen product.",
+    "showTiles": "Show as tiles"
+  },
+  "topRisks": {
+    "title": "Top risks",
+    "order": "Off track first, then by attainment",
+    "reason": "{attainment} · {growth} YoY",
+    "empty": "No markets at risk here."
+  },
+  "trend": {
+    "title": "Revenue · {from} – {to}",
+    "actual": "Actual",
+    "forecast": "Forecast",
+    "priorYear": "Prior year",
+    "showTable": "Show as table",
+    "summary": "Revenue for {scope}, {from} to {to}. {period}: actual {actual}, forecast {forecast}, prior year {priorYear}.",
+    "anomaly": "{period} · {market}: {note}",
+    "month": "Month",
+    "caption": "Revenue by month for {scope}",
+    "anomalyMark": "anomaly",
+    "window": "selected",
+    "legend": "Legend",
+    "name": "Revenue trend",
+    "showChart": "Show as chart",
+    "windowRange": "{from} – {to}"
+  },
+  "topMovers": {
+    "title": "Top movers",
+    "basis": "Growth YoY, {range} to {period}",
+    "risers": "Highest growth",
+    "fallers": "Lowest growth",
+    "empty": "Not enough markets to compare."
   }
 }

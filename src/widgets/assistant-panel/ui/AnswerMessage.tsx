@@ -4,7 +4,7 @@ import { BanIcon, SparklesIcon, SquareIcon, TriangleAlertIcon } from 'lucide-rea
 import { useTranslations } from 'next-intl';
 import { type ReactNode, useMemo } from 'react';
 
-import { resolveCitation, type ResolvedCitation } from '@/entities/performance';
+import { resolveCitation, type ResolvedCitation, useKpiFormat } from '@/entities/performance';
 import type { ChatMessage } from '@/features/ask-question';
 import { SuggestedQuestions } from '@/features/ask-question';
 import type { Confidence, Dataset } from '@/shared/api';
@@ -15,7 +15,6 @@ import { buildDataCheck } from '../model/data-check';
 import { AnswerActions } from './AnswerActions';
 import { DataCheckBlock } from './DataCheckBlock';
 import { SourceButton } from './SourceButton';
-import { useKpiFormat } from './use-kpi-format';
 
 const CONFIDENCE_BARS = { high: 3, medium: 2, low: 1 } as const;
 

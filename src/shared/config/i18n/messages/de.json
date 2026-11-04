@@ -2,7 +2,8 @@
   "common": {
     "appName": "Market Ops Console",
     "skipToContent": "Zum Inhalt springen",
-    "description": "Vertriebsleistung nach Markt, Produkt und Zeitraum, mit einem KI-Assistenten, der seine Quellen zeigt."
+    "description": "Vertriebsleistung nach Markt, Produkt und Zeitraum, mit einem KI-Assistenten, der seine Quellen zeigt.",
+    "close": "Schließen"
   },
   "errors": {
     "timeout": "Die Anfrage hat zu lange gedauert. Bitte versuchen Sie es erneut.",
@@ -11,7 +12,10 @@
     "invalidData": "Die empfangenen Daten haben ein unerwartetes Format.",
     "unknown": "Etwas ist schiefgelaufen.",
     "sectionTitle": "Dieser Bereich konnte nicht geladen werden.",
-    "retry": "Erneut versuchen"
+    "retry": "Erneut versuchen",
+    "widgetTitle": "{name} konnte nicht geladen werden",
+    "retryWidget": "Erneut versuchen: {name}",
+    "dataFailed": "Die Dashboard-Daten konnten nicht geladen werden. Jeder Bereich hat eine Schaltfläche „Erneut versuchen“."
   },
   "offline": {
     "title": "Sie sind offline",
@@ -39,9 +43,6 @@
     "en-US": "English (US)",
     "de-DE": "Deutsch",
     "ru-RU": "Русский"
-  },
-  "dashboard": {
-    "marketCount": "{count, plural, one {# Markt} other {# Märkte}}"
   },
   "assistant": {
     "composer": {
@@ -161,5 +162,119 @@
     "collapse": "Assistent ausblenden",
     "expand": "Assistent einblenden",
     "newAnswers": "{count, plural, one {# neue Antwort} other {# neue Antworten}}"
+  },
+  "monthPicker": {
+    "previousYear": "Vorheriges Jahr",
+    "nextYear": "Nächstes Jahr",
+    "months": "Monate {year}"
+  },
+  "period": {
+    "trigger": "Zeitraum: {period}, {range}. Zeitraum ändern",
+    "label": "{period} · {range}",
+    "title": "Zeitraum",
+    "range": {
+      "1m": "1 Monat",
+      "3m": "3 Monate",
+      "12m": "12 Monate"
+    },
+    "rangeLabel": "Monate bis {period}"
+  },
+  "mode": {
+    "label": "Ansicht",
+    "executive": "Management",
+    "analyst": "Analyse"
+  },
+  "drill": {
+    "label": "Drill-down",
+    "portfolio": "Portfolio",
+    "chooseRegion": "Region wählen",
+    "chooseMarket": "Markt wählen",
+    "chooseProduct": "Produkt wählen",
+    "region": "Region",
+    "market": "Markt",
+    "product": "Produkt",
+    "changeRegion": "Region: {name}. Region ändern",
+    "changeMarket": "Markt: {name}. Markt ändern",
+    "changeProduct": "Produkt: {name}. Produkt ändern"
+  },
+  "header": {
+    "settings": "Einstellungen: Sprache, Design, Ansicht zurücksetzen",
+    "settingsTitle": "Einstellungen",
+    "resetView": "Ansicht zurücksetzen",
+    "resetHint": "Portfolio, letzter Monat, Management"
+  },
+  "overview": {
+    "summary": "{markets, plural, one {# Markt} other {# Märkte}} · {products, plural, one {# Produkt} other {# Produkte}} · neueste Daten {period}"
+  },
+  "kpi": {
+    "title": "Kennzahlen",
+    "revenue": "Umsatz",
+    "attainment": "Planerfüllung",
+    "growth": "Wachstum ggü. Vorjahr",
+    "atRisk": "Märkte mit Risiko",
+    "vsPriorYear": "{value} ggü. Vorjahr",
+    "forecast": "Plan {value}",
+    "priorYear": "Vorjahr {value}",
+    "riskValue": "{count} von {total}",
+    "riskSplit": "{offTrack} verfehlt · {atRisk} gefährdet",
+    "riskNone": "Alle im Plan",
+    "latestOnly": "Der Status gilt nur für den neuesten Monat.",
+    "goLatest": "{period} anzeigen",
+    "perProduct": "Der Status gilt je Markt, nicht je Produkt.",
+    "calculated": "Berechnet",
+    "calculatedLabel": "Berechnet: {formula}",
+    "formula": {
+      "revenue": "Summe der monatlichen Ist-Umsätze im gewählten Zeitraum.",
+      "attainment": "Ist ÷ Plan im gewählten Zeitraum; kann vom gespeicherten Marktwert um etwa 1 Punkt abweichen.",
+      "growth": "Ist ÷ Vorjahres-Ist im gewählten Zeitraum, minus 100 %."
+    },
+    "unavailable": "—"
+  },
+  "marketStatus": {
+    "title": "Marktstatus",
+    "showTable": "Als Tabelle",
+    "tile": "{code} {name}, {status}, Planerfüllung {value}",
+    "tileNoStatus": "{code} {name}, Planerfüllung {value}",
+    "highlighted": "vom Assistenten markiert",
+    "selected": "ausgewählt",
+    "hatched": "schraffiert",
+    "latestOnly": "Der Status gilt nur für den neuesten Monat; die Kacheln zeigen die Planerfüllung.",
+    "market": "Markt",
+    "region": "Region",
+    "attainment": "Planerfüllung",
+    "status": "Status",
+    "caption": "Marktstatus nach Region, {window}",
+    "perMarket": "Die Kacheln zeigen ganze Märkte, nicht das gewählte Produkt.",
+    "showTiles": "Als Kacheln anzeigen"
+  },
+  "topRisks": {
+    "title": "Größte Risiken",
+    "order": "Verfehlt zuerst, dann nach Planerfüllung",
+    "reason": "{attainment} · {growth} ggü. Vorjahr",
+    "empty": "Hier gibt es keine Märkte mit Risiko."
+  },
+  "trend": {
+    "title": "Umsatz · {from} – {to}",
+    "actual": "Ist",
+    "forecast": "Plan",
+    "priorYear": "Vorjahr",
+    "showTable": "Als Tabelle",
+    "summary": "Umsatz für {scope}, {from} bis {to}. {period}: Ist {actual}, Plan {forecast}, Vorjahr {priorYear}.",
+    "anomaly": "{period} · {market}: {note}",
+    "month": "Monat",
+    "caption": "Umsatz je Monat für {scope}",
+    "anomalyMark": "Auffälligkeit",
+    "window": "ausgewählt",
+    "legend": "Legende",
+    "name": "Umsatzverlauf",
+    "showChart": "Als Diagramm anzeigen",
+    "windowRange": "{from} – {to}"
+  },
+  "topMovers": {
+    "title": "Größte Veränderungen",
+    "basis": "Wachstum ggü. Vorjahr, {range} bis {period}",
+    "risers": "Höchstes Wachstum",
+    "fallers": "Niedrigstes Wachstum",
+    "empty": "Zu wenige Märkte für einen Vergleich."
   }
 }

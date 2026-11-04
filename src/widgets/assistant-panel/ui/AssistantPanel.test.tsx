@@ -466,9 +466,14 @@ describe('AssistantPanel', () => {
     await user.click(await screen.findByRole('button', { name: new RegExp(en.dataCheck.title) }));
     await user.click(await screen.findByRole('button', { name: en.dataCheck.showOnDashboard }));
     await waitFor(() => {
-      expect(onUrlUpdate.mock.calls.at(-1)?.[0].searchParams.get('markets')).toBe(
-        'de,es,it,gb,br,fr',
-      );
+      expect(onUrlUpdate.mock.calls.at(-1)?.[0].searchParams.getAll('markets')).toEqual([
+        'de',
+        'es',
+        'it',
+        'gb',
+        'br',
+        'fr',
+      ]);
     });
   });
 

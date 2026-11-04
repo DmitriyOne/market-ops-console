@@ -22,6 +22,18 @@ const STYLE = {
   },
 } as const;
 
+/** The status shape alone (● ▲ ■), for places that also say the word. */
+export function StatusIcon({ status, className }: { status: MarketStatus; className?: string }) {
+  const { Icon } = STYLE[status];
+  return <Icon aria-hidden className={cn('size-2.5 fill-current', className)} />;
+}
+
+/** The translated status word. */
+export function useStatusLabel(): (status: MarketStatus) => string {
+  const t = useTranslations('dataCheck');
+  return (status) => t(STYLE[status].key);
+}
+
 /** Status as shape + word + colour, never colour alone. */
 export function StatusChip({ status }: { status: MarketStatus }) {
   const t = useTranslations('dataCheck');
