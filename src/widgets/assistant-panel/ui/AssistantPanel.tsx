@@ -12,10 +12,11 @@ import {
 } from '@/entities/performance';
 import { Composer, SuggestedQuestions, useChatStream } from '@/features/ask-question';
 import { useErrorMessage } from '@/shared/api';
-import { Button, Skeleton, Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui';
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui';
 
 import { AnswerMessage, isCantAnswer } from './AnswerMessage';
 import { Conversation } from './Conversation';
+import { ConversationSkeleton } from './ConversationSkeleton';
 
 type AssistantPanelProps = {
   /** An answer finished (the shell shows a badge when the panel is hidden). */
@@ -107,11 +108,7 @@ export function AssistantPanel({
       </header>
       {!chat.ready ? (
         // Until the stored conversation is read (server HTML, hydration).
-        <div aria-busy="true" className="flex flex-1 flex-col gap-3 p-4">
-          <Skeleton className="h-6 w-2/3" />
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-4 w-5/6" />
-        </div>
+        <ConversationSkeleton />
       ) : chat.messages.length === 0 ? (
         <div className="relative flex flex-1 flex-col gap-3 overflow-y-auto p-4">
           <h3 className="text-lg font-semibold">{t('empty.title')}</h3>

@@ -79,6 +79,10 @@ describe('AssistantPanel', () => {
       </QueryClientProvider>,
     );
     expect(html).toContain('aria-busy="true"');
+    expect(html).toContain(t.panel.loading);
+    // Shaped like the chat: a question bubble and an answer frame.
+    expect(html).toContain('data-skeleton="question"');
+    expect(html).toContain('data-skeleton="answer"');
     expect(html).not.toContain(t.panel.empty.title);
   });
 

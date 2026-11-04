@@ -69,7 +69,8 @@
       "youAsked": "You asked",
       "newContent": "New content",
       "subtitle": "Answers in English",
-      "newChat": "New chat"
+      "newChat": "New chat",
+      "loading": "Loading the conversation…"
     },
     "answer": {
       "label": "AI answer · may be incomplete",

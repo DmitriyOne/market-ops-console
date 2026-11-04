@@ -69,7 +69,8 @@
       "youAsked": "Ihre Frage",
       "newContent": "Neuer Inhalt",
       "subtitle": "Antwortet auf Englisch",
-      "newChat": "Neuer Chat"
+      "newChat": "Neuer Chat",
+      "loading": "Unterhaltung wird geladen…"
     },
     "answer": {
       "label": "KI-Antwort · möglicherweise unvollständig",

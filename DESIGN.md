@@ -134,7 +134,7 @@ Rules:
 | `Collapsible` | "What the data shows" (closed by default) |
 | `DropdownMenu` | theme and locale switches |
 | `Tooltip` | the name of an icon-only control on hover and focus (New chat) |
-| `Skeleton` | a block whose content is not known yet (the conversation before the stored chat is read) |
+| `Skeleton` | content not known yet, in the shape of what replaces it (`ConversationSkeleton`: question bubble + answer frame); no pulse under reduced motion |
 | `Toaster` / `toast.success` / `toast.error` (sonner) | short confirmations and failures that are not tied to a field ("Thanks for the feedback", "Couldn't copy"); top centre, as wide as the text up to 28rem |
 | `ErrorBoundary`, `WidgetBoundary` | a failing widget explains itself and offers "Try again" without taking the page down |
 
