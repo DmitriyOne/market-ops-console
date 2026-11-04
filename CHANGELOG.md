@@ -6,6 +6,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 
 ### Added
 - CI on PRs into `release/*`: format check, lint (ESLint + Steiger) and typecheck, no tests (ADR 0007).
+- Market map in the Market status card, behind a `Map / Tiles / Table` switch remembered per browser (map from the md width, tiles on a phone; an old "table" choice is kept). World without Antarctica, coloured by status (colour + dots / hatching) or, in Analyst, by attainment, growth, share or revenue on stepped scales with a legend that counts markets per step. Hover or keyboard focus shows name, value ("Calculated" when computed) and status; click or Enter opens the market; a touch tap shows the tooltip with an "Open" button. One finger and the plain wheel scroll the page; pinch or Ctrl/⌘ + wheel zoom, plus `+ / − / Whole world`. A drill or "Show on dashboard" flies the map to fit; a zoom set by hand survives month, window and metric changes. Status or share where they do not exist fall back to attainment with a notice. The map loads on its own chunk.
+- `kpi` URL param (map metric, Analyst only; changes replace history).
+- The table view gets the map metric's column; tiles, table and map follow the chosen product (status stays market level).
+
+### Changed
+- Moving to another market keeps the chosen product (map, tiles, top risks, top movers, breadcrumbs); picking the current market again in the breadcrumbs goes back up from the product.
 
 ## [0.5.0] - Unreleased
 

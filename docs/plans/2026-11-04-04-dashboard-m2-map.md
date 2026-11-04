@@ -5,8 +5,7 @@ sees where the portfolio is off plan at a glance, colours the map by a KPI
 in Analyst mode, opens a market from the map with mouse, touch or keyboard,
 and gets the same facts from tiles or the table.
 
-**Status:** plan approved by the owner (2026-11-04), scale checked on the
-data and with the `dataviz` validator.
+**Status:** built on `feature/0.6.0/market-map` (2026-11-04), in review.
 
 **Spec:** `docs/specs/2026-11-03-market-ops-console-design.md` §4 (ISO join),
 §5, §6 (`kpi`), §8 (Market map, Market status), §11, §13. Decisions: ADR
@@ -153,8 +152,9 @@ product; breadcrumb clears it.
 ### 3. Scale tokens (app/styles)
 
 `--scale-div-1…6`, `--scale-seq-1…5`, `--map-land`, `--map-ocean`, light
-and dark, values above. `tokens.test.ts`: both themes defined; neighbouring
-steps and land ΔE ≥ 15; ramps monotone; sequential light end ≥ 2:1. The
+and dark, values above. `tokens.test.ts`: diverging steps and land ΔE ≥ 15
+(all pairs); sequential ramp monotone with ΔL ≥ 0.06 per step (the skill's
+ordinal rule); sequential light end ≥ 2:1. The
 diverging set is reused by the heat map in M4.
 
 ### 4. Map view (widgets/market-status)
