@@ -3,7 +3,7 @@
 import { GlobeIcon, LayoutGridIcon, TableIcon } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
-import { useId, useMemo, useState } from 'react';
+import { useId, useMemo, useRef, useState } from 'react';
 
 import {
   getProduct,
@@ -19,7 +19,7 @@ import {
   useStatusLabel,
 } from '@/entities/performance';
 import { useDrillDown } from '@/features/drill-down';
-import { useMarketSelection } from '@/features/select-markets';
+import { SelectionBar, useMarketSelection } from '@/features/select-markets';
 import { MetricPicker } from '@/features/select-metric';
 import { LatestOnlyNotice } from '@/features/select-period';
 import type { MarketStatus as Status } from '@/shared/api';
@@ -75,6 +75,7 @@ function MapSkeleton() {
 export function MarketStatus() {
   const t = useTranslations('marketStatus');
   const titleId = useId();
+  const title = useRef<HTMLHeadingElement>(null);
   const { ds, state } = useDashboard();
   const { toMarket } = useDrillDown();
   const { toggle } = useMarketSelection();
@@ -126,7 +127,13 @@ export function MarketStatus() {
     <Card aria-labelledby={titleId} role="region" className={CARD}>
       <CardHeader className="flex flex-wrap items-center justify-between gap-2">
         <CardTitle>
-          <h2 id={titleId} className="text-base font-semibold">
+          {/* Focus lands here when the selection bar below is cleared and goes away. */}
+          <h2
+            ref={title}
+            id={titleId}
+            tabIndex={-1}
+            className="text-base font-semibold outline-none"
+          >
             {t('title')}
           </h2>
         </CardTitle>
@@ -159,6 +166,11 @@ export function MarketStatus() {
         </div>
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
+        <SelectionBar
+          onCleared={() => {
+            title.current?.focus();
+          }}
+        />
         {view === 'map' ? (
           <MapView
             map={map}

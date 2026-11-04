@@ -76,8 +76,13 @@ describe('MarketsTable', () => {
   it('the selection narrows the rows and the total', async () => {
     setup('?mode=analyst&markets=de&markets=es');
     expect(await bodyRows()).toHaveLength(2);
-    expect(screen.getByText('2 of 13 markets')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Remove Germany' })).toBeInTheDocument();
+    // Filter, count and Clear on one row; the chips on the row below.
+    const count = screen.getByText('2 of 13 selected');
+    const chip = screen.getByRole('button', { name: 'Remove Germany' });
+    expect(count.parentElement).toContainElement(
+      screen.getByRole('button', { name: en.marketFilter.clear }),
+    );
+    expect(count.parentElement).not.toContainElement(chip);
   });
 
   it('selected markets outside the scope: an empty state with Clear', async () => {

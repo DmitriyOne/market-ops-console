@@ -318,7 +318,9 @@
     "buttonCount": "Markets ({count})",
     "title": "Show only these markets",
     "clear": "Clear selection",
-    "remove": "Remove {name}"
+    "remove": "Remove {name}",
+    "count": "{selected} of {total} selected",
+    "selected": "Selected"
   },
   "marketsTable": {
     "title": "Markets",
@@ -338,13 +340,17 @@
       "status": "Status"
     },
     "empty": "None of the selected markets is in this view. Clear the selection to see every market.",
-    "shown": "{shown} of {total} markets",
     "noteLatest": "Status and share are set for the latest month only.",
     "notePerProduct": "Share is not available per product.",
     "noteCalculated": "Gap to forecast, units and the total are calculated from monthly data."
   },
   "exportMarkets": {
-    "button": "Export CSV",
-    "hint": "Rows as shown, raw USD"
+    "button": "Export",
+    "title": "Rows as shown",
+    "excel": "Excel (.xlsx)",
+    "excelHint": "Formatted, with filters",
+    "csv": "CSV",
+    "csvHint": "Raw numbers in USD, for other tools",
+    "failed": "Couldn't create the file. Try again."
   }
 }

@@ -318,7 +318,9 @@
     "buttonCount": "Märkte ({count})",
     "title": "Nur diese Märkte zeigen",
     "clear": "Auswahl aufheben",
-    "remove": "{name} entfernen"
+    "remove": "{name} entfernen",
+    "count": "{selected} von {total} ausgewählt",
+    "selected": "Ausgewählt"
   },
   "marketsTable": {
     "title": "Märkte",
@@ -338,13 +340,17 @@
       "status": "Status"
     },
     "empty": "Keiner der ausgewählten Märkte ist in dieser Ansicht. Heben Sie die Auswahl auf, um alle Märkte zu sehen.",
-    "shown": "{shown} von {total} Märkten",
     "noteLatest": "Status und Marktanteil gibt es nur für den letzten Monat.",
     "notePerProduct": "Marktanteil gibt es nicht pro Produkt.",
     "noteCalculated": "Abstand zur Prognose, Stückzahlen und Summe sind aus Monatsdaten berechnet."
   },
   "exportMarkets": {
-    "button": "CSV exportieren",
-    "hint": "Zeilen wie angezeigt, Rohwerte in USD"
+    "button": "Exportieren",
+    "title": "Zeilen wie angezeigt",
+    "excel": "Excel (.xlsx)",
+    "excelHint": "Formatiert, mit Filtern",
+    "csv": "CSV",
+    "csvHint": "Rohwerte in USD, für andere Programme",
+    "failed": "Datei konnte nicht erstellt werden. Bitte erneut versuchen."
   }
 }

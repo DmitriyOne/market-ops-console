@@ -17,8 +17,8 @@ import {
   useKpiFormat,
 } from '@/entities/performance';
 import { useDrillDown } from '@/features/drill-down';
-import { ExportMarketsButton } from '@/features/export-markets';
-import { MarketFilter } from '@/features/select-markets';
+import { ExportMenu } from '@/features/export-markets';
+import { MarketFilter, SelectionChips } from '@/features/select-markets';
 import { cn } from '@/shared/lib';
 import {
   Button,
@@ -127,16 +127,12 @@ export function MarketsTable() {
             {t('title')}
           </h2>
         </CardTitle>
-        <ExportMarketsButton />
+        <ExportMenu />
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-col gap-2">
           <MarketFilter />
-          {view.filtered && view.rows.length > 0 ? (
-            <p className="text-xs text-muted-foreground">
-              {t('shown', { shown: view.rows.length, total: view.inScope })}
-            </p>
-          ) : null}
+          <SelectionChips />
         </div>
         {view.rows.length === 0 ? (
           // The filter's own Clear above is the way back.

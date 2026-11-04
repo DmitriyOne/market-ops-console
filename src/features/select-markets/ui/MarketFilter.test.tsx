@@ -6,6 +6,7 @@ import { enMessages as en } from '@/shared/config';
 import { datasetHandler, renderWithProviders, server } from '@/shared/lib/test';
 
 import { MarketFilter } from './MarketFilter';
+import { SelectionChips } from './SelectionChips';
 
 const t = en.marketFilter;
 
@@ -13,6 +14,7 @@ function setup(searchParams = '?mode=analyst') {
   return renderWithProviders(
     <Suspense>
       <MarketFilter />
+      <SelectionChips />
     </Suspense>,
     { searchParams },
   );
@@ -35,7 +37,17 @@ describe('MarketFilter', () => {
     expect(lastUpdate()?.queryString).toBe('?mode=analyst&region=eu&markets=de&markets=es');
   });
 
-  it('chips name the selection; × removes one; Clear removes all and focuses the menu button', async () => {
+  it('counts the selected markets of the scope; Clear removes all and focuses the menu button', async () => {
+    const { user, lastUpdate } = setup('?mode=analyst&region=eu&markets=de&markets=jp');
+    expect(await screen.findByText('1 of 5 selected')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: t.clear }));
+    await waitFor(() => {
+      expect(lastUpdate()?.queryString).toBe('?mode=analyst&region=eu');
+    });
+    expect(screen.getByRole('button', { name: t.button })).toHaveFocus();
+  });
+
+  it('chips name the selection; × removes one', async () => {
     const { user, lastUpdate } = setup('?mode=analyst&markets=de&markets=es');
     const remove = await screen.findByRole('button', { name: 'Remove Germany' });
     expect(screen.getByRole('button', { name: 'Remove Spain' })).toBeInTheDocument();
@@ -44,11 +56,6 @@ describe('MarketFilter', () => {
     await waitFor(() => {
       expect(lastUpdate()?.queryString).toBe('?mode=analyst&markets=es');
     });
-    await user.click(screen.getByRole('button', { name: t.clear }));
-    await waitFor(() => {
-      expect(lastUpdate()?.queryString).toBe('?mode=analyst');
-    });
-    expect(screen.getByRole('button', { name: t.button })).toHaveFocus();
   });
 
   it('no selection: no chips and no Clear', async () => {

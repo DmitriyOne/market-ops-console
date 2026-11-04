@@ -1,10 +1,10 @@
 'use client';
 
-import { ChevronDownIcon, XIcon } from 'lucide-react';
+import { ChevronDownIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useRef } from 'react';
 
-import { getMarket, marketsInOrder, useDashboard } from '@/entities/performance';
+import { marketsInOrder, useDashboard } from '@/entities/performance';
 import {
   Button,
   DropdownMenu,
@@ -19,8 +19,9 @@ import {
 import { useMarketSelection } from '../model/use-market-selection';
 
 /**
- * The table filter: a menu with a checkbox per market of the scope, then
- * one chip per selected market. The map and the tiles change the same list.
+ * The table filter row: a menu with a checkbox per market of the scope,
+ * how many of them are selected, and Clear. The chips go on their own row
+ * (`SelectionChips`). The map and the tiles change the same list.
  */
 export function MarketFilter() {
   const t = useTranslations('marketFilter');
@@ -32,6 +33,7 @@ export function MarketFilter() {
   );
   const regions = ds.regions.filter((r) => markets.some((m) => m.regionId === r.id));
   const chosen = new Set(selected);
+  const inScope = markets.filter((m) => chosen.has(m.id)).length;
 
   return (
     <div className="flex flex-wrap items-center gap-2">
@@ -72,24 +74,11 @@ export function MarketFilter() {
           ))}
         </DropdownMenuContent>
       </DropdownMenu>
-      {selected.map((id) => {
-        const name = getMarket(ds, id)?.name ?? id;
-        return (
-          <Button
-            key={id}
-            type="button"
-            variant="secondary"
-            className="min-h-9 gap-1 rounded-full"
-            aria-label={t('remove', { name })}
-            onClick={() => {
-              toggle(id);
-            }}
-          >
-            {name}
-            <XIcon aria-hidden />
-          </Button>
-        );
-      })}
+      {selected.length > 0 ? (
+        <span className="text-xs text-muted-foreground">
+          {t('count', { selected: inScope, total: markets.length })}
+        </span>
+      ) : null}
       {selected.length > 0 ? (
         <Button
           type="button"

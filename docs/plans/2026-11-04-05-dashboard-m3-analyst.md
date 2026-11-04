@@ -82,6 +82,7 @@ filter. A new `sort` param keeps the order in shared links. New slices:
   table filter" (touch: "Tap a market, then Add to filter").
 - **History:** selection changes push (spec §6); sort replaces.
 - **Map flight (found while building):** a pick on the map keeps the map still (it would fly away from the pointer); a selection from the assistant or the table filter still flies the map to it.
+- **Owner check (2026-11-04):** CSV opened as one column in Excel with Russian regional settings and has no filters → `Export ▾` with Excel (.xlsx, ExcelJS, lazy) and CSV; filter row = button, "N of M selected", Clear, chips below; a selection bar on the Market status card in both modes.
 - **Empty state** uses the filter's own `Clear selection` above it (two buttons with one name would confuse a screen reader).
 - **Plan numbering:** this file is Plan 5. The backlog's "Plan 5"
   (hardening, a11y pass) is renamed **"Hardening plan"** in Task 6.

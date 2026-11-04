@@ -461,4 +461,15 @@ describe('MarketStatus tiles selection', () => {
       await screen.findByRole('button', { name: /^FR France,.*· selected$/ }),
     ).toBeInTheDocument();
   });
+
+  it('a selection shows as a bar with chips in Executive too; Clear empties it', async () => {
+    const { user, lastUpdate } = setup('?markets=fr&markets=es');
+    const bar = await screen.findByRole('group', { name: en.marketFilter.selected });
+    expect(within(bar).getByRole('button', { name: 'Remove France' })).toBeInTheDocument();
+    await user.click(within(bar).getByRole('button', { name: en.marketFilter.clear }));
+    await waitFor(() => {
+      expect(lastUpdate()?.queryString).toBe('');
+    });
+    expect(screen.getByRole('heading', { name: t.title })).toHaveFocus();
+  });
 });
