@@ -34,7 +34,7 @@ type GeographyInput = Parameters<typeof useGeographies>[0]['geography'];
 const ANTARCTICA = '010';
 const ZOOM_STEP = 1.5;
 const FLY_MS = 450;
-// The only cast in the map (owner to confirm, backlog): react-simple-maps types its input as
+// The only cast in the map (kept by the owner, 2026-11-04): react-simple-maps types its input as
 // GeoJSON, but it reads a TopoJSON topology at runtime, which is what world-atlas ships.
 const TOPOLOGY = topology as unknown as GeographyInput;
 const NON_SCALING = { vectorEffect: 'non-scaling-stroke' } as const;

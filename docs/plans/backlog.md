@@ -63,7 +63,7 @@ Points the owner wants explained in the README, in his own words:
   - "Back returns to the old market with the product" needs real browser history (the nuqs test adapter keeps none): add it to the **E2E** happy path (Playwright). Locale switch keeping `kpi` and the SSR skeleton are now unit-tested.
 - **Dev warning "Encountered a script tag while rendering React component"** (seen by the owner in the browser console). Source not confirmed yet: the likely one is our two inline `<script>` tags in `app/[locale]/layout.tsx` (ADR 0015) when React renders the layout on the client; ADR 0009 says `@wrksz/themes` injects its script outside the tree. Reproduce with the stack trace, then fix in the ADR 0015 pattern. Dev only so far. **Plan 5**.
 
-- **One type cast in the map** (`MarketMap.tsx`, `TOPOLOGY`): react-simple-maps types its `geography` as GeoJSON while it accepts the TopoJSON that world-atlas ships; CLAUDE.md forbids casts that silence errors. Owner to choose: keep with the comment (recommended), or convert with `topojson-client` as a direct dependency (still one cast at the JSON import).
+- **One type cast in the map** (`MarketMap.tsx`, `TOPOLOGY`): react-simple-maps types its `geography` as GeoJSON while it accepts the TopoJSON that world-atlas ships; CLAUDE.md forbids casts that silence errors. **Owner, 2026-11-04: keep it with the comment** (converting with `topojson-client` would add a dependency and still need a cast at the JSON import). Closed.
 
 ## Currency picker (owner, 2026-11-04) — after the required work, its own release before the README
 
