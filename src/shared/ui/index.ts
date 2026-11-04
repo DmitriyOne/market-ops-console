@@ -10,6 +10,7 @@ export { Popover, PopoverContent, PopoverTrigger } from './popover';
 export * from './sheet';
 export { Skeleton } from './skeleton';
 export { toast, Toaster } from './sonner';
+export { Sparkline } from './sparkline';
 export * from './table';
 export { Textarea } from './textarea';
 export { ToggleGroup, ToggleGroupItem } from './toggle-group';

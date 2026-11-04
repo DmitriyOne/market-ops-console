@@ -200,5 +200,29 @@
   },
   "overview": {
     "summary": "{markets, plural, one {# Markt} other {# Märkte}} · {products, plural, one {# Produkt} other {# Produkte}} · neueste Daten {period}"
+  },
+  "kpi": {
+    "title": "Kennzahlen",
+    "revenue": "Umsatz",
+    "attainment": "Planerfüllung",
+    "growth": "Wachstum ggü. Vorjahr",
+    "atRisk": "Märkte mit Risiko",
+    "vsPriorYear": "{value} ggü. Vorjahr",
+    "forecast": "Plan {value}",
+    "priorYear": "Vorjahr {value}",
+    "riskValue": "{count} von {total}",
+    "riskSplit": "{offTrack} verfehlt · {atRisk} gefährdet",
+    "riskNone": "Alle im Plan",
+    "latestOnly": "Der Status gilt nur für den neuesten Monat.",
+    "goLatest": "{period} anzeigen",
+    "perProduct": "Der Status gilt je Markt, nicht je Produkt.",
+    "calculated": "Berechnet",
+    "calculatedLabel": "Berechnet: {formula}",
+    "formula": {
+      "revenue": "Summe der monatlichen Ist-Umsätze im gewählten Zeitraum.",
+      "attainment": "Ist ÷ Plan im gewählten Zeitraum; kann vom gespeicherten Marktwert um etwa 1 Punkt abweichen.",
+      "growth": "Ist ÷ Vorjahres-Ist im gewählten Zeitraum, minus 100 %."
+    },
+    "unavailable": "—"
   }
 }

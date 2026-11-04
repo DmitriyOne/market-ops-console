@@ -200,5 +200,29 @@
   },
   "overview": {
     "summary": "{markets, plural, one {# market} other {# markets}} · {products, plural, one {# product} other {# products}} · latest data {period}"
+  },
+  "kpi": {
+    "title": "Key figures",
+    "revenue": "Revenue",
+    "attainment": "Forecast attainment",
+    "growth": "Growth YoY",
+    "atRisk": "Markets at risk",
+    "vsPriorYear": "{value} vs prior year",
+    "forecast": "Forecast {value}",
+    "priorYear": "Prior year {value}",
+    "riskValue": "{count} of {total}",
+    "riskSplit": "{offTrack} off track · {atRisk} at risk",
+    "riskNone": "All on track",
+    "latestOnly": "Status is set for the latest month only.",
+    "goLatest": "Show {period}",
+    "perProduct": "Status is set per market, not per product.",
+    "calculated": "Calculated",
+    "calculatedLabel": "Calculated: {formula}",
+    "formula": {
+      "revenue": "sum of monthly actual revenue over the selected months.",
+      "attainment": "actual ÷ forecast over the selected months; can differ from a market's stored figure by about 1 point.",
+      "growth": "actual ÷ prior-year actual over the selected months, minus 100%."
+    },
+    "unavailable": "—"
   }
 }

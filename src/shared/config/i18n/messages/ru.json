@@ -200,5 +200,29 @@
   },
   "overview": {
     "summary": "{markets, plural, one {# рынок} few {# рынка} many {# рынков} other {# рынка}} · {products, plural, one {# продукт} few {# продукта} many {# продуктов} other {# продукта}} · последние данные {period}"
+  },
+  "kpi": {
+    "title": "Ключевые показатели",
+    "revenue": "Выручка",
+    "attainment": "Выполнение плана",
+    "growth": "Рост к прошлому году",
+    "atRisk": "Рынки под риском",
+    "vsPriorYear": "{value} к прошлому году",
+    "forecast": "План {value}",
+    "priorYear": "Прошлый год {value}",
+    "riskValue": "{count} из {total}",
+    "riskSplit": "{offTrack} отстают · {atRisk} под риском",
+    "riskNone": "Все в плане",
+    "latestOnly": "Статус есть только для последнего месяца.",
+    "goLatest": "Показать {period}",
+    "perProduct": "Статус есть у рынка, не у продукта.",
+    "calculated": "Расчёт",
+    "calculatedLabel": "Расчёт: {formula}",
+    "formula": {
+      "revenue": "сумма фактической выручки по месяцам за выбранный период.",
+      "attainment": "факт ÷ план за выбранный период; может отличаться от сохранённого значения рынка примерно на 1 пункт.",
+      "growth": "факт ÷ факт прошлого года за выбранный период, минус 100 %."
+    },
+    "unavailable": "—"
   }
 }

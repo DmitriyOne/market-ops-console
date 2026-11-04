@@ -4,14 +4,12 @@ import { ChevronDownIcon, SquareSquareIcon } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
 import { type ReactNode, useState } from 'react';
 
-import { getRegion, type KpiValue } from '@/entities/performance';
+import { getRegion, type KpiValue, StatusChip, useKpiFormat } from '@/entities/performance';
 import type { Dataset, Market, MarketStatus } from '@/shared/api';
 import { cn } from '@/shared/lib';
 import { Button, Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/shared/ui';
 
 import type { CheckRow, DataCheck } from '../model/data-check';
-import { StatusChip } from './StatusChip';
-import { useKpiFormat } from './use-kpi-format';
 
 type Line = {
   key: string;

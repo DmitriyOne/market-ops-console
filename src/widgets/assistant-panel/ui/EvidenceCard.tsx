@@ -2,69 +2,14 @@
 
 import { useTranslations } from 'next-intl';
 
-import { evidenceFor, type ResolvedCitation } from '@/entities/performance';
+import {
+  evidenceFor,
+  type ResolvedCitation,
+  StatusChip,
+  useKpiFormat,
+} from '@/entities/performance';
 import type { Dataset } from '@/shared/api';
-
-import { StatusChip } from './StatusChip';
-import { useKpiFormat } from './use-kpi-format';
-
-// Card content width (w-72 minus p-2.5), so the chart fills it edge to edge.
-const SPARK_W = 268;
-const SPARK_H = 56;
-const PAD = 5;
-
-type SparkPoint = { value: number; marked: boolean };
-
-/** 12-month revenue line; the cited month (last) and anomaly months are marked. */
-function Sparkline({ points, label }: { points: SparkPoint[]; label: string }) {
-  const values = points.map((p) => p.value);
-  const min = Math.min(...values);
-  const max = Math.max(...values);
-  const span = max - min || 1;
-  const step = points.length > 1 ? (SPARK_W - PAD * 2) / (points.length - 1) : 0;
-  const xy = points.map((p, i) => ({
-    ...p,
-    x: PAD + i * step,
-    y: PAD + (1 - (p.value - min) / span) * (SPARK_H - PAD * 2),
-  }));
-  const line = xy.map((p) => `${String(p.x)},${String(p.y)}`).join(' ');
-  const first = xy[0];
-  const last = xy.at(-1);
-  const area =
-    first && last
-      ? `${String(first.x)},${String(SPARK_H)} ${line} ${String(last.x)},${String(SPARK_H)}`
-      : '';
-  return (
-    <svg
-      viewBox={`0 0 ${String(SPARK_W)} ${String(SPARK_H)}`}
-      role="img"
-      aria-label={label}
-      className="h-14 w-full overflow-visible text-foreground"
-    >
-      <polygon points={area} className="fill-muted" />
-      <polyline
-        points={line}
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinejoin="round"
-      />
-      {xy
-        .filter((p) => p.marked)
-        .map((p) => (
-          <circle
-            key={p.x}
-            cx={p.x}
-            cy={p.y}
-            r="4"
-            strokeWidth="2"
-            className="fill-popover stroke-status-off-track"
-          />
-        ))}
-      {last ? <circle cx={last.x} cy={last.y} r="3" className="fill-foreground" /> : null}
-    </svg>
-  );
-}
+import { Sparkline } from '@/shared/ui';
 
 /** The real numbers behind one citation (spec §7, message anatomy 3). */
 export function EvidenceCard({
@@ -122,6 +67,7 @@ export function EvidenceCard({
         <Sparkline
           points={trend.map((p) => ({ value: p.actual, marked: anomalyPeriods.has(p.period) }))}
           label={t('trend', { name })}
+          className="h-14"
         />
         <div className="flex justify-between font-mono text-xs text-muted-foreground">
           <span>{trend[0] ? f.period(trend[0].period) : null}</span>

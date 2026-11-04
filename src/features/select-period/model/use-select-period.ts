@@ -19,6 +19,10 @@ export function useSelectPeriod() {
       setRange: (range: Range) => {
         void setParams({ range: range === '1m' ? null : range });
       },
+      /** The view where status exists: latest month, 1 month (spec §5). */
+      toLatest: () => {
+        void setParams({ period: null, range: null });
+      },
     }),
     [ds, setParams],
   );

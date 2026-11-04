@@ -3,7 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
-import { resolveCitation, type ResolvedCitation } from '@/entities/performance';
+import { resolveCitation, type ResolvedCitation, useKpiFormat } from '@/entities/performance';
 import type { Citation, Dataset } from '@/shared/api';
 import { useMediaQuery } from '@/shared/lib';
 import {
@@ -17,7 +17,6 @@ import {
 } from '@/shared/ui';
 
 import { EvidenceCard } from './EvidenceCard';
-import { useKpiFormat } from './use-kpi-format';
 
 type SourceButtonProps = {
   citation: Citation;
