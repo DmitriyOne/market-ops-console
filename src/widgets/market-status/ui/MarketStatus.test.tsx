@@ -1,7 +1,7 @@
 import { QueryClient } from '@tanstack/react-query';
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
-import { renderToString } from 'react-dom/server';
 import { Suspense } from 'react';
+import { renderToString } from 'react-dom/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import raw from '@/data/data.json';
