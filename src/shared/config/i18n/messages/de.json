@@ -471,6 +471,18 @@
     "examples": {
       "attainment": "Planerfüllung unter 95 %",
       "share": "Marktanteil unter 10 %"
-    }
+    },
+    "condition": "{operator, select, below {{metric} unter {threshold}} other {{metric} über {threshold}}}",
+    "metric": {
+      "growth": "Wachstum",
+      "attainment": "Planerfüllung",
+      "share": "Marktanteil",
+      "revenue": "Umsatz"
+    },
+    "scope": {
+      "portfolio": "Alle Märkte",
+      "marketsCount": "{count, plural, one {# Markt} other {# Märkte}}"
+    },
+    "flagged": "{severity, select, critical {Kritischer Alarm} other {Alarm}}: {rules}"
   }
 }

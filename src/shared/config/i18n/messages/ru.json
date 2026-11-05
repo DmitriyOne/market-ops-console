@@ -471,6 +471,18 @@
     "examples": {
       "attainment": "Выполнение плана ниже 95%",
       "share": "Доля ниже 10%"
-    }
+    },
+    "condition": "{operator, select, below {{metric} ниже {threshold}} other {{metric} выше {threshold}}}",
+    "metric": {
+      "growth": "Рост",
+      "attainment": "Выполнение плана",
+      "share": "Доля",
+      "revenue": "Выручка"
+    },
+    "scope": {
+      "portfolio": "Все рынки",
+      "marketsCount": "{count, plural, one {# рынок} few {# рынка} many {# рынков} other {# рынка}}"
+    },
+    "flagged": "{severity, select, critical {Критичный алерт} other {Алерт}}: {rules}"
   }
 }

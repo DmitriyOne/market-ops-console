@@ -471,6 +471,18 @@
     "examples": {
       "attainment": "Attainment below 95%",
       "share": "Share below 10%"
-    }
+    },
+    "condition": "{operator, select, below {{metric} below {threshold}} other {{metric} above {threshold}}}",
+    "metric": {
+      "growth": "Growth",
+      "attainment": "Attainment",
+      "share": "Share",
+      "revenue": "Revenue"
+    },
+    "scope": {
+      "portfolio": "All markets",
+      "marketsCount": "{count, plural, one {# market} other {# markets}}"
+    },
+    "flagged": "{severity, select, critical {Critical alert} other {Alert}}: {rules}"
   }
 }
