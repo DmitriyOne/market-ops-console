@@ -42,7 +42,7 @@ Points the owner wants explained in the README, in his own words:
 - **Citations are per answer, not per claim**: the contract has no positions in the text; guessing them means parsing AI text.
 - **Status is for the latest month only** in the data; the data block says so, while a question may say "this quarter".
 - **Answer feedback** (👍/👎 + reason, once per answer) goes to `logEvent` (console now, analytics later); it never includes the question text.
-- **Rate limits belong on the server**: per user / IP in middleware or the platform firewall (e.g. Vercel WAF) for `/api/chat` and a future `/api/feedback`; the client only prevents accidental repeats (one stream at a time, one rating per answer).
+- **Rate limits belong on the server**: per user / IP in middleware or the platform firewall (e.g. Vercel WAF) for `/api/chat`, `/api/v1/alerts` (with input limits: body size, market ids) and a future `/api/feedback`; the client only prevents accidental repeats (one stream at a time, one rating per answer).
 - **An answer cut by a reload comes back empty**, as "Stopped" without its partial text (owner, 2026-11-04: keep it). Storage is written when a message starts or ends, not per token; a `pagehide` flush would keep the text if it is ever needed.
 
 ## From the 0.6.0 map build (2026-11-04)
@@ -84,6 +84,10 @@ Points the owner wants explained in the README, in his own words:
 
 - **A Retry from the rollback toast resends the change as it was**: for an edit or a toggle, a rule changed again in between gets the older version back. Rare (two edits of one rule inside one failed save). **Hardening plan**, if it shows.
 - **Two writes to one rule in flight** (toggle twice before the first answer): each undoes only itself, but a failed first write puts back its `previous`, which the second had already replaced. The list is refetched when the last write settles, so the server's state wins in the end. **Accepted**.
+- **The alerts route has no input limits** (agent review, 2026-11-05): no cap on the body size or on `marketIds` (count, duplicates, unknown ids), `regionId` not checked against the dataset. A crafted POST with 3,000 ids got 201 and a 46 KB cookie the browser drops, so a reported success stores nothing; only the sender's own data is affected. **Accepted for the mock (owner, 2026-11-05)**; the README says a production API over live data needs input limits and rate limiting.
+- **The threshold field reads "1,000" as 1** in English, and "5." or "1.000,5" say "required" instead of "not a number" (`parseThreshold`). Nobody types a thousands separator in a field that holds up to 200 % or a few million dollars. **Accepted (owner, 2026-11-05)**.
+- **A revenue threshold is shown with one decimal** ("$1.3M" for 1.25 M$, `useThresholdFormat` uses `compactCurrency`), in the rule list and the Firing reasons. A threshold format with two decimals would show it as typed. **Owner**, decide.
+- **The anomaly ⚠ in the markets table has a hover tooltip only**, so a touch screen can't read its note (the alert bell next to it became a popover in 0.9.0). Same fix if wanted. **Hardening plan**.
 - **Alerts checked in jsdom only** (no browser run this round): the sheet's look and focus return on desktop, the phone tab with the keyboard open, Radix Select inside the sheet on a phone. **Owner check**.
 
 ## Currency picker (owner, 2026-11-04) — after the required work, its own release before the README
