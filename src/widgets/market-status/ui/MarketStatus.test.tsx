@@ -52,7 +52,7 @@ describe('MarketStatus', () => {
     const section = await screen.findByRole('region', { name: t.title });
     expect(within(section).getAllByRole('button', { name: /attainment/ })).toHaveLength(13);
     expect(
-      within(section).getByRole('button', { name: 'DE Germany, Off track, attainment 92.0%' }),
+      within(section).getByRole('button', { name: 'DE 92.0% attainment, Germany, Off track' }),
     ).toBeInTheDocument();
   });
 
@@ -78,7 +78,7 @@ describe('MarketStatus', () => {
 
   it('clicking a tile drills into that market', async () => {
     const { user, lastUpdate } = setup('?period=2026-05');
-    await user.click(await screen.findByRole('button', { name: /^DE Germany,/ }));
+    await user.click(await screen.findByRole('button', { name: /^DE .*, Germany/ }));
     await waitFor(() => {
       expect(Object.fromEntries(lastUpdate()?.searchParams ?? [])).toMatchObject({
         region: 'eu',
@@ -92,7 +92,7 @@ describe('MarketStatus', () => {
     setup('?markets=es&markets=fr');
     expect(
       await screen.findByRole('button', {
-        name: 'ES Spain, Off track, attainment 104.5% · selected',
+        name: 'ES 104.5% attainment, Spain, Off track · selected',
       }),
     ).toBeInTheDocument();
   });
@@ -101,7 +101,9 @@ describe('MarketStatus', () => {
     setup('?period=2026-03');
     expect(await screen.findByText(t.latestOnly)).toBeInTheDocument();
     expect(screen.queryByText(/Off track|At risk|On track/)).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /^DE Germany, attainment/ })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /^DE [\d.]+% attainment, Germany$/ }),
+    ).toBeInTheDocument();
   });
 
   it('with a product chosen, values are for that product and status per market', async () => {
@@ -135,7 +137,7 @@ describe('MarketStatus', () => {
     expect(germany).toHaveTextContent('Off track');
     expect(within(table).getAllByRole('row')).toHaveLength(14);
     expect(screen.getByRole('radio', { name: 'Table' })).toBeChecked();
-    expect(screen.queryByRole('button', { name: /^DE Germany,/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /^DE .*, Germany/ })).not.toBeInTheDocument();
   });
 
   it('the chosen view is remembered', async () => {
@@ -501,13 +503,13 @@ describe('MarketStatus tiles selection', () => {
   it('Analyst: Shift+click on a tile toggles it', async () => {
     const { user, lastUpdate } = setup('?mode=analyst');
     await user.keyboard('{Shift>}');
-    await user.click(await screen.findByRole('button', { name: /^FR France,/ }));
+    await user.click(await screen.findByRole('button', { name: /^FR .*, France/ }));
     await user.keyboard('{/Shift}');
     await waitFor(() => {
       expect(lastUpdate()?.queryString).toBe('?mode=analyst&markets=fr');
     });
     expect(
-      await screen.findByRole('button', { name: /^FR France,.*· selected$/ }),
+      await screen.findByRole('button', { name: /^FR .*, France.*· selected$/ }),
     ).toBeInTheDocument();
   });
 

@@ -243,8 +243,8 @@
   },
   "marketStatus": {
     "title": "Marktstatus",
-    "tile": "{code} {name}, {status}, Planerfüllung {value}",
-    "tileNoStatus": "{code} {name}, Planerfüllung {value}",
+    "tile": "{code} {value} Planerfüllung, {name}, {status}",
+    "tileNoStatus": "{code} {value} Planerfüllung, {name}",
     "current": "geöffnet",
     "selected": "ausgewählt",
     "hatched": "schraffiert",
@@ -374,6 +374,7 @@
     "gridLabel": "{metric} nach Markt und Monat",
     "market": "Markt",
     "cell": "{market}, {month}: {value}",
+    "cellRounded": "{market}, {month}: {shown} ({value})",
     "stepBelow": "unter {to}",
     "stepBetween": "{from} – {to}",
     "stepAbove": "ab {from}",

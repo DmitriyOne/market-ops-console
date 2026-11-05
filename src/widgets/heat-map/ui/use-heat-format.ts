@@ -32,8 +32,13 @@ export function useHeatFormat(metric: HeatMetric, marketNotes = false) {
     marketNotes ? t('anomalyMarket', { note: text }) : t('anomaly', { note: text });
 
   const cellName = (row: HeatRow, cell: HeatCell) => {
+    // The cell's visible (rounded) figure is part of its name (label in
+    // name, WCAG 2.5.3), the exact one follows: "Canada, Dec 2024: +12% (+11.7%)".
+    const where = { market: row.name, month: month(cell.period) };
     const parts = [
-      t('cell', { market: row.name, month: month(cell.period), value: long(cell.value) }),
+      cell.value === null
+        ? t('cell', { ...where, value: dash })
+        : t('cellRounded', { ...where, shown: short(cell.value), value: long(cell.value) }),
     ];
     if (cell.anomaly) parts.push(note(cell.anomaly.note));
     if (row.selected) parts.push(t('selected'));
