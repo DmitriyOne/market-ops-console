@@ -2,6 +2,17 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/). The top version must match `package.json` and the `release/X.Y.Z` branch.
 
+## [0.10.0] - Unreleased
+
+### Added
+- End-to-end tests (Playwright, `pnpm e2e`, `e2e/`), on a desktop and a phone (Pixel 7 emulation): the brief's happy path (Germany on the map, the suggested question streams token by token, a source opens Germany in March 2026) and German number formats; Back and Forward in a real browser (drill-down one level at a time, another market keeping the product, selected markets with the table, the alerts sheet leaving no step behind, heat-map focus kept in the grid); the phone tab bar; accessibility scans with axe (WCAG 2.1 A/AA) of Executive, Analyst, the alerts panel and the assistant with an answer. The suite builds the app and starts it on port 3100, so a dev server on 3000 keeps running; with `BASE_URL` it tests that address instead (a deployed preview).
+
+### Changed
+- PRs into `develop` also run the E2E suite, so they build the app too (Chromium only, cached; the report is uploaded when a test fails).
+
+### Fixed
+- Screen readers and voice control: a heat-map cell's name now includes the figure it shows ("Canada, Dec 2024: +12% (+11.7%)"), and a market tile's name starts with its code and figure together ("US 100.5% attainment, United States, On track"). Found by the axe scans (WCAG 2.5.3, label in name).
+
 ## [0.9.0] - Unreleased
 
 ### Added

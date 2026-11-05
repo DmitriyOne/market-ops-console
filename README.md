@@ -44,7 +44,17 @@ pnpm format:check
 pnpm lint                    # ESLint + Steiger (FSD boundaries)
 pnpm typecheck
 pnpm test                    # Vitest
+pnpm exec playwright install chromium   # once, for the E2E tests
+pnpm e2e                     # Playwright: builds, starts on :3100 (dev on :3000 can keep running)
+pnpm e2e:ui                  # the same in Playwright's UI mode
+pnpm e2e --project=phone     # one project (desktop | phone); --headed shows the browser
 ```
+
+## Testing
+
+- **Unit and component** (Vitest + Testing Library + MSW, next to the code): parsing the stream, schemas, selectors, formatters; streaming, stop, abstain / low confidence / error, citations, drill-down into the URL, alert validation and optimistic rollback, the charts' table alternatives.
+- **End-to-end** (Playwright, `e2e/`): the brief's happy path, Back and Forward in a real browser, the phone tab bar, and axe accessibility scans (WCAG 2.1 A/AA) on desktop and a phone emulation. They run locally (`pnpm e2e`) and on every PR into `develop`; `BASE_URL=https://… pnpm e2e` tests a deployed copy.
+- **Skipped on purpose:** visual regression, a cross-browser matrix, Storybook (ADR 0008).
 
 ## Project structure
 

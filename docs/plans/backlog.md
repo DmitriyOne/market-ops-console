@@ -17,7 +17,7 @@ Format: **Item**: what is wrong (file). Why it can wait. Where it goes.
 
 ## From Plan 2 (assistant, 2026-11-03)
 
-- **No live accessibility audit yet**: the Plan 2 audit was by code and contrast tests; no rendered axe/Lighthouse run or screen-reader pass of the panel (streaming announcements, `aria-busy` log). **Hardening plan**, accessibility pass.
+- **No screen-reader pass yet**: the Plan 2 audit was by code and contrast tests. Since 0.10.0 axe scans the rendered panel with an answer (E2E); a screen-reader pass (streaming announcements, `aria-busy` log) is still manual. **Hardening plan**, accessibility pass.
 - **`summary-long` scroll behaviour tested only at hook level** (`use-stick-to-bottom.test.tsx`); no test scrolls the real panel while it streams. **Hardening plan**, in the Playwright happy path or manually.
 
 ## From the owner review of 0.4.0 (2026-11-03)
@@ -55,7 +55,7 @@ Points the owner wants explained in the README, in his own words:
   - Focus ring on a market is partly covered by neighbours and the pattern layer drawn later; draw a separate focus outline on top. **Hardening plan**, a11y polish.
   - When zoomed in, Tab can focus a market outside the view; fly to it on focus if off-screen. **Hardening plan**.
   - Status metric with a product: tooltip shows the product's attainment next to the market's status; only the note under the card says status is per market. Owner decision №9; add the note to the tooltip if users misread it.
-  - "Back returns to the old market with the product" needs real browser history (the nuqs test adapter keeps none): add it to the **E2E** happy path (Playwright). Locale switch keeping `kpi` and the SSR skeleton are now unit-tested.
+  - "Back returns to the old market with the product": covered by the E2E history test (0.10.0). Closed.
 
 - **One type cast in the map** (`MarketMap.tsx`, `TOPOLOGY`): react-simple-maps types its `geography` as GeoJSON while it accepts the TopoJSON that world-atlas ships; CLAUDE.md forbids casts that silence errors. **Owner, 2026-11-04: keep it with the comment** (converting with `topojson-client` would add a dependency and still need a cast at the JSON import). Closed.
 
@@ -76,7 +76,7 @@ Points the owner wants explained in the README, in his own words:
 
 - **Radar colours follow the selection order**, not the market: removing the first selected market moves the others to the next colour (dataviz rule "colour follows the entity"). Four slots for 13 markets cannot be fixed per market; a stable slot per selection would need memory outside the URL. Legend, dash and marker always match. **Design pass**, if it confuses.
 - **Heat-map cell names repeat for each of the 312 buttons** (market, month, value, anomaly); a screen reader reads the row header too, so the market name is said twice. Row and column headers would carry it if the cells were `gridcell`s instead of buttons. **Hardening plan**, a11y pass with a screen reader.
-- **Heat-map focus fallback is untested**: when the focused row disappears (browser Back from the portfolio to a region with focus on a row outside it) focus should land on the clamped row. Code reads right; no in-app action reaches it. **E2E** happy path.
+- **Heat-map focus fallback**: covered by the E2E history test (0.10.0: Back from the portfolio to Europe with focus on Japan keeps focus on a European row). Closed.
 - **A radar series without a value on a kept axis** would be drawn by Recharts at the centre (as "worst"). Cannot happen with this data (no zero forecast or prior year). Drop the axis or the series if it ever can. **Hardening plan**.
 - **Heat-map and radar checked in jsdom only** (no browser run this round; the owner checked on his phone): layout at xl with the assistant open, phone scroll to the selected month, the Recharts radar's look in both themes. **Owner check**.
 
@@ -89,6 +89,13 @@ Points the owner wants explained in the README, in his own words:
 - **A revenue threshold is shown with one decimal** ("$1.3M" for 1.25 M$, `useThresholdFormat` uses `compactCurrency`), in the rule list and the Firing reasons. Fixed (owner, 2026-11-05): a `thresholdCurrency` format with two decimals shows it as typed. Closed.
 - **The anomaly ⚠ in the markets table has a hover tooltip only**, so a touch screen can't read its note (the alert bell next to it became a popover in 0.9.0). Same fix if wanted. **Hardening plan**.
 - **Alerts checked in the browser (Playwright on the dev server, 2026-11-05)**: Back after closing the sheet (X, Escape, overlay; a deep link), two quick writes kept after a reload, the saved toast while another rule is switched, ru examples kept after a write, focus after a delete and on a missing market, 44 px rows and switch, the table bell on a tap (touch emulation). Not checked: a real phone, the keyboard open over the form. **Owner check**.
+
+## From the 0.10.0 E2E build (2026-11-05)
+
+- **Unit tests take ~5 min in CI** (279 s on the 2-core runner, ~26 s on the owner's machine): 36 % setup and 26 % environment, jsdom built for each of 114 files. Candidates: `happy-dom`, Vitest `pool: 'threads'` or a shared environment for pure-logic files (`// @vitest-environment node`). **Owner**, decide (it is what makes the develop check ~8 min).
+- **The E2E run on Vercel previews** (`deployment_status`, `BASE_URL` = the preview URL, filtered to `release/*` previews to spare minutes; protection bypass or Trusted Sources) comes with the deploy. **Deploy release**.
+- **The CI E2E step is untested live**: the workflow was checked by parsing it, not by a run; the first PR into `develop` is its test. **Owner check**.
+- **The phone tab's name reads "Alerts , 5 markets flagged"** in Chromium (a space before the comma from the inline count). Screen readers ignore it. Cosmetic.
 
 ## Currency picker (owner, 2026-11-04) — after the required work, its own release before the README
 

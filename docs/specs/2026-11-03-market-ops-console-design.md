@@ -258,7 +258,7 @@ Four suggested questions (buttons) taken from the brief: risks this quarter, Ger
 
 ## 12. Testing (ADR 0008)
 
-Unit: SSE parsing, schemas, selectors, formatters, chat reducer, discrepancy rule, alert validation, fetch client timeouts and error mapping, online-status hook. Component/integration (MSW): streaming, stop, abstain/low/error, citations and data block, drill-down → URL, optimistic rollback, chart table alternatives. One local Playwright happy path.
+Unit: SSE parsing, schemas, selectors, formatters, chat reducer, discrepancy rule, alert validation, fetch client timeouts and error mapping, online-status hook. Component/integration (MSW): streaming, stop, abstain/low/error, citations and data block, drill-down → URL, optimistic rollback, chart table alternatives. Playwright (0.10.0): the happy path, Back/Forward in a real browser, the phone tab bar and axe scans, desktop and phone, locally and on PRs into `develop`.
 
 ## 13. Dependencies beyond ADR 0002 **[owner approved]**
 
