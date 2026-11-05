@@ -2,6 +2,16 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/). The top version must match `package.json` and the `release/X.Y.Z` branch.
 
+## [0.11.0] - Unreleased
+
+### Fixed
+- Alerts: with the panel open on desktop, a keyboard can't reach the toast (the panel keeps focus inside), so its Retry was mouse/touch only. A failed save now also shows in the rule's row ("Not saved. …", "Not deleted. …"; a new rule's above the list) with Retry and Dismiss, next after the switch for Tab; focus stays on the rule or the list afterwards.
+- Alerts: switching a rule with the keyboard sent focus to the start of the page while it saved (the switch was disabled meanwhile). It keeps focus now and waits for the save.
+- The ⚠ anomaly mark in the markets table opens its note on a tap, like the alert bell next to it (it was a hover tooltip).
+- After the "You're offline" notice goes, focus is back where it was instead of at the start of the page.
+- Screen readers: a heat-map cell no longer repeats its market and month ("Canada, Dec 2024: +12% (+11.7%)" → "+12% (+11.7%)"); the row and column headers say them.
+- Map with a keyboard: the focus ring is drawn on top, not partly under neighbouring countries and the status patterns; Tab to a market outside a zoomed-in view moves the map to it, with its tooltip.
+
 ## [0.10.0] - Unreleased
 
 ### Added

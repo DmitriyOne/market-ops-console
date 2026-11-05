@@ -4,7 +4,7 @@ A console for a commercial operations team: a **streaming AI assistant** that an
 
 Take-home assignment for the Frontend Engineer role at NewPage Solutions.
 
-> Status: `0.9.0` alerts, built, waiting for the owner's check and the review. Done: foundation (0.2.0), design direction and tokens (0.3.0), assistant (0.4.0), dashboard shell (0.5.0), market map (0.6.0), Analyst markets table (0.7.0), heat map and radar (0.8.0). Next: end-to-end test and deploy. Full list: `CHANGELOG.md`.
+> Status: `0.11.0` accessibility pass, built, waiting for the owner's check and the review. Done: foundation (0.2.0), design direction and tokens (0.3.0), assistant (0.4.0), dashboard shell (0.5.0), market map (0.6.0), Analyst markets table (0.7.0), heat map and radar (0.8.0), alerts (0.9.0), end-to-end tests (0.10.0). Next: deploy (0.12.0). Full list: `CHANGELOG.md`.
 
 ## What works now
 
@@ -53,7 +53,7 @@ pnpm e2e --project=phone     # one project (desktop | phone); --headed shows the
 ## Testing
 
 - **Unit and component** (Vitest + Testing Library + MSW, next to the code): parsing the stream, schemas, selectors, formatters; streaming, stop, abstain / low confidence / error, citations, drill-down into the URL, alert validation and optimistic rollback, the charts' table alternatives.
-- **End-to-end** (Playwright, `e2e/`): the brief's happy path, Back and Forward in a real browser, the phone tab bar, the alert form's optimistic save and rollback on the real API, the assistant's error, "can't answer" and Stop states, a shared link opening the same view, Excel/CSV downloads, offline and a failing API, and axe accessibility scans (WCAG 2.1 A/AA) on desktop and a phone emulation. They run locally (`pnpm e2e`) and on every PR into `develop`; `BASE_URL=https://… pnpm e2e` tests a deployed copy (an unprotected one; protected Vercel previews come with the deploy). `E2E_REUSE=1` reuses a server already on :3100 instead of building.
+- **End-to-end** (Playwright, `e2e/`): the brief's happy path, Back and Forward in a real browser, the phone tab bar, the alert form's optimistic save and rollback on the real API, the assistant's error, "can't answer" and Stop states, a shared link opening the same view, Excel/CSV downloads, offline and a failing API, the map and the alerts panel with a keyboard, and axe accessibility scans (WCAG 2.1 A/AA) on desktop and a phone emulation. They run locally (`pnpm e2e`) and on every PR into `develop`; `BASE_URL=https://… pnpm e2e` tests a deployed copy (an unprotected one; protected Vercel previews come with the deploy). `E2E_REUSE=1` reuses a server already on :3100 instead of building.
 - **Skipped on purpose:** visual regression, a cross-browser matrix, Storybook (ADR 0008).
 
 ## Project structure
