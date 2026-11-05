@@ -76,8 +76,8 @@ Rules:
 - Scale in use: `text-xs` (12px: meta, table cells, chips, hints),
   `text-sm` (14px: body in panels, buttons), `text-base` (16px: panel
   title, composer field; 16px stops iOS zoom), `text-lg` (empty-state
-  heading). `text-compact` (0.8rem, 0.11.1) only in shadcn's `sm` buttons
-  and toggles, where the generated code had `text-[0.8rem]`.
+  heading). shadcn's `sm` buttons and toggles keep their `text-[0.8rem]`
+  (§6).
 - Weights: 400 body, 500 labels and buttons, 600 titles, names in tables,
   chips.
 - Table headers: `text-xs uppercase tracking-wide text-muted-foreground`.
@@ -91,10 +91,10 @@ Rules:
   `rounded-xl` for cards and answer surfaces, `rounded-lg` for buttons and
   source buttons, `rounded-full` for chips, suggestion buttons and the
   "New content" pill, `rounded-sm` for the confidence bars. Small shadcn
-  controls (0.11.1): `rounded-compact` (`min(radius-md, 10px)`) for `xs`
-  buttons and the `sm` toggle group, `rounded-md` for `sm` buttons and
-  toggles (the generated `min(radius-md, 12px)` is `radius-md` at this
-  radius), `rounded-xs` for the tooltip arrow.
+  controls (0.11.1): `xs` buttons and the `sm` toggle group keep their
+  `min(radius-md, 10px)` (§6), `sm` buttons and toggles use `rounded-md`
+  (the generated `min(radius-md, 12px)` is `radius-md` at this radius),
+  the tooltip arrow `rounded-xs`.
 - Shadow: only on floating layers (hover card, popover, dropdown, the "New
   content" pill: `shadow-sm` / the shadcn default). Cards are flat with a
   `border`.
@@ -168,23 +168,35 @@ Rules:
 | `ChartContainer` | Recharts frame (trimmed shadcn chart): series colours are token vars on each mark, legend and tooltip drawn by the chart; a pixel `height` when the chart can be hidden. Import it from `@/shared/ui/chart`, not the index, and only inside a `next/dynamic` chart, so Recharts stays out of the first bundle |
 | `Sparkline` | 12-month line in text colour; decorative (`aria-hidden`) unless given a `label` |
 
-**Arbitrary values in the generated code (0.11.1).** shadcn writes some;
-they were replaced with tokens or scale steps: `rounded-compact`,
-`text-compact`, `bg-secondary-hover` (above), `ring-3` for `ring-[3px]`,
-`min-w-24` for `min-w-[96px]`, `rounded-xs` for `rounded-[2px]`, and
-`ToggleGroup`'s gap as a class per `spacing` step (`0`–`4`) instead of
-`gap-[--spacing(var(--gap))]` with an inline style and a cast. Three are
-kept, each with a comment, as no utility says the same:
+**Arbitrary values (0.11.1).** shadcn writes some; they were replaced
+with tokens or scale steps where `cn` still merges them right:
+`bg-secondary-hover` (§1), `rounded-md` for `min(radius-md, 12px)`,
+`ring-3` for `ring-[3px]`, `min-w-24` for `min-w-[96px]`, `rounded-xs` for
+`rounded-[2px]`, and `ToggleGroup`'s gap as a class per `spacing` step
+(`0`–`4`) instead of an inline `--gap` style with a cast.
+
+`cn` is shadcn's package, imported as-is (ADR 0002), with tailwind-merge's
+default config: it knows Tailwind's own names and arbitrary values. A size
+or radius under a name of our own (`text-compact`) would read as a colour
+or as an unknown class and drop the variant's class, so those stay as
+shadcn wrote them; a colour token (`bg-*`) merges fine. `button.test.tsx`
+pins it. Kept, each with a comment:
 
 | Where | Value | Why it stays |
 |---|---|---|
+| `Button` `xs` / `icon-xs`, `ToggleGroup` `sm` | `rounded-[min(var(--radius-md),10px)]` | a radius name of our own would not replace `rounded-lg` in `cn` |
+| `Button` `sm`, `Toggle` `sm` | `text-[0.8rem]` | a font-size name of our own would read as a text colour in `cn` |
 | `TooltipContent` arrow | `translate-y-[calc(-50%_-_2px)]` | half the arrow plus the 2px gap to the bubble; no scale step |
 | `CardHeader` with `CardAction` | `grid-cols-[1fr_auto]` | title takes the room, the action its own width; `grid-cols-N` are equal columns |
 | `CardHeader` with `CardDescription` | `grid-rows-[auto_auto]` | two rows as tall as their content; `grid-rows-N` are equal rows |
+| `SectionTabBar` (ours) | `pb-[max(0.625rem,env(safe-area-inset-bottom))]` | the phone's home indicator area; `env()` has no utility |
+| `MarketStatus` map skeleton (ours) | `aspect-[800/428]`, `md:aspect-[800/356]` | the map's own SVG frames, so the skeleton has the map's shape |
 
-Selector variants such as `data-[size=sm]:` or `has-[>img]:` are not values
-and are fine. A new shadcn component is checked the same way when it is
-added: replace, or list it here with the reason.
+Not values, and fine: selector variants (`data-[size=sm]:`, `has-[>img]:`),
+container-query steps (`@min-[11rem]:`), and references to a CSS variable
+(`px-(--card-spacing)`, `origin-(--radix-…)`). A new shadcn component is
+checked the same way when it is added: replace, or list it here with the
+reason.
 
 ### Dashboard building blocks (0.5.0)
 

@@ -7,9 +7,9 @@ import * as React from 'react';
 
 import { toggleVariants } from '@/shared/ui/toggle';
 
-// Gap between items on the spacing scale. A class per step, not shadcn's
-// `gap-[--spacing(var(--gap))]` with an inline style (an arbitrary value and
-// a cast, DESIGN.md §6).
+// Gap between items on the spacing scale: a class per step instead of
+// shadcn's inline `--gap` style, which needed an arbitrary gap and a cast
+// (DESIGN.md §6). The `sm` corner stays as in `Button`.
 const GAP = { 0: 'gap-0', 1: 'gap-1', 2: 'gap-2', 3: 'gap-3', 4: 'gap-4' };
 type Spacing = keyof typeof GAP;
 
@@ -46,7 +46,7 @@ function ToggleGroup({
       data-spacing={spacing}
       data-orientation={orientation}
       className={cn(
-        'group/toggle-group flex w-fit flex-row items-center rounded-lg data-[size=sm]:rounded-compact data-vertical:flex-col data-vertical:items-stretch',
+        'group/toggle-group flex w-fit flex-row items-center rounded-lg data-[size=sm]:rounded-[min(var(--radius-md),10px)] data-vertical:flex-col data-vertical:items-stretch',
         GAP[spacing],
         className,
       )}
