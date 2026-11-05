@@ -142,6 +142,11 @@ describe('DashboardHeader', () => {
     const { user, lastUpdate } = setup('?region=eu&market=de&period=2026-03&mode=analyst');
     const home = screen.getByRole('link', { name: `${en.common.appName}, ${en.header.resetView}` });
     expect(home).toHaveAttribute('href', expect.stringMatching(/\/dashboard$/));
+    // The logo is inside the link, hidden from screen readers (the name says it),
+    // drawn from the theme tokens so dark mode inverts it.
+    const logo = home.querySelector('[aria-hidden="true"]');
+    expect(logo?.querySelector('svg')).not.toBeNull();
+    expect(logo).toHaveClass('bg-foreground', 'text-background');
     await user.click(home);
     await waitFor(() => {
       expect(lastUpdate()?.queryString).toBe('');

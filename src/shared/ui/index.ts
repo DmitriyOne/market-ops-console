@@ -9,6 +9,7 @@ export { ErrorBoundary } from './error-boundary';
 export { HoverCard, HoverCardContent, HoverCardTrigger } from './hover-card';
 export { Input } from './input';
 export { Label } from './label';
+export { Logo } from './logo';
 export { MonthPicker } from './month-picker';
 export { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from './popover';
 export { PopperBoundary } from './popper-boundary';
