@@ -105,6 +105,13 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+  /* Were arbitrary values in the shadcn code (0.11.1, DESIGN.md §6): the xs
+     controls' corner, the sm controls' text, the secondary hover, and the
+     table footer made opaque so its sticky cell matches the row. */
+  --radius-compact: min(var(--radius-md), 10px);
+  --text-compact: 0.8rem;
+  --color-secondary-hover: color-mix(in oklch, var(--secondary), var(--foreground) 5%);
+  --color-table-footer: color-mix(in srgb, var(--muted) 50%, var(--card));
 }
 
 /* Values from the "D + A · Design system" board; contrast pairs are checked in tokens.test.ts. */

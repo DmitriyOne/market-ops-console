@@ -48,6 +48,7 @@ values** (`bg-[#fff]`, `w-[37px]`).
 | Map and heat-map scales (0.6.0; heat map 0.8.0) | diverging `scale-div-1` … `scale-div-6` (orange · grey · blue), sequential `scale-seq-1` … `scale-seq-5` (blue); SVG fills read these source tokens, not `--color-*` aliases |
 | Heat-map cell text (0.8.0) | `scale-div-N-foreground`, `scale-seq-N-foreground`: black or white (`scale-ink-dark` / `scale-ink-light`), whichever reads on the step at ≥ 4.5:1 |
 | Radar series (0.8.0) | `series-1` … `series-4`: blue · teal · violet · wine, apart from the status hues; checked with the dataviz validator (CVD ΔE ≥ 9, ≥ 3:1 on the card) and paired with a dash pattern and a marker shape each |
+| Mixed from the tokens above (0.11.1, `@theme inline`) | `secondary-hover` (`Button` `secondary` on hover: `secondary` with 5 % `foreground`), `table-footer` (`muted` at 50 % over `card`, opaque: the total row and its sticky first cell share one tone) |
 
 Rules:
 
@@ -75,7 +76,8 @@ Rules:
 - Scale in use: `text-xs` (12px: meta, table cells, chips, hints),
   `text-sm` (14px: body in panels, buttons), `text-base` (16px: panel
   title, composer field; 16px stops iOS zoom), `text-lg` (empty-state
-  heading).
+  heading). `text-compact` (0.8rem, 0.11.1) only in shadcn's `sm` buttons
+  and toggles, where the generated code had `text-[0.8rem]`.
 - Weights: 400 body, 500 labels and buttons, 600 titles, names in tables,
   chips.
 - Table headers: `text-xs uppercase tracking-wide text-muted-foreground`.
@@ -88,7 +90,11 @@ Rules:
 - `--radius: 0.875rem`; Tailwind steps derive from it. In use:
   `rounded-xl` for cards and answer surfaces, `rounded-lg` for buttons and
   source buttons, `rounded-full` for chips, suggestion buttons and the
-  "New content" pill, `rounded-sm` for the confidence bars.
+  "New content" pill, `rounded-sm` for the confidence bars. Small shadcn
+  controls (0.11.1): `rounded-compact` (`min(radius-md, 10px)`) for `xs`
+  buttons and the `sm` toggle group, `rounded-md` for `sm` buttons and
+  toggles (the generated `min(radius-md, 12px)` is `radius-md` at this
+  radius), `rounded-xs` for the tooltip arrow.
 - Shadow: only on floating layers (hover card, popover, dropdown, the "New
   content" pill: `shadow-sm` / the shadcn default). Cards are flat with a
   `border`.
@@ -146,7 +152,7 @@ Rules:
 | `Popover` | the same card on coarse pointers (tap); the map tooltip (virtual anchor at the pointer or the country) |
 | `Collapsible` | "What the data shows" (closed by default) |
 | `DropdownMenu` | theme and locale switches, breadcrumb steps, the map metric picker (`modal={false}`, one trigger width), the markets filter and `Export ▾` |
-| `Tooltip` | the name of an icon-only control on hover and focus (New chat), the anomaly note in the markets table (hover only: a note a touch user needs goes in a `Popover`, like the table's alert bell) |
+| `Tooltip` | the name of an icon-only control on hover and focus (New chat); hover only, so a note a touch user needs goes in a `Popover` (the table's ⚠ and bell, 0.11.0) |
 | `PopperBoundary` (ours) | the scroll area popups inside it belong to; `AppShell` provides `<main>`. `DropdownMenuContent`, `PopoverContent`, `TooltipContent` and `HoverCardContent` read it themselves (§5) |
 | `Skeleton` | content not known yet, in the shape of what replaces it (`ConversationSkeleton`: question bubble + answer frame); no pulse under reduced motion |
 | `Toaster` / `toast.success` / `toast.error` (sonner) | short confirmations and failures that are not tied to a field ("Thanks for the feedback", "Couldn't copy", a rolled-back alert save); top centre, as wide as the text up to 28rem; `toast.error(message, { label, onClick })` adds one text button (Retry); visible toasts take clicks over a modal sheet (`globals.css`), and pressing one does not close the sheet; the keyboard can't reach them there, so a failed alert save repeats its Retry in the panel (0.11.0) |
@@ -162,6 +168,24 @@ Rules:
 | `ChartContainer` | Recharts frame (trimmed shadcn chart): series colours are token vars on each mark, legend and tooltip drawn by the chart; a pixel `height` when the chart can be hidden. Import it from `@/shared/ui/chart`, not the index, and only inside a `next/dynamic` chart, so Recharts stays out of the first bundle |
 | `Sparkline` | 12-month line in text colour; decorative (`aria-hidden`) unless given a `label` |
 
+**Arbitrary values in the generated code (0.11.1).** shadcn writes some;
+they were replaced with tokens or scale steps: `rounded-compact`,
+`text-compact`, `bg-secondary-hover` (above), `ring-3` for `ring-[3px]`,
+`min-w-24` for `min-w-[96px]`, `rounded-xs` for `rounded-[2px]`, and
+`ToggleGroup`'s gap as a class per `spacing` step (`0`–`4`) instead of
+`gap-[--spacing(var(--gap))]` with an inline style and a cast. Three are
+kept, each with a comment, as no utility says the same:
+
+| Where | Value | Why it stays |
+|---|---|---|
+| `TooltipContent` arrow | `translate-y-[calc(-50%_-_2px)]` | half the arrow plus the 2px gap to the bubble; no scale step |
+| `CardHeader` with `CardAction` | `grid-cols-[1fr_auto]` | title takes the room, the action its own width; `grid-cols-N` are equal columns |
+| `CardHeader` with `CardDescription` | `grid-rows-[auto_auto]` | two rows as tall as their content; `grid-rows-N` are equal rows |
+
+Selector variants such as `data-[size=sm]:` or `has-[>img]:` are not values
+and are fine. A new shadcn component is checked the same way when it is
+added: replace, or list it here with the reason.
+
 ### Dashboard building blocks (0.5.0)
 
 `DashboardHeader` (app name, path, `PeriodPicker`, `ModeSwitch`, language, theme; phone: name + `SettingsSheet`, then the path), `ScopeTitle`, `KpiStrip` / `KpiCard`, `MarketStatus` / `StatusTile` / `MarketMap` / `MapLegend` / `MapTooltip`, `MetricPicker`, `TopRisks`, `TopMovers`, `RevenueTrend` (Recharts via `next/dynamic`), and in Analyst `MarketsTable` with `MarketFilter`, `SelectionChips`, `SelectionBar` and `ExportMenu` (0.7.0), `HeatMap` / `HeatGrid` and `ComparisonRadar` (Recharts via `next/dynamic`) (0.8.0), `AlertsButton` in the header and `AlertsPanel` / `RuleList` / `RuleForm` / `RulePreview` / `MarketsField` / `DeleteRuleDialog` (0.9.0, `features/configure-alerts`); `AlertMark` (the bell) from `entities/alert-rule`. Entity UI shared with the assistant: `StatusChip`, `StatusIcon`, `useKpiFormat`, `DatasetGate` (one message when the dataset fails).
@@ -172,7 +196,7 @@ Rules:
 - Skeletons are built from the same `Card` / `CardHeader` / `CardAction` / `CardContent` as the widget, so the title, the corner button and the body sit where the real card puts them. The markets table skeleton is row-shaped (header, 13 markets and the total, 44px each), the heat map's has the card's lines (notice, legend, month row, 13 rows of 44px, the line under the grid, hint, notes), the radar's a chart block under Top risks; Analyst-only parts of a skeleton use `mode-analyst:` (§5).
 - Segmented switches (mode, range): `ToggleGroup` `spacing={1}` in a `rounded-xl bg-muted p-1` track; items `min-h-11 px-4`, on = `bg-card shadow-sm`.
 - Table/chart toggles: the button names the view it switches to ("Show as table" ↔ "Show as chart"), no `aria-pressed`; remembered with `useStoredFlag` (`mo:revenue-trend-table`, `mo:heat-map-table`, `mo:radar-table`).
-- Markets table (0.7.0): sortable headers are ghost buttons inside `<th>` (`min-h-11`, uppercase label, arrow icon at 40% when not sorted) with `aria-sort` on the cell; market names are ghost buttons; the first column `sticky left-0 bg-card`; numbers `font-mono tabular-nums` right-aligned; total in `TableFooter`. Filter = `DropdownMenu` (not modal): "At risk or off track", per region an "All of …" checkbox (`indeterminate` shows a dash) and indented market checkboxes that keep the menu open, "Clear all" last; "N of M selected" next to the trigger; `secondary` rounded-full chips with an × on the row below. Market code in `font-mono text-muted-foreground` before the name; an anomaly is a ghost `size-11` ⚠ in `text-status-off-track` that opens a `Popover` with the note on a click or a tap, the note as its name and the popover's (0.11.0); an alert is a ghost `size-11` bell that opens a `Popover` with the rule names on a click or a tap (0.9.0). Removing a chip moves focus to the chip now in its place (or the one before); after the last one, to the card title. The Market status card shows the same chips as a `role="group"` bar labelled "Selected"; clearing it moves focus to the card title. `Export ▾` = `DropdownMenu` with two two-line items (format + what it is for); while the workbook is made the trigger shows a spinner and "Preparing…" (`aria-busy`) and the items wait; a failure is a `toast.error`.
+- Markets table (0.7.0): sortable headers are ghost buttons inside `<th>` (`min-h-11`, uppercase label, arrow icon at 40% when not sorted) with `aria-sort` on the cell; market names are ghost buttons; the first column `sticky left-0 bg-card`; numbers `font-mono tabular-nums` right-aligned; total in `TableFooter` (`bg-table-footer`, the sticky first cell the same tone, no hover tint, 0.11.1). Filter = `DropdownMenu` (not modal): "At risk or off track", per region an "All of …" checkbox (`indeterminate` shows a dash) and indented market checkboxes that keep the menu open, "Clear all" last; "N of M selected" next to the trigger; `secondary` rounded-full chips with an × on the row below. Market code in `font-mono text-muted-foreground` before the name; an anomaly is a ghost `size-11` ⚠ in `text-status-off-track` that opens a `Popover` with the note on a click or a tap, the note as its name and the popover's (0.11.0); an alert is a ghost `size-11` bell that opens a `Popover` with the rule names on a click or a tap (0.9.0). Removing a chip moves focus to the chip now in its place (or the one before); after the last one, to the card title. The Market status card shows the same chips as a `role="group"` bar labelled "Selected"; clearing it moves focus to the card title. `Export ▾` = `DropdownMenu` with two two-line items (format + what it is for); while the workbook is made the trigger shows a spinner and "Preparing…" (`aria-busy`) and the items wait; a failure is a `toast.error`.
 - Market status view switch (0.6.0): `Map / Tiles / Table` as a segmented `ToggleGroup` with icons, remembered with `useStoredChoice` (`mo:market-status-view`; the old `mo:market-status-table` flag still counts). Default: map from `md`, tiles on a phone.
 - Market map (0.6.0, `MarketMap` via `next/dynamic`): markets `role="button"` paths with a surface gap stroke, status by colour + pattern (dots at risk, hatching off track, in `card` colour), the open market a `foreground` outline, selected markets a dashed `ring`; keyboard focus a 2.5px `foreground` ring over a 5px `card` halo, drawn after every layer, and a Tab to a market off a zoomed view re-centres on it (keyboard only, 0.11.0); plain land `map-land` with a `border` hairline on `map-sea`. Phones get a taller 800 × 428 frame. A reload with a drill or a selection opens on its fit: the map stays behind a same-size skeleton until the first fit is set (before paint), never the whole world and then a jump. Zoom buttons under the map: 44px on desktop, 36px look with a 44px hit area (`after:-inset-1`) on phones. Legend: a swatch with the same pattern, the step as "from – to" through the app's number formats, and the count.
 - Chart motion: `motion-safe:animate-reveal-x` (sparklines), `motion-safe:animate-grow-x origin-left` (bars), Recharts line animation off under `prefers-reduced-motion`. Window marker: dashed `muted-foreground` line (1 month) or `muted` band (3 / 12 months), labelled above the plot.

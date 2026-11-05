@@ -7,9 +7,15 @@ import * as React from 'react';
 
 import { toggleVariants } from '@/shared/ui/toggle';
 
+// Gap between items on the spacing scale. A class per step, not shadcn's
+// `gap-[--spacing(var(--gap))]` with an inline style (an arbitrary value and
+// a cast, DESIGN.md §6).
+const GAP = { 0: 'gap-0', 1: 'gap-1', 2: 'gap-2', 3: 'gap-3', 4: 'gap-4' };
+type Spacing = keyof typeof GAP;
+
 const ToggleGroupContext = React.createContext<
   VariantProps<typeof toggleVariants> & {
-    spacing?: number;
+    spacing?: Spacing;
     orientation?: 'horizontal' | 'vertical';
   }
 >({
@@ -29,7 +35,7 @@ function ToggleGroup({
   ...props
 }: React.ComponentProps<typeof ToggleGroupPrimitive.Root> &
   VariantProps<typeof toggleVariants> & {
-    spacing?: number;
+    spacing?: Spacing;
     orientation?: 'horizontal' | 'vertical';
   }) {
   return (
@@ -39,9 +45,9 @@ function ToggleGroup({
       data-size={size}
       data-spacing={spacing}
       data-orientation={orientation}
-      style={{ '--gap': spacing } as React.CSSProperties}
       className={cn(
-        'group/toggle-group flex w-fit flex-row items-center gap-[--spacing(var(--gap))] rounded-lg data-[size=sm]:rounded-[min(var(--radius-md),10px)] data-vertical:flex-col data-vertical:items-stretch',
+        'group/toggle-group flex w-fit flex-row items-center rounded-lg data-[size=sm]:rounded-compact data-vertical:flex-col data-vertical:items-stretch',
+        GAP[spacing],
         className,
       )}
       {...props}

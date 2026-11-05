@@ -180,8 +180,9 @@ export function MarketsTable() {
               ))}
             </TableBody>
             <TableFooter>
-              <TableRow>
-                <TableCell className={cn(STICKY, 'bg-muted font-semibold')}>
+              {/* Not a link: no hover tint, so the sticky cell stays the row's tone. */}
+              <TableRow className="hover:bg-transparent">
+                <TableCell className={cn(STICKY, 'bg-table-footer font-semibold')}>
                   <span aria-hidden>{t('total')}</span>
                   <span className="sr-only">{t('totalCalculated')}</span>
                 </TableCell>
