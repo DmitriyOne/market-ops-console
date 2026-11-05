@@ -37,11 +37,25 @@ export {
   type TopRisks,
   topRisks,
 } from './model/market-status';
+export {
+  marketsMonthly,
+  marketsTable,
+  type MarketsTableView,
+  type MonthlyRow,
+  parseSort,
+  sortParam,
+  TABLE_COLUMNS,
+  type TableColumn,
+  type TableRow,
+  type TableSort,
+  type TableTotals,
+} from './model/markets-table';
 export { type OverviewKpis, overviewKpis, type RiskCount } from './model/overview';
 export { periodToDate } from './model/period';
 export { getMarket, getProduct, getRegion, scopeLabel } from './model/reference';
 export {
   isLatestSnapshot,
+  marketsInOrder,
   marketsInScope,
   periodsInRange,
   type Range,

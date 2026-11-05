@@ -7,7 +7,7 @@ import type { ResolvedCitation } from './citation';
 import { dashboardSearchParams } from './search-params';
 
 export type DashboardFocus = {
-  /** Show what a citation points at: its scope and month, nothing highlighted. */
+  /** Show what a citation points at: its scope and month, nothing selected. */
   focus: (r: ResolvedCitation) => void;
   /** Highlight markets on the whole portfolio, latest month. */
   highlight: (marketIds: string[]) => void;

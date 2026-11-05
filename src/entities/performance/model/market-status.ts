@@ -11,10 +11,10 @@ export type MarketTile = {
   attainmentPct: KpiValue;
   /** Null off the latest month: the stored status describes that month only. */
   status: MarketStatus | null;
-  /** Listed by the assistant ("Show on dashboard"). */
-  highlighted: boolean;
-  /** The market the dashboard is drilled into. */
+  /** In the selection (assistant, map, tiles or table filter). */
   selected: boolean;
+  /** The market the dashboard is drilled into. */
+  current: boolean;
 };
 
 export type TileGroup = { region: Region; tiles: MarketTile[] };
@@ -30,9 +30,9 @@ export function marketTiles(
   scope: Scope,
   period: Period,
   range: Range,
-  highlighted: readonly string[],
+  selected: readonly string[],
 ): TileGroup[] {
-  const marked = new Set(highlighted);
+  const marked = new Set(selected);
   return ds.regions
     .filter((region) => !scope.regionId || region.id === scope.regionId)
     .map((region) => ({
@@ -54,8 +54,8 @@ export function marketTiles(
             range,
           ).attainmentPct,
           status: statusFor(ds, m.id, period, range),
-          highlighted: marked.has(m.id),
-          selected: m.id === scope.marketId,
+          selected: marked.has(m.id),
+          current: m.id === scope.marketId,
         })),
     }));
 }

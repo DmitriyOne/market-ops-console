@@ -82,4 +82,17 @@ describe('RevenueTrend', () => {
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: t.showTable })).toBeInTheDocument();
   });
+
+  it('Analyst adds units to the table; Executive keeps money only', async () => {
+    const { user, unmount } = setup('?mode=analyst&region=eu&market=de');
+    await user.click(await screen.findByRole('button', { name: t.showTable }));
+    const table = screen.getByRole('table', { name: 'Revenue by month for Germany' });
+    expect(within(table).getByRole('columnheader', { name: t.units })).toBeInTheDocument();
+    const may = within(table).getByRole('row', { name: /May 2026/ });
+    expect(may).toHaveTextContent(/\d,\d{3}$/);
+    unmount();
+    setup('?region=eu&market=de');
+    const again = await screen.findByRole('table', { name: 'Revenue by month for Germany' });
+    expect(within(again).queryByRole('columnheader', { name: t.units })).not.toBeInTheDocument();
+  });
 });

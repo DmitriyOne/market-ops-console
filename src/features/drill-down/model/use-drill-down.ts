@@ -22,7 +22,7 @@ export type DrillDown = {
 /**
  * Moves through portfolio → region → market → product. Each move is a
  * history entry; period and range stay, so the context is kept. A new
- * drill clears the highlighted markets from the assistant.
+ * drill clears the selected markets.
  */
 export function useDrillDown(): DrillDown {
   const { ds } = useDashboard();

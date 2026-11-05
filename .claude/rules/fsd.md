@@ -11,7 +11,7 @@ paths:
 | Layer | Holds | Example here |
 | --- | --- | --- |
 | `src/app` | Providers, global styles, tokens | `QueryClientProvider`, `NuqsAdapter`, `OfflineGuard` |
-| `src/pages` | Page composition only | `dashboard`, `assistant` |
+| `src/pages` | Page composition only | `dashboard` (the phone Assistant is a section of it, `?tab=assistant`) |
 | `src/widgets` | Self-contained screen blocks | map panel, radar panel, chat panel, health summary |
 | `src/features` | User actions with business value | drill-down, select period, ask question, stop generation, configure alerts |
 | `src/entities` | Business entities: types, schemas, selectors, small UI | market, region, product, citation, chat-message |

@@ -35,7 +35,7 @@ Detailed rules: `.claude/rules/fsd.md` (auto-loads for `src/**`). Decision: `doc
 
 ## Stack (fixed, see `docs/decisions/0002-stack.md`)
 
-Next.js 16 App Router · React 19 · TypeScript 6 strict · Tailwind v4 + shadcn/ui · `@wrksz/themes` · TanStack Query · nuqs · zod · react-hook-form · next-intl (`as-needed` routing, static pages) · `@t3-oss/env-nextjs` · `eventsource-parser` · shadcn charts (Recharts) · react-simple-maps · Vitest + Testing Library + MSW · Playwright (one local E2E) · Prettier + ESLint 10 + Steiger · Vercel.
+Next.js 16 App Router · React 19 · TypeScript 6 strict · Tailwind v4 + shadcn/ui · `@wrksz/themes` · TanStack Query · nuqs · zod · react-hook-form (alerts, not installed yet) · next-intl (`as-needed` routing, static pages) · `@t3-oss/env-nextjs` · `eventsource-parser` · shadcn charts (Recharts) · react-simple-maps · ExcelJS (Excel export, lazy) · Vitest + Testing Library + MSW · Playwright (one local E2E) · Prettier + ESLint 10 + Steiger · Vercel.
 
 ## Code rules
 

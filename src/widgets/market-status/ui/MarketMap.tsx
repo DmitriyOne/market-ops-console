@@ -2,14 +2,14 @@
 
 import { MinusIcon, PlusIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { ComposableMap, useGeographies, useMapContext } from 'react-simple-maps/core';
 import { ZoomableGroup } from 'react-simple-maps/zoom';
 import topology from 'world-atlas/countries-110m.json';
 
 import type { MapItem, MarketMapView } from '@/entities/performance';
-import { useMediaQuery } from '@/shared/lib';
-import { Button } from '@/shared/ui';
+import { cn, useMediaQuery } from '@/shared/lib';
+import { Button, Skeleton } from '@/shared/ui';
 
 import {
   type Box,
@@ -75,10 +75,16 @@ function useMapPosition() {
   const flyTo = useCallback(
     (target: MapView, instant = false) => {
       stop();
+      // No frame in between: the first fit lands before the map is painted.
+      if (instant || still) {
+        latest.current = target;
+        setPos(target);
+        return;
+      }
       const from = latest.current;
       const begin = performance.now();
       const tick = (now: number) => {
-        const p = instant || still ? 1 : Math.min(1, (now - begin) / FLY_MS);
+        const p = Math.min(1, (now - begin) / FLY_MS);
         const e = 1 - (1 - p) ** 3;
         setPos({
           center: [
@@ -106,6 +112,8 @@ export type MarketMapProps = {
   /** Markets the view should fit: the drilled region or the assistant's list; none = world. */
   fitIds: readonly string[];
   onOpen: (marketId: string) => void;
+  /** Analyst: Shift+click, Shift+Enter or the touch tooltip add or remove a market of the scope. */
+  onToggle?: (marketId: string) => void;
 };
 
 /**
@@ -115,12 +123,17 @@ export type MarketMapProps = {
  * each market is a button in Tab order, Enter opens it; Esc hides the
  * tooltip (the popover's own dismiss).
  */
-export function MarketMap({ view, tall = false, fitIds, onOpen }: MarketMapProps) {
+export function MarketMap({ view, tall = false, fitIds, onOpen, onToggle }: MarketMapProps) {
   const frame: MapFrame = tall ? FRAMES.tall : FRAMES.wide;
   const t = useTranslations('marketStatus');
   const m = useMapFormat();
   const { pos, setPos, flyTo, stop } = useMapPosition();
   const [tip, setTip] = useState<TooltipState | null>(null);
+  // Hidden behind its skeleton until the first fit: never the whole world, then a jump.
+  // Per frame: a new frame remounts the map and fits again.
+  const frameKey = tall ? 'tall' : 'wide';
+  const [fittedFrame, setFittedFrame] = useState<string | null>(null);
+  const fitted = fittedFrame === frameKey;
   const item = tip ? view.items.find((i) => i.id === tip.id) : undefined;
   const touchTip = tip?.via === 'touch';
 
@@ -143,29 +156,41 @@ export function MarketMap({ view, tall = false, fitIds, onOpen }: MarketMapProps
 
   return (
     <div>
-      <ComposableMap
-        // A new frame is a new projection: remount and fit again.
-        key={tall ? 'tall' : 'wide'}
-        width={frame.width}
-        height={frame.height}
-        projection="geoEqualEarth"
-        projectionConfig={{ scale: frame.scale, center: WORLD.center }}
-        role="group"
-        aria-label={t('mapLabel', { metric: m.metricLabel(view.metric) })}
-        className="block h-auto w-full touch-pan-x touch-pan-y rounded-md bg-map-sea select-none"
-      >
-        <MapLayers
-          frame={frame}
-          view={view}
-          fitIds={fitIds}
-          pos={pos}
-          onMoveEnd={setPos}
-          onGesture={stop}
-          flyTo={flyTo}
-          onOpen={onOpen}
-          onTip={setTip}
-        />
-      </ComposableMap>
+      <div className="relative">
+        <ComposableMap
+          // A new frame is a new projection: remount and fit again.
+          key={frameKey}
+          width={frame.width}
+          height={frame.height}
+          projection="geoEqualEarth"
+          projectionConfig={{ scale: frame.scale, center: WORLD.center }}
+          role="group"
+          aria-label={t('mapLabel', { metric: m.metricLabel(view.metric) })}
+          aria-hidden={fitted ? undefined : true}
+          className={cn(
+            'block h-auto w-full touch-pan-x touch-pan-y rounded-md bg-map-sea select-none',
+            !fitted && 'invisible',
+          )}
+        >
+          <MapLayers
+            frame={frame}
+            view={view}
+            fitIds={fitIds}
+            pos={pos}
+            onMoveEnd={setPos}
+            onGesture={stop}
+            flyTo={flyTo}
+            onOpen={onOpen}
+            onToggle={onToggle}
+            onTip={setTip}
+            fitted={fitted}
+            onFitted={() => {
+              setFittedFrame(frameKey);
+            }}
+          />
+        </ComposableMap>
+        {fitted ? null : <Skeleton aria-hidden className="absolute inset-0 rounded-md" />}
+      </div>
       <div className="mt-2 flex justify-end gap-2 md:gap-1">
         <Button
           type="button"
@@ -211,6 +236,7 @@ export function MarketMap({ view, tall = false, fitIds, onOpen }: MarketMapProps
           metric={view.metric}
           tip={tip}
           onOpen={onOpen}
+          onToggle={item.inScope ? onToggle : undefined}
           onClose={() => {
             setTip(null);
           }}
@@ -220,18 +246,24 @@ export function MarketMap({ view, tall = false, fitIds, onOpen }: MarketMapProps
   );
 }
 
-type MapLayersProps = Pick<MarketMapProps, 'view' | 'fitIds' | 'onOpen'> & {
+type MapLayersProps = Pick<MarketMapProps, 'view' | 'fitIds' | 'onOpen' | 'onToggle'> & {
   frame: MapFrame;
   pos: MapView;
   onMoveEnd: (pos: MapView) => void;
   onGesture: () => void;
   flyTo: (target: MapView, instant?: boolean) => void;
   onTip: CountriesProps['onTip'];
+  /** The first fit is in place: the map can be shown. */
+  fitted: boolean;
+  onFitted: () => void;
 };
 
 /**
  * Shapes, zoom and fit. Flies to fit `fitIds` when they change, so a zoom
- * set by hand survives a month, window or metric change; the first fit is instant.
+ * set by hand survives a month, window or metric change. The first fit is
+ * set in a layout effect, before the browser paints, and the zoom group
+ * mounts with it, so a reload with a drill or a selection opens on it
+ * instead of the whole world.
  */
 function MapLayers({
   frame,
@@ -242,7 +274,10 @@ function MapLayers({
   onGesture,
   flyTo,
   onOpen,
+  onToggle,
   onTip,
+  fitted: shown,
+  onFitted,
 }: MapLayersProps) {
   const { projection } = useMapContext();
   const { geographies } = useGeographies({ geography: TOPOLOGY, parseGeographies: dropAntarctica });
@@ -250,7 +285,7 @@ function MapLayers({
   const key = fitIds.join(',');
   const fitted = useRef<string | null>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (shapes.size === 0 || fitted.current === key) return;
     const first = fitted.current === null;
     fitted.current = key;
@@ -266,8 +301,12 @@ function MapLayers({
       fitView(boxes, frame, (p) => projection.invert?.(p) ?? null),
       first,
     );
-  }, [fitIds, flyTo, frame, key, projection, shapes, view.items]);
+    if (first) onFitted();
+  }, [fitIds, flyTo, frame, key, onFitted, projection, shapes, view.items]);
 
+  // ZoomableGroup takes later center/zoom changes in an effect (a frame late)
+  // but its first position from props: mount it once the first fit is known.
+  if (!shown) return null;
   return (
     <ZoomableGroup
       center={pos.center}
@@ -285,7 +324,7 @@ function MapLayers({
       }}
     >
       <Patterns zoom={pos.zoom} />
-      <Countries view={view} shapes={shapes} onOpen={onOpen} onTip={onTip} />
+      <Countries view={view} shapes={shapes} onOpen={onOpen} onToggle={onToggle} onTip={onTip} />
     </ZoomableGroup>
   );
 }
@@ -324,11 +363,18 @@ type CountriesProps = {
   view: MarketMapView;
   shapes: ReadonlyMap<string, Geography>;
   onOpen: (marketId: string) => void;
+  onToggle: MarketMapProps['onToggle'];
   onTip: (update: (prev: TooltipState | null) => TooltipState | null) => void;
 };
 
 /** Every country: plain land, then the markets in Tab order, then patterns and rings on top. */
-const Countries = memo(function Countries({ view, shapes, onOpen, onTip }: CountriesProps) {
+const Countries = memo(function Countries({
+  view,
+  shapes,
+  onOpen,
+  onToggle,
+  onTip,
+}: CountriesProps) {
   const m = useMapFormat();
   const { projection } = useMapContext();
   // Above the main part of the country (not France with French Guiana, the US with Alaska).
@@ -353,6 +399,11 @@ const Countries = memo(function Countries({ view, shapes, onOpen, onTip }: Count
   };
   const hideIf = (match: (prev: TooltipState) => boolean) => {
     onTip((prev) => (prev && match(prev) ? null : prev));
+  };
+  // Shift picks a market of the scope for the table; anything else opens it.
+  const act = (item: MapItem, shift: boolean) => {
+    if (shift && onToggle && item.inScope) onToggle(item.id);
+    else onOpen(item.id);
   };
   const pattern = (item: MapItem) =>
     view.metric !== 'status' || !item.inScope
@@ -413,7 +464,7 @@ const Countries = memo(function Countries({ view, shapes, onOpen, onTip }: Count
             }}
             onClick={(e) => {
               if (pointer.current.type === 'touch') show(item.id, [e.clientX, e.clientY], 'touch');
-              else onOpen(item.id);
+              else act(item, e.shiftKey);
             }}
             onFocus={(e) => {
               // A press focuses too; the tooltip on focus is for the keyboard.
@@ -426,7 +477,7 @@ const Countries = memo(function Countries({ view, shapes, onOpen, onTip }: Count
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                onOpen(item.id);
+                act(item, e.shiftKey);
               }
             }}
           />
@@ -439,7 +490,7 @@ const Countries = memo(function Countries({ view, shapes, onOpen, onTip }: Count
           return (
             <g key={item.id}>
               {fill ? <path d={d} fill={`url(#${fill === 'dots' ? DOTS : HATCH})`} /> : null}
-              {item.highlighted ? (
+              {item.selected ? (
                 <path
                   d={d}
                   fill="none"
@@ -449,7 +500,7 @@ const Countries = memo(function Countries({ view, shapes, onOpen, onTip }: Count
                   style={NON_SCALING}
                 />
               ) : null}
-              {item.selected ? (
+              {item.current ? (
                 <path
                   d={d}
                   fill="none"

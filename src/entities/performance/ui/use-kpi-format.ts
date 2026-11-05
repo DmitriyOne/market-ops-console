@@ -15,9 +15,13 @@ export function useKpiFormat() {
   const t = useTranslations('dataCheck');
   const dash = t('noStatus');
 
-  const value = (kpi: KpiValue, kind: 'currency' | 'percent' | 'signedPercent' | 'integer') => {
+  const value = (
+    kpi: KpiValue,
+    kind: 'currency' | 'signedCurrency' | 'percent' | 'signedPercent' | 'integer',
+  ) => {
     if (kpi.value === null) return dash;
     if (kind === 'currency') return format.number(kpi.value, 'compactCurrency');
+    if (kind === 'signedCurrency') return format.number(kpi.value, 'signedCompactCurrency');
     if (kind === 'integer') return format.number(kpi.value, 'integer');
     return format.number(kpi.value / 100, kind);
   };

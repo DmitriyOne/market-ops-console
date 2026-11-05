@@ -22,11 +22,13 @@ type MapTooltipProps = {
   metric: MapMetric;
   tip: TooltipState;
   onOpen: (marketId: string) => void;
+  /** Analyst, a market of the scope: the touch tooltip also adds it to the table filter. */
+  onToggle?: (marketId: string) => void;
   onClose: () => void;
 };
 
 /** Name, value and status of one market, next to the pointer or the focused country. */
-export function MapTooltip({ item, metric, tip, onOpen, onClose }: MapTooltipProps) {
+export function MapTooltip({ item, metric, tip, onOpen, onToggle, onClose }: MapTooltipProps) {
   const t = useTranslations('marketStatus');
   const tKpi = useTranslations('kpi');
   const m = useMapFormat();
@@ -92,6 +94,19 @@ export function MapTooltip({ item, metric, tip, onOpen, onClose }: MapTooltipPro
             }}
           >
             {t('openMarket', { name: item.name })}
+          </Button>
+        ) : null}
+        {touch && onToggle ? (
+          <Button
+            type="button"
+            variant="outline"
+            className="min-h-11 w-full"
+            onClick={() => {
+              onToggle(item.id);
+              onClose();
+            }}
+          >
+            {item.selected ? t('removeFromFilter') : t('addToFilter')}
           </Button>
         ) : null}
       </PopoverContent>

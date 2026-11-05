@@ -38,9 +38,10 @@ export function useMapFormat() {
       metric: metricLabel(valueMetric(metric)),
       value: value(metric, item.value),
     };
-    return item.status
+    const name = item.status
       ? t('countryStatus', { ...args, status: statusLabel(item.status) })
       : t('country', args);
+    return item.selected ? `${name} · ${t('selected')}` : name;
   };
   return { metricLabel, valueMetric, value, bound, countryName };
 }

@@ -4,6 +4,8 @@ import { cn } from 'cn';
 import { Popover as PopoverPrimitive } from 'radix-ui';
 import * as React from 'react';
 
+import { usePopperBoundary } from './popper-boundary';
+
 function Popover({ ...props }: React.ComponentProps<typeof PopoverPrimitive.Root>) {
   return <PopoverPrimitive.Root data-slot="popover" {...props} />;
 }
@@ -18,9 +20,11 @@ function PopoverContent({
   sideOffset = 4,
   ...props
 }: React.ComponentProps<typeof PopoverPrimitive.Content>) {
+  const boundary = usePopperBoundary();
   return (
     <PopoverPrimitive.Portal>
       <PopoverPrimitive.Content
+        {...boundary}
         data-slot="popover-content"
         align={align}
         sideOffset={sideOffset}

@@ -15,8 +15,10 @@ export const dashboardSearchParams = {
   /** Map metric (Analyst only); `status` is the default and is not written. */
   kpi: parseAsString,
   /**
-   * Markets highlighted from the assistant's data check, as repeated keys
+   * Selected markets (assistant, map, tiles, table filter), as repeated keys
    * (`markets=de&markets=es`): the standard form, kept by the locale switch.
    */
   markets: parseAsNativeArrayOf(parseAsString),
+  /** Markets table order: `growth` ascending, `-growth` descending. */
+  sort: parseAsString,
 };
