@@ -17,7 +17,7 @@ import {
 import { useDrillDown } from '@/features/drill-down';
 import { useMarketSelection } from '@/features/select-markets';
 import { MetricPicker } from '@/features/select-metric';
-import { cn, useStoredFlag } from '@/shared/lib';
+import { cn, useCurrency, useStoredFlag } from '@/shared/lib';
 import {
   Button,
   Card,
@@ -47,6 +47,7 @@ const CARD = 'gap-3 border border-border ring-0';
 export function HeatMap() {
   const t = useTranslations('heatMap');
   const tDrill = useTranslations('drill');
+  const currency = useCurrency();
   const titleId = useId();
   const { ds, state } = useDashboard();
   const { scope, period, range, kpi, selected } = state;
@@ -111,7 +112,7 @@ export function HeatMap() {
         )}
         <ul className="flex flex-col gap-0.5 text-xs text-muted-foreground">
           {product ? <li>{t('perProduct', { product })}</li> : null}
-          {view.metric === 'revenue' ? <li>{t('revenueUnit')}</li> : null}
+          {view.metric === 'revenue' ? <li>{t('revenueUnit', { currency })}</li> : null}
           <li>{t('noteCalculated')}</li>
         </ul>
       </CardContent>

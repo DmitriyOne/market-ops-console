@@ -103,3 +103,33 @@ preview move to 0.13.0.
   attainment 100.4 % unchanged, the Germany + Spain filter recomputes the
   totals); no `$` text node or attribute left in Analyst with EUR; the phone
   sheet and menu (ru); the logo in light and dark.
+
+## Owner check (2026-11-05)
+
+- A dropdown kept its focus ring after a mouse or touch pick (every menu,
+  not only the currency's): focus returns without the ring now
+  (`focusVisible: false`), the keyboard keeps it.
+- Phone sheet: the currency menu was 288 px (`w-72`), now as wide as its row
+  (`min-w-72`); a pick in any of its menus closes the sheet.
+
+## Independent review (2026-11-05)
+
+Fixed:
+- **Critical:** the heat map's note said "Revenue in US dollars." under €
+  cells; it follows the currency now.
+- The Excel About sheet's source row said "amounts in USD" in a € file; the
+  Currency row already says the data is USD.
+- A currency change in another tab while the rule form was open read the
+  typed number in the new currency (a threshold ~20 % off, saved silently):
+  the form starts again in the new currency.
+- A market exactly on a revenue threshold could flag in EUR/GBP but not in
+  USD (the threshold was rounded, revenue not): thresholds are compared
+  unrounded; only the form shows whole units.
+- The highest threshold could pass the form in £ and fail on the server: the
+  form checks the range on the USD it will send.
+- The assistant's USD note also catches "dollars"; the header skeleton's
+  currency block is `min-w-16` like the button.
+
+To the backlog: six decimals for a USD rule edited in EUR/GBP; no guard
+against a new raw dataset reader (owner's calls).
+

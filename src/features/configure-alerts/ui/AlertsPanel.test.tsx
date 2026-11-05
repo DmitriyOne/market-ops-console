@@ -214,6 +214,39 @@ describe('AlertsPanel', () => {
     });
   });
 
+  it('a currency change in another tab restarts an open form in the new currency (ADR 0017)', async () => {
+    localStorage.setItem('mo:currency', 'EUR');
+    const stored = {
+      id: 'r-rev',
+      name: 'Revenue watch',
+      metric: 'revenue',
+      operator: 'below',
+      threshold: 1_250_000,
+      scope: { kind: 'portfolio' },
+      severity: 'warning',
+      enabled: true,
+    } as const;
+    const { user, api } = setup('', alertsApi([stored]));
+    await user.click(await screen.findByRole('button', { name: 'Edit Revenue watch' }));
+    // 1,250,000 $ × 0.89095 = 1,113,687.5 € → 1,113,688
+    expect(screen.getByRole('textbox', { name: 'Threshold, M€' })).toHaveValue('1.113688');
+
+    localStorage.setItem('mo:currency', 'GBP');
+    window.dispatchEvent(new StorageEvent('storage', { key: 'mo:currency', newValue: 'GBP' }));
+
+    // 1,250,000 $ × 0.74299 = 928,737.5 £ → 928,738
+    const threshold = await screen.findByRole('textbox', { name: 'Threshold, M£' });
+    expect(threshold).toHaveValue('0.928738');
+    const name = screen.getByRole('textbox', { name: t.form.name });
+    await user.clear(name);
+    await user.type(name, 'Revenue watch 2');
+    await user.click(screen.getByRole('button', { name: t.form.save }));
+    await waitFor(() => {
+      expect(api.rules()[0]?.name).toBe('Revenue watch 2');
+    });
+    expect(api.rules()[0]?.threshold).toBe(1_250_000);
+  });
+
   it('a revenue threshold reads as typed: 1.25 M$ is "$1.25m", not "$1.3m"', async () => {
     const { user } = setup();
     await rulesList();

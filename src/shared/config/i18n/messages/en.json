@@ -403,7 +403,7 @@
     "legend": "Legend",
     "noteCalculated": "Calculated from monthly series: values can differ from the stored KPIs by about a point.",
     "perProduct": "Values are for {product}.",
-    "revenueUnit": "Revenue in US dollars.",
+    "revenueUnit": "Revenue in {currency, select, EUR {euros} GBP {British pounds} other {US dollars}}.",
     "anomalyMarket": "anomaly in the whole market: {note}",
     "anomalies": "Anomalies",
     "anomalyMark": "anomaly"
@@ -467,7 +467,7 @@
     },
     "about": {
       "source": "Source",
-      "sourceValue": "data.json, generated {date}; amounts in USD",
+      "sourceValue": "data.json, generated {date}",
       "currency": "Currency",
       "currencyUsd": "{code} ({name}), as in the data",
       "currencyConverted": "{code} ({name}), converted from USD at 1 USD = {rate} {code}, ECB rate of {date}. Fixed for this demo; a live app would get rates from the backend API.",

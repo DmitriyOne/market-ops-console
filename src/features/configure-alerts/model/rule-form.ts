@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { ruleInUsd } from '@/entities/alert-rule';
 import {
   ALERT_METRICS,
   ALERT_NAME_MAX,
@@ -12,6 +13,7 @@ import {
   nameKey,
   THRESHOLD_LIMITS,
 } from '@/shared/api';
+import { type Currency, DEFAULT_CURRENCY } from '@/shared/config';
 
 export const SCOPE_KINDS = ['portfolio', 'region', 'markets'] as const;
 export type ScopeKind = (typeof SCOPE_KINDS)[number];
@@ -80,7 +82,10 @@ export function toFormValues(rule: AlertRuleInput): RuleFormValues {
     name: rule.name,
     metric: rule.metric,
     operator: rule.operator,
-    threshold: String(rule.metric === 'revenue' ? rule.threshold / REVENUE_UNIT : rule.threshold),
+    // Revenue in whole units of the currency shown (a converted rule is not whole).
+    threshold: String(
+      rule.metric === 'revenue' ? Math.round(rule.threshold) / REVENUE_UNIT : rule.threshold,
+    ),
     scopeKind: rule.scope.kind,
     regionId: rule.scope.kind === 'region' ? rule.scope.regionId : '',
     marketIds: rule.scope.kind === 'markets' ? rule.scope.marketIds : [],
@@ -112,7 +117,10 @@ const issue = (ctx: z.RefinementCtx, path: keyof RuleFormValues, message: RuleFo
  * The form's schema: the shared rule schema (same checks as the server)
  * plus what only the list knows, a name taken by another rule.
  */
-export function ruleFormSchema(others: readonly Pick<AlertRule, 'name'>[]) {
+export function ruleFormSchema(
+  others: readonly Pick<AlertRule, 'name'>[],
+  currency: Currency = DEFAULT_CURRENCY,
+) {
   const taken = new Set(others.map((r) => nameKey(r.name)));
   return z
     .object({
@@ -135,8 +143,8 @@ export function ruleFormSchema(others: readonly Pick<AlertRule, 'name'>[]) {
       if (Number.isNaN(parseThreshold(values.threshold))) {
         issue(ctx, 'threshold', 'thresholdRequired');
       } else {
-        // The range: exactly what the server will check.
-        const shared = alertRuleInputSchema.safeParse(toRuleInput(values));
+        // The range: exactly what the server will check, on the USD it will get.
+        const shared = alertRuleInputSchema.safeParse(ruleInUsd(toRuleInput(values), currency));
         if (!shared.success && shared.error.issues.some((i) => i.path[0] === 'threshold')) {
           issue(ctx, 'threshold', 'thresholdRange');
         }

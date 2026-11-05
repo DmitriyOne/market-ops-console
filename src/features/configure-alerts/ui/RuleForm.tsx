@@ -72,7 +72,8 @@ export function RuleForm({ ds, initial, others, editing, onSubmit, onCancel }: R
   const format = useFormatter();
   const base = useId();
   const id = (name: string) => `${base}-${name}`;
-  const schema = useMemo(() => ruleFormSchema(others), [others]);
+  const currency = useCurrency();
+  const schema = useMemo(() => ruleFormSchema(others, currency), [others, currency]);
   const form = useForm<RuleFormValues, unknown, AlertRuleInput>({
     resolver: zodResolver(schema),
     defaultValues: initial,
@@ -100,7 +101,6 @@ export function RuleForm({ ds, initial, others, editing, onSubmit, onCancel }: R
   const nameError = message('name');
   const thresholdError = message('threshold');
   const regionError = message('regionId');
-  const currency = useCurrency();
   const unit =
     metric === 'revenue'
       ? t('form.unitRevenue', { symbol: CURRENCY_SYMBOLS[currency] })

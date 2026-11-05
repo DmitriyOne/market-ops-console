@@ -266,8 +266,8 @@ export function AnswerMessage({
   );
 }
 
-// An amount the answer quotes: "$1.2M", "1.2 M$", "USD". The text is shown as received.
-const QUOTES_USD = /\$|\bUSD\b/;
+// An amount the answer quotes: "$1.2M", "1.2 M$", "USD", "2.9 million dollars". The text is shown as received.
+const QUOTES_USD = /\$|\bUSD\b|\bdollars?\b/i;
 
 /**
  * The answer's text is not converted (shown as received): when it quotes

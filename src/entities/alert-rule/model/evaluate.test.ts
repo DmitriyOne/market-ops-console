@@ -2,8 +2,10 @@ import { describe, expect, it } from 'vitest';
 
 import raw from '@/data/data.json';
 import { type AlertRule, datasetSchema } from '@/shared/api';
+import { USD_RATES } from '@/shared/config';
 
 import { evaluateRules, flaggedIds, ruleMarkets } from './evaluate';
+import { ruleInCurrency } from './in-currency';
 
 const ds = datasetSchema.parse(raw);
 
@@ -76,5 +78,29 @@ describe('evaluateRules', () => {
       rule({ id: 'b', severity: 'warning', threshold: 99 }),
     ]);
     expect(flags.byMarket.get('de')?.severity).toBe('critical');
+  });
+
+  it('a market on a revenue threshold flags the same in every currency (ADR 0017)', () => {
+    const de = ds.markets.find((m) => m.id === 'de');
+    if (!de) throw new Error('no Germany');
+    // "below" Germany's own revenue: not flagged in USD, so not in EUR or GBP either.
+    for (const operator of ['below', 'above'] as const) {
+      const r = rule({ metric: 'revenue', operator, threshold: de.kpis.revenue });
+      const usd = ruleMarkets(ds, r).some((m) => m.id === 'de');
+      expect(usd).toBe(false);
+      for (const currency of ['EUR', 'GBP'] as const) {
+        // Market revenue as `inCurrency` gives it (that slice is not imported here).
+        const converted = {
+          ...ds,
+          markets: ds.markets.map((m) => ({
+            ...m,
+            kpis: { ...m.kpis, revenue: m.kpis.revenue * USD_RATES[currency] },
+          })),
+        };
+        const shown = ruleMarkets(converted, ruleInCurrency(r, currency));
+        expect(shown.some((m) => m.id === 'de')).toBe(usd);
+        expect(shown.map((m) => m.id)).toEqual(ruleMarkets(ds, r).map((m) => m.id));
+      }
+    }
   });
 });

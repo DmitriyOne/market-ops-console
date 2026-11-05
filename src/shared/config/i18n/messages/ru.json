@@ -403,7 +403,7 @@
     "legend": "Легенда",
     "noteCalculated": "Рассчитано из помесячных данных: значения могут отличаться от готовых KPI примерно на пункт.",
     "perProduct": "Значения для продукта {product}.",
-    "revenueUnit": "Выручка в долларах США.",
+    "revenueUnit": "Выручка в {currency, select, EUR {евро} GBP {фунтах стерлингов} other {долларах США}}.",
     "anomalyMarket": "аномалия по рынку в целом: {note}",
     "anomalies": "Аномалии",
     "anomalyMark": "аномалия"
@@ -467,7 +467,7 @@
     },
     "about": {
       "source": "Источник",
-      "sourceValue": "data.json, сформирован {date}; суммы в USD",
+      "sourceValue": "data.json, сформирован {date}",
       "currency": "Валюта",
       "currencyUsd": "{code} ({name}), как в данных",
       "currencyConverted": "{code} ({name}), пересчитано из USD по курсу 1 USD = {rate} {code}, курс ЕЦБ на {date}. В демо курс зафиксирован; в реальном приложении он приходил бы из API бэкенда.",

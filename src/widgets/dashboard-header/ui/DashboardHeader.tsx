@@ -125,7 +125,7 @@ export function DashboardHeaderSkeleton() {
       </div>
       <div className="flex items-center gap-1 max-lg:hidden">
         <Skeleton className="size-11" />
-        <Skeleton className="h-8 w-16" />
+        <Skeleton className="h-8 min-w-16" />
         <Skeleton className="size-9" />
         <Skeleton className="size-9" />
       </div>
