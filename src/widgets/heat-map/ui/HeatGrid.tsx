@@ -154,7 +154,13 @@ export function HeatGrid({ view, period, label, onOpen, onToggle }: Props) {
   return (
     // `min-w-0`: the grid scrolls inside the card, never widens the page (phones).
     <div className="flex min-w-0 flex-col gap-2">
-      <div ref={scroller} className="overflow-x-auto">
+      {/*
+        `relative`: the scroll box must contain the grid's absolute bits (the
+        `sr-only` "in the window" text in the month headers). Without it they
+        sit at their column far to the right, outside the box, and widen the
+        whole page on a phone.
+      */}
+      <div ref={scroller} className="relative overflow-x-auto">
         <table
           role="grid"
           aria-label={label}

@@ -275,7 +275,7 @@ export function comparisonRadar(ds: Dataset, scope: Scope, period: Period, range
 ## Owner check 1 (2026-11-05)
 
 - **Mode switch was invisible** (the top of the page is the same in both modes; on a phone the Analyst parts are all below): the page title gets a badge with the view's name and a line of what it shows (Analyst: what it adds below), read out on change. Options offered: badge, toast with "Show", auto-scroll, anchor links; the owner chose the badge.
-- **Heat map widened the page on a phone** after a tap: the two buttons under the grid ("Open United Kingdom, May 2026", "Add United Kingdom to selection") did not wrap. They wrap now, and so do their labels; the grid has `min-w-0`. Not testable in jsdom: owner check.
+- **Heat map widened the page on a phone** after a tap: the two buttons under the grid ("Open United Kingdom, May 2026", "Add United Kingdom to selection") did not wrap. They wrap now, and so do their labels; the grid has `min-w-0`. Not testable in jsdom: owner check. **Owner check 2:** the page still scrolled sideways in the chart view only. Real cause: the `sr-only` "in the window" text in the month headers is `position: absolute`, and no ancestor inside the scroll box was positioned, so it sat at its column (~1000 px) outside the box and widened the page. The scroll box is `relative` now (as shadcn's table container is, which is why the table view was fine).
 - **Radar stayed on regions after opening UK on the map** (a drill clears the selection, and the radar ignored the open market): with nothing selected it now follows the open scope: the open market and its region's neighbours (it first), else the open region's markets, else the regions.
 
 ## Built differently from the tasks
