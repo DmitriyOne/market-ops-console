@@ -15,7 +15,9 @@ function Toaster(props: ToasterProps) {
       theme={theme}
       style={{ '--width': 'min(28rem, calc(100vw - 2rem))' } as React.CSSProperties}
       // The toast slot spans --width; the visible box inside is centred.
-      toastOptions={{ style: { width: 'var(--width)' } }}
+      // A modal (the alerts sheet) sets `pointer-events: none` on <body>;
+      // toasts take clicks back, so Retry and Show work over it.
+      toastOptions={{ style: { width: 'var(--width)', pointerEvents: 'auto' } }}
       {...props}
     />
   );
