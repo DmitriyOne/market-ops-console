@@ -14,6 +14,8 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     setupFiles: ['./vitest.setup.ts'],
+    // The mock alerts route answers at once under test.
+    env: { MOCK_ALERTS_DELAY_MS: '0' },
     include: ['src/**/*.test.{ts,tsx}', 'app/**/*.test.{ts,tsx}', 'scripts/**/*.test.ts'],
     // next-intl imports `next/navigation` without an extension; inlining lets
     // Vite resolve it (next has no exports map).

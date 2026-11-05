@@ -37,6 +37,27 @@ describe('error logging', () => {
     vi.restoreAllMocks();
   });
 
+  // TanStack reverts a cancelled fetch without calling the cache's onError
+  // (5.105); this pins it, since optimistic writes cancel the alerts query.
+  it('does not log a query cancelled before an optimistic write', async () => {
+    const log = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const client = makeQueryClient();
+    const pending = client
+      .query({
+        queryKey: ['alerts', 'v1'],
+        queryFn: ({ signal }) =>
+          new Promise((_, reject) => {
+            signal.addEventListener('abort', () => {
+              reject(new Error('aborted'));
+            });
+          }),
+      })
+      .catch(() => undefined);
+    await client.cancelQueries({ queryKey: ['alerts', 'v1'] });
+    await pending;
+    expect(log).not.toHaveBeenCalled();
+  });
+
   it('logs a failed query once, with its key', async () => {
     const log = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     const error = new HttpError(500);

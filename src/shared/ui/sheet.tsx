@@ -32,7 +32,9 @@ function SheetOverlay({
     <SheetPrimitive.Overlay
       data-slot="sheet-overlay"
       className={cn(
-        'fixed inset-0 z-50 bg-black/10 duration-100 supports-backdrop-filter:backdrop-blur-xs data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0',
+        // The same 200 ms as the panel: a shorter fade took the blur away first and
+        // the panel a moment later, which read as two flashes (owner, 2026-11-05).
+        'fixed inset-0 z-50 bg-black/10 duration-200 ease-in-out supports-backdrop-filter:backdrop-blur-xs data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0',
         className,
       )}
       {...props}

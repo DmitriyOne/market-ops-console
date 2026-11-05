@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
 import { useId, useMemo, useRef, useState } from 'react';
 
+import { AlertMark, useAlertFlags, useFlagLabel } from '@/entities/alert-rule';
 import {
   getProduct,
   type MapItem,
@@ -307,7 +308,9 @@ function MarketTable({ groups, map }: { groups: TileGroup[]; map: MarketMapView 
   const tPeriod = useTranslations('period');
   const f = useKpiFormat();
   const m = useMapFormat();
-  const { state } = useDashboard();
+  const { ds, state } = useDashboard();
+  const flags = useAlertFlags(ds);
+  const flagLabel = useFlagLabel();
   const extra = map.metric !== 'status' && map.metric !== 'attainment' ? map.metric : null;
   const byId = new Map<string, MapItem>(map.items.map((i) => [i.id, i]));
 
@@ -332,12 +335,14 @@ function MarketTable({ groups, map }: { groups: TileGroup[]; map: MarketMapView 
             <TableHead className="text-right">{t('attainment')}</TableHead>
             {extra ? <TableHead className="text-right">{m.metricLabel(extra)}</TableHead> : null}
             <TableHead>{t('status')}</TableHead>
+            <TableHead>{t('alerts')}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {groups.flatMap((g) =>
             g.tiles.map((tile) => {
               const item = byId.get(tile.id);
+              const flag = flags.byMarket.get(tile.id);
               return (
                 <TableRow key={tile.id}>
                   <TableCell className="font-medium">{tile.name}</TableCell>
@@ -352,6 +357,16 @@ function MarketTable({ groups, map }: { groups: TileGroup[]; map: MarketMapView 
                   ) : null}
                   <TableCell>
                     {tile.status ? <StatusChip status={tile.status} /> : t('latestOnly')}
+                  </TableCell>
+                  <TableCell className="text-xs whitespace-normal">
+                    {flag ? (
+                      <span className="flex items-start gap-1">
+                        <AlertMark flag={flag} labelled={false} className="mt-px" />
+                        {flagLabel(flag)}
+                      </span>
+                    ) : (
+                      <span className="text-muted-foreground">{t('noAlerts')}</span>
+                    )}
                   </TableCell>
                 </TableRow>
               );

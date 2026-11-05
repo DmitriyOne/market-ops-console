@@ -4,6 +4,7 @@ import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon, TriangleAlertIcon } from '
 import { useTranslations } from 'next-intl';
 import { useCallback, useId, useMemo, useRef } from 'react';
 
+import { AlertMark, type MarketFlag, useAlertFlags, useFlagLabel } from '@/entities/alert-rule';
 import {
   isLatestSnapshot,
   marketsTable,
@@ -26,6 +27,9 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Skeleton,
   Table,
   TableBody,
@@ -111,6 +115,7 @@ export function MarketsTable() {
   const f = useKpiFormat();
   const { ds, state } = useDashboard();
   const { toMarket } = useDrillDown();
+  const flags = useAlertFlags(ds);
   const { sort, sortBy } = useTableSort();
   const { scope, period, range, selected } = state;
 
@@ -169,7 +174,12 @@ export function MarketsTable() {
             </TableHeader>
             <TableBody>
               {view.rows.map((row) => (
-                <MarketRow key={row.id} row={row} onOpen={toMarket} />
+                <MarketRow
+                  key={row.id}
+                  row={row}
+                  flag={flags.byMarket.get(row.id)}
+                  onOpen={toMarket}
+                />
               ))}
             </TableBody>
             <TableFooter>
@@ -199,9 +209,19 @@ export function MarketsTable() {
   );
 }
 
-function MarketRow({ row, onOpen }: { row: Row; onOpen: (id: string) => void }) {
+function MarketRow({
+  row,
+  flag,
+  onOpen,
+}: {
+  row: Row;
+  /** What the alert rules say about this market now, if anything. */
+  flag: MarketFlag | undefined;
+  onOpen: (id: string) => void;
+}) {
   const t = useTranslations('marketsTable');
   const f = useKpiFormat();
+  const flagLabel = useFlagLabel();
   return (
     <TableRow aria-current={row.current ? 'true' : undefined}>
       <TableCell className={cn(STICKY, 'p-0 font-medium')}>
@@ -217,6 +237,22 @@ function MarketRow({ row, onOpen }: { row: Row; onOpen: (id: string) => void }) 
             {/* The code as on the tiles; part of the name (label in name, WCAG 2.5.3). */}
             <span className="font-mono text-xs text-muted-foreground">{row.code}</span> {row.name}
           </Button>
+          {flag ? (
+            // A popover, not a tooltip: a tap shows the rule names on touch too.
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="size-11"
+                  aria-label={flagLabel(flag)}
+                >
+                  <AlertMark flag={flag} labelled={false} />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto max-w-64 text-sm">{flagLabel(flag)}</PopoverContent>
+            </Popover>
+          ) : null}
           {row.anomalies.map((a) => {
             const label = t('anomaly', { period: f.period(a.period), note: a.note });
             return (
@@ -225,9 +261,8 @@ function MarketRow({ row, onOpen }: { row: Row; onOpen: (id: string) => void }) 
                   <Button
                     type="button"
                     variant="ghost"
-                    size="icon-sm"
                     aria-label={label}
-                    className="text-status-off-track"
+                    className="size-11 text-status-off-track"
                   >
                     <TriangleAlertIcon aria-hidden />
                   </Button>

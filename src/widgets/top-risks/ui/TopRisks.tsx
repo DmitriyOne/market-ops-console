@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 
+import { AlertMark, flaggedIds, useAlertFlags, useFlagLabel } from '@/entities/alert-rule';
 import { StatusChip, topRisks, useDashboard, useKpiFormat } from '@/entities/performance';
 import { useDrillDown } from '@/features/drill-down';
 import { LatestOnlyNotice } from '@/features/select-period';
@@ -16,7 +17,9 @@ export function TopRisks() {
   const titleId = useId();
   const { ds, state } = useDashboard();
   const { toMarket } = useDrillDown();
-  const risks = topRisks(ds, state.scope, state.period, state.range);
+  const flags = useAlertFlags(ds);
+  const flagLabel = useFlagLabel();
+  const risks = topRisks(ds, state.scope, state.period, state.range, flaggedIds(flags));
 
   return (
     <Card aria-labelledby={titleId} role="region" className="gap-3 border border-border ring-0">
@@ -40,28 +43,37 @@ export function TopRisks() {
         ) : null}
         {risks.kind === 'list' && risks.items.length > 0 ? (
           <ul className="flex flex-col">
-            {risks.items.map((r) => (
-              <li key={r.id} className="border-t border-border first:border-t-0">
-                <button
-                  type="button"
-                  onClick={() => {
-                    toMarket(r.id);
-                  }}
-                  className="flex min-h-12 w-full items-center gap-3 rounded-md px-1 py-1.5 text-left outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50"
-                >
-                  <span className="flex min-w-0 flex-1 flex-col">
-                    <span className="truncate font-semibold">{r.name}</span>{' '}
-                    <span className="font-mono text-xs text-muted-foreground tabular-nums">
-                      {t('reason', {
-                        attainment: f.percent(r.attainmentPct),
-                        growth: f.signedPercent(r.growthPct),
-                      })}
-                    </span>
-                  </span>{' '}
-                  <StatusChip status={r.status} />
-                </button>
-              </li>
-            ))}
+            {risks.items.map((r) => {
+              const flag = flags.byMarket.get(r.id);
+              return (
+                <li key={r.id} className="border-t border-border first:border-t-0">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      toMarket(r.id);
+                    }}
+                    className="flex min-h-12 w-full items-center gap-3 rounded-md px-1 py-1.5 text-left outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50"
+                  >
+                    <span className="flex min-w-0 flex-1 flex-col">
+                      <span className="truncate font-semibold">{r.name}</span>{' '}
+                      <span className="font-mono text-xs text-muted-foreground tabular-nums">
+                        {t('reason', {
+                          attainment: f.percent(r.attainmentPct),
+                          growth: f.signedPercent(r.growthPct),
+                        })}
+                      </span>
+                      {flag ? (
+                        <span className="flex items-start gap-1 text-xs">
+                          <AlertMark flag={flag} labelled={false} className="mt-px" />
+                          {flagLabel(flag)}
+                        </span>
+                      ) : null}
+                    </span>{' '}
+                    <StatusChip status={r.status} />
+                  </button>
+                </li>
+              );
+            })}
           </ul>
         ) : null}
       </CardContent>
