@@ -49,7 +49,7 @@
     "USD": "US-Dollar",
     "EUR": "Euro",
     "GBP": "Britisches Pfund",
-    "current": "Währung: {name}",
+    "current": "Währung: {code}, {name}",
     "rates": "EZB-Kurse vom {date}: 1 USD = {eur} EUR = {gbp} GBP.",
     "demo": "Für diese Demo fest hinterlegt; eine echte App holt die Kurse über die Backend-API."
   },
@@ -211,7 +211,7 @@
     "changeProduct": "Produkt: {name}. Produkt ändern"
   },
   "header": {
-    "settings": "Einstellungen: Sprache, Design, Ansicht zurücksetzen",
+    "settings": "Einstellungen: Sprache, Währung, Design, Ansicht zurücksetzen",
     "settingsTitle": "Einstellungen",
     "resetView": "Ansicht zurücksetzen",
     "resetHint": "Portfolio, letzter Monat, Management"

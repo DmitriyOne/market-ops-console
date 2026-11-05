@@ -49,7 +49,7 @@
     "USD": "US dollar",
     "EUR": "Euro",
     "GBP": "British pound",
-    "current": "Currency: {name}",
+    "current": "Currency: {code}, {name}",
     "rates": "ECB rates of {date}: 1 USD = {eur} EUR = {gbp} GBP.",
     "demo": "Fixed for this demo; a live app would get rates from the backend API."
   },
@@ -211,7 +211,7 @@
     "changeProduct": "Product: {name}. Change product"
   },
   "header": {
-    "settings": "Settings: language, theme, reset view",
+    "settings": "Settings: language, currency, theme, reset view",
     "settingsTitle": "Settings",
     "resetView": "Reset view",
     "resetHint": "Portfolio, latest month, Executive"

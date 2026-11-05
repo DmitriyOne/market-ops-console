@@ -26,3 +26,16 @@ test('tab bar: Alerts opens full screen with the count; Back returns to Overview
   );
   expect(sideways, 'no sideways scroll').toBe(0);
 });
+
+test('settings sheet: the currency row switches amounts to pounds', async ({ page }) => {
+  await page.goto('/dashboard');
+  await page.getByRole('button', { name: /^Settings/ }).click();
+  await page.getByRole('button', { name: /^Currency/ }).click();
+  await page.getByRole('menuitemradio', { name: /GBP/ }).click();
+  await expect(page.getByRole('button', { name: /^Currency/ })).toContainText(
+    'GBP · British pound',
+  );
+  await page.keyboard.press('Escape');
+  // 22,850,419 $ × 0.74299
+  await expect(page.getByRole('group', { name: 'Revenue' })).toContainText(/£17m/i);
+});

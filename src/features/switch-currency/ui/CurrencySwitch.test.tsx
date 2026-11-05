@@ -21,7 +21,7 @@ describe('CurrencySwitch', () => {
 
   it('offers USD, EUR and GBP with their names, and says where the rates come from', async () => {
     const { user } = renderWithProviders(<CurrencySwitch />);
-    await user.click(screen.getByRole('button', { name: 'Currency: US dollar' }));
+    await user.click(screen.getByRole('button', { name: 'Currency: USD, US dollar' }));
     expect(screen.getAllByRole('menuitemradio').map((i) => i.textContent)).toEqual([
       '$USDUS dollar',
       '€EUREuro',
@@ -42,10 +42,10 @@ describe('CurrencySwitch', () => {
     );
     expect(screen.getByRole('status')).toHaveTextContent('$1,000.00');
 
-    await user.click(screen.getByRole('button', { name: 'Currency: US dollar' }));
+    await user.click(screen.getByRole('button', { name: 'Currency: USD, US dollar' }));
     await user.click(screen.getByRole('menuitemradio', { name: /GBP/ }));
 
-    expect(screen.getByRole('button', { name: 'Currency: British pound' })).toHaveTextContent(
+    expect(screen.getByRole('button', { name: 'Currency: GBP, British pound' })).toHaveTextContent(
       'GBP',
     );
     expect(screen.getByRole('status')).toHaveTextContent('£1,000.00');
@@ -55,7 +55,9 @@ describe('CurrencySwitch', () => {
   it('reads a stored choice; an unknown one falls back to USD', () => {
     localStorage.setItem('mo:currency', 'JPY');
     renderWithProviders(<CurrencySwitch />);
-    expect(screen.getByRole('button', { name: 'Currency: US dollar' })).toHaveTextContent('USD');
+    expect(screen.getByRole('button', { name: 'Currency: USD, US dollar' })).toHaveTextContent(
+      'USD',
+    );
   });
 
   it('settings row: shows the code and the name', () => {

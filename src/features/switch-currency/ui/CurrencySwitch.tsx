@@ -68,7 +68,7 @@ export function CurrencySwitch() {
       <Button
         variant="ghost"
         className="min-w-16"
-        aria-label={currency ? t('current', { name: t(currency) }) : t('label')}
+        aria-label={currency ? t('current', { code: currency, name: t(currency) }) : t('label')}
         disabled={currency === null}
       >
         {currency ?? CURRENCIES[0]}
