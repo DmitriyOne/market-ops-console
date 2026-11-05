@@ -55,7 +55,9 @@ const span = (col: string, first: number, last: number) =>
 const ratio = (formula: string) => `IFERROR(${formula},"")`;
 // Σ share × revenue ÷ Σ revenue over the rows the filter shows (the UI's
 // revenue-weighted share). SUBTOTAL over OFFSET gives each row's revenue, 0
-// when hidden, so SUMPRODUCT weighs only the visible shares.
+// when hidden, so SUMPRODUCT weighs only the visible shares. The weight is the
+// revenue column (the month's sum); the UI weighs by the stored revenue, a few
+// dollars apart in the data, so the two agree to about 1e-6 %.
 const weightedShare = (share: string, revenue: string, first: number, last: number) => {
   const top = `${revenue}${String(first)}`;
   const rows = `ROW(${span(revenue, first, last)})-ROW(${top})`;

@@ -130,6 +130,17 @@ describe('marketsXlsx', () => {
     expect(total.getCell(10).value).toBeNull();
   });
 
+  it('no share total for a product, as in the UI (share is per market)', async () => {
+    const productId = ds.products[0]?.id ?? '';
+    const view = marketsTable(ds, { productId }, '2026-05', '1m', [], null);
+    expect(view.totals.sharePct.value).toBeNull();
+    const wb = new ExcelJS.Workbook();
+    await wb.xlsx.load(await (await marketsXlsx(view, [], LABELS)).arrayBuffer());
+    const total = sheetOf(wb, 'Markets').getRow(4 + view.rows.length);
+    expect(total.getCell(1).value).toBe('Total');
+    expect(total.getCell(10).value).toBeNull();
+  });
+
   it('ratio totals are blank, not #DIV/0!, when the filter hides every row', async () => {
     const total = sheetOf(await book(['de', 'es'], '1m'), 'Markets').getRow(6);
     for (const col of [7, 9, 10]) {
