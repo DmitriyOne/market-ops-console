@@ -23,6 +23,9 @@ export const formats = {
     compact: { notation: 'compact', maximumFractionDigits: 1 },
     integer: { maximumFractionDigits: 0 },
     percent: { style: 'percent', minimumFractionDigits: 1, maximumFractionDigits: 1 },
+    /** Heat-map cells: whole percent, the decimal shows on focus. */
+    wholePercent: { style: 'percent', maximumFractionDigits: 0 },
+    signedWholePercent: { style: 'percent', maximumFractionDigits: 0, signDisplay: 'exceptZero' },
     signedPercent: {
       style: 'percent',
       minimumFractionDigits: 1,

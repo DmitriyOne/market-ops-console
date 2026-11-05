@@ -29,6 +29,7 @@ export {
   type MapScale,
   type ScaleMetric,
   type ScaleStep,
+  scaleSteps,
 } from './model/map-scale';
 export {
   type MapItem,
@@ -87,5 +88,6 @@ export { type TrendAnomaly, type TrendView, trendView } from './model/trend-view
 export { useDashboard } from './model/use-dashboard';
 export { type DashboardFocus, useDashboardFocus } from './model/use-dashboard-focus';
 export { DatasetGate } from './ui/DatasetGate';
+export { toneFill, toneText } from './ui/scale-tone';
 export { StatusChip, StatusIcon, useStatusLabel } from './ui/StatusChip';
 export { useKpiFormat } from './ui/use-kpi-format';

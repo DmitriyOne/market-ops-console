@@ -351,6 +351,36 @@
     "noteCalculated": "All figures are calculated from monthly data, so a row adds up and the total is the sum of the rows. Share and status are the stored latest-month figures; the tiles show stored KPIs, which can differ by about 1 point.",
     "anomaly": "Anomaly, {period}: {note}"
   },
+  "heatMap": {
+    "title": "Heat map",
+    "subtitle": "{metric} by month",
+    "notice": {
+      "statusPerMonth": "Status is set for the latest month only; the heat map shows growth YoY.",
+      "sharePerMonth": "Market share is set for the latest month only; the heat map shows growth YoY."
+    },
+    "gridLabel": "{metric} by market and month",
+    "market": "Market",
+    "cell": "{market}, {month}: {value}",
+    "stepBelow": "below {to}",
+    "stepBetween": "{from} – {to}",
+    "stepAbove": "{from} and above",
+    "anomaly": "anomaly: {note}",
+    "selected": "selected",
+    "current": "open now",
+    "inWindow": "in the selected window",
+    "open": "Open {market}, {month}",
+    "add": "Add {market} to selection",
+    "remove": "Remove {market} from selection",
+    "pick": "Pick a cell to see its value.",
+    "hint": "Arrow keys move, Enter opens the market at that month, Shift+click or Shift+Enter selects it.",
+    "showTable": "Show as table",
+    "showChart": "Show as chart",
+    "caption": "{metric} by month for {scope}",
+    "legend": "Legend",
+    "noteCalculated": "Calculated from monthly series: values can differ from the stored KPIs by about a point.",
+    "perProduct": "Values are for {product}.",
+    "revenueUnit": "Revenue in US dollars."
+  },
   "exportMarkets": {
     "button": "Export",
     "preparing": "Preparing…",

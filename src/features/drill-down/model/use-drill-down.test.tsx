@@ -47,6 +47,29 @@ describe('useDrillDown', () => {
     expect(event?.options.history).toBe('push');
   });
 
+  it('a market at a month (heat-map cell) sets that month and keeps the range', async () => {
+    const { result, last } = await setup('?range=3m&markets=es');
+    act(() => {
+      result.current.toMarket('de', { period: '2026-03' });
+    });
+    const event = await last();
+    expect(Object.fromEntries(event?.searchParams ?? [])).toEqual({
+      region: 'eu',
+      market: 'de',
+      period: '2026-03',
+      range: '3m',
+    });
+  });
+
+  it('a market at the latest month leaves the period out of the URL', async () => {
+    const { result, last } = await setup('?period=2026-03');
+    act(() => {
+      result.current.toMarket('de', { period: '2026-05' });
+    });
+    const event = await last();
+    expect(Object.fromEntries(event?.searchParams ?? [])).toEqual({ region: 'eu', market: 'de' });
+  });
+
   it('another market keeps the chosen product', async () => {
     const { result, last } = await setup('?region=eu&market=de&product=veltrix');
     act(() => {
