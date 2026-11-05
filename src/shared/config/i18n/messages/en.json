@@ -157,11 +157,14 @@
     "sections": "Sections",
     "tabs": {
       "overview": "Overview",
-      "assistant": "Assistant"
+      "assistant": "Assistant",
+      "alerts": "Alerts"
     },
     "collapse": "Hide assistant",
     "expand": "Show assistant",
-    "newAnswers": "{count, plural, one {# new answer} other {# new answers}}"
+    "newAnswers": "{count, plural, one {# new answer} other {# new answers}}",
+    "flagged": "{count, plural, one {, # market flagged} other {, # markets flagged}}",
+    "alerts": "Alerts"
   },
   "monthPicker": {
     "previousYear": "Previous year",
@@ -288,11 +291,13 @@
     "addToFilter": "Add to filter",
     "removeFromFilter": "Remove from filter",
     "hintPointer": "Shift+click a market to add it to the table filter.",
-    "hintTouch": "Tap a market, then Add to filter."
+    "hintTouch": "Tap a market, then Add to filter.",
+    "alerts": "Alerts",
+    "noAlerts": "None"
   },
   "topRisks": {
     "title": "Top risks",
-    "order": "Off track first, then by attainment",
+    "order": "Off track first, then by attainment; then markets your alerts flag",
     "reason": "{attainment} · {growth} YoY",
     "empty": "No markets at risk here."
   },
@@ -465,6 +470,128 @@
       "status": "Status",
       "statusValue": "Set in the data for the latest month only.",
       "link": "Open this view"
+    }
+  },
+  "alerts": {
+    "examples": {
+      "attainment": "Attainment below 95%",
+      "share": "Share below 10%"
+    },
+    "condition": "{operator, select, below {{metric} below {threshold}} other {{metric} above {threshold}}}",
+    "full": "{condition} · {scope}",
+    "metric": {
+      "growth": "Growth",
+      "attainment": "Attainment",
+      "share": "Share",
+      "revenue": "Revenue"
+    },
+    "scope": {
+      "portfolio": "All markets",
+      "marketsCount": "{count, plural, one {# market} other {# markets}}"
+    },
+    "flagged": "{severity, select, critical {Critical alert} other {Alert}}: {rules}",
+    "rollback": "Couldn't save — restored previous state. {reason}",
+    "retry": "Retry",
+    "errors": {
+      "invalid_request": "The rule is not valid.",
+      "not_found": "This rule no longer exists.",
+      "duplicate_name": "A rule with this name already exists.",
+      "too_many": "You can keep up to 10 rules.",
+      "simulated": "Simulated failure (demo switch)."
+    },
+    "title": "Alerts",
+    "description": "Rules check each market’s figures for {period}, the latest month.",
+    "button": "{count, plural, =0 {Alerts} one {Alerts, # market flagged} other {Alerts, # markets flagged}}",
+    "severity": {
+      "warning": "Warning",
+      "critical": "Critical"
+    },
+    "operator": {
+      "below": "Below",
+      "above": "Above"
+    },
+    "list": {
+      "label": "Your rules",
+      "empty": "No rules yet. A rule flags markets whose figure crosses a threshold.",
+      "new": "New rule",
+      "full": "You can keep up to 10 rules. Delete one to add another.",
+      "saving": "Saving…",
+      "enabled": "Rule on: {name}",
+      "edit": "Edit",
+      "editRule": "Edit {name}",
+      "delete": "Delete",
+      "deleteRule": "Delete {name}",
+      "flagsNow": "{count, plural, =0 {Flags no markets now} one {Flags # market now} other {Flags # markets now}}",
+      "off": "Off",
+      "loading": "Loading your rules…",
+      "loadFailed": "Couldn't load your rules.",
+      "retry": "Try again"
+    },
+    "form": {
+      "newTitle": "New rule",
+      "editTitle": "Edit rule",
+      "name": "Name",
+      "metric": "Metric",
+      "operator": "Condition",
+      "threshold": "Threshold",
+      "unitPercent": "%",
+      "unitRevenue": "M$",
+      "revenueHint": "In millions of US dollars, e.g. 1.5",
+      "scope": "Applies to",
+      "scopeKind": {
+        "portfolio": "All markets",
+        "region": "One region",
+        "markets": "Chosen markets"
+      },
+      "region": "Region",
+      "regionPlaceholder": "Choose a region",
+      "markets": "Markets",
+      "severity": "Severity",
+      "enabled": "Rule on",
+      "save": "Save rule",
+      "cancel": "Cancel",
+      "errors": {
+        "nameRequired": "Give the rule a name.",
+        "nameTooLong": "Keep the name under 60 characters.",
+        "duplicateName": "Another rule already has this name.",
+        "thresholdRequired": "Enter a number.",
+        "thresholdRange": "Enter a number from {min} to {max}.",
+        "thresholdMin": "Enter {min} or more.",
+        "regionRequired": "Choose a region.",
+        "marketsRequired": "Choose at least one market."
+      },
+      "back": "Back"
+    },
+    "preview": {
+      "label": "Preview",
+      "flags": "{count, plural, one {Would flag # market now ({period}): {markets}} other {Would flag # markets now ({period}): {markets}}}",
+      "none": "Would flag no markets now ({period}).",
+      "incomplete": "Enter a threshold to see which markets it flags."
+    },
+    "delete": {
+      "title": "Delete “{name}”?",
+      "description": "The rule and its flags go away. This can’t be undone.",
+      "confirm": "Delete rule",
+      "cancel": "Keep it"
+    },
+    "simulate": {
+      "label": "Fail the next save (demo)",
+      "hint": "The next change fails on purpose, so you can see it rolled back."
+    },
+    "triggered": {
+      "title": "{count, plural, =0 {Firing now ({period})} one {Firing now: # market ({period})} other {Firing now: # markets ({period})}}",
+      "none": "No rule flags a market now.",
+      "reason": "{metric} {value} · {operator, select, below {below {threshold}} other {above {threshold}}}",
+      "open": "Open {name}",
+      "show": "Show",
+      "openShort": "Open"
+    },
+    "saved": "{enabled, select, false {Saved “{name}” (off).} other {{count, plural, =0 {Saved “{name}”: it flags no markets now.} one {Saved “{name}”: it flags # market now.} other {Saved “{name}”: it flags # markets now.}}}}",
+    "tabs": {
+      "label": "Alerts view",
+      "firing": "Firing",
+      "rules": "Rules",
+      "withCount": "{tab} · {count, number}"
     }
   }
 }

@@ -157,11 +157,14 @@
     "sections": "Bereiche",
     "tabs": {
       "overview": "Übersicht",
-      "assistant": "Assistent"
+      "assistant": "Assistent",
+      "alerts": "Alarme"
     },
     "collapse": "Assistent ausblenden",
     "expand": "Assistent einblenden",
-    "newAnswers": "{count, plural, one {# neue Antwort} other {# neue Antworten}}"
+    "newAnswers": "{count, plural, one {# neue Antwort} other {# neue Antworten}}",
+    "flagged": "{count, plural, one {, # Markt markiert} other {, # Märkte markiert}}",
+    "alerts": "Alarme"
   },
   "monthPicker": {
     "previousYear": "Vorheriges Jahr",
@@ -288,11 +291,13 @@
     "addToFilter": "Zum Filter hinzufügen",
     "removeFromFilter": "Aus dem Filter entfernen",
     "hintPointer": "Umschalt+Klick auf einen Markt fügt ihn dem Tabellenfilter hinzu.",
-    "hintTouch": "Tippen Sie auf einen Markt, dann auf „Zum Filter hinzufügen“."
+    "hintTouch": "Tippen Sie auf einen Markt, dann auf „Zum Filter hinzufügen“.",
+    "alerts": "Alarme",
+    "noAlerts": "Keine"
   },
   "topRisks": {
     "title": "Größte Risiken",
-    "order": "Verfehlt zuerst, dann nach Planerfüllung",
+    "order": "Verfehlt zuerst, dann nach Planerfüllung; danach Märkte, die Ihre Alarme markieren",
     "reason": "{attainment} · {growth} ggü. Vorjahr",
     "empty": "Hier gibt es keine Märkte mit Risiko."
   },
@@ -465,6 +470,128 @@
       "status": "Status",
       "statusValue": "In den Daten nur für den letzten Monat gesetzt.",
       "link": "Diese Ansicht öffnen"
+    }
+  },
+  "alerts": {
+    "examples": {
+      "attainment": "Planerfüllung unter 95 %",
+      "share": "Marktanteil unter 10 %"
+    },
+    "condition": "{operator, select, below {{metric} unter {threshold}} other {{metric} über {threshold}}}",
+    "full": "{condition} · {scope}",
+    "metric": {
+      "growth": "Wachstum",
+      "attainment": "Planerfüllung",
+      "share": "Marktanteil",
+      "revenue": "Umsatz"
+    },
+    "scope": {
+      "portfolio": "Alle Märkte",
+      "marketsCount": "{count, plural, one {# Markt} other {# Märkte}}"
+    },
+    "flagged": "{severity, select, critical {Kritischer Alarm} other {Alarm}}: {rules}",
+    "rollback": "Speichern fehlgeschlagen – vorheriger Stand wiederhergestellt. {reason}",
+    "retry": "Erneut versuchen",
+    "errors": {
+      "invalid_request": "Die Regel ist ungültig.",
+      "not_found": "Diese Regel gibt es nicht mehr.",
+      "duplicate_name": "Eine Regel mit diesem Namen gibt es bereits.",
+      "too_many": "Sie können höchstens 10 Regeln anlegen.",
+      "simulated": "Simulierter Fehler (Demo-Schalter)."
+    },
+    "title": "Alarme",
+    "description": "Regeln prüfen die Werte jedes Markts für {period}, den letzten Monat.",
+    "button": "{count, plural, =0 {Alarme} one {Alarme, # Markt markiert} other {Alarme, # Märkte markiert}}",
+    "severity": {
+      "warning": "Warnung",
+      "critical": "Kritisch"
+    },
+    "operator": {
+      "below": "Unter",
+      "above": "Über"
+    },
+    "list": {
+      "label": "Ihre Regeln",
+      "empty": "Noch keine Regeln. Eine Regel markiert Märkte, deren Wert eine Schwelle überschreitet.",
+      "new": "Neue Regel",
+      "full": "Sie können höchstens 10 Regeln anlegen. Löschen Sie eine, um eine neue hinzuzufügen.",
+      "saving": "Wird gespeichert…",
+      "enabled": "Regel aktiv: {name}",
+      "edit": "Bearbeiten",
+      "editRule": "{name} bearbeiten",
+      "delete": "Löschen",
+      "deleteRule": "{name} löschen",
+      "flagsNow": "{count, plural, =0 {Markiert derzeit keine Märkte} one {Markiert derzeit # Markt} other {Markiert derzeit # Märkte}}",
+      "off": "Aus",
+      "loading": "Ihre Regeln werden geladen…",
+      "loadFailed": "Ihre Regeln konnten nicht geladen werden.",
+      "retry": "Erneut versuchen"
+    },
+    "form": {
+      "newTitle": "Neue Regel",
+      "editTitle": "Regel bearbeiten",
+      "name": "Name",
+      "metric": "Kennzahl",
+      "operator": "Bedingung",
+      "threshold": "Schwelle",
+      "unitPercent": "%",
+      "unitRevenue": "Mio. $",
+      "revenueHint": "In Millionen US-Dollar, z. B. 1,5",
+      "scope": "Gilt für",
+      "scopeKind": {
+        "portfolio": "Alle Märkte",
+        "region": "Eine Region",
+        "markets": "Ausgewählte Märkte"
+      },
+      "region": "Region",
+      "regionPlaceholder": "Region wählen",
+      "markets": "Märkte",
+      "severity": "Schweregrad",
+      "enabled": "Regel aktiv",
+      "save": "Regel speichern",
+      "cancel": "Abbrechen",
+      "errors": {
+        "nameRequired": "Geben Sie der Regel einen Namen.",
+        "nameTooLong": "Der Name darf höchstens 60 Zeichen haben.",
+        "duplicateName": "Eine andere Regel hat bereits diesen Namen.",
+        "thresholdRequired": "Geben Sie eine Zahl ein.",
+        "thresholdRange": "Geben Sie eine Zahl von {min} bis {max} ein.",
+        "thresholdMin": "Geben Sie {min} oder mehr ein.",
+        "regionRequired": "Wählen Sie eine Region.",
+        "marketsRequired": "Wählen Sie mindestens einen Markt."
+      },
+      "back": "Zurück"
+    },
+    "preview": {
+      "label": "Vorschau",
+      "flags": "{count, plural, one {Würde derzeit # Markt markieren ({period}): {markets}} other {Würde derzeit # Märkte markieren ({period}): {markets}}}",
+      "none": "Würde derzeit keine Märkte markieren ({period}).",
+      "incomplete": "Geben Sie eine Schwelle ein, um die markierten Märkte zu sehen."
+    },
+    "delete": {
+      "title": "„{name}“ löschen?",
+      "description": "Die Regel und ihre Markierungen verschwinden. Das lässt sich nicht rückgängig machen.",
+      "confirm": "Regel löschen",
+      "cancel": "Behalten"
+    },
+    "simulate": {
+      "label": "Nächstes Speichern scheitern lassen (Demo)",
+      "hint": "Die nächste Änderung schlägt absichtlich fehl, damit Sie das Zurücksetzen sehen."
+    },
+    "triggered": {
+      "title": "{count, plural, =0 {Aktuell ausgelöst ({period})} one {Aktuell ausgelöst: # Markt ({period})} other {Aktuell ausgelöst: # Märkte ({period})}}",
+      "none": "Derzeit markiert keine Regel einen Markt.",
+      "reason": "{metric} {value} · {operator, select, below {unter {threshold}} other {über {threshold}}}",
+      "open": "{name} öffnen",
+      "show": "Anzeigen",
+      "openShort": "Öffnen"
+    },
+    "saved": "{enabled, select, false {„{name}“ gespeichert (aus).} other {{count, plural, =0 {„{name}“ gespeichert: markiert derzeit keine Märkte.} one {„{name}“ gespeichert: markiert derzeit # Markt.} other {„{name}“ gespeichert: markiert derzeit # Märkte.}}}}",
+    "tabs": {
+      "label": "Alarm-Ansicht",
+      "firing": "Ausgelöst",
+      "rules": "Regeln",
+      "withCount": "{tab} · {count, number}"
     }
   }
 }

@@ -21,6 +21,18 @@ async function readErrorCode(response: Response): Promise<string | undefined> {
   return undefined;
 }
 
+/** A request whose success has no body (204), with the same errors as fetchJson. */
+export async function fetchEmpty(url: string, init: FetchJsonInit = {}): Promise<void> {
+  const { timeoutMs = REQUEST_TIMEOUT_MS, signal: callerSignal, ...rest } = init;
+  const signal = createRequestSignal(timeoutMs, callerSignal ?? undefined);
+  try {
+    const response = await fetch(url, { ...rest, signal });
+    if (!response.ok) throw new HttpError(response.status, await readErrorCode(response));
+  } catch (error) {
+    throw toApiError(error, signal);
+  }
+}
+
 export async function fetchJson<T>(
   url: string,
   schema: z.ZodType<T>,

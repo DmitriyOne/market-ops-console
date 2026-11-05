@@ -10,14 +10,10 @@ Format: **Item**: what is wrong (file). Why it can wait. Where it goes.
 - **Arbitrary Tailwind values in shadcn components** (`src/shared/ui/*`), against `.claude/rules/ui.md`. Generated code. **Design pass**, with the semantic tokens.
 - **Offline overlay does not return focus** to where it was after closing (`src/features/network-status/ui/OfflineGuard.tsx`). **Hardening plan**, accessibility pass.
 
-## From the error-handling review (2026-11-03)
-
-- **TanStack `CancelledError` would be logged as a failure** (`src/app/providers/query-client.ts`). No `cancelQueries` in the code (checked in 0.7.0; Plan 2 did not need it). **Hardening plan**, if anything starts cancelling queries; add a test.
-
 ## From the design pass (2026-11-03)
 
 - **D screens drawn on the canvas (2026-11-03)**: Analyst, phone (Overview / Assistant / Alerts), widget and assistant states. The heat-map and radar calls were built in 0.8.0. Still open: in Analyst the assistant is shown collapsed with a badge (today the panel keeps the user's own choice). **Owner**, decide or drop.
-- **Not drawn yet**: tablet, Alerts as a desktop sheet. **Alerts plan** (tablet is cut line 2, spec §14). The evidence card (0.4.0) and product drill-down (0.5.0–0.6.0) were built from the tokens without a board.
+- **Not drawn yet**: tablet (cut line 2, spec §14). The evidence card (0.4.0), product drill-down (0.5.0–0.6.0) and the desktop alerts sheet (0.9.0, owner, 2026-11-05) were built from the tokens without a board.
 
 ## From Plan 2 (assistant, 2026-11-03)
 
@@ -46,7 +42,7 @@ Points the owner wants explained in the README, in his own words:
 - **Citations are per answer, not per claim**: the contract has no positions in the text; guessing them means parsing AI text.
 - **Status is for the latest month only** in the data; the data block says so, while a question may say "this quarter".
 - **Answer feedback** (👍/👎 + reason, once per answer) goes to `logEvent` (console now, analytics later); it never includes the question text.
-- **Rate limits belong on the server**: per user / IP in middleware or the platform firewall (e.g. Vercel WAF) for `/api/chat` and a future `/api/feedback`; the client only prevents accidental repeats (one stream at a time, one rating per answer).
+- **Rate limits belong on the server**: per user / IP in middleware or the platform firewall (e.g. Vercel WAF) for `/api/chat`, `/api/v1/alerts` (with input limits: body size, market ids) and a future `/api/feedback`; the client only prevents accidental repeats (one stream at a time, one rating per answer).
 - **An answer cut by a reload comes back empty**, as "Stopped" without its partial text (owner, 2026-11-04: keep it). Storage is written when a message starts or ends, not per token; a `pagehide` flush would keep the text if it is ever needed.
 
 ## From the 0.6.0 map build (2026-11-04)
@@ -60,7 +56,6 @@ Points the owner wants explained in the README, in his own words:
   - When zoomed in, Tab can focus a market outside the view; fly to it on focus if off-screen. **Hardening plan**.
   - Status metric with a product: tooltip shows the product's attainment next to the market's status; only the note under the card says status is per market. Owner decision №9; add the note to the tooltip if users misread it.
   - "Back returns to the old market with the product" needs real browser history (the nuqs test adapter keeps none): add it to the **E2E** happy path (Playwright). Locale switch keeping `kpi` and the SSR skeleton are now unit-tested.
-- **Dev warning "Encountered a script tag while rendering React component"** (seen by the owner in the browser console). Source not confirmed yet: the likely one is our two inline `<script>` tags in `app/[locale]/layout.tsx` (ADR 0015) when React renders the layout on the client; ADR 0009 says `@wrksz/themes` injects its script outside the tree. Reproduce with the stack trace, then fix in the ADR 0015 pattern. Dev only so far. **Hardening plan**.
 
 - **One type cast in the map** (`MarketMap.tsx`, `TOPOLOGY`): react-simple-maps types its `geography` as GeoJSON while it accepts the TopoJSON that world-atlas ships; CLAUDE.md forbids casts that silence errors. **Owner, 2026-11-04: keep it with the comment** (converting with `topojson-client` would add a dependency and still need a cast at the JSON import). Closed.
 
@@ -84,6 +79,16 @@ Points the owner wants explained in the README, in his own words:
 - **Heat-map focus fallback is untested**: when the focused row disappears (browser Back from the portfolio to a region with focus on a row outside it) focus should land on the clamped row. Code reads right; no in-app action reaches it. **E2E** happy path.
 - **A radar series without a value on a kept axis** would be drawn by Recharts at the centre (as "worst"). Cannot happen with this data (no zero forecast or prior year). Drop the axis or the series if it ever can. **Hardening plan**.
 - **Heat-map and radar checked in jsdom only** (no browser run this round; the owner checked on his phone): layout at xl with the assistant open, phone scroll to the selected month, the Recharts radar's look in both themes. **Owner check**.
+
+## From the 0.9.0 alerts build (2026-11-05)
+
+- **A Retry from the rollback toast resends the change as it was**: for an edit or a toggle, a rule changed again in between gets the older version back. Rare (two edits of one rule inside one failed save). **Hardening plan**, if it shows.
+- **Two writes to one rule in flight** (toggle twice before the first answer): each undoes only itself, but a failed first write puts back its `previous`, which the second had already replaced. Writes now go one at a time (mutation `scope`) and the list is refetched when the last one settles, so the server's state wins in the end. **Accepted**.
+- **The alerts route has no input limits** (agent review, 2026-11-05): no cap on the body size or on `marketIds` (count, duplicates, unknown ids), `regionId` not checked against the dataset. A crafted POST with 3,000 ids got 201 and a 46 KB cookie the browser drops, so a reported success stores nothing; only the sender's own data is affected. **Accepted for the mock (owner, 2026-11-05)**; the README says a production API over live data needs input limits and rate limiting.
+- **The threshold field reads "1,000" as 1** in English, and "5." or "1.000,5" say "required" instead of "not a number" (`parseThreshold`). Nobody types a thousands separator in a field that holds up to 200 % or a few million dollars. **Accepted (owner, 2026-11-05)**.
+- **A revenue threshold is shown with one decimal** ("$1.3M" for 1.25 M$, `useThresholdFormat` uses `compactCurrency`), in the rule list and the Firing reasons. Fixed (owner, 2026-11-05): a `thresholdCurrency` format with two decimals shows it as typed. Closed.
+- **The anomaly ⚠ in the markets table has a hover tooltip only**, so a touch screen can't read its note (the alert bell next to it became a popover in 0.9.0). Same fix if wanted. **Hardening plan**.
+- **Alerts checked in the browser (Playwright on the dev server, 2026-11-05)**: Back after closing the sheet (X, Escape, overlay; a deep link), two quick writes kept after a reload, the saved toast while another rule is switched, ru examples kept after a write, focus after a delete and on a missing market, 44 px rows and switch, the table bell on a tap (touch emulation). Not checked: a real phone, the keyboard open over the form. **Owner check**.
 
 ## Currency picker (owner, 2026-11-04) — after the required work, its own release before the README
 

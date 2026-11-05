@@ -3,7 +3,8 @@
 import { useTranslations } from 'next-intl';
 import { useMemo } from 'react';
 
-import { type MapItem, type MapMetric, StatusChip } from '@/entities/performance';
+import { AlertMark, useAlertFlags, useFlagLabel } from '@/entities/alert-rule';
+import { type MapItem, type MapMetric, StatusChip, useDashboard } from '@/entities/performance';
 import { cn, scrollMainToTop } from '@/shared/lib';
 import { Button, Popover, PopoverAnchor, PopoverContent } from '@/shared/ui';
 
@@ -32,6 +33,9 @@ export function MapTooltip({ item, metric, tip, onOpen, onToggle, onClose }: Map
   const t = useTranslations('marketStatus');
   const tKpi = useTranslations('kpi');
   const m = useMapFormat();
+  const { ds } = useDashboard();
+  const flag = useAlertFlags(ds).byMarket.get(item.id);
+  const flagLabel = useFlagLabel();
   const [x, y] = tip.at;
   const anchor = useMemo(
     () => ({
@@ -81,6 +85,13 @@ export function MapTooltip({ item, metric, tip, onOpen, onToggle, onClose }: Map
           <div>
             <StatusChip status={item.status} />
           </div>
+        ) : null}
+        {/* Alerts are about the latest month, whatever month the map shows. */}
+        {flag ? (
+          <p className="flex items-start gap-1">
+            <AlertMark flag={flag} labelled={false} className="mt-px" />
+            {flagLabel(flag)}
+          </p>
         ) : null}
         {touch ? (
           <Button

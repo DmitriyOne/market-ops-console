@@ -2,11 +2,20 @@
 
 import { PanelRightCloseIcon, PanelRightOpenIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { type ReactNode, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 
+import { useFlaggedCount } from '@/features/configure-alerts';
 import { SectionTabBar, useSection } from '@/features/switch-section';
 import { cn, scrollMainToTop, useMediaQuery } from '@/shared/lib';
-import { Button, PopperBoundary, WidgetBoundary } from '@/shared/ui';
+import {
+  Button,
+  PopperBoundary,
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  WidgetBoundary,
+} from '@/shared/ui';
 
 import { usePanelCollapsed } from '../model/use-panel-collapsed';
 
@@ -23,6 +32,8 @@ type AppShellProps = {
   header: ReactNode;
   main: ReactNode;
   assistant: (api: AssistantApi) => ReactNode;
+  /** The alerts panel: a right sheet on desktop, the Alerts tab on phones (`tab=alerts`). */
+  alerts: ReactNode;
 };
 
 const FRAME = 'flex h-dvh flex-col bg-background';
@@ -30,6 +41,8 @@ const FRAME = 'flex h-dvh flex-col bg-background';
 // area, not the page, so it cannot stretch the page below the tab bar.
 const HEADER = 'border-b border-border';
 const MAIN = 'relative min-w-0 flex-1 overflow-y-auto';
+const ALERTS_SECTION = 'relative min-w-0 flex-1 overflow-y-auto p-4';
+const ALERTS_TITLE = 'mb-3 text-lg font-semibold';
 const ASIDE =
   'flex min-h-0 flex-col border-border max-lg:flex-1 lg:w-96 lg:border-l lg:assistant-collapsed:w-14';
 
@@ -41,11 +54,15 @@ const DESKTOP = '(min-width: 64rem)';
  * a rail. Phone: one section at a time with a bottom tab bar. The assistant
  * is mounted once, so the conversation survives switching.
  */
-export function AppShell({ header, main, assistant }: AppShellProps) {
+export function AppShell({ header, main, assistant, alerts }: AppShellProps) {
   const t = useTranslations('shell');
   const tCommon = useTranslations('common');
   const desktop = useMediaQuery(DESKTOP);
   const [section, setSection] = useSection();
+  const alertsCount = useFlaggedCount();
+  const alertsTitleId = useId();
+  // Phones show one section at a time; the header belongs to Overview.
+  const overviewHidden = section !== 'overview';
   const [collapsed, setCollapsed] = usePanelCollapsed();
   // State, not a ref: the popups read it, so they re-render once it is attached.
   const [mainArea, setMainArea] = useState<HTMLElement | null>(null);
@@ -58,6 +75,16 @@ export function AppShell({ header, main, assistant }: AppShellProps) {
   useEffect(() => {
     document.documentElement.removeAttribute('data-section');
   }, []);
+
+  // Opened in the app (the bell's push, or Forward), the sheet closes with
+  // Back, which takes away the entry it added; a link that opens on it has
+  // no entry before it to go back to, so closing replaces it.
+  const [shownSection, setShownSection] = useState(section);
+  const [alertsOpenedHere, setAlertsOpenedHere] = useState(false);
+  if (section !== shownSection) {
+    setShownSection(section);
+    setAlertsOpenedHere(section === 'alerts');
+  }
 
   const hidden = desktop ? collapsed : section !== 'assistant';
   // Seen again, however it happened (expand, tab bar, Back): clear the badge.
@@ -118,19 +145,23 @@ export function AppShell({ header, main, assistant }: AppShellProps) {
         {tCommon('skipToContent')}
       </a>
       {/* Phone assistant: the whole screen, as a chat app. */}
-      <header className={cn(HEADER, section === 'assistant' && 'max-lg:hidden')}>{header}</header>
+      <header className={cn(HEADER, overviewHidden && 'max-lg:hidden')}>{header}</header>
       <div className="flex min-h-0 flex-1">
-        <main
-          ref={setMainArea}
-          id="main"
-          className={cn(MAIN, section === 'assistant' && 'max-lg:hidden')}
-        >
+        <main ref={setMainArea} id="main" className={cn(MAIN, overviewHidden && 'max-lg:hidden')}>
           {/* Popups here stay below the header (they are portalled to the body). */}
           <PopperBoundary value={mainArea}>
             {/* Each side fails on its own: a crash in one keeps the other. */}
             <WidgetBoundary>{main}</WidgetBoundary>
           </PopperBoundary>
         </main>
+        {section === 'alerts' && !desktop ? (
+          <section aria-labelledby={alertsTitleId} className={cn(ALERTS_SECTION, 'lg:hidden')}>
+            <h1 id={alertsTitleId} className={ALERTS_TITLE}>
+              {t('alerts')}
+            </h1>
+            <WidgetBoundary>{alerts}</WidgetBoundary>
+          </section>
+        ) : null}
         <aside
           aria-label={t('assistant')}
           className={cn(ASIDE, section !== 'assistant' && 'max-lg:hidden')}
@@ -161,8 +192,33 @@ export function AppShell({ header, main, assistant }: AppShellProps) {
         </aside>
       </div>
       <div className="lg:hidden">
-        <SectionTabBar section={section} onChange={setSection} badge={unread} />
+        <SectionTabBar
+          section={section}
+          onChange={setSection}
+          badge={unread}
+          alertsCount={alertsCount}
+        />
       </div>
+      {/* Desktop: the same `tab=alerts` opens a sheet over the dashboard.
+          Closing goes Back when the app opened it, else replaces the entry:
+          either way Back afterwards neither reopens it nor stays put. */}
+      <Sheet
+        open={desktop && section === 'alerts'}
+        onOpenChange={(open) => {
+          if (open) return;
+          if (alertsOpenedHere) window.history.back();
+          else setSection('overview', { history: 'replace' });
+        }}
+      >
+        <SheetContent aria-describedby={undefined} className="w-full overflow-y-auto sm:max-w-md">
+          <SheetHeader className="pr-14">
+            <SheetTitle className="text-lg font-semibold">{t('alerts')}</SheetTitle>
+          </SheetHeader>
+          <div className="px-4 pb-6">
+            <WidgetBoundary>{alerts}</WidgetBoundary>
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
@@ -176,17 +232,29 @@ export function AppShellFallback({
   header,
   main,
   assistant,
-}: Pick<AppShellProps, 'header' | 'main'> & { assistant?: ReactNode }) {
+  alerts,
+}: Pick<AppShellProps, 'header' | 'main'> & { assistant?: ReactNode; alerts?: ReactNode }) {
   const t = useTranslations('shell');
   return (
     <div className={FRAME}>
-      <header className={cn(HEADER, 'max-lg:section-assistant:hidden')}>{header}</header>
+      <header
+        className={cn(HEADER, 'max-lg:section-assistant:hidden max-lg:section-alerts:hidden')}
+      >
+        {header}
+      </header>
       <div className="flex min-h-0 flex-1">
-        {/* `section-assistant`: set before paint for `?tab=assistant` (ADR 0015). */}
-        <main id="main" className={cn(MAIN, 'max-lg:section-assistant:hidden')}>
+        {/* `section-*`: set before paint for `?tab=assistant` / `?tab=alerts` (ADR 0015). */}
+        <main
+          id="main"
+          className={cn(MAIN, 'max-lg:section-assistant:hidden max-lg:section-alerts:hidden')}
+        >
           {/* Each side fails on its own: a crash in one keeps the other. */}
           <WidgetBoundary>{main}</WidgetBoundary>
         </main>
+        <section className={cn(ALERTS_SECTION, 'hidden max-lg:section-alerts:block')}>
+          <h1 className={ALERTS_TITLE}>{t('alerts')}</h1>
+          {alerts}
+        </section>
         <aside
           aria-label={t('assistant')}
           className={cn(ASIDE, 'max-lg:hidden max-lg:section-assistant:flex')}

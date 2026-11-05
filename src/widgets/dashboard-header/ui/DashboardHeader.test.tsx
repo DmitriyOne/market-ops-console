@@ -3,7 +3,7 @@ import { Suspense } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { enMessages as en } from '@/shared/config';
-import { datasetHandler, renderWithProviders, server } from '@/shared/lib/test';
+import { alertsApi, datasetHandler, renderWithProviders, server } from '@/shared/lib/test';
 
 import { DashboardHeader } from './DashboardHeader';
 
@@ -32,7 +32,18 @@ const params = (update: ReturnType<ReturnType<typeof setup>['lastUpdate']>) =>
 
 describe('DashboardHeader', () => {
   beforeEach(() => {
-    server.use(datasetHandler());
+    server.use(datasetHandler(), ...alertsApi().handlers);
+  });
+
+  it('the bell counts the markets the rules flag and opens the alerts (tab=alerts)', async () => {
+    const { user, lastUpdate } = setup();
+    const bell = await screen.findByRole('button', { name: 'Alerts, 5 markets flagged' });
+    expect(bell).toHaveTextContent('5');
+    await user.click(bell);
+    await waitFor(() => {
+      expect(params(lastUpdate())).toEqual({ tab: 'alerts' });
+    });
+    expect(lastUpdate()?.options.history).toBe('push');
   });
 
   it('on the portfolio the path is "Portfolio" and a region chooser; no market or product yet', async () => {

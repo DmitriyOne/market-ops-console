@@ -31,3 +31,14 @@ class ResizeObserverStub {
 }
 // Assigned, not stubbed: tests that unstub their own globals must keep it.
 Object.assign(globalThis, { ResizeObserver: ResizeObserverStub });
+
+// jsdom has no pointer capture or scrollIntoView; sonner's swipe and Radix
+// Select call them on press and open. Node-environment tests have no DOM.
+if (typeof Element !== 'undefined') {
+  Object.assign(Element.prototype, {
+    setPointerCapture(): void {},
+    releasePointerCapture(): void {},
+    hasPointerCapture: () => false,
+    scrollIntoView(): void {},
+  });
+}
