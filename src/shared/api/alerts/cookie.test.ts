@@ -18,6 +18,13 @@ describe('alerts cookie', () => {
     expect(decodeRules(deflateRawSync('{"rules":1}').toString('base64url'))).toBeNull();
   });
 
+  it('refuses a crafted value: too long, or inflating past the cap', () => {
+    expect(decodeRules('a'.repeat(5000))).toBeNull();
+    const bomb = deflateRawSync(`[${' '.repeat(1_000_000)}]`).toString('base64url');
+    expect(bomb.length).toBeLessThan(4096);
+    expect(decodeRules(bomb)).toBeNull();
+  });
+
   it('ten full rules with long Cyrillic names fit in one cookie (under 4 KB)', () => {
     const marketIds = [
       'us',

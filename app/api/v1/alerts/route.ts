@@ -14,7 +14,7 @@ import {
   withErrorHandling,
 } from '@/shared/api/server';
 import { API_ROUTES, env } from '@/shared/config';
-import { ValidationError } from '@/shared/lib';
+import { ForbiddenError, ValidationError } from '@/shared/lib';
 
 export const runtime = 'nodejs';
 
@@ -53,7 +53,24 @@ function saved(rules: readonly AlertRule[], body: unknown, status = 200): Respon
   return Response.json(body, { status, headers });
 }
 
+/**
+ * Writes come only from our own pages: SameSite=Lax already keeps the
+ * cookie off cross-site POSTs, and this also refuses them outright.
+ */
+function assertSameOrigin(request: Request): void {
+  const site = request.headers.get('sec-fetch-site');
+  if (site !== null && site !== 'same-origin') throw new ForbiddenError('Cross-site write.');
+  const origin = request.headers.get('origin');
+  if (origin !== null && origin !== new URL(request.url).origin) {
+    throw new ForbiddenError('Cross-site write.');
+  }
+}
+
 async function readInput(request: Request) {
+  // JSON only: a form post cannot send it without a CORS preflight.
+  if (!request.headers.get('content-type')?.startsWith('application/json')) {
+    throw new ValidationError('Body must be application/json.');
+  }
   let body: unknown;
   try {
     body = await request.json();
@@ -75,6 +92,7 @@ function readId(request: Request): string {
 
 /** Every answer waits like a real network; a demo switch can fail one write. */
 async function write(request: Request, handler: () => Promise<Response>): Promise<Response> {
+  assertSameOrigin(request);
   await sleep(env.MOCK_ALERTS_DELAY_MS);
   if (request.headers.get(SIMULATE_FAILURE_HEADER) === '1') {
     return Response.json(

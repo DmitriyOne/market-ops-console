@@ -3,7 +3,7 @@
  * Client-side transport failures are `ApiError`s in `@/shared/api` (ADR 0013).
  */
 export type AppErrorCode =
-  'invalid_request' | 'not_found' | 'data_integrity' | 'duplicate_name' | 'too_many';
+  'invalid_request' | 'not_found' | 'data_integrity' | 'forbidden' | 'duplicate_name' | 'too_many';
 
 type AppErrorOptions = { cause?: unknown; details?: Record<string, unknown> };
 
@@ -38,6 +38,13 @@ export class NotFoundError extends AppError {
   constructor(resource: string, id: string, options: Omit<AppErrorOptions, 'details'> = {}) {
     super(`${resource} not found`, { ...options, details: { resource, id } });
   }
+}
+
+/** The request comes from another site (a write must come from our own pages). */
+export class ForbiddenError extends AppError {
+  readonly code = 'forbidden';
+  readonly status = 403;
+  readonly expose = true;
 }
 
 /** The request is valid but clashes with what is stored (a duplicate, a full list). */

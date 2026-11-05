@@ -31,7 +31,7 @@ function client() {
     const response = await handler(
       new Request(`${URL_BASE}${query}`, {
         method: 'POST',
-        headers: { cookie, ...headers },
+        headers: { cookie, 'content-type': 'application/json', ...headers },
         body: body === undefined ? undefined : JSON.stringify(body),
       }),
     );
@@ -104,6 +104,30 @@ describe('/api/v1/alerts', () => {
     expect(await failed.json()).toMatchObject({ error: { code: 'simulated' } });
     expect(c.cookie()).toBe('');
     expect(await c.list()).toHaveLength(2);
+  });
+
+  it('refuses writes from another site and bodies that are not JSON', async () => {
+    const c = client();
+    const code = async (r: Response) =>
+      ((await r.json()) as { error: { code: string } }).error.code;
+    const fetchSite = await c.send(POST, {
+      body: input,
+      headers: { 'sec-fetch-site': 'cross-site' },
+    });
+    expect([fetchSite.status, await code(fetchSite)]).toEqual([403, 'forbidden']);
+    const origin = await c.send(DELETE, {
+      query: '?id=example-share',
+      headers: { origin: 'https://evil.example' },
+    });
+    expect(origin.status).toBe(403);
+    const form = await c.send(POST, { body: input, headers: { 'content-type': 'text/plain' } });
+    expect([form.status, await code(form)]).toEqual([400, 'invalid_request']);
+    expect(c.cookie()).toBe('');
+    const same = await c.send(POST, {
+      body: input,
+      headers: { 'sec-fetch-site': 'same-origin', origin: 'http://localhost' },
+    });
+    expect(same.status).toBe(201);
   });
 
   it('a broken cookie is read as no list', async () => {
