@@ -147,16 +147,15 @@ describe('MarketsTable', () => {
   });
 
   it('forecast and prior year columns; the anomaly in the window is marked with its note', async () => {
-    setup('?mode=analyst&period=2026-03');
+    const { user } = setup('?mode=analyst&period=2026-03');
     expect(
       await screen.findByRole('columnheader', { name: t.column.forecast }),
     ).toBeInTheDocument();
     expect(screen.getByRole('columnheader', { name: t.column.priorYear })).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', {
-        name: 'Anomaly, Mar 2026: Revenue fell 27% versus the prior month.',
-      }),
-    ).toBeInTheDocument();
+    const note = 'Anomaly, Mar 2026: Revenue fell 27% versus the prior month.';
     expect(screen.getAllByRole('button', { name: /^Anomaly/ })).toHaveLength(1);
+    // A press (a tap on touch) opens the note; hover is not needed.
+    await user.click(screen.getByRole('button', { name: note }));
+    expect(await screen.findByRole('dialog')).toHaveTextContent(note);
   });
 });

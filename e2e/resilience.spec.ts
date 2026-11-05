@@ -10,16 +10,20 @@ test('offline: one notice over the page, gone when the network is back', async (
 }) => {
   await page.goto('/dashboard?region=eu');
   await expect(page.getByRole('heading', { level: 1, name: 'Europe' })).toBeVisible();
+  const period = page.getByRole('button', { name: /^Period:/ });
+  await period.focus();
 
   await context.setOffline(true);
   const notice = page.getByRole('alertdialog', { name: "You're offline" });
   await expect(notice).toBeVisible();
   await expect(notice).toContainText('Everything on this page is kept.');
+  await expect(notice.getByRole('button', { name: 'Try again' })).toBeFocused();
 
   await context.setOffline(false);
   await expect(notice).toBeHidden();
-  // The view the user had is still there.
+  // The view the user had is still there, and so is their place in it.
   await expect(page.getByRole('heading', { level: 1, name: 'Europe' })).toBeVisible();
+  await expect(period).toBeFocused();
 });
 
 test('the alerts API failing: the panel says so, Try again loads the rules', async ({ page }) => {

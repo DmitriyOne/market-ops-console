@@ -2,7 +2,7 @@
 
 import { WifiOffIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { type ReactNode, useId, useReducer } from 'react';
+import { type ReactNode, useEffect, useId, useReducer, useRef } from 'react';
 
 import { Button } from '@/shared/ui';
 
@@ -10,7 +10,8 @@ import { useOnlineStatus } from '../model/use-online-status';
 
 /**
  * Covers the app while offline. Children stay mounted underneath (made
- * inert), so chat history, drafts and URL state survive reconnecting.
+ * inert), so chat history, drafts and URL state survive reconnecting, and
+ * focus goes back where it was.
  */
 export function OfflineGuard({ children }: { children: ReactNode }) {
   const t = useTranslations();
@@ -19,10 +20,26 @@ export function OfflineGuard({ children }: { children: ReactNode }) {
   const [, recheck] = useReducer((n: number) => n + 1, 0);
   const titleId = useId();
   const bodyId = useId();
+  // Where focus was in the app, to put it back once the overlay goes (its
+  // button had it, and is gone).
+  const last = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    if (online) return;
+    return () => {
+      if (last.current?.isConnected) last.current.focus();
+    };
+  }, [online]);
 
   return (
     <>
-      <div inert={!online}>{children}</div>
+      <div
+        inert={!online}
+        onFocus={(event) => {
+          if (event.target instanceof HTMLElement) last.current = event.target;
+        }}
+      >
+        {children}
+      </div>
       {!online && (
         <div
           role="alertdialog"

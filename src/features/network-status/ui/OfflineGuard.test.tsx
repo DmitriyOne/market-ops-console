@@ -66,6 +66,18 @@ describe('OfflineGuard', () => {
     }
   });
 
+  it('takes focus while offline and gives it back to where it was', async () => {
+    renderGuard();
+    const counter = screen.getByRole('button', { name: 'count 0' });
+    await userEvent.click(counter);
+    expect(screen.getByRole('button', { name: 'count 1' })).toHaveFocus();
+
+    goOffline();
+    expect(screen.getByRole('button', { name: en.errors.retry })).toHaveFocus();
+    goOnline();
+    expect(screen.getByRole('button', { name: 'count 1' })).toHaveFocus();
+  });
+
   it('re-checks the connection on retry', async () => {
     renderGuard();
     goOffline();
