@@ -6,6 +6,7 @@ import { Suspense } from 'react';
 import { DatasetGate } from '@/entities/performance';
 import { ResetViewLink } from '@/features/reset-view';
 import { PeriodPicker } from '@/features/select-period';
+import { CurrencySwitch } from '@/features/switch-currency';
 import { LocaleSwitch } from '@/features/switch-locale';
 import { ModeSwitch } from '@/features/switch-mode';
 import { ThemeSwitch } from '@/features/switch-theme';
@@ -44,7 +45,7 @@ function AppName({ live = false }: { live?: boolean }) {
 }
 
 /**
- * Desktop: name · path · period · mode · alerts · language · theme in one row.
+ * Desktop: name · path · period · mode · alerts · currency · language · theme in one row.
  * Phone: name and ⚙︎ on the first row, the path below, then period and
  * mode full width.
  */
@@ -77,6 +78,7 @@ export function DashboardHeader() {
         <Suspense fallback={<Skeleton aria-hidden className="size-11" />}>
           <AlertsButton />
         </Suspense>
+        <CurrencySwitch />
         <Suspense>
           <LocaleSwitch />
         </Suspense>
@@ -115,6 +117,7 @@ export function DashboardHeaderSkeleton() {
       </div>
       <div className="flex items-center gap-1 max-lg:hidden">
         <Skeleton className="size-11" />
+        <Skeleton className="h-8 w-16" />
         <Skeleton className="size-9" />
         <Skeleton className="size-9" />
       </div>

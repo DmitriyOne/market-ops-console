@@ -44,6 +44,15 @@
     "de-DE": "Deutsch",
     "ru-RU": "Русский"
   },
+  "currency": {
+    "label": "Währung",
+    "USD": "US-Dollar",
+    "EUR": "Euro",
+    "GBP": "Britisches Pfund",
+    "current": "Währung: {name}",
+    "rates": "EZB-Kurse vom {date}: 1 USD = {eur} EUR = {gbp} GBP.",
+    "demo": "Für diese Demo fest hinterlegt; eine echte App holt die Kurse über die Backend-API."
+  },
   "assistant": {
     "composer": {
       "label": "Frage zu den Daten",

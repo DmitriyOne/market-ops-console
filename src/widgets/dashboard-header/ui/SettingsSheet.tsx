@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Suspense, useState } from 'react';
 
 import { ResetViewLink } from '@/features/reset-view';
+import { CurrencySwitchRow } from '@/features/switch-currency';
 import { LocaleSwitchRow } from '@/features/switch-locale';
 import { ThemeSwitchRow } from '@/features/switch-theme';
 import { cn } from '@/shared/lib';
@@ -22,7 +23,7 @@ import {
 const ROW =
   '-mx-2 flex min-h-12 items-center justify-between gap-3 rounded-md px-2 text-left outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-50';
 
-/** Phones: language, theme and reset behind one ⚙︎ button (spec §6 Layout). */
+/** Phones: language, currency, theme and reset behind one ⚙︎ button (spec §6 Layout). */
 export function SettingsSheet({ className }: { className?: string }) {
   const t = useTranslations('header');
   const [open, setOpen] = useState(false);
@@ -48,6 +49,7 @@ export function SettingsSheet({ className }: { className?: string }) {
           <Suspense>
             <LocaleSwitchRow className={ROW} />
           </Suspense>
+          <CurrencySwitchRow className={ROW} />
           <ThemeSwitchRow className={ROW} />
           {/* Reads search params, which static HTML does not have. */}
           <Suspense>

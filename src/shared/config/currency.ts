@@ -4,6 +4,9 @@ export type Currency = (typeof CURRENCIES)[number];
 
 export const DEFAULT_CURRENCY: Currency = 'USD';
 
+/** The symbol each prints with (`narrowSymbol`): "$", never "US$". */
+export const CURRENCY_SYMBOLS: Record<Currency, string> = { USD: '$', EUR: '€', GBP: '£' };
+
 /**
  * Units of each currency per US dollar: ECB reference rates of `RATES_DATE`
  * (Frankfurter API; open.er-api.com within 0.15 %). One rate for every

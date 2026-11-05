@@ -44,6 +44,15 @@
     "de-DE": "Deutsch",
     "ru-RU": "Русский"
   },
+  "currency": {
+    "label": "Currency",
+    "USD": "US dollar",
+    "EUR": "Euro",
+    "GBP": "British pound",
+    "current": "Currency: {name}",
+    "rates": "ECB rates of {date}: 1 USD = {eur} EUR = {gbp} GBP.",
+    "demo": "Fixed for this demo; a live app would get rates from the backend API."
+  },
   "assistant": {
     "composer": {
       "label": "Ask about the data",

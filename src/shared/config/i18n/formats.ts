@@ -36,6 +36,8 @@ export const formatsFor = (currency: Currency) => {
       signedWholePercent: { style: 'percent', maximumFractionDigits: 0, signDisplay: 'exceptZero' },
       /** An alert threshold as typed: "$1.25M" (two decimals, not the dashboard's one). */
       thresholdCurrency: { ...money, notation: 'compact', maximumFractionDigits: 2 },
+      /** A currency rate: "0.89095". */
+      rate: { minimumFractionDigits: 2, maximumFractionDigits: 5 },
       /** An alert threshold as typed: "95%", "95.5%", "+2%". */
       thresholdPercent: { style: 'percent', maximumFractionDigits: 2 },
       signedThresholdPercent: {
