@@ -545,8 +545,8 @@
       "operator": "Condition",
       "threshold": "Threshold",
       "unitPercent": "%",
-      "unitRevenue": "M$",
-      "revenueHint": "In millions of US dollars, e.g. 1.5",
+      "unitRevenue": "M{symbol}",
+      "revenueHint": "In millions of {currency, select, EUR {euros} GBP {British pounds} other {US dollars}}, e.g. 1.5",
       "scope": "Applies to",
       "scopeKind": {
         "portfolio": "All markets",

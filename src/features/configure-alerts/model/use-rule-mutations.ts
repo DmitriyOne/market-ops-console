@@ -10,7 +10,14 @@ import {
 import { useLocale, useTranslations } from 'next-intl';
 import { useCallback, useMemo } from 'react';
 
-import { ALERTS_QUERY_KEY, createRule, deleteRule, updateRule } from '@/entities/alert-rule';
+import {
+  ALERTS_QUERY_KEY,
+  createRule,
+  deleteRule,
+  ruleInCurrency,
+  ruleInUsd,
+  updateRule,
+} from '@/entities/alert-rule';
 import {
   ALERT_ERROR_CODES,
   type AlertErrorCode,
@@ -19,6 +26,7 @@ import {
   HttpError,
   useErrorMessage,
 } from '@/shared/api';
+import { useCurrency } from '@/shared/lib';
 import { toast } from '@/shared/ui';
 
 import { takeSimulatedFailure } from './simulate-failure';
@@ -39,6 +47,7 @@ type WriteVars = CreateVars | UpdateVars | RemoveVars;
 const isCode = (code: string | undefined): code is AlertErrorCode =>
   ALERT_ERROR_CODES.some((c) => c === code);
 
+/** The list as the API has it: revenue thresholds in USD. */
 function rules(client: QueryClient): AlertRule[] {
   return client.getQueryData<AlertRule[]>(ALERTS_QUERY_KEY) ?? [];
 }
@@ -137,13 +146,15 @@ function retryWrite(
 /**
  * Rule writes with an optimistic update (spec §9): the list changes at once,
  * a failure puts that one rule back and says so with Retry; the list is
- * refetched once no write is left in flight.
+ * refetched once no write is left in flight. Rules come in and `onSaved`
+ * goes out in the chosen currency; the cache and the API get USD (ADR 0017).
  */
 export function useRuleMutations() {
   const client = useQueryClient();
   const t = useTranslations('alerts');
   const locale = useLocale();
   const reason = useReason();
+  const currency = useCurrency();
 
   const mutation = useMutation({
     mutationKey: WRITE_KEY,
@@ -186,22 +197,41 @@ export function useRuleMutations() {
   });
   const { mutate } = mutation;
 
-  return useMemo(
-    () => ({
+  return useMemo(() => {
+    const shown = (onSaved?: OnSaved): OnSaved | undefined =>
+      onSaved &&
+      ((saved) => {
+        onSaved(ruleInCurrency(saved, currency));
+      });
+    return {
       /** `onSaved` runs once the server has the rule (the list already shows it). */
       create: (input: AlertRuleInput, onSaved?: OnSaved) => {
-        mutate({ kind: 'create', input, tempId: `saving-${crypto.randomUUID()}`, onSaved });
+        mutate({
+          kind: 'create',
+          input: ruleInUsd(input, currency),
+          tempId: `saving-${crypto.randomUUID()}`,
+          onSaved: shown(onSaved),
+        });
       },
       update: (rule: AlertRule, onSaved?: OnSaved) => {
         const previous = rules(client).find((r) => r.id === rule.id);
-        if (previous) mutate({ kind: 'update', rule, previous, onSaved });
+        if (previous) {
+          const next = ruleInUsd(rule, currency, previous);
+          mutate({ kind: 'update', rule: next, previous, onSaved: shown(onSaved) });
+        }
       },
+      // From the stored rule: only `enabled` changes.
       toggle: (rule: AlertRule) => {
-        mutate({ kind: 'update', rule: { ...rule, enabled: !rule.enabled }, previous: rule });
+        const previous = rules(client).find((r) => r.id === rule.id);
+        if (previous) {
+          mutate({ kind: 'update', rule: { ...previous, enabled: !previous.enabled }, previous });
+        }
       },
       remove: (rule: AlertRule) => {
-        const index = rules(client).findIndex((r) => r.id === rule.id);
-        if (index >= 0) mutate({ kind: 'remove', rule, index });
+        const list = rules(client);
+        const index = list.findIndex((r) => r.id === rule.id);
+        const stored = list[index];
+        if (stored) mutate({ kind: 'remove', rule: stored, index });
       },
       /** The failed write again, as it was (the same as the toast's Retry, which it closes). */
       retry: (failed: FailedWrite) => {
@@ -218,9 +248,8 @@ export function useRuleMutations() {
         }
         toast.dismiss(toastId(failed.target));
       },
-    }),
-    [client, mutate],
-  );
+    };
+  }, [client, currency, mutate]);
 }
 
 /**

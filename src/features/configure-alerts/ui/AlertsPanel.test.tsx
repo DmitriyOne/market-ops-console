@@ -149,7 +149,7 @@ describe('AlertsPanel', () => {
     await user.type(screen.getByRole('textbox', { name: t.form.name }), 'Small markets');
     await choose(user, t.form.metric, 'Revenue');
     const threshold = screen.getByRole('textbox', { name: 'Threshold, M$' });
-    expect(threshold).toHaveAccessibleDescription(t.form.revenueHint);
+    expect(threshold).toHaveAccessibleDescription('In millions of US dollars, e.g. 1.5');
     await user.clear(threshold);
     await user.type(threshold, '0,95');
     expect(
@@ -158,6 +158,59 @@ describe('AlertsPanel', () => {
     await user.click(screen.getByRole('button', { name: t.form.save }));
     await waitFor(() => {
       expect(api.rules().find((r) => r.name === 'Small markets')?.threshold).toBe(950_000);
+    });
+  });
+
+  describe('in another currency (ADR 0017)', () => {
+    it('EUR: typed in millions of euros, previewed on euro revenue, stored in USD', async () => {
+      localStorage.setItem('mo:currency', 'EUR');
+      const { user, api } = setup();
+      await rulesList();
+      await user.click(screen.getByRole('button', { name: t.list.new }));
+      await user.type(screen.getByRole('textbox', { name: t.form.name }), 'Under a million');
+      await choose(user, t.form.metric, 'Revenue');
+      const threshold = screen.getByRole('textbox', { name: 'Threshold, M€' });
+      expect(threshold).toHaveAccessibleDescription('In millions of euros, e.g. 1.5');
+      await user.clear(threshold);
+      await user.type(threshold, '1');
+      // Brazil: 1,115,100 $ = 993,498 € — under €1M, though over $1M.
+      expect(
+        screen.getByText(/^Would flag 5 markets now \(May 2026\): .*Brazil/),
+      ).toBeInTheDocument();
+      await user.click(screen.getByRole('button', { name: t.form.save }));
+      // 1,000,000 € ÷ 0.89095 = 1,122,397 $
+      await waitFor(() => {
+        expect(api.rules().find((r) => r.name === 'Under a million')?.threshold).toBe(1_122_397);
+      });
+      const row = await ruleRow('Under a million');
+      expect(row).toHaveTextContent('Revenue below €1m · All markets');
+      expect(row).toHaveTextContent('Flags 5 markets now');
+    });
+
+    it('GBP: editing only the name keeps the stored USD threshold to the dollar', async () => {
+      localStorage.setItem('mo:currency', 'GBP');
+      const stored = {
+        id: 'r-rev',
+        name: 'Revenue watch',
+        metric: 'revenue',
+        operator: 'below',
+        // £742,991 shown; £742,991 ÷ 0.74299 would round to 1,000,001 $.
+        threshold: 1_000_002,
+        scope: { kind: 'portfolio' },
+        severity: 'warning',
+        enabled: true,
+      } as const;
+      const { user, api } = setup('', alertsApi([stored]));
+      await user.click(await screen.findByRole('button', { name: 'Edit Revenue watch' }));
+      expect(screen.getByRole('textbox', { name: 'Threshold, M£' })).toHaveValue('0.742991');
+      const name = screen.getByRole('textbox', { name: t.form.name });
+      await user.clear(name);
+      await user.type(name, 'Revenue watch UK');
+      await user.click(screen.getByRole('button', { name: t.form.save }));
+      await waitFor(() => {
+        expect(api.rules()[0]?.name).toBe('Revenue watch UK');
+      });
+      expect(api.rules()[0]?.threshold).toBe(1_000_002);
     });
   });
 

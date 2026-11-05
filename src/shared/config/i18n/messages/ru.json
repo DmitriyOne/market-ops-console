@@ -545,8 +545,8 @@
       "operator": "Условие",
       "threshold": "Порог",
       "unitPercent": "%",
-      "unitRevenue": "млн $",
-      "revenueHint": "В миллионах долларов США, например 1,5",
+      "unitRevenue": "млн {symbol}",
+      "revenueHint": "В миллионах {currency, select, EUR {евро} GBP {фунтов стерлингов} other {долларов США}}, например 1,5",
       "scope": "Для каких рынков",
       "scopeKind": {
         "portfolio": "Все рынки",

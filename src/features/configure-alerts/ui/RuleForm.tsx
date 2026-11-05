@@ -13,6 +13,8 @@ import {
   type AlertRuleInput,
   type Dataset,
 } from '@/shared/api';
+import { CURRENCY_SYMBOLS } from '@/shared/config';
+import { useCurrency } from '@/shared/lib';
 import {
   Button,
   Input,
@@ -98,7 +100,11 @@ export function RuleForm({ ds, initial, others, editing, onSubmit, onCancel }: R
   const nameError = message('name');
   const thresholdError = message('threshold');
   const regionError = message('regionId');
-  const unit = metric === 'revenue' ? t('form.unitRevenue') : t('form.unitPercent');
+  const currency = useCurrency();
+  const unit =
+    metric === 'revenue'
+      ? t('form.unitRevenue', { symbol: CURRENCY_SYMBOLS[currency] })
+      : t('form.unitPercent');
 
   return (
     <form
@@ -178,7 +184,7 @@ export function RuleForm({ ds, initial, others, editing, onSubmit, onCancel }: R
       <FormField
         id={id('threshold')}
         label={`${t('form.threshold')}, ${unit}`}
-        hint={metric === 'revenue' ? t('form.revenueHint') : undefined}
+        hint={metric === 'revenue' ? t('form.revenueHint', { currency }) : undefined}
         error={thresholdError}
       >
         <Input

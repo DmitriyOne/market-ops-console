@@ -16,7 +16,7 @@ import {
 export const SCOPE_KINDS = ['portfolio', 'region', 'markets'] as const;
 export type ScopeKind = (typeof SCOPE_KINDS)[number];
 
-/** Revenue is typed in millions of USD (monthly revenue is 0.8–3.8 M$). */
+/** Revenue is typed in millions of the chosen currency (monthly revenue is 0.8–3.8 M$); the API stores USD. */
 const REVENUE_UNIT = 1_000_000;
 
 /** What the fields hold: text for the number, flat scope fields. */

@@ -545,8 +545,8 @@
       "operator": "Bedingung",
       "threshold": "Schwelle",
       "unitPercent": "%",
-      "unitRevenue": "Mio. $",
-      "revenueHint": "In Millionen US-Dollar, z. B. 1,5",
+      "unitRevenue": "Mio. {symbol}",
+      "revenueHint": "In Millionen {currency, select, EUR {Euro} GBP {Britische Pfund} other {US-Dollar}}, z. B. 1,5",
       "scope": "Gilt für",
       "scopeKind": {
         "portfolio": "Alle Märkte",
