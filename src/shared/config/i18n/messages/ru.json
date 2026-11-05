@@ -483,6 +483,15 @@
       "portfolio": "Все рынки",
       "marketsCount": "{count, plural, one {# рынок} few {# рынка} many {# рынков} other {# рынка}}"
     },
-    "flagged": "{severity, select, critical {Критичный алерт} other {Алерт}}: {rules}"
+    "flagged": "{severity, select, critical {Критичный алерт} other {Алерт}}: {rules}",
+    "rollback": "Не удалось сохранить — вернули прежнее состояние. {reason}",
+    "retry": "Повторить",
+    "errors": {
+      "invalid_request": "Правило заполнено неверно.",
+      "not_found": "Этого правила больше нет.",
+      "duplicate_name": "Правило с таким названием уже есть.",
+      "too_many": "Можно хранить не больше 10 правил.",
+      "simulated": "Имитация сбоя (демо-переключатель)."
+    }
   }
 }

@@ -1,7 +1,7 @@
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it } from 'vitest';
 
-import { type AlertRuleInput, HttpError } from '@/shared/api';
+import { type AlertRuleInput, alertRuleInputSchema, HttpError } from '@/shared/api';
 import { server } from '@/shared/lib/test';
 
 import { createRule, deleteRule } from './alerts-requests';
@@ -24,7 +24,7 @@ describe('alert rule requests', () => {
         seen.push(request.headers.get('x-simulate-failure'));
         expect(request.headers.get('content-type')).toBe('application/json');
         return HttpResponse.json(
-          { rule: { ...((await request.json()) as AlertRuleInput), id: 'x' } },
+          { rule: { ...alertRuleInputSchema.parse(await request.json()), id: 'x' } },
           { status: 201 },
         );
       }),

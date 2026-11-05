@@ -1,11 +1,13 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest';
+import { z } from 'zod';
 
-import { type AlertRuleInput, alertsResponseSchema } from '@/shared/api';
+import { type AlertRuleInput, alertRuleResponseSchema, alertsResponseSchema } from '@/shared/api';
 
 import { DELETE, GET, PATCH, POST } from './route';
 
 const URL_BASE = 'http://localhost/api/v1/alerts';
+const errorBody = z.object({ error: z.object({ code: z.string() }) });
 
 const input: AlertRuleInput = {
   name: 'Low growth',
@@ -58,7 +60,7 @@ describe('/api/v1/alerts', () => {
     const created = await c.send(POST, { body: input });
     expect(created.status).toBe(201);
     expect(created.headers.get('set-cookie')).toMatch(/HttpOnly; SameSite=Lax/);
-    const { rule } = (await created.json()) as { rule: { id: string } };
+    const { rule } = alertRuleResponseSchema.parse(await created.json());
     expect((await c.list()).map((r) => r.name)).toEqual([
       'Attainment below 95%',
       'Share below 10%',
@@ -79,8 +81,7 @@ describe('/api/v1/alerts', () => {
 
   it('answers with codes the client translates', async () => {
     const c = client();
-    const code = async (r: Response) =>
-      ((await r.json()) as { error: { code: string } }).error.code;
+    const code = async (r: Response) => errorBody.parse(await r.json()).error.code;
 
     const invalid = await c.send(POST, { body: { ...input, threshold: 500 } });
     expect([invalid.status, await code(invalid)]).toEqual([400, 'invalid_request']);
@@ -108,8 +109,7 @@ describe('/api/v1/alerts', () => {
 
   it('refuses writes from another site and bodies that are not JSON', async () => {
     const c = client();
-    const code = async (r: Response) =>
-      ((await r.json()) as { error: { code: string } }).error.code;
+    const code = async (r: Response) => errorBody.parse(await r.json()).error.code;
     const fetchSite = await c.send(POST, {
       body: input,
       headers: { 'sec-fetch-site': 'cross-site' },
@@ -132,7 +132,7 @@ describe('/api/v1/alerts', () => {
 
   it('a broken cookie is read as no list', async () => {
     const response = await GET(new Request(URL_BASE, { headers: { cookie: 'mo-alerts=garbage' } }));
-    expect((await response.json()) as unknown).toMatchObject({
+    expect(await response.json()).toMatchObject({
       rules: [{ id: 'example-attainment' }, { id: 'example-share' }],
     });
   });

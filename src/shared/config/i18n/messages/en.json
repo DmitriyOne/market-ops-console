@@ -483,6 +483,15 @@
       "portfolio": "All markets",
       "marketsCount": "{count, plural, one {# market} other {# markets}}"
     },
-    "flagged": "{severity, select, critical {Critical alert} other {Alert}}: {rules}"
+    "flagged": "{severity, select, critical {Critical alert} other {Alert}}: {rules}",
+    "rollback": "Couldn't save — restored previous state. {reason}",
+    "retry": "Retry",
+    "errors": {
+      "invalid_request": "The rule is not valid.",
+      "not_found": "This rule no longer exists.",
+      "duplicate_name": "A rule with this name already exists.",
+      "too_many": "You can keep up to 10 rules.",
+      "simulated": "Simulated failure (demo switch)."
+    }
   }
 }

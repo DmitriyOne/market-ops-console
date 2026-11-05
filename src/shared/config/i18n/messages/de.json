@@ -483,6 +483,15 @@
       "portfolio": "Alle Märkte",
       "marketsCount": "{count, plural, one {# Markt} other {# Märkte}}"
     },
-    "flagged": "{severity, select, critical {Kritischer Alarm} other {Alarm}}: {rules}"
+    "flagged": "{severity, select, critical {Kritischer Alarm} other {Alarm}}: {rules}",
+    "rollback": "Speichern fehlgeschlagen – vorheriger Stand wiederhergestellt. {reason}",
+    "retry": "Erneut versuchen",
+    "errors": {
+      "invalid_request": "Die Regel ist ungültig.",
+      "not_found": "Diese Regel gibt es nicht mehr.",
+      "duplicate_name": "Eine Regel mit diesem Namen gibt es bereits.",
+      "too_many": "Sie können höchstens 10 Regeln anlegen.",
+      "simulated": "Simulierter Fehler (Demo-Schalter)."
+    }
   }
 }
