@@ -6,7 +6,9 @@ import { type ReactNode, Suspense } from 'react';
 import { DatasetGate, useDashboard } from '@/entities/performance';
 import { useModeAttribute } from '@/features/switch-mode';
 import { WidgetBoundary } from '@/shared/ui';
+import { ComparisonRadar, ComparisonRadarSkeleton } from '@/widgets/comparison-radar';
 import { ScopeTitle, ScopeTitleSkeleton } from '@/widgets/dashboard-header';
+import { HeatMap, HeatMapSkeleton } from '@/widgets/heat-map';
 import { KpiStrip, KpiStripSkeleton } from '@/widgets/kpi-strip';
 import { MarketStatus, MarketStatusSkeleton } from '@/widgets/market-status';
 import { MarketsTable, MarketsTableSkeleton } from '@/widgets/markets-table';
@@ -19,6 +21,8 @@ const PAGE = 'flex flex-col gap-4 p-4';
 // `min-w-0` on every cell: a wide table scrolls inside its card instead of widening the page.
 const ROW = 'grid gap-4 xl:grid-cols-3 *:min-w-0';
 const WIDE = 'xl:col-span-2';
+// The companion column: Top risks, and in Analyst the radar under it.
+const STACK = 'flex flex-col gap-4';
 
 /** One widget: its own error (named) and its own skeleton. */
 function Slot({
@@ -43,18 +47,30 @@ function AnalystOnly({ children }: { children: ReactNode }) {
   return state.mode === 'analyst' ? children : null;
 }
 
-/** The table's skeleton, only where the URL says Analyst (the <html> mark). */
-function AnalystTableSkeleton() {
-  return (
-    <div className="hidden mode-analyst:block">
-      <MarketsTableSkeleton />
-    </div>
-  );
+/** A skeleton only where the URL says Analyst (the <html> mark set before paint). */
+function AnalystSkeleton({ children }: { children: ReactNode }) {
+  return <div className="hidden mode-analyst:block">{children}</div>;
 }
+const tableSkeleton = (
+  <AnalystSkeleton>
+    <MarketsTableSkeleton />
+  </AnalystSkeleton>
+);
+const heatMapSkeleton = (
+  <AnalystSkeleton>
+    <HeatMapSkeleton />
+  </AnalystSkeleton>
+);
+const radarSkeleton = (
+  <AnalystSkeleton>
+    <ComparisonRadarSkeleton />
+  </AnalystSkeleton>
+);
 
 /**
- * Variant A (ADR 0014 checkpoint). Analyst adds the markets table under
- * the map, so a pick on the map narrows the table in view.
+ * Variant A (ADR 0014 checkpoint). Analyst adds the radar under Top risks
+ * (next to the map, so a pick there changes it in view), the markets table
+ * under the map and the heat map under the table (owner, 2026-11-05).
  */
 export function Overview() {
   const t = useTranslations();
@@ -74,14 +90,26 @@ export function Overview() {
               <MarketStatus />
             </Slot>
           </div>
-          <Slot name={t('topRisks.title')} fallback={<TopRisksSkeleton />}>
-            <TopRisks />
-          </Slot>
+          <div className={STACK}>
+            <Slot name={t('topRisks.title')} fallback={<TopRisksSkeleton />}>
+              <TopRisks />
+            </Slot>
+            <Slot name={t('radar.title')} fallback={radarSkeleton}>
+              <AnalystOnly>
+                <ComparisonRadar />
+              </AnalystOnly>
+            </Slot>
+          </div>
         </div>
         {/* The mode check is inside the slot: its error and its skeleton apply too. */}
-        <Slot name={t('marketsTable.title')} fallback={<AnalystTableSkeleton />}>
+        <Slot name={t('marketsTable.title')} fallback={tableSkeleton}>
           <AnalystOnly>
             <MarketsTable />
+          </AnalystOnly>
+        </Slot>
+        <Slot name={t('heatMap.title')} fallback={heatMapSkeleton}>
+          <AnalystOnly>
+            <HeatMap />
           </AnalystOnly>
         </Slot>
         <div className={ROW}>
@@ -109,9 +137,13 @@ export function OverviewSkeleton() {
         <div className={WIDE}>
           <MarketStatusSkeleton />
         </div>
-        <TopRisksSkeleton />
+        <div className={STACK}>
+          <TopRisksSkeleton />
+          {radarSkeleton}
+        </div>
       </div>
-      <AnalystTableSkeleton />
+      {tableSkeleton}
+      {heatMapSkeleton}
       <div className={ROW}>
         <div className={WIDE}>
           <RevenueTrendSkeleton />

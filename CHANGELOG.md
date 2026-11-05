@@ -2,6 +2,17 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/). The top version must match `package.json` and the `release/X.Y.Z` branch.
 
+## [0.8.0] - Unreleased
+
+### Added
+- Heat map in Analyst, full width under the markets table: the scope's markets × 24 months, coloured by the map's metric with the map's steps (one picker for both, also on the card); status and share have no months, so it shows growth YoY with a notice, which is where Germany's March 2026 dip shows (−31 %; as attainment it stays at 92 %, the forecast fell too). Whole numbers in the cells, one decimal and the anomaly note in the line under the grid, a ⚠ mark on anomaly cells, the selected window marked on the month headers and around its cells, selected markets marked in their row. One Tab stop and arrow keys; Enter or a click opens the market at that month (the window stays), Shift+click or Shift+Enter selects it; on a touch screen a tap shows the cell and the line under the grid has Open and Select (the line previews the hovered cell and otherwise keeps the one picked, so its buttons act on it). Scrolls sideways inside its card on a phone with the market column fixed, opened at the selected month. In a product view the anomaly note is called the whole market's (the data has no per-product notes). Table alternative with the anomaly marks and notes, remembered per browser.
+- Comparison radar in Analyst, under Top risks next to the map: the selected markets (the first four, with "Showing the first 4 of N"); with nothing selected, the open market and its neighbours in the region, the open region's markets, or the four regions; against a grey dashed portfolio average. Axes: growth, attainment, share, revenue and momentum (growth over the last 3 months minus the 3 before, in points), each scaled from the weakest to the strongest of the 13 markets (or of the 4 regions); the tooltip and the table show the real values. Follows the month and the window; an axis without data (share off the latest month, momentum before November 2024) is left out with a note rather than drawn at the centre. Four new series colours checked for colour blindness, each with its own dash and marker. Table alternative, remembered per browser.
+- Text colours for every map and heat-map step, checked for contrast.
+- The page title names the view ("Executive view" / "Analyst view") with a line of what it shows, so switching modes is visible at the top, also on a phone.
+
+### Changed
+- Analyst skeletons hold the radar and the heat map too, so an Analyst link does not grow on load.
+
 ## [0.7.0] - Unreleased
 
 ### Added

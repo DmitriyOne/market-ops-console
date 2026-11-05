@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: superpowers:executing-plans (owner's usual flow: build → owner check → review → owner check). Steps use `- [ ]`.
 
-**Status:** built on `feature/0.7.0/analyst-table` (2026-11-04); three owner checks and an independent branch review done (see Owner decisions); waiting for the owner's last look and push.
+**Status:** built on `feature/0.7.0/analyst-table` (2026-11-04); three owner checks and an independent branch review done (see Owner decisions); merged into `develop` with `release/0.7.0` (PRs #21, #22).
 
 **Goal.** Analyst mode gets the brief's "dense tables": a markets table with
 every KPI, sort, a markets filter fed by the map ("brush … and the table

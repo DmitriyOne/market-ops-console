@@ -12,6 +12,14 @@ export {
   normalizeDashboardState,
   RANGES,
 } from './model/dashboard-state';
+export {
+  type HeatCell,
+  heatMap,
+  type HeatMapView,
+  type HeatMetric,
+  type HeatNotice,
+  type HeatRow,
+} from './model/heat-map';
 export { ISO3_TO_NUMERIC } from './model/iso-numeric';
 export { computeKpis, type KpiName, type Kpis, type KpiSource, type KpiValue } from './model/kpis';
 export {
@@ -21,6 +29,7 @@ export {
   type MapScale,
   type ScaleMetric,
   type ScaleStep,
+  scaleSteps,
 } from './model/map-scale';
 export {
   type MapItem,
@@ -52,6 +61,17 @@ export {
 } from './model/markets-table';
 export { type OverviewKpis, overviewKpis, type RiskCount } from './model/overview';
 export { periodToDate } from './model/period';
+export {
+  comparisonRadar,
+  RADAR_AXES,
+  RADAR_LIMIT,
+  type RadarAxis,
+  type RadarAxisNotice,
+  type RadarBasis,
+  type RadarSeries,
+  type RadarValue,
+  type RadarView,
+} from './model/radar';
 export { getMarket, getProduct, getRegion, scopeLabel } from './model/reference';
 export {
   isLatestSnapshot,
@@ -69,5 +89,6 @@ export { type TrendAnomaly, type TrendView, trendView } from './model/trend-view
 export { useDashboard } from './model/use-dashboard';
 export { type DashboardFocus, useDashboardFocus } from './model/use-dashboard-focus';
 export { DatasetGate } from './ui/DatasetGate';
+export { toneFill, toneText } from './ui/scale-tone';
 export { StatusChip, StatusIcon, useStatusLabel } from './ui/StatusChip';
 export { useKpiFormat } from './ui/use-kpi-format';

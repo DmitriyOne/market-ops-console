@@ -204,7 +204,15 @@
     "resetHint": "Portfolio, letzter Monat, Management"
   },
   "overview": {
-    "summary": "{markets, plural, one {# Markt} other {# Märkte}} · {products, plural, one {# Produkt} other {# Produkte}} · neueste Daten {period}"
+    "summary": "{markets, plural, one {# Markt} other {# Märkte}} · {products, plural, one {# Produkt} other {# Produkte}} · neueste Daten {period}",
+    "modeBadge": {
+      "executive": "Ansicht Management",
+      "analyst": "Ansicht Analyse"
+    },
+    "modeNote": {
+      "executive": "Das Wichtigste: KPIs, Marktstatus, Risiken und Umsatztrend.",
+      "analyst": "Zusätzlich unten: Kartenkennzahl, Vergleichsnetz, Markttabelle und Heatmap."
+    }
   },
   "kpi": {
     "title": "Kennzahlen",
@@ -350,6 +358,77 @@
     "notePerProduct": "Marktanteil gibt es nicht pro Produkt.",
     "noteCalculated": "Alle Werte sind aus Monatsdaten berechnet, daher geht jede Zeile auf und die Summe ist die Summe der Zeilen. Anteil und Status sind die gespeicherten Werte des letzten Monats; die Kacheln zeigen gespeicherte KPIs, die um etwa 1 Punkt abweichen können.",
     "anomaly": "Anomalie, {period}: {note}"
+  },
+  "heatMap": {
+    "title": "Heatmap",
+    "subtitle": "{metric} nach Monat",
+    "notice": {
+      "statusPerMonth": "Der Status liegt nur für den letzten Monat vor; die Heatmap zeigt das Wachstum ggü. Vorjahr.",
+      "sharePerMonth": "Der Marktanteil liegt nur für den letzten Monat vor; die Heatmap zeigt das Wachstum ggü. Vorjahr."
+    },
+    "gridLabel": "{metric} nach Markt und Monat",
+    "market": "Markt",
+    "cell": "{market}, {month}: {value}",
+    "stepBelow": "unter {to}",
+    "stepBetween": "{from} – {to}",
+    "stepAbove": "ab {from}",
+    "anomaly": "Auffälligkeit: {note}",
+    "selected": "ausgewählt",
+    "current": "gerade geöffnet",
+    "inWindow": "im gewählten Zeitraum",
+    "open": "{market} öffnen, {month}",
+    "add": "{market} zur Auswahl hinzufügen",
+    "remove": "{market} aus der Auswahl entfernen",
+    "pick": "Wählen Sie eine Zelle, um ihren Wert zu sehen.",
+    "hint": "Pfeiltasten bewegen, Enter öffnet den Markt in diesem Monat, Umschalt+Klick oder Umschalt+Enter wählt ihn aus.",
+    "showTable": "Als Tabelle anzeigen",
+    "showChart": "Als Diagramm anzeigen",
+    "caption": "{metric} nach Monat für {scope}",
+    "legend": "Legende",
+    "noteCalculated": "Aus den Monatsreihen berechnet: Werte können um etwa einen Punkt von den gespeicherten KPIs abweichen.",
+    "perProduct": "Werte für {product}.",
+    "revenueUnit": "Umsatz in US-Dollar.",
+    "anomalyMarket": "Auffälligkeit im ganzen Markt: {note}",
+    "anomalies": "Auffälligkeiten",
+    "anomalyMark": "Auffälligkeit"
+  },
+  "radar": {
+    "title": "Vergleich",
+    "basis": {
+      "selection": "Ausgewählte Märkte im Vergleich zum Portfolio",
+      "market": "{market} und seine Nachbarn in {region} im Vergleich zum Portfolio",
+      "region": "Märkte in {region} im Vergleich zum Portfolio",
+      "regions": "Regionen im Vergleich zum Portfolio"
+    },
+    "portfolio": "Portfolio-Durchschnitt",
+    "compared": "Verglichen",
+    "axis": {
+      "growth": "Wachstum ggü. VJ",
+      "attainment": "Planerfüllung",
+      "share": "Marktanteil",
+      "revenue": "Umsatz",
+      "momentum": "Dynamik"
+    },
+    "scaleMarkets": "Jede Achse reicht vom schwächsten (Mitte) bis zum stärksten (Rand) der 13 Märkte.",
+    "scaleRegions": "Jede Achse reicht von der schwächsten (Mitte) bis zur stärksten (Rand) der 4 Regionen.",
+    "momentumNote": "Dynamik: Wachstum ggü. Vorjahr in den letzten 3 Monaten minus die 3 Monate davor, in Prozentpunkten.",
+    "removed": {
+      "shareLatestOnly": "Der Marktanteil liegt nur für den letzten Monat vor; seine Achse fehlt.",
+      "momentumTooEarly": "Die Dynamik braucht sechs Monate Daten; ihre Achse fehlt."
+    },
+    "hidden": {
+      "selection": "Die ersten {shown} von {total} ausgewählten Märkten.",
+      "neighbours": "{shown} von {total} Märkten in {region}."
+    },
+    "productIgnored": "Vergleicht Märkte, nicht Produkte: {product} gilt hier nicht.",
+    "pickHint": "Um andere Märkte zu vergleichen, klicken Sie sie mit Umschalt auf der Karte an oder wählen Sie sie im Tabellenfilter.",
+    "tooFewAxes": "Zu wenige Achsen mit Daten für ein Diagramm; die Tabelle zeigt die Werte.",
+    "showTable": "Als Tabelle anzeigen",
+    "showChart": "Als Diagramm anzeigen",
+    "caption": "{names} im Vergleich zum Portfolio-Durchschnitt, {window}",
+    "chartLabel": "Netzdiagramm: {names} im Vergleich zum Portfolio-Durchschnitt",
+    "pp": "{value} Pp.",
+    "legend": "Legende"
   },
   "exportMarkets": {
     "button": "Exportieren",

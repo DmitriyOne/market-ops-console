@@ -140,3 +140,26 @@ describe.each([':root', '.dark'])('map scales in %s', (selector) => {
     expect(deltaE(theme, 'map-sea', 'map-land')).toBeGreaterThan(2);
   });
 });
+
+const steps = [...diverging, ...sequential];
+const series = ['1', '2', '3', '4'].map((n) => `series-${n}`);
+
+describe.each([':root', '.dark'])('heat-map cells and radar series in %s', (selector) => {
+  const theme = readTheme(selector);
+
+  it.each(steps)('text on %s meets 4.5:1', (step) => {
+    expect(contrast(theme, `${step}-foreground`, step)).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it.each(series)('%s on the card meets 3:1', (name) => {
+    expect(contrast(theme, name, 'card')).toBeGreaterThanOrEqual(3);
+  });
+
+  it('the radar series differ by ΔE ≥ 15', () => {
+    for (const [i, x] of series.entries()) {
+      for (const y of series.slice(i + 1)) {
+        expect(deltaE(theme, x, y), `${x} vs ${y}`).toBeGreaterThanOrEqual(15);
+      }
+    }
+  });
+});

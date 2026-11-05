@@ -69,14 +69,25 @@ describe('Overview', () => {
     expect(screen.getAllByText(en.kpi.latestOnly).length).toBeGreaterThan(0);
   });
 
-  it('Analyst adds the markets table; Executive does not', async () => {
+  it('Analyst adds the radar by Top risks, the table, then the heat map; Executive does not', async () => {
     server.use(datasetHandler());
     const { unmount } = renderWithProviders(<Overview />, { searchParams: '?mode=analyst' });
-    expect(await screen.findByRole('region', { name: en.marketsTable.title })).toBeInTheDocument();
+    const table = await screen.findByRole('region', { name: en.marketsTable.title });
+    const heat = await screen.findByRole('region', { name: en.heatMap.title });
+    const radar = await screen.findByRole('region', { name: en.radar.title });
+    const risks = screen.getByRole('region', { name: en.topRisks.title });
+    const after = (a: Element, b: Element) =>
+      Boolean(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+    // Top risks, then the radar under it (same column), the table, the heat map.
+    expect(after(risks, radar)).toBe(true);
+    expect(after(radar, table)).toBe(true);
+    expect(after(table, heat)).toBe(true);
     unmount();
     renderWithProviders(<Overview />);
     await screen.findByRole('heading', { level: 1, name: 'Portfolio' });
-    expect(screen.queryByRole('region', { name: en.marketsTable.title })).not.toBeInTheDocument();
+    for (const name of [en.marketsTable.title, en.heatMap.title, en.radar.title]) {
+      expect(screen.queryByRole('region', { name })).not.toBeInTheDocument();
+    }
   });
 
   it('the <html> mark follows the mode, so later skeletons have its shape', async () => {
@@ -90,10 +101,10 @@ describe('Overview', () => {
     expect(document.documentElement).not.toHaveAttribute('data-mode');
   });
 
-  it('the static skeleton has the table, shown only for an Analyst link (no jump)', () => {
+  it('the static skeleton has the radar, table and heat map, shown only for an Analyst link (no jump)', () => {
     const { container } = renderWithProviders(<OverviewSkeleton />);
     const analystOnly = container.querySelectorAll('.mode-analyst\\:block');
-    expect(analystOnly).toHaveLength(1);
-    expect(analystOnly[0]?.className).toContain('hidden');
+    expect(analystOnly).toHaveLength(3);
+    for (const block of analystOnly) expect(block.className).toContain('hidden');
   });
 });
