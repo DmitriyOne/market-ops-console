@@ -3,7 +3,9 @@ import type { ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 const inserted: (() => ReactNode)[] = [];
-vi.mock('next/navigation', () => ({
+// Only the hook is replaced: next-intl's navigation needs the rest.
+vi.mock(import('next/navigation'), async (importOriginal) => ({
+  ...(await importOriginal()),
   useServerInsertedHTML: (callback: () => ReactNode) => {
     inserted.push(callback);
   },

@@ -37,7 +37,7 @@ registry (`pnpm dlx shadcn@latest search <name>`), and only then a new one,
 after asking the owner.
 
 **Checks before every commit:** `pnpm format && pnpm lint && pnpm typecheck
-&& pnpm test`; `pnpm build` must stay static for all four locales.
+&& pnpm test` (and `pnpm e2e` when a user flow can change); `pnpm build` must stay static for all four locales.
 
 The block below is written and kept up to date by `next dev`; edit only
 outside its markers.

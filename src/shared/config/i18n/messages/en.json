@@ -243,8 +243,8 @@
   },
   "marketStatus": {
     "title": "Market status",
-    "tile": "{code} {name}, {status}, attainment {value}",
-    "tileNoStatus": "{code} {name}, attainment {value}",
+    "tile": "{code} {value} attainment, {name}, {status}",
+    "tileNoStatus": "{code} {value} attainment, {name}",
     "current": "open now",
     "selected": "selected",
     "hatched": "hatched",
@@ -374,6 +374,7 @@
     "gridLabel": "{metric} by market and month",
     "market": "Market",
     "cell": "{market}, {month}: {value}",
+    "cellRounded": "{market}, {month}: {shown} ({value})",
     "stepBelow": "below {to}",
     "stepBetween": "{from} – {to}",
     "stepAbove": "{from} and above",

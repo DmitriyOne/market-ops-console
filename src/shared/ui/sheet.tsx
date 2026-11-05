@@ -47,6 +47,7 @@ function SheetContent({
   children,
   side = 'right',
   showCloseButton = true,
+  onInteractOutside,
   ...props
 }: React.ComponentProps<typeof SheetPrimitive.Content> & {
   side?: 'top' | 'right' | 'bottom' | 'left';
@@ -64,6 +65,14 @@ function SheetContent({
           className,
         )}
         {...props}
+        onInteractOutside={(event) => {
+          // A toast's button (Retry, Show) sits outside the sheet but acts on
+          // what it shows: pressing it must not close the sheet.
+          if (event.target instanceof Element && event.target.closest('[data-sonner-toaster]')) {
+            event.preventDefault();
+          }
+          onInteractOutside?.(event);
+        }}
       >
         {children}
         {showCloseButton && (

@@ -3,7 +3,9 @@ import '@testing-library/jest-dom/vitest';
 import { cleanup } from '@testing-library/react';
 import { afterAll, afterEach, beforeAll, vi } from 'vitest';
 
-import { server } from '@/shared/lib/test';
+// The server only: the helpers' barrel pulls providers, dictionaries and the
+// fixtures into every file, pure-logic tests too (~0.2 s each on CI).
+import { server } from '@/shared/lib/test/msw';
 
 // Vitest runs without globals, so Testing Library cannot unmount on its own.
 afterEach(() => {

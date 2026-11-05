@@ -3,6 +3,7 @@ import nextVitals from 'eslint-config-next/core-web-vitals';
 import nextTs from 'eslint-config-next/typescript';
 import prettier from 'eslint-config-prettier';
 import i18next from 'eslint-plugin-i18next';
+import playwright from 'eslint-plugin-playwright';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import tseslint from 'typescript-eslint';
 
@@ -43,6 +44,20 @@ export default defineConfig([
       ],
     },
   },
+  {
+    // End-to-end tests (ADR 0008): Playwright's own rules on top of the above.
+    files: ['e2e/**/*.ts'],
+    ...playwright.configs['flat/recommended'],
+  },
   prettier,
-  globalIgnores(['.next/**', 'out/**', 'build/**', 'coverage/**', 'next-env.d.ts', 'reference/**']),
+  globalIgnores([
+    '.next/**',
+    'out/**',
+    'build/**',
+    'coverage/**',
+    'next-env.d.ts',
+    'reference/**',
+    'playwright-report/**',
+    'test-results/**',
+  ]),
 ]);

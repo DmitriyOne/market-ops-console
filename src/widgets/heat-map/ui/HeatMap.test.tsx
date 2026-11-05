@@ -35,7 +35,8 @@ describe('HeatMap', () => {
     expect(screen.getByText(t.notice.statusPerMonth)).toBeInTheDocument();
     const g = await grid();
     expect(within(g).getAllByRole('rowheader')).toHaveLength(13);
-    const dip = cell(/^Germany, Mar 2026: -31\.\d%/);
+    // The visible figure, then the exact one (label in name, WCAG 2.5.3).
+    const dip = cell(/^Germany, Mar 2026: -31% \(-31\.\d%\)/);
     expect(dip).toHaveAccessibleName(/anomaly: Revenue fell 27% versus the prior month/);
     expect(dip).toHaveTextContent('-31%');
   });

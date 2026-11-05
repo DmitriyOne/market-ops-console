@@ -309,3 +309,10 @@
     cursor: not-allowed;
   }
 }
+
+/* A modal (the alerts sheet) sets pointer-events: none on <body>, which the
+   toasts inherit; visible ones take clicks back, so Retry and Show work over
+   it. Hidden ones (past sonner's visible three) stay inert. */
+[data-sonner-toast][data-visible='true'] {
+  pointer-events: auto;
+}
