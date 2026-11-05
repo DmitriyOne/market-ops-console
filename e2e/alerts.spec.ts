@@ -59,3 +59,29 @@ test('a failed save rolls back with the reason, and Retry saves it', async ({ pa
   await sheet.getByRole('radio', { name: /^Rules/ }).click();
   await expect(sheet.getByRole('switch', { name: 'Rule on: Share below 10%' })).not.toBeChecked();
 });
+
+test('a failed save offers Retry in the row, reachable by keyboard inside the modal sheet', async ({
+  page,
+}) => {
+  await page.goto('/dashboard?tab=alerts');
+  const sheet = page.getByRole('dialog', { name: 'Alerts' });
+  await sheet.getByRole('radio', { name: /^Rules/ }).click();
+  await sheet.getByRole('switch', { name: 'Fail the next save (demo)' }).click();
+  const share = sheet.getByRole('switch', { name: 'Rule on: Share below 10%' });
+  await share.focus();
+  await page.keyboard.press('Space');
+  const row = sheet.getByRole('listitem').filter({ hasText: 'Share below 10%' });
+  await expect(row).toContainText('Not saved. Simulated failure (demo switch).');
+  await expect(share).toBeChecked();
+
+  await page.keyboard.press('Tab');
+  await expect(row.getByRole('button', { name: 'Retry: Share below 10%' })).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(row).toBeFocused();
+  await expect(share).not.toBeChecked();
+  await expect(row).not.toContainText('Saving…');
+  await expect(row).not.toContainText('Not saved');
+  await page.reload();
+  await sheet.getByRole('radio', { name: /^Rules/ }).click();
+  await expect(sheet.getByRole('switch', { name: 'Rule on: Share below 10%' })).not.toBeChecked();
+});

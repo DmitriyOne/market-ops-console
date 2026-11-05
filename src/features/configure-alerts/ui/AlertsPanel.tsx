@@ -11,7 +11,7 @@ import { Button, Label, Skeleton, Switch, ToggleGroup, ToggleGroupItem } from '@
 
 import { newRuleValues, toFormValues } from '../model/rule-form';
 import { useSimulateFailure } from '../model/simulate-failure';
-import { useRuleMutations, useSavingIds } from '../model/use-rule-mutations';
+import { useFailedWrites, useRuleMutations, useSavingIds } from '../model/use-rule-mutations';
 import { DeleteRuleDialog } from './DeleteRuleDialog';
 import { RuleForm } from './RuleForm';
 import { RuleList } from './RuleList';
@@ -45,7 +45,8 @@ export function AlertsPanel({ firing, tab, onTabChange, onSaved }: AlertsPanelPr
   const rules = useAlertRules();
   const flags = useAlertFlags(ds);
   const saving = useSavingIds();
-  const { create, update, toggle, remove } = useRuleMutations();
+  const failed = useFailedWrites();
+  const { create, update, toggle, remove, retry, dismiss } = useRuleMutations();
   const [simulate, setSimulate] = useSimulateFailure();
   const [form, setForm] = useState<Form>(null);
   const [deleting, setDeleting] = useState<AlertRule | null>(null);
@@ -181,6 +182,9 @@ export function AlertsPanel({ firing, tab, onTabChange, onSaved }: AlertsPanelPr
               setForm({ kind: 'edit', rule });
             }}
             onDelete={setDeleting}
+            failed={failed}
+            onRetry={retry}
+            onDismiss={dismiss}
           />
         )}
       </div>

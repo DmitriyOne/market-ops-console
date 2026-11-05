@@ -106,10 +106,19 @@ test('heat map: Back to a scope without the focused row keeps focus in the grid'
   await expect(title(page)).toHaveText('Portfolio');
 
   const grid = page.getByRole('grid', { name: /by market and month/ });
-  await grid.getByRole('button', { name: /^Japan, May 2026/ }).focus();
+  // A cell by its row and column headers (its own name is only the value).
+  const cell = async (market: string, month: string) => {
+    const headers = await grid.getByRole('columnheader').allTextContents();
+    const col = headers.findIndex((h) => h.startsWith(month));
+    const row = grid.getByRole('row').filter({
+      has: page.getByRole('rowheader', { name: new RegExp(`^${market}`) }),
+    });
+    return row.getByRole('button').nth(col - 1);
+  };
+  await (await cell('Japan', 'May 26')).focus();
   await page.goBack();
   await expect(title(page)).toHaveText('Europe');
-  await expect(grid.getByRole('button', { name: /^Japan/ })).toHaveCount(0);
+  await expect(grid.getByRole('rowheader', { name: /^Japan/ })).toHaveCount(0);
   // Focus lands on the clamped row: Europe's last market, same month.
-  await expect(grid.getByRole('button', { name: /^United Kingdom, May 2026/ })).toBeFocused();
+  await expect(await cell('United Kingdom', 'May 26')).toBeFocused();
 });

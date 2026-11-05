@@ -211,7 +211,10 @@ export function HeatGrid({ view, period, label, onOpen, onToggle }: Props) {
                       inWindow && 'rounded-t-sm bg-foreground font-semibold text-background',
                     )}
                   >
-                    {h.monthShort(p)}
+                    {/* "Mar 26" on screen; the whole month for a screen reader,
+                        as it is the only place a cell's month is said. */}
+                    <span aria-hidden>{h.monthShort(p)}</span>
+                    <span className="sr-only">{h.month(p)}</span>
                     {inWindow ? <span className="sr-only">{`, ${t('inWindow')}`}</span> : null}
                   </th>
                 );
@@ -228,7 +231,6 @@ export function HeatGrid({ view, period, label, onOpen, onToggle }: Props) {
                   return (
                     <td key={c.period} className={cn('p-0.5', c.inWindow && 'bg-foreground')}>
                       <CellButton
-                        row={row}
                         cell={c}
                         metric={view.metric}
                         marketNotes={view.marketNotes}
@@ -295,7 +297,6 @@ function RowHeader({ row }: { row: HeatRow }) {
 }
 
 type CellProps = {
-  row: HeatRow;
   cell: HeatCell;
   metric: HeatMapView['metric'];
   marketNotes: boolean;
@@ -308,7 +309,6 @@ type CellProps = {
 };
 
 function CellButton({
-  row,
   cell,
   metric,
   marketNotes,
@@ -327,7 +327,7 @@ function CellButton({
       ref={ref}
       type="button"
       tabIndex={tabbable ? 0 : -1}
-      aria-label={h.cellName(row, cell)}
+      aria-label={h.cellName(cell)}
       // A fill and its ink from the scale tokens (SVG-style source tokens).
       style={
         tone === undefined

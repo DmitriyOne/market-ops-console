@@ -8,7 +8,6 @@ Format: **Item**: what is wrong (file). Why it can wait. Where it goes.
 
 - **SSE errors lose detail**: `streamSse` drops the API error `code` from a non-2xx JSON body and does not check that `Content-Type` is `text/event-stream` (`src/shared/api/http/stream-sse.ts`). No UI reads it yet; not done in Plan 2. **Hardening plan**, hardening.
 - **Arbitrary Tailwind values in shadcn components** (`src/shared/ui/*`), against `.claude/rules/ui.md`. Generated code. **Design pass**, with the semantic tokens.
-- **Offline overlay does not return focus** to where it was after closing (`src/features/network-status/ui/OfflineGuard.tsx`). **Hardening plan**, accessibility pass.
 
 ## From the design pass (2026-11-03)
 
@@ -17,7 +16,7 @@ Format: **Item**: what is wrong (file). Why it can wait. Where it goes.
 
 ## From Plan 2 (assistant, 2026-11-03)
 
-- **No screen-reader pass yet**: the Plan 2 audit was by code and contrast tests. Since 0.10.0 axe scans the rendered panel with an answer (E2E); a screen-reader pass (streaming announcements, `aria-busy` log) is still manual. **Hardening plan**, accessibility pass.
+- **No screen-reader pass yet**: the Plan 2 audit was by code and contrast tests. Since 0.10.0 axe scans the rendered panel with an answer (E2E); a screen-reader pass (streaming announcements, `aria-busy` log) is still manual. Since 0.11.0 heat-map cells say only their value and rely on the row and column headers being read as focus moves (NVDA and JAWS do in a grid; VoiceOver not tried). **Owner check**, with VoiceOver.
 - **`summary-long` scroll behaviour tested only at hook level** (`use-stick-to-bottom.test.tsx`); no test scrolls the real panel while it streams. **Hardening plan**, in the Playwright happy path or manually.
 
 ## From the owner review of 0.4.0 (2026-11-03)
@@ -32,7 +31,7 @@ Format: **Item**: what is wrong (file). Why it can wait. Where it goes.
 
 ## From the owner check of 0.5.0 (2026-11-04)
 
-- **No favicon**: every page requests `/favicon.ico` and gets a 404 (console error in the browser). Add an `app/icon.svg` (or `favicon.ico`) in the app's style. **Hardening plan**, polish before the README.
+- **No favicon**: every page requests `/favicon.ico` and gets a 404 (console error in the browser). Add an `app/icon.svg` (or `favicon.ico`) in the app's style. **0.12.0, with the deploy** (owner, 2026-11-05: together with the title, description and preview image).
 
 ## README notes (owner, 2026-11-04)
 
@@ -52,8 +51,6 @@ Points the owner wants explained in the README, in his own words:
 - **Touch flow checked in unit tests and Chrome emulation only**, not on a real phone (pinch, tap tooltip, page scroll over the map). **Owner check**.
 - **Europe is small at world zoom** in the narrow card column; markets stay reachable by Tab, zoom buttons and the table. Revisit if the layout gives the map more width.
 - **Review of 0.6.0 map, deferred** (2026-11-04):
-  - Focus ring on a market is partly covered by neighbours and the pattern layer drawn later; draw a separate focus outline on top. **Hardening plan**, a11y polish.
-  - When zoomed in, Tab can focus a market outside the view; fly to it on focus if off-screen. **Hardening plan**.
   - Status metric with a product: tooltip shows the product's attainment next to the market's status; only the note under the card says status is per market. Owner decision №9; add the note to the tooltip if users misread it.
   - "Back returns to the old market with the product": covered by the E2E history test (0.10.0). Closed.
 
@@ -75,28 +72,29 @@ Points the owner wants explained in the README, in his own words:
 ## From the 0.8.0 heat map and radar (2026-11-05)
 
 - **Radar colours follow the selection order**, not the market: removing the first selected market moves the others to the next colour (dataviz rule "colour follows the entity"). Four slots for 13 markets cannot be fixed per market; a stable slot per selection would need memory outside the URL. Legend, dash and marker always match. **Design pass**, if it confuses.
-- **Heat-map cell names repeat for each of the 312 buttons** (market, month, value, anomaly); a screen reader reads the row header too, so the market name is said twice. Row and column headers would carry it if the cells were `gridcell`s instead of buttons. **Hardening plan**, a11y pass with a screen reader.
 - **Heat-map focus fallback**: covered by the E2E history test (0.10.0: Back from the portfolio to Europe with focus on Japan keeps focus on the clamped row, United Kingdom). Closed.
 - **A radar series without a value on a kept axis** would be drawn by Recharts at the centre (as "worst"). Cannot happen with this data (no zero forecast or prior year). Drop the axis or the series if it ever can. **Hardening plan**.
 - **Heat-map and radar checked in jsdom only** (no browser run this round; the owner checked on his phone): layout at xl with the assistant open, phone scroll to the selected month, the Recharts radar's look in both themes. **Owner check**.
 
 ## From the 0.9.0 alerts build (2026-11-05)
 
-- **A Retry from the rollback toast resends the change as it was**: for an edit or a toggle, a rule changed again in between gets the older version back. Rare (two edits of one rule inside one failed save). **Hardening plan**, if it shows.
+- **A Retry (the toast's, or the row's since 0.11.0) resends the change as it was**: for an edit or a toggle, a rule changed again in between gets the older version back. Rare (two edits of one rule inside one failed save). **Hardening plan**, if it shows.
 - **Two writes to one rule in flight** (toggle twice before the first answer): each undoes only itself, but a failed first write puts back its `previous`, which the second had already replaced. Writes now go one at a time (mutation `scope`) and the list is refetched when the last one settles, so the server's state wins in the end. **Accepted**.
 - **The alerts route has no input limits** (agent review, 2026-11-05): no cap on the body size or on `marketIds` (count, duplicates, unknown ids), `regionId` not checked against the dataset. A crafted POST with 3,000 ids got 201 and a 46 KB cookie the browser drops, so a reported success stores nothing; only the sender's own data is affected. **Accepted for the mock (owner, 2026-11-05)**; the README says a production API over live data needs input limits and rate limiting.
 - **The threshold field reads "1,000" as 1** in English, and "5." or "1.000,5" say "required" instead of "not a number" (`parseThreshold`). Nobody types a thousands separator in a field that holds up to 200 % or a few million dollars. **Accepted (owner, 2026-11-05)**.
 - **A revenue threshold is shown with one decimal** ("$1.3M" for 1.25 M$, `useThresholdFormat` uses `compactCurrency`), in the rule list and the Firing reasons. Fixed (owner, 2026-11-05): a `thresholdCurrency` format with two decimals shows it as typed. Closed.
-- **The anomaly ⚠ in the markets table has a hover tooltip only**, so a touch screen can't read its note (the alert bell next to it became a popover in 0.9.0). Same fix if wanted. **Hardening plan**.
 - **Alerts checked in the browser (Playwright on the dev server, 2026-11-05)**: Back after closing the sheet (X, Escape, overlay; a deep link), two quick writes kept after a reload, the saved toast while another rule is switched, ru examples kept after a write, focus after a delete and on a missing market, 44 px rows and switch, the table bell on a tap (touch emulation). Not checked: a real phone, the keyboard open over the form. **Owner check**.
 
 ## From the 0.10.0 E2E build (2026-11-05)
 
-- **Unit tests take ~5 min in CI** (279 s on the 2-core runner). Done in 0.10.0 (owner, 2026-11-05), measured locally with `--maxWorkers=2`: 72 s → 58 s (−19 %): the setup file imports only the MSW server (the helpers' barrel loaded providers, dictionaries and fixtures into every file), and logic tests run in `node` (Vitest projects). `pool: 'threads'` gave nothing (72.6 s). What is left is the component tests' own work (64 %); `happy-dom` would need a new dependency and a compatibility check with Radix and user-event. The CI time is to be confirmed on the next PR into `develop`.
-- **The E2E run on Vercel previews** (`deployment_status`, `BASE_URL` = the preview URL, filtered to `release/*` previews to spare minutes; protection bypass or Trusted Sources) comes with the deploy. **Deploy release**.
-- **The CI E2E step is untested live**: the workflow was checked by parsing it, not by a run; the first PR into `develop` is its test. **Owner check**.
-- **Keyboard users cannot reach a toast while the alerts sheet is open**: the sheet is modal and keeps focus inside (Radix focus trap), so Retry and Show in a toast are mouse/touch only there; the toast is still announced, and the rule row itself can be switched again. A non-modal sheet, or the action repeated inside the panel, would fix it. **Hardening plan**, a11y pass.
+- **The E2E run on Vercel previews** (`deployment_status`, `BASE_URL` = the preview URL, filtered to `release/*` previews to spare minutes; protection bypass or Trusted Sources) comes with the deploy. **0.12.0**.
 - **The phone tab's name reads "Alerts , 5 markets flagged"** in Chromium (a space before the comma from the inline count). Screen readers ignore it. Cosmetic.
+
+## From the 0.11.0 review (2026-11-05)
+
+- **The alerts sheet stays usable behind the offline notice**: it is portalled outside the wrapper the notice makes inert, and Radix keeps focus inside it, so the keyboard can still switch rules while offline (pre-existing). Mark portalled layers inert too, or close the sheet's focus trap while offline. **Hardening plan**.
+- **A failure shown in the panel is forgotten after ~5 minutes**: failed writes keep TanStack's default `gcTime` (5 min); only the newest stays while the panel is open, and the toast is gone long before. Set a `gcTime` on the write mutation if it matters. **Accepted**.
+- **"Not saved. " with an empty reason** (`alerts.failed.update/remove` when `errorMessage` gives `''`): never seen, every failure has a reason. Cosmetic.
 
 ## Currency picker (owner, 2026-11-04) — after the required work, its own release before the README
 
