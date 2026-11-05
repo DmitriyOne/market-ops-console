@@ -23,6 +23,18 @@ export function useThresholdFormat(): (metric: AlertMetric, value: number) => st
   );
 }
 
+/** A market's figure as the dashboard shows it: "8.9%", "−9.7%", "$1.7M". */
+export function useMetricValueFormat(): (metric: AlertMetric, value: number) => string {
+  const format = useFormatter();
+  return useCallback(
+    (metric, value) =>
+      metric === 'revenue'
+        ? format.number(value, 'compactCurrency')
+        : format.number(value / 100, metric === 'growth' ? 'signedPercent' : 'percent'),
+    [format],
+  );
+}
+
 /** A rule in plain words: "Attainment below 95% · Europe". */
 export function useRuleText(ds: Dataset) {
   const t = useTranslations('alerts');

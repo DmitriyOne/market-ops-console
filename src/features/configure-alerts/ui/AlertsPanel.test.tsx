@@ -176,6 +176,20 @@ describe('AlertsPanel', () => {
     expect(screen.getByRole('switch', { name: t.simulate.label })).not.toBeChecked();
   });
 
+  it('a rule being saved is dimmed, busy and says "Saving…" until the server answers', async () => {
+    const { user, api } = setup();
+    await rulesList();
+    const release = api.hold();
+    await user.click(screen.getByRole('switch', { name: 'Rule on: Share below 10%' }));
+    const row = within(await rulesList()).getAllByRole('listitem')[1];
+    expect(row).toHaveAttribute('aria-busy', 'true');
+    expect(row).toHaveTextContent(t.list.saving);
+    release();
+    await waitFor(() => {
+      expect(row).not.toHaveAttribute('aria-busy');
+    });
+  });
+
   it('a list that fails to load says so with Try again', async () => {
     server.use(datasetHandler());
     const api = alertsApi();

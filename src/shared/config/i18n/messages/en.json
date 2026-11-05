@@ -575,6 +575,14 @@
     "simulate": {
       "label": "Fail the next save (demo)",
       "hint": "The next change fails on purpose, so you can see it rolled back."
-    }
+    },
+    "triggered": {
+      "title": "{count, plural, =0 {Firing now ({period})} one {Firing now: # market ({period})} other {Firing now: # markets ({period})}}",
+      "none": "No rule flags a market now.",
+      "reason": "{metric} {value} · {rule}",
+      "open": "Open {name}",
+      "show": "Show"
+    },
+    "saved": "{enabled, select, false {Saved “{name}” (off).} other {{count, plural, =0 {Saved “{name}”: it flags no markets now.} one {Saved “{name}”: it flags # market now.} other {Saved “{name}”: it flags # markets now.}}}}"
   }
 }

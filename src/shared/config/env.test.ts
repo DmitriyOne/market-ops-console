@@ -6,8 +6,8 @@ import { serverEnvSchema } from './env';
 const server = z.object(serverEnvSchema);
 
 describe('serverEnvSchema', () => {
-  it('defaults the token delay to 35 ms and the alerts delay to 600 ms', () => {
-    expect(server.parse({})).toEqual({ MOCK_TOKEN_DELAY_MS: 35, MOCK_ALERTS_DELAY_MS: 600 });
+  it('defaults the token delay to 35 ms and the alerts delay to 1200 ms', () => {
+    expect(server.parse({})).toEqual({ MOCK_TOKEN_DELAY_MS: 35, MOCK_ALERTS_DELAY_MS: 1200 });
   });
 
   it('coerces "0" to 0', () => {

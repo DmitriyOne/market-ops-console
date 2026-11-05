@@ -575,6 +575,14 @@
     "simulate": {
       "label": "Nächstes Speichern scheitern lassen (Demo)",
       "hint": "Die nächste Änderung schlägt absichtlich fehl, damit Sie das Zurücksetzen sehen."
-    }
+    },
+    "triggered": {
+      "title": "{count, plural, =0 {Aktuell ausgelöst ({period})} one {Aktuell ausgelöst: # Markt ({period})} other {Aktuell ausgelöst: # Märkte ({period})}}",
+      "none": "Derzeit markiert keine Regel einen Markt.",
+      "reason": "{metric} {value} · {rule}",
+      "open": "{name} öffnen",
+      "show": "Anzeigen"
+    },
+    "saved": "{enabled, select, false {„{name}“ gespeichert (aus).} other {{count, plural, =0 {„{name}“ gespeichert: markiert derzeit keine Märkte.} one {„{name}“ gespeichert: markiert derzeit # Markt.} other {„{name}“ gespeichert: markiert derzeit # Märkte.}}}}"
   }
 }

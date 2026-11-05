@@ -131,12 +131,21 @@ export function useRuleMutations() {
 
   return useMemo(
     () => ({
-      create: (input: AlertRuleInput) => {
-        mutate({ kind: 'create', input, tempId: `saving-${crypto.randomUUID()}` });
+      /** `onSaved` runs once the server has the rule (the list already shows it). */
+      create: (input: AlertRuleInput, onSaved?: (rule: AlertRule) => void) => {
+        mutate(
+          { kind: 'create', input, tempId: `saving-${crypto.randomUUID()}` },
+          { onSuccess: (saved) => saved && onSaved?.(saved) },
+        );
       },
-      update: (rule: AlertRule) => {
+      update: (rule: AlertRule, onSaved?: (rule: AlertRule) => void) => {
         const previous = rules(client).find((r) => r.id === rule.id);
-        if (previous) mutate({ kind: 'update', rule, previous });
+        if (previous) {
+          mutate(
+            { kind: 'update', rule, previous },
+            { onSuccess: (saved) => saved && onSaved?.(saved) },
+          );
+        }
       },
       toggle: (rule: AlertRule) => {
         mutate({ kind: 'update', rule: { ...rule, enabled: !rule.enabled }, previous: rule });

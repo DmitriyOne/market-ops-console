@@ -2,7 +2,7 @@
 
 import { PlusIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useEffect, useId, useRef, useState } from 'react';
+import { type ReactNode, useEffect, useId, useRef, useState } from 'react';
 
 import { useAlertRules } from '@/entities/alert-rule';
 import { useDashboard, useKpiFormat } from '@/entities/performance';
@@ -34,7 +34,15 @@ export function useAlertsHeading(): { title: string; description: string } {
  * demo switch. Needs the dataset (inside Suspense); the frame (desktop
  * sheet or phone tab) gives the title.
  */
-export function AlertsPanel() {
+export function AlertsPanel({
+  summary,
+  onSaved,
+}: {
+  /** Shown above the rules in the list view (what the rules flag now). */
+  summary?: ReactNode;
+  /** After the server has a created or edited rule. */
+  onSaved?: (rule: AlertRule) => void;
+} = {}) {
   const t = useTranslations('alerts');
   const { ds, state } = useDashboard();
   const { period } = useKpiFormat();
@@ -74,8 +82,8 @@ export function AlertsPanel() {
         editing={editing !== null}
         onCancel={backToList}
         onSubmit={(input) => {
-          if (editing) update({ ...input, id: editing.id });
-          else create(input);
+          if (editing) update({ ...input, id: editing.id }, onSaved);
+          else create(input, onSaved);
           backToList();
         }}
       />
@@ -109,6 +117,8 @@ export function AlertsPanel() {
         </div>
       ) : (
         <>
+          {summary}
+          <h3 className="text-base font-semibold">{t('list.label')}</h3>
           <RuleList
             ds={ds}
             rules={list}

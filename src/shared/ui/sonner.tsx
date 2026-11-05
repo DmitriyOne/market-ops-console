@@ -50,7 +50,7 @@ function show(kind: 'success' | 'error', message: string, action?: ToastAction) 
 
 /** Short confirmations and failures; sonner announces them in its live region. */
 const toast = {
-  success: (message: string) => show('success', message),
+  success: (message: string, action?: ToastAction) => show('success', message, action),
   /** With `action`, a button in the toast (e.g. Retry after a rollback). */
   error: (message: string, action?: ToastAction) => show('error', message, action),
 };

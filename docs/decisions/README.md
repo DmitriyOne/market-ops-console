@@ -19,3 +19,4 @@ One file per decision: context, decision, alternatives, consequences. Status is 
 | [0013](0013-error-handling.md) | Error handling: typed errors, boundaries, one log | 2026-11-03 |
 | [0014](0014-design-direction.md) | Design: dashboard D, assistant A, fallback to dashboard A | 2026-11-03 |
 | [0015](0015-persisted-ui-state-before-paint.md) | Persisted UI state before first paint: inline `<head>` script | 2026-11-03 |
+| [0016](0016-alert-writes.md) | Alert writes: Route Handler + TanStack mutations, not Server Actions + `useOptimistic` | 2026-11-05 |

@@ -30,6 +30,11 @@ const VALUE: Record<AlertMetric, (m: Market) => number> = {
   revenue: (m) => m.kpis.revenue,
 };
 
+/** The figure a rule compares: the market's stored KPI for the latest month. */
+export function metricValue(market: Market, metric: AlertMetric): number {
+  return VALUE[metric](market);
+}
+
 function inScope(market: Market, scope: AlertRuleInput['scope']): boolean {
   if (scope.kind === 'portfolio') return true;
   if (scope.kind === 'region') return market.regionId === scope.regionId;

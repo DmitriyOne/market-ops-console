@@ -1,10 +1,11 @@
 'use client';
 
-import { PencilIcon, Trash2Icon } from 'lucide-react';
+import { LoaderCircleIcon, PencilIcon, Trash2Icon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { AlertMark, ruleMarkets, useRuleText } from '@/entities/alert-rule';
 import type { AlertRule, Dataset } from '@/shared/api';
+import { cn } from '@/shared/lib';
 import { Button, Switch } from '@/shared/ui';
 
 type RuleListProps = {
@@ -33,14 +34,19 @@ export function RuleList({ ds, rules, saving, onToggle, onEdit, onDelete }: Rule
         return (
           <li
             key={rule.id}
-            className="flex flex-col gap-2 border-t border-border py-3 first:border-t-0"
+            aria-busy={busy || undefined}
+            className={cn(
+              'flex flex-col gap-2 border-t border-border py-3 transition-opacity first:border-t-0',
+              busy && 'opacity-60',
+            )}
           >
             <div className="flex items-start gap-3">
               <div className="flex min-w-0 flex-1 flex-col gap-0.5">
                 <p className="font-semibold break-words">
                   {rule.name}
                   {busy ? (
-                    <span className="ml-2 text-xs font-normal text-muted-foreground">
+                    <span className="ml-2 inline-flex items-center gap-1 text-xs font-normal text-muted-foreground">
+                      <LoaderCircleIcon aria-hidden className="size-3.5 motion-safe:animate-spin" />
                       {t('list.saving')}
                     </span>
                   ) : null}
