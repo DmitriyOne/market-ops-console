@@ -4,7 +4,7 @@ A console for a commercial operations team: a **streaming AI assistant** that an
 
 Take-home assignment for the Frontend Engineer role at NewPage Solutions.
 
-> Status: `0.11.0` accessibility pass, built and reviewed, waiting for the owner's check. Done: foundation (0.2.0), design direction and tokens (0.3.0), assistant (0.4.0), dashboard shell (0.5.0), market map (0.6.0), Analyst markets table (0.7.0), heat map and radar (0.8.0), alerts (0.9.0), end-to-end tests (0.10.0). Next: deploy (0.12.0). Full list: `CHANGELOG.md`.
+> Status: `0.11.1` polish (shadcn values as tokens, the total row's tone, the share total in Excel, CI split into one check per job), built, waiting for the owner's check. Done: foundation (0.2.0), design direction and tokens (0.3.0), assistant (0.4.0), dashboard shell (0.5.0), market map (0.6.0), Analyst markets table (0.7.0), heat map and radar (0.8.0), alerts (0.9.0), end-to-end tests (0.10.0), accessibility pass (0.11.0). Next: deploy (0.12.0). Full list: `CHANGELOG.md`.
 
 ## What works now
 
@@ -80,7 +80,7 @@ reference/           reference mock SSE route from the starter pack
 
 ## Git flow
 
-`feature/X.Y.Z/NAME` (or `fix/X.Y.Z/NAME`) → `release/X.Y.Z` → `develop` → `master`. Work happens on `feature/X.Y.Z/NAME` branched from `release/X.Y.Z`, so the branch name says which release it belongs to; nobody commits to `release/*`, `develop` or `master` directly. Only `release/*` merges into `develop`, only `develop` into `master`. The version in `package.json`, the top of `CHANGELOG.md` and the release branch must match. CI runs on pull requests only: into `release/*` format, lint and types; into `develop` the same plus unit tests and the version check; into `master` the version check. Details: `docs/decisions/0007-git-flow-and-ci.md`.
+`feature/X.Y.Z/NAME` (or `fix/X.Y.Z/NAME`) → `release/X.Y.Z` → `develop` → `master`. Work happens on `feature/X.Y.Z/NAME` branched from `release/X.Y.Z`, so the branch name says which release it belongs to; nobody commits to `release/*`, `develop` or `master` directly. Only `release/*` merges into `develop`, only `develop` into `master`. The version in `package.json`, the top of `CHANGELOG.md` and the release branch must match. CI runs on pull requests only, each check its own job (and its own line in the PR): into `release/*` format, lint and types; into `develop` the branch and version check first, then the same plus unit tests and the E2E suite in parallel; into `master` the version check. Details: `docs/decisions/0007-git-flow-and-ci.md`.
 
 ## Working with AI agents
 

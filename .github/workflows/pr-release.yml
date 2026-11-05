@@ -1,5 +1,6 @@
 # PR into a release branch: a quick gate on each feature (ADR 0007).
-# Format, lint and types only; unit tests run once, on the release → develop PR.
+# Format, lint and types, each its own check in the PR; unit tests run once,
+# on the release → develop PR.
 name: PR → release
 
 on:
@@ -10,29 +11,43 @@ on:
 
 concurrency:
   # Per workflow and PR. A title/body edit gets its own group so it cannot
-  # cancel a running check (its job is skipped anyway).
+  # cancel a running check (its jobs are skipped anyway).
   group: ${{ github.workflow }}-${{ github.event.number }}-${{ github.event.action == 'edited' && github.event.changes.base == null && 'edit' || 'run' }}
   cancel-in-progress: true
 
 permissions:
   contents: read
 
+# One job per check, in parallel, so each has its own line and log in the PR
+# (owner, 2026-11-05). Each job installs on its own: ~3 billed minutes a run
+# instead of ~2 (.claude/rules/ci.md).
 jobs:
-  check:
+  format:
+    name: Format
+    if: github.event.action != 'edited' || github.event.changes.base != null
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/setup
+      - run: pnpm format:check
+
+  lint:
+    name: Lint
     if: github.event.action != 'edited' || github.event.changes.base != null
     runs-on: ubuntu-latest
     timeout-minutes: 6
     steps:
       - uses: actions/checkout@v5
-
-      - uses: pnpm/action-setup@v4
-
-      - uses: actions/setup-node@v5
-        with:
-          node-version-file: .nvmrc
-          cache: pnpm
-
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm format:check
+      - uses: ./.github/actions/setup
       - run: pnpm lint
+
+  types:
+    name: Types
+    if: github.event.action != 'edited' || github.event.changes.base != null
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ./.github/actions/setup
       - run: pnpm typecheck
