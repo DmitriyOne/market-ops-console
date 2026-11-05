@@ -7,7 +7,7 @@
 | Choropleth map | react-simple-maps 5 (React 19 support, Aug 2026) | 13 countries; each is an SVG path we can make focusable with ARIA |
 | Heat map (markets × periods) | HTML table as an ARIA grid of buttons, no library | 13 × 24 cells; arrow-key navigation is simple; shows the Germany March 2026 dip as growth YoY (as attainment it is invisible: the forecast fell too) |
 
-Diverging scale validated for contrast (`dataviz` skill); the heat map reuses the map's attainment steps and `--scale-div-*` tones, so a value has one colour on both (owner, 2026-11-04). Heat map chosen over scatter as the "advanced" chart.
+Diverging scale validated for contrast (`dataviz` skill); the heat map reuses the map's steps and tones for the same metric (`--scale-div-*` / `--scale-seq-*`), so a value has one colour on both (owner, 2026-11-04; metric shared from 0.8.0). Heat map chosen over scatter as the "advanced" chart.
 
 **Rejected.** ECharts (≈190 KB gz modular, option-object theming), Nivo (one package per chart, theme object, client-only), Highcharts (paid licence), own d3-geo map (react-simple-maps is a thin wrapper and is maintained again).
 

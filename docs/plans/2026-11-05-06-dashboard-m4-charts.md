@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: superpowers:executing-plans (owner's usual flow: build → owner check → review → owner check). Steps use `- [x]`.
 
-**Status:** approved by the owner (2026-11-05); Tasks 1–6 built on `feature/0.8.0/charts`; branch review and owner check next.
+**Status:** approved by the owner (2026-11-05); built on `feature/0.8.0/charts`; two owner checks and an independent branch review done (see below); waiting for the owner's last look and push.
 
 **Goal.** Analyst mode gets the brief's two remaining charts: the
 **heat map** (markets × 24 months, the "advanced" chart, ADR 0004) and the
@@ -158,7 +158,8 @@ export type HeatCell = { period: Period; value: number | null; step: number | nu
 export type HeatRow = { id: string; name: string; regionId: string;
   cells: HeatCell[]; selected: boolean; current: boolean };
 export type HeatMapView = { metric: Exclude<ScaleMetric, 'share'>; notice: HeatNotice | null;
-  periods: Period[]; window: Period[]; rows: HeatRow[] };
+  periods: Period[]; window: Period[]; rows: HeatRow[];
+  /** Added at the branch review: a product is open, notes are the market's. */ marketNotes: boolean };
 export function heatMap(ds: Dataset, scope: Scope, period: Period, range: Range,
   kpi: MapMetric, selected: readonly string[]): HeatMapView;
 ```
@@ -190,7 +191,8 @@ export type RadarSeries = { id: string; name: string; kind: 'market' | 'region' 
   values: Partial<Record<RadarAxis, { raw: number; scaled: number }>> };
 export type RadarView = { compared: 'markets' | 'regions'; axes: RadarAxis[];
   removed: { axis: RadarAxis; notice: RadarAxisNotice }[];
-  series: RadarSeries[]; reference: RadarSeries; hiddenSelected: number; productIgnored: boolean };
+  series: RadarSeries[]; reference: RadarSeries; hidden: number; productIgnored: boolean;
+  /** Added at owner check 1: what is compared. */ basis: 'selection' | 'market' | 'region' | 'regions' };
 export function comparisonRadar(ds: Dataset, scope: Scope, period: Period, range: Range,
   selected: readonly string[]): RadarView;
 ```
@@ -198,7 +200,7 @@ export function comparisonRadar(ds: Dataset, scope: Scope, period: Period, range
 - [x] **Step 1: failing tests**:
   - nothing selected → `compared: 'regions'`, 4 series in data order, reference `kind: 'portfolio'`.
   - selected `['de','es']`, latest 1m → 2 market series; DE growth raw = stored −9.7 (computeKpis, `data`); DE momentum raw within 0.1 of −11.8; every `scaled` in [0, 1]; the best of the 13 on growth (CN) would scale to 1.
-  - 5 selected → 4 series, `hiddenSelected: 1`, order kept.
+  - 5 selected → 4 series, `hidden: 1`, order kept.
   - `range: '3m'` → share removed with `shareLatestOnly`; `period: '2024-08'` → momentum removed with `momentumTooEarly`, 3 axes left.
   - regions compared: revenue scaled across the 4 regions (EU not clamped to 1 because a market is smaller); reference revenue = mean of the 4.
   - all peers equal on an axis → `scaled: 0.5`.
@@ -269,7 +271,7 @@ export function comparisonRadar(ds: Dataset, scope: Scope, period: Period, range
 
 ### Task 7: review and owner check
 
-- [ ] Independent branch review by an agent (correctness, a11y, FSD, tests); fix or record each finding in the backlog.
+- [x] Independent branch review by an agent (correctness, a11y, FSD, tests); fix or record each finding in the backlog.
 - [ ] Owner check on his dev server; fixes; plan status → built.
 
 ## Owner check 1 (2026-11-05)
