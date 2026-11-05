@@ -152,7 +152,8 @@ export function HeatGrid({ view, period, label, onOpen, onToggle }: Props) {
   const shownCell = shown ? shownRow?.cells[shown.col] : undefined;
 
   return (
-    <div className="flex flex-col gap-2">
+    // `min-w-0`: the grid scrolls inside the card, never widens the page (phones).
+    <div className="flex min-w-0 flex-col gap-2">
       <div ref={scroller} className="overflow-x-auto">
         <table
           role="grid"
@@ -353,8 +354,8 @@ function CellDetail({
   }
   const month = h.month(cell.period);
   return (
-    <div className="flex min-h-11 flex-wrap items-center gap-x-3 gap-y-1 text-sm">
-      <p>
+    <div className="flex min-h-11 min-w-0 flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+      <p className="min-w-0">
         {[row.name, month, `${h.metricName} ${h.long(cell.value)}`].join(' · ')}
         {cell.anomaly ? (
           <span className="text-muted-foreground">
@@ -364,12 +365,13 @@ function CellDetail({
           </span>
         ) : null}
       </p>
-      <div className="flex gap-2">
+      {/* Long market names: the buttons wrap, and so do their labels, on a phone. */}
+      <div className="flex min-w-0 flex-wrap gap-2">
         <Button
           type="button"
           variant="outline"
           size="sm"
-          className="min-h-11"
+          className="h-auto min-h-11 text-left whitespace-normal"
           onClick={() => {
             onOpen(row.id, cell.period);
           }}
@@ -380,7 +382,7 @@ function CellDetail({
           type="button"
           variant="outline"
           size="sm"
-          className="min-h-11"
+          className="h-auto min-h-11 text-left whitespace-normal"
           onClick={() => {
             onToggle(row.id);
           }}
