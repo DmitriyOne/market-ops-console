@@ -12,11 +12,30 @@ export default defineConfig({
     ],
   },
   test: {
-    environment: 'jsdom',
     setupFiles: ['./vitest.setup.ts'],
     // The mock alerts route answers at once under test.
     env: { MOCK_ALERTS_DELAY_MS: '0' },
-    include: ['src/**/*.test.{ts,tsx}', 'app/**/*.test.{ts,tsx}', 'scripts/**/*.test.ts'],
+    // Logic (*.test.ts) runs without a DOM, components (*.test.tsx) in jsdom:
+    // building jsdom for every file was a third of the time on the 2-core CI
+    // runner. A *.test.ts that needs the DOM says `// @vitest-environment jsdom`.
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: 'logic',
+          environment: 'node',
+          include: ['src/**/*.test.ts', 'app/**/*.test.ts', 'scripts/**/*.test.ts'],
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: 'components',
+          environment: 'jsdom',
+          include: ['src/**/*.test.tsx', 'app/**/*.test.tsx'],
+        },
+      },
+    ],
     // next-intl imports `next/navigation` without an extension; inlining lets
     // Vite resolve it (next has no exports map).
     server: { deps: { inline: ['next-intl'] } },

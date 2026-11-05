@@ -92,7 +92,7 @@ Points the owner wants explained in the README, in his own words:
 
 ## From the 0.10.0 E2E build (2026-11-05)
 
-- **Unit tests take ~5 min in CI** (279 s on the 2-core runner, ~26 s on the owner's machine): 36 % setup and 26 % environment, jsdom built for each of 114 files. Candidates: `happy-dom`, Vitest `pool: 'threads'` or a shared environment for pure-logic files (`// @vitest-environment node`). **Owner**, decide (it is what makes the develop check ~8 min).
+- **Unit tests take ~5 min in CI** (279 s on the 2-core runner). Done in 0.10.0 (owner, 2026-11-05), measured locally with `--maxWorkers=2`: 72 s → 58 s (−19 %): the setup file imports only the MSW server (the helpers' barrel loaded providers, dictionaries and fixtures into every file), and logic tests run in `node` (Vitest projects). `pool: 'threads'` gave nothing (72.6 s). What is left is the component tests' own work (64 %); `happy-dom` would need a new dependency and a compatibility check with Radix and user-event. The CI time is to be confirmed on the next PR into `develop`.
 - **The E2E run on Vercel previews** (`deployment_status`, `BASE_URL` = the preview URL, filtered to `release/*` previews to spare minutes; protection bypass or Trusted Sources) comes with the deploy. **Deploy release**.
 - **The CI E2E step is untested live**: the workflow was checked by parsing it, not by a run; the first PR into `develop` is its test. **Owner check**.
 - **The phone tab's name reads "Alerts , 5 markets flagged"** in Chromium (a space before the comma from the inline count). Screen readers ignore it. Cosmetic.
