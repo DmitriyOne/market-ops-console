@@ -19,7 +19,7 @@ permissions:
   contents: read
 
 # One job per check, in parallel, so each has its own line and log in the PR
-# (owner, 2026-11-05). Each job installs on its own: ~3 billed minutes a run
+# (owner, 2026-11-05). Each job installs on its own: ~4 billed minutes a run
 # instead of ~2 (.claude/rules/ci.md).
 jobs:
   format:

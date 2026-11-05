@@ -19,8 +19,8 @@ permissions:
   contents: read
 
 # One job per check so each has its own line and log in the PR (owner,
-# 2026-11-05). Every job after `gate` installs on its own: ~11 billed minutes
-# a run instead of ~6, ~4 minutes to wait instead of ~6 (.claude/rules/ci.md).
+# 2026-11-05). Every job after `gate` installs on its own: ~13 billed minutes
+# a run instead of ~8, ~4.5 minutes to wait instead of ~7.5 (.claude/rules/ci.md).
 jobs:
   gate:
     name: Branch & version
@@ -44,7 +44,10 @@ jobs:
             exit 1
           fi
 
+      # This job's token can comment and close: keep it out of the checkout.
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
 
       # No install: the script runs on Node's own type stripping.
       - uses: actions/setup-node@v5

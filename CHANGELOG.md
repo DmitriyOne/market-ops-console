@@ -5,8 +5,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 ## [0.11.1] - Unreleased
 
 ### Changed
-- CI: each check is its own job, so it gets its own line and log in the pull request and they run side by side. Into a release branch: Format, Lint, Types. Into `develop`: Branch & version first, then Format, Lint, Types, Unit tests and E2E. Shorter to wait for (~4 min instead of ~6 into `develop`), more runner minutes (~11 instead of ~6), well within the free plan.
-- The shadcn components use tokens and scale steps instead of arbitrary values (`rounded-compact`, `text-compact`, `secondary-hover`, `min-w-24`, `ring-3`, `rounded-xs`); three layout values with no scale step stay, listed in DESIGN.md with the reason. `ToggleGroup` takes `spacing` 0–4.
+- CI: each check is its own job, so it gets its own line and log in the pull request and they run side by side. Into a release branch: Format, Lint, Types. Into `develop`: Branch & version first, then Format, Lint, Types, Unit tests and E2E. Shorter to wait for (~4.5 min instead of ~7.5 into `develop`), more runner minutes (~13 instead of ~8; ~4 instead of ~2 into a release branch), well within the free plan.
+- The shadcn components use tokens and scale steps instead of arbitrary values where shadcn's `cn` still merges them right (`secondary-hover`, `rounded-md`, `min-w-24`, `ring-3`, `rounded-xs`); the rest stay as shadcn wrote them and are listed in DESIGN.md with the reason (a size or radius under a name of our own would make `cn` drop the variant's colour or corner). `ToggleGroup` takes `spacing` 0–4.
 
 ### Fixed
 - Assistant: clicking a source (Germany, Italy, …) to open it on the dashboard made its card blink: it closed, reopened and closed again while the pointer was still on the button. It now closes once and shows again only after the pointer or focus leaves the button and comes back.

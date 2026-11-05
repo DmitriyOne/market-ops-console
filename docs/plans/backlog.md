@@ -93,6 +93,12 @@ Points the owner wants explained in the README, in his own words:
 - **A failure shown in the panel is forgotten after ~5 minutes**: failed writes keep TanStack's default `gcTime` (5 min); only the newest stays while the panel is open, and the toast is gone long before. Set a `gcTime` on the write mutation if it matters. **Accepted**.
 - **"Not saved. " with an empty reason** (`alerts.failed.update/remove` when `errorMessage` gives `''`): never seen, every failure has a reason. Cosmetic.
 
+## From the 0.11.1 review (2026-11-05)
+
+- **The share-total formula is not run by a spreadsheet in tests**: they check its text and redo its sum in JS. Open one export in Excel, filter a market out, and see the share total change (owner's check). LibreOffice may not take `SUBTOTAL` over `OFFSET` inside `SUMPRODUCT`; `IFERROR` would leave it blank. **Owner check**, then accepted or a note in About.
+- **Column letters are written by hand** in the totals (`'D'`, `'J'`, as in the attainment and growth totals): moving a column breaks them silently. Derive them from the column list if columns ever move. **Hardening plan**.
+- **A new lockfile makes the parallel jobs race to save one pnpm cache key** ("Unable to reserve cache" warnings, harmless). **Accepted**.
+
 ## Currency picker (owner, 2026-11-04) — after the required work, its own release before the README
 
 - Money everywhere shows a plain `$` (`currencyDisplay: 'narrowSymbol'` in `formats.ts`), not `US$`.
