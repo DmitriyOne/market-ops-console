@@ -14,7 +14,7 @@ const TONE = {
 /**
  * One market: code, status shape, attainment. Click drills in; in Analyst
  * Shift+click adds it to the selection. The name starts with the visible
- * code (label in name, WCAG 2.5.3).
+ * code and figure, together (label in name, WCAG 2.5.3).
  */
 export function StatusTile({
   tile,
@@ -62,6 +62,8 @@ export function StatusTile({
         {tile.iso2}
         {tile.status ? <StatusIcon status={tile.status} /> : null}
       </span>
+      {/* Not shown (flex), but it keeps "US 100.5%" two words in the text a
+          speech-input user or axe reads from the tile. */}{' '}
       <span className="font-mono text-sm tabular-nums">{value}</span>
     </button>
   );

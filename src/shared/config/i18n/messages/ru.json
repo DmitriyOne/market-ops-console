@@ -243,8 +243,8 @@
   },
   "marketStatus": {
     "title": "Статус рынков",
-    "tile": "{code} {name}, {status}, выполнение плана {value}",
-    "tileNoStatus": "{code} {name}, выполнение плана {value}",
+    "tile": "{code} {value} выполнение плана, {name}, {status}",
+    "tileNoStatus": "{code} {value} выполнение плана, {name}",
     "current": "открыт",
     "selected": "выбран",
     "hatched": "штриховка",
@@ -374,6 +374,7 @@
     "gridLabel": "{metric} по рынкам и месяцам",
     "market": "Рынок",
     "cell": "{market}, {month}: {value}",
+    "cellRounded": "{market}, {month}: {shown} ({value})",
     "stepBelow": "ниже {to}",
     "stepBetween": "{from} – {to}",
     "stepAbove": "{from} и выше",

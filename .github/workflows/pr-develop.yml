@@ -1,4 +1,5 @@
 # PR into develop: only a release branch may merge here (ADR 0007).
+# Checks: version, format, lint, types, unit tests, then the E2E suite (ADR 0008).
 # One job to stay within GitHub Free minutes (.claude/rules/ci.md).
 name: PR → develop
 
@@ -22,7 +23,9 @@ jobs:
   check:
     if: github.event.action != 'edited' || github.event.changes.base != null
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    # Unit tests ~4 min on the 2-core runner, E2E ~3–5 more (ADR 0008); room
+    # until the first real runs show the numbers.
+    timeout-minutes: 20
     steps:
       - name: Require a release/X.Y.Z head branch
         env:
@@ -55,3 +58,44 @@ jobs:
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm test
+
+      # E2E (ADR 0008): Chromium only, the browser cached by Playwright's version.
+      - name: Playwright version
+        id: playwright
+        run: echo "version=$(pnpm exec playwright --version | cut -d' ' -f2)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+
+      - name: Install Chromium
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Install Chromium's system libraries
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: pnpm exec playwright install-deps chromium
+
+      # Next's build cache (the Next docs' advice for CI): later builds reuse it.
+      - name: Cache the Next.js build
+        uses: actions/cache@v6
+        with:
+          path: .next/cache
+          key: nextjs-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('src/**', 'app/**') }}
+          restore-keys: nextjs-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
+
+      # Builds the app and starts it on :3100 (playwright.config.ts). Its own
+      # limit, so a hang fails this step and the report below is still uploaded.
+      - run: pnpm e2e
+        timeout-minutes: 10
+
+      - name: Upload the Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

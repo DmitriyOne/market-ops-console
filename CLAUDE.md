@@ -35,7 +35,7 @@ Detailed rules: `.claude/rules/fsd.md` (auto-loads for `src/**`). Decision: `doc
 
 ## Stack (fixed, see `docs/decisions/0002-stack.md`)
 
-Next.js 16 App Router · React 19 · TypeScript 6 strict · Tailwind v4 + shadcn/ui · `@wrksz/themes` · TanStack Query · nuqs · zod · react-hook-form + zod resolver (alert rules) · next-intl (`as-needed` routing, static pages) · `@t3-oss/env-nextjs` · `eventsource-parser` · shadcn charts (Recharts) · react-simple-maps · ExcelJS (Excel export, lazy) · Vitest + Testing Library + MSW · Playwright (one local E2E) · Prettier + ESLint 10 + Steiger · Vercel.
+Next.js 16 App Router · React 19 · TypeScript 6 strict · Tailwind v4 + shadcn/ui · `@wrksz/themes` · TanStack Query · nuqs · zod · react-hook-form + zod resolver (alert rules) · next-intl (`as-needed` routing, static pages) · `@t3-oss/env-nextjs` · `eventsource-parser` · shadcn charts (Recharts) · react-simple-maps · ExcelJS (Excel export, lazy) · Vitest + Testing Library + MSW · Playwright + axe (E2E, local and on PRs into `develop`) · Prettier + ESLint 10 + Steiger · Vercel.
 
 ## Code rules
 
@@ -80,9 +80,10 @@ pnpm format:check
 pnpm lint           # next typegen + ESLint + Steiger
 pnpm typecheck      # next typegen + tsc
 pnpm test           # Vitest, single run
+pnpm e2e            # Playwright: builds, starts on :3100, desktop + phone (never touches :3000)
 ```
 
-Run `format`, `lint`, `typecheck` and `test` before every commit; there are no git hooks.
+Run `format`, `lint`, `typecheck` and `test` before every commit (and `e2e` when a change can touch a user flow); there are no git hooks.
 
 ## Do not
 

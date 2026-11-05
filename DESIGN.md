@@ -149,7 +149,7 @@ Rules:
 | `Tooltip` | the name of an icon-only control on hover and focus (New chat), the anomaly note in the markets table (hover only: a note a touch user needs goes in a `Popover`, like the table's alert bell) |
 | `PopperBoundary` (ours) | the scroll area popups inside it belong to; `AppShell` provides `<main>`. `DropdownMenuContent`, `PopoverContent`, `TooltipContent` and `HoverCardContent` read it themselves (§5) |
 | `Skeleton` | content not known yet, in the shape of what replaces it (`ConversationSkeleton`: question bubble + answer frame); no pulse under reduced motion |
-| `Toaster` / `toast.success` / `toast.error` (sonner) | short confirmations and failures that are not tied to a field ("Thanks for the feedback", "Couldn't copy", a rolled-back alert save); top centre, as wide as the text up to 28rem; `toast.error(message, { label, onClick })` adds one text button (Retry) |
+| `Toaster` / `toast.success` / `toast.error` (sonner) | short confirmations and failures that are not tied to a field ("Thanks for the feedback", "Couldn't copy", a rolled-back alert save); top centre, as wide as the text up to 28rem; `toast.error(message, { label, onClick })` adds one text button (Retry); visible toasts take clicks over a modal sheet (`globals.css`), and pressing one does not close the sheet |
 | `ErrorBoundary`, `WidgetBoundary` | a failing widget explains itself and offers "Try again" without taking the page down; dashboard widgets pass `name` ("Try again: Key figures") |
 | `Card` | dashboard widget frame: `border border-border ring-0`, `h2` inside `CardTitle`, actions in `CardAction` |
 | `Breadcrumb` | the drill-down path; callers give it its `aria-label` |
