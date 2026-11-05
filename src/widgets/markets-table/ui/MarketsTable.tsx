@@ -247,7 +247,9 @@ function MarketRow({
                   <AlertMark flag={flag} labelled={false} />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto max-w-64 text-sm">{flagLabel(flag)}</PopoverContent>
+              <PopoverContent aria-label={flagLabel(flag)} className="w-auto max-w-64 text-sm">
+                {flagLabel(flag)}
+              </PopoverContent>
             </Popover>
           ) : null}
           {row.anomalies.map((a) => {
@@ -265,7 +267,9 @@ function MarketRow({
                     <TriangleAlertIcon aria-hidden />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto max-w-64 text-sm">{label}</PopoverContent>
+                <PopoverContent aria-label={label} className="w-auto max-w-64 text-sm">
+                  {label}
+                </PopoverContent>
               </Popover>
             );
           })}

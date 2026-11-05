@@ -58,6 +58,8 @@ describe('HeatMap', () => {
       /^-31% \(-31\.\d%\), anomaly: Revenue fell 27% versus the prior month\.$/,
     );
     expect(dip).toHaveTextContent('-31%');
+    // The column says the whole month to a screen reader ("Mar 26" on screen).
+    expect(within(g).getByRole('columnheader', { name: 'Mar 2026' })).toBeInTheDocument();
   });
 
   it('one Tab stop; arrows move and stop at the edges', async () => {

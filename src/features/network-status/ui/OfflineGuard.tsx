@@ -26,7 +26,7 @@ export function OfflineGuard({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (online) return;
     return () => {
-      if (last.current?.isConnected) last.current.focus();
+      if (last.current?.isConnected) last.current.focus({ preventScroll: true });
     };
   }, [online]);
 
@@ -36,6 +36,11 @@ export function OfflineGuard({ children }: { children: ReactNode }) {
         inert={!online}
         onFocus={(event) => {
           if (event.target instanceof HTMLElement) last.current = event.target;
+        }}
+        // Focus went nowhere (a click on empty page): no place to go back
+        // to. Moving to the overlay's button keeps it.
+        onBlur={(event) => {
+          if (event.relatedTarget === null) last.current = null;
         }}
       >
         {children}

@@ -156,6 +156,6 @@ describe('MarketsTable', () => {
     expect(screen.getAllByRole('button', { name: /^Anomaly/ })).toHaveLength(1);
     // A press (a tap on touch) opens the note; hover is not needed.
     await user.click(screen.getByRole('button', { name: note }));
-    expect(await screen.findByRole('dialog')).toHaveTextContent(note);
+    expect(await screen.findByRole('dialog', { name: note })).toHaveTextContent(note);
   });
 });

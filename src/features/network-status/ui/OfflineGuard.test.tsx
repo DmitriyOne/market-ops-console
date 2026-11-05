@@ -78,6 +78,17 @@ describe('OfflineGuard', () => {
     expect(screen.getByRole('button', { name: 'count 1' })).toHaveFocus();
   });
 
+  it('gives nothing back when focus had already left the app', async () => {
+    renderGuard();
+    await userEvent.click(screen.getByRole('button', { name: 'count 0' }));
+    act(() => {
+      screen.getByRole('button', { name: 'count 1' }).blur();
+    });
+    goOffline();
+    goOnline();
+    expect(document.body).toHaveFocus();
+  });
+
   it('re-checks the connection on retry', async () => {
     renderGuard();
     goOffline();

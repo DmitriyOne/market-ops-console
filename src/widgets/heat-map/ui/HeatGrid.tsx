@@ -211,7 +211,10 @@ export function HeatGrid({ view, period, label, onOpen, onToggle }: Props) {
                       inWindow && 'rounded-t-sm bg-foreground font-semibold text-background',
                     )}
                   >
-                    {h.monthShort(p)}
+                    {/* "Mar 26" on screen; the whole month for a screen reader,
+                        as it is the only place a cell's month is said. */}
+                    <span aria-hidden>{h.monthShort(p)}</span>
+                    <span className="sr-only">{h.month(p)}</span>
                     {inWindow ? <span className="sr-only">{`, ${t('inWindow')}`}</span> : null}
                   </th>
                 );
