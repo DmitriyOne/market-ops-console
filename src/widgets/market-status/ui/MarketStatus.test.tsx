@@ -376,8 +376,8 @@ describe('MarketStatus map', () => {
     const items = within(legend)
       .getAllByRole('listitem')
       .map((li) => li.textContent);
-    expect(items[0]).toMatch(/^below US\$1m\d+$/);
-    expect(items[1]).toMatch(/^US\$1m – US\$1\.5m\d+$/);
+    expect(items[0]).toMatch(/^below \$1m\d+$/);
+    expect(items[1]).toMatch(/^\$1m – \$1\.5m\d+$/);
   });
 
   it('Open in the tap tooltip brings the page back to its top', async () => {
