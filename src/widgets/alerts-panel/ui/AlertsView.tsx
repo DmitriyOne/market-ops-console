@@ -5,7 +5,8 @@ import { useEffect, useRef, useState } from 'react';
 
 import { ruleMarkets } from '@/entities/alert-rule';
 import { useDashboard } from '@/entities/performance';
-import { AlertsPanel,type AlertTab } from '@/features/configure-alerts';
+import { AlertsPanel, type AlertTab } from '@/features/configure-alerts';
+import { useSection } from '@/features/switch-section';
 import { toast } from '@/shared/ui';
 
 import { TriggeredAlerts } from './TriggeredAlerts';
@@ -20,6 +21,17 @@ export function AlertsView() {
   const { ds } = useDashboard();
   const [tab, setTab] = useState<AlertTab>('firing');
   const heading = useRef<HTMLHeadingElement>(null);
+  const [, setSection] = useSection();
+
+  // A save can be confirmed after the sheet or tab was closed; Show then
+  // opens it again (on "Firing", where it starts).
+  const mounted = useRef(false);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
 
   // The heading exists only once "Firing" is shown: focus it after that render.
   const [showFiring, setShowFiring] = useState(0);
@@ -44,6 +56,10 @@ export function AlertsView() {
           {
             label: t('triggered.show'),
             onClick: () => {
+              if (!mounted.current) {
+                setSection('alerts');
+                return;
+              }
               // Sonner hands focus back to where it came from as soon as it
               // leaves the toasts; let it do that first, then move on.
               const active = document.activeElement;

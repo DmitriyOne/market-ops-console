@@ -14,6 +14,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 - `/api/v1/alerts` mock (GET, POST, PATCH, DELETE, ~1.2 s): the list lives in one httpOnly cookie (compressed, so ten full rules fit), checked with the same schema; writes only from the app's own pages and as JSON.
 
 ### Fixed
+- Alerts: two changes saved within a second of each other (switching two rules, or a new rule and a switch) could lose the first one after the list reloaded, with no error; saves now reach the server one at a time, and the screen still changes at once.
+- Alerts: in German and Russian, the first save renamed the two example rules to English.
+- Alerts: the "Saved … it flags N markets" message did not come when another rule was switched before the save was confirmed, or when the panel was closed meanwhile; then its "Show" opens the panel again.
 - Closing a side sheet (alerts, phone settings) flashed twice: the dimmed, blurred backdrop faded in 100 ms and the panel in 200 ms; both now take 200 ms and leave in the same frame (measured in the browser).
 - The browser console no longer warns "Encountered a script tag while rendering React component": the scripts that mark the page before it is painted (collapsed assistant, phone tab, Analyst mode) go into the server HTML only.
 

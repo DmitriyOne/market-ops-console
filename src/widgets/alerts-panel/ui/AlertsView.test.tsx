@@ -1,5 +1,5 @@
 import { screen, waitFor, within } from '@testing-library/react';
-import { Suspense } from 'react';
+import { Suspense, useState } from 'react';
 import { Toaster } from 'sonner';
 import { describe, expect, it } from 'vitest';
 
@@ -79,6 +79,64 @@ describe('AlertsView', () => {
     expect(await firing()).toHaveAccessibleName('Firing now: 6 markets (May 2026)');
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: /^Firing now/ })).toHaveFocus();
+    });
+  });
+
+  it('the confirmed-save toast still comes when another rule is toggled meanwhile', async () => {
+    const api = alertsApi();
+    const { user } = setup('?tab=alerts', api);
+    await firing();
+    await user.click(screen.getByRole('button', { name: t.list.new }));
+    await user.type(screen.getByRole('textbox', { name: t.form.name }), 'Saved while toggling');
+    const release = api.hold();
+    await user.click(screen.getByRole('button', { name: t.form.save }));
+    // Before the server answers, another write starts.
+    await user.click(screen.getByRole('switch', { name: 'Rule on: Share below 10%' }));
+    release();
+    expect(
+      await screen.findByText(/^Saved “Saved while toggling”: it flags \d+ markets? now\.$/),
+    ).toBeInTheDocument();
+  });
+
+  it('a save confirmed after the panel closed still says so; Show opens the panel again', async () => {
+    function Closable() {
+      const [open, setOpen] = useState(true);
+      return (
+        <>
+          {open ? <AlertsView /> : null}
+          <button
+            type="button"
+            onClick={() => {
+              setOpen(false);
+            }}
+          >
+            close panel
+          </button>
+        </>
+      );
+    }
+    const api = alertsApi();
+    server.use(datasetHandler(), ...api.handlers);
+    const { user, lastUpdate } = renderWithProviders(
+      <Suspense>
+        <Closable />
+        <Toaster />
+      </Suspense>,
+    );
+    await firing();
+    await user.click(screen.getByRole('button', { name: t.list.new }));
+    await user.type(screen.getByRole('textbox', { name: t.form.name }), 'Closed meanwhile');
+    const release = api.hold();
+    await user.click(screen.getByRole('button', { name: t.form.save }));
+    await user.click(screen.getByRole('button', { name: 'close panel' }));
+    release();
+    // Sonner's toasts outlive a test; find this one.
+    const message = await screen.findByText(/^Saved “Closed meanwhile”/);
+    const toastItem = message.closest('li');
+    if (!toastItem) throw new Error('no toast');
+    await user.click(within(toastItem).getByRole('button', { name: t.triggered.show }));
+    await waitFor(() => {
+      expect(query(lastUpdate())).toEqual({ tab: 'alerts' });
     });
   });
 });

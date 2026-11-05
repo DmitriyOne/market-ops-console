@@ -55,6 +55,16 @@ describe('/api/v1/alerts', () => {
     expect(rules.map((r) => r.name)).toEqual(['Выполнение плана ниже 95%', 'Доля ниже 10%']);
   });
 
+  it('the first write keeps the examples in the language it names', async () => {
+    const c = client();
+    expect((await c.send(POST, { query: '?locale=ru-RU', body: input })).status).toBe(201);
+    expect((await c.list()).map((r) => r.name)).toEqual([
+      'Выполнение плана ниже 95%',
+      'Доля ниже 10%',
+      'Low growth',
+    ]);
+  });
+
   it('creates, replaces and deletes, keeping the list in an httpOnly cookie', async () => {
     const c = client();
     const created = await c.send(POST, { body: input });

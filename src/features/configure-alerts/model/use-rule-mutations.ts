@@ -6,7 +6,7 @@ import {
   useMutationState,
   useQueryClient,
 } from '@tanstack/react-query';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useCallback, useMemo } from 'react';
 
 import { ALERTS_QUERY_KEY, createRule, deleteRule, updateRule } from '@/entities/alert-rule';
@@ -24,8 +24,14 @@ import { takeSimulatedFailure } from './simulate-failure';
 
 const WRITE_KEY = ['alerts', 'write'] as const;
 
-type CreateVars = { kind: 'create'; input: AlertRuleInput; tempId: string };
-type UpdateVars = { kind: 'update'; rule: AlertRule; previous: AlertRule };
+/**
+ * Runs once the server has the rule. It travels with the write (not as a
+ * `mutate()` callback, which the next write would replace), so it also
+ * runs after a Retry.
+ */
+type OnSaved = (rule: AlertRule) => void;
+type CreateVars = { kind: 'create'; input: AlertRuleInput; tempId: string; onSaved?: OnSaved };
+type UpdateVars = { kind: 'update'; rule: AlertRule; previous: AlertRule; onSaved?: OnSaved };
 type RemoveVars = { kind: 'remove'; rule: AlertRule; index: number };
 type WriteVars = CreateVars | UpdateVars | RemoveVars;
 
@@ -69,8 +75,8 @@ function revert(client: QueryClient, vars: WriteVars): void {
   }
 }
 
-async function send(vars: WriteVars): Promise<AlertRule | null> {
-  const options = { simulateFailure: takeSimulatedFailure() };
+async function send(vars: WriteVars, locale: string): Promise<AlertRule | null> {
+  const options = { locale, simulateFailure: takeSimulatedFailure() };
   if (vars.kind === 'create') return createRule(vars.input, options);
   if (vars.kind === 'update') {
     const { id, ...input } = vars.rule;
@@ -88,6 +94,7 @@ async function send(vars: WriteVars): Promise<AlertRule | null> {
 export function useRuleMutations() {
   const client = useQueryClient();
   const t = useTranslations('alerts');
+  const locale = useLocale();
   const errorMessage = useErrorMessage();
 
   const reason = useCallback(
@@ -100,7 +107,11 @@ export function useRuleMutations() {
 
   const mutation = useMutation({
     mutationKey: WRITE_KEY,
-    mutationFn: send,
+    // One write at a time: the server stores the whole list per answer, so
+    // two in flight would each start from the old list and one would be
+    // lost. The optimistic change (onMutate) still shows at once.
+    scope: { id: 'alert-rules' },
+    mutationFn: (vars: WriteVars) => send(vars, locale),
     onMutate: async (vars) => {
       // A list arriving now would overwrite the optimistic change.
       await client.cancelQueries({ queryKey: ALERTS_QUERY_KEY });
@@ -110,6 +121,7 @@ export function useRuleMutations() {
       if (vars.kind === 'create' && saved) {
         setRules(client, (list) => list.map((r) => (r.id === vars.tempId ? saved : r)));
       }
+      if (vars.kind !== 'remove' && saved) vars.onSaved?.(saved);
     },
     onError: (error, vars) => {
       revert(client, vars);
@@ -132,20 +144,12 @@ export function useRuleMutations() {
   return useMemo(
     () => ({
       /** `onSaved` runs once the server has the rule (the list already shows it). */
-      create: (input: AlertRuleInput, onSaved?: (rule: AlertRule) => void) => {
-        mutate(
-          { kind: 'create', input, tempId: `saving-${crypto.randomUUID()}` },
-          { onSuccess: (saved) => saved && onSaved?.(saved) },
-        );
+      create: (input: AlertRuleInput, onSaved?: OnSaved) => {
+        mutate({ kind: 'create', input, tempId: `saving-${crypto.randomUUID()}`, onSaved });
       },
-      update: (rule: AlertRule, onSaved?: (rule: AlertRule) => void) => {
+      update: (rule: AlertRule, onSaved?: OnSaved) => {
         const previous = rules(client).find((r) => r.id === rule.id);
-        if (previous) {
-          mutate(
-            { kind: 'update', rule, previous },
-            { onSuccess: (saved) => saved && onSaved?.(saved) },
-          );
-        }
+        if (previous) mutate({ kind: 'update', rule, previous, onSaved });
       },
       toggle: (rule: AlertRule) => {
         mutate({ kind: 'update', rule: { ...rule, enabled: !rule.enabled }, previous: rule });

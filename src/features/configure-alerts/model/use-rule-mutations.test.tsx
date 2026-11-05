@@ -158,6 +158,27 @@ describe('useRuleMutations', () => {
     });
   });
 
+  it('two quick writes to different rules both stay (the server keeps one list)', async () => {
+    const { api, user } = await setup();
+    const release = api.hold();
+    await user.click(screen.getByRole('button', { name: 'toggle share' }));
+    await user.click(screen.getByRole('button', { name: 'create' }));
+    expect(items()).toEqual([
+      'Attainment below 95%',
+      'Share below 10% (off) · saving',
+      'Low growth · saving',
+    ]);
+    release();
+    await waitFor(() => {
+      expect(items()).toEqual(['Attainment below 95%', 'Share below 10% (off)', 'Low growth']);
+    });
+    expect(api.rules().map((r) => `${r.name}${r.enabled ? '' : ' (off)'}`)).toEqual([
+      'Attainment below 95%',
+      'Share below 10% (off)',
+      'Low growth',
+    ]);
+  });
+
   it('two quick writes: the first failing does not undo the second', async () => {
     const { api, user } = await setup();
     const release = api.hold();

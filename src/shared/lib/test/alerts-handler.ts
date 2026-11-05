@@ -27,9 +27,12 @@ export const EXAMPLE_RULES: readonly AlertRule[] = [
 ];
 
 /**
- * An in-memory `/api/v1/alerts` for component tests. `hold()` keeps every
- * answer waiting until the returned function is called, so a test can look
- * at the optimistic state; `failNext()` answers the next write with 503.
+ * An in-memory `/api/v1/alerts` for component tests. Like the real route
+ * (one cookie), a write starts from the list as its request arrives and
+ * stores the whole list when it answers, so two writes in flight at once
+ * lose one of them. `hold()` keeps every answer waiting until the returned
+ * function is called, so a test can look at the optimistic state;
+ * `failNext()` answers the next write with 503.
  */
 export function alertsApi(initial: readonly AlertRule[] = EXAMPLE_RULES) {
   let rules = [...initial];
@@ -52,26 +55,29 @@ export function alertsApi(initial: readonly AlertRule[] = EXAMPLE_RULES) {
     }),
     http.post('*/api/v1/alerts', async ({ request }) => {
       const input = alertRuleInputSchema.parse(await request.json());
+      const base = rules;
       await wait();
       if (writeFails(request)) return failure();
       const rule = { ...input, id: `rule-${String(nextId++)}` };
-      rules = [...rules, rule];
+      rules = [...base, rule];
       return HttpResponse.json({ rule }, { status: 201 });
     }),
     http.patch('*/api/v1/alerts', async ({ request }) => {
       const id = new URL(request.url).searchParams.get('id') ?? '';
       const input = alertRuleInputSchema.parse(await request.json());
+      const base = rules;
       await wait();
       if (writeFails(request)) return failure();
       const rule = { ...input, id };
-      rules = rules.map((r) => (r.id === id ? rule : r));
+      rules = base.map((r) => (r.id === id ? rule : r));
       return HttpResponse.json({ rule });
     }),
     http.delete('*/api/v1/alerts', async ({ request }) => {
       const id = new URL(request.url).searchParams.get('id') ?? '';
+      const base = rules;
       await wait();
       if (writeFails(request)) return failure();
-      rules = rules.filter((r) => r.id !== id);
+      rules = base.filter((r) => r.id !== id);
       return new HttpResponse(null, { status: 204 });
     }),
   ];
