@@ -20,11 +20,18 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
   projects: [
+    // Desktop runs every spec but the phone's; the phone runs its own, the
+    // smoke test and the accessibility scans.
     {
       name: 'desktop',
+      testIgnore: /phone\.spec\.ts/,
       use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } },
     },
-    { name: 'phone', use: { ...devices['Pixel 7'] } },
+    {
+      name: 'phone',
+      testMatch: /(phone|smoke|a11y)\.spec\.ts/,
+      use: { ...devices['Pixel 7'] },
+    },
   ],
   webServer: process.env.BASE_URL
     ? undefined
