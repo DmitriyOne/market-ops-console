@@ -96,7 +96,9 @@ export function AlertsPanel({ firing, tab, onTabChange, onSaved }: AlertsPanelPr
     );
   }
 
-  const count = (n: number) => (rules.data ? ` · ${String(n)}` : '');
+  // The counts once the list is in ("Rules · 2"), the bare names before.
+  const tabLabel = (tab: AlertTab, n: number) =>
+    rules.data ? t('tabs.withCount', { tab: t(`tabs.${tab}`), count: n }) : t(`tabs.${tab}`);
 
   return (
     <div className="flex flex-col gap-4">
@@ -122,8 +124,7 @@ export function AlertsPanel({ firing, tab, onTabChange, onSaved }: AlertsPanelPr
               value={v}
               className="min-h-11 px-3 hover:bg-card/60 data-[state=on]:bg-card data-[state=on]:shadow-sm"
             >
-              {t(`tabs.${v}`)}
-              {count(v === 'firing' ? flags.count : list.length)}
+              {tabLabel(v, v === 'firing' ? flags.count : list.length)}
             </ToggleGroupItem>
           ))}
         </ToggleGroup>
@@ -206,6 +207,9 @@ export function AlertsPanel({ firing, tab, onTabChange, onSaved }: AlertsPanelPr
           setDeleting(null);
         }}
         onConfirm={remove}
+        afterDelete={() => {
+          newButton.current?.focus();
+        }}
       />
     </div>
   );

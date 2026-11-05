@@ -478,6 +478,7 @@
       "share": "Доля ниже 10%"
     },
     "condition": "{operator, select, below {{metric} ниже {threshold}} other {{metric} выше {threshold}}}",
+    "full": "{condition} · {scope}",
     "metric": {
       "growth": "Рост",
       "attainment": "Выполнение плана",
@@ -589,7 +590,8 @@
     "tabs": {
       "label": "Раздел алертов",
       "firing": "Сработало",
-      "rules": "Правила"
+      "rules": "Правила",
+      "withCount": "{tab} · {count, number}"
     }
   }
 }

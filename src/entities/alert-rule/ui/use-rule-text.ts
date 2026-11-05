@@ -66,8 +66,8 @@ export function useRuleText(ds: Dataset) {
   );
 
   const full = useCallback(
-    (rule: AlertRuleInput) => `${condition(rule)} · ${scope(rule.scope)}`,
-    [condition, scope],
+    (rule: AlertRuleInput) => t('full', { condition: condition(rule), scope: scope(rule.scope) }),
+    [condition, scope, t],
   );
 
   return { condition, scope, full };

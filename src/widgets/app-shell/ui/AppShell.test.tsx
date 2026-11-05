@@ -299,7 +299,7 @@ describe('AppShell', () => {
     expect(screen.getByRole('main')).toHaveClass('max-lg:hidden');
   });
 
-  it('desktop: tab=alerts opens the sheet; Escape closes it with a replace', async () => {
+  it('desktop: a link to tab=alerts opens the sheet; Escape closes it with a replace', async () => {
     viewport(true);
     const { user, onUrlUpdate } = setup('?tab=alerts');
     const dialog = await screen.findByRole('dialog', { name: t.alerts });
@@ -312,6 +312,19 @@ describe('AppShell', () => {
     const event = onUrlUpdate.mock.calls.at(-1)?.[0];
     expect(event?.queryString).toBe('');
     expect(event?.options.history).toBe('replace');
+  });
+
+  it('desktop: a sheet opened in the app closes with Back, leaving no entry behind', async () => {
+    viewport(true);
+    const back = vi.spyOn(window.history, 'back').mockImplementation(() => undefined);
+    const { user, rerender, withUrl, onUrlUpdate } = setup('');
+    // The bell pushes `tab=alerts`.
+    rerender(withUrl('?tab=alerts'));
+    await screen.findByRole('dialog', { name: t.alerts });
+    const updates = onUrlUpdate.mock.calls.length;
+    await user.keyboard('{Escape}');
+    expect(back).toHaveBeenCalledTimes(1);
+    expect(onUrlUpdate.mock.calls).toHaveLength(updates);
   });
 
   it('Back while the sheet is open closes it', async () => {

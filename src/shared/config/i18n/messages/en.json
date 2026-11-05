@@ -478,6 +478,7 @@
       "share": "Share below 10%"
     },
     "condition": "{operator, select, below {{metric} below {threshold}} other {{metric} above {threshold}}}",
+    "full": "{condition} · {scope}",
     "metric": {
       "growth": "Growth",
       "attainment": "Attainment",
@@ -589,7 +590,8 @@
     "tabs": {
       "label": "Alerts view",
       "firing": "Firing",
-      "rules": "Rules"
+      "rules": "Rules",
+      "withCount": "{tab} · {count, number}"
     }
   }
 }

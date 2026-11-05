@@ -248,6 +248,7 @@ export function RuleForm({ ds, initial, others, editing, onSubmit, onCancel }: R
           name="marketIds"
           render={({ field }) => (
             <MarketsField
+              ref={field.ref}
               id={id('markets')}
               ds={ds}
               value={field.value}

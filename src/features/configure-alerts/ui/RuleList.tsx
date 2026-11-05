@@ -60,7 +60,9 @@ export function RuleList({ ds, rules, saving, onToggle, onEdit, onDelete }: Rule
                 </p>
               </div>
               <div className="flex min-h-11 items-center">
+                {/* The hit area reaches 44 px tall (h-5 and 12 px each side). */}
                 <Switch
+                  className="after:-inset-y-3"
                   checked={rule.enabled}
                   disabled={busy}
                   aria-label={t('list.enabled', { name: rule.name })}

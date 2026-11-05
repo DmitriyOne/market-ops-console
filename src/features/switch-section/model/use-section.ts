@@ -14,7 +14,8 @@ export type SetSection = (s: Section, options?: { history?: 'push' | 'replace' }
 /**
  * The section in the URL (`tab`), so Back returns to the previous one. On
  * phones it is the tab bar; `alerts` also opens the desktop sheet, which
- * closes with `replace` so Back does not open it again.
+ * closes by going Back (or with `replace` after a link), so Back does not
+ * open it again.
  */
 export function useSection(): [Section, SetSection] {
   const [section, setSection] = useQueryState('tab', tabParser);

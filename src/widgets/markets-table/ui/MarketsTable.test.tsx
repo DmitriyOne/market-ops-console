@@ -32,7 +32,7 @@ describe('MarketsTable', () => {
   it('a market the alert rules flag has a bell naming the rules', async () => {
     const api = alertsApi();
     server.use(...api.handlers);
-    setup();
+    const { user } = setup();
     const bell = await screen.findByRole('button', {
       name: 'Critical alert: Attainment below 95% and Share below 10%',
     });
@@ -41,6 +41,11 @@ describe('MarketsTable', () => {
         name: /Critical alert/,
       }),
     ).toBe(bell);
+    // A tap (touch has no hover) shows the rule names as text.
+    await user.click(bell);
+    expect(await screen.findByRole('dialog')).toHaveTextContent(
+      'Critical alert: Attainment below 95% and Share below 10%',
+    );
     // United States and Australia: the share rule only.
     expect(screen.getAllByRole('button', { name: 'Alert: Share below 10%' })).toHaveLength(2);
     expect(

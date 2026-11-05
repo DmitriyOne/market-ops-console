@@ -1,7 +1,7 @@
 'use client';
 
 import { BellIcon } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useFormatter, useTranslations } from 'next-intl';
 
 import { useFlaggedCount } from '@/features/configure-alerts';
 import { useSection } from '@/features/switch-section';
@@ -11,6 +11,7 @@ import { Button } from '@/shared/ui';
 /** The header's bell: opens the alerts sheet (`tab=alerts`), counts flagged markets. */
 export function AlertsButton({ className }: { className?: string }) {
   const t = useTranslations('alerts');
+  const format = useFormatter();
   const count = useFlaggedCount();
   const [, setSection] = useSection();
   return (
@@ -29,7 +30,7 @@ export function AlertsButton({ className }: { className?: string }) {
           aria-hidden
           className="absolute top-1 right-0.5 min-w-4 rounded-full bg-foreground px-1 text-center text-xs leading-4 font-semibold text-background tabular-nums"
         >
-          {count}
+          {format.number(count, 'integer')}
         </span>
       ) : null}
     </Button>

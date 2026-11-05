@@ -1,7 +1,7 @@
 'use client';
 
 import { BellIcon, LayoutDashboardIcon, SparklesIcon } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useFormatter, useTranslations } from 'next-intl';
 
 import { cn } from '@/shared/lib';
 
@@ -30,6 +30,7 @@ export function SectionTabBar({
   alertsCount = null,
 }: SectionTabBarProps) {
   const t = useTranslations('shell');
+  const format = useFormatter();
   return (
     <nav
       aria-label={t('sections')}
@@ -67,7 +68,7 @@ export function SectionTabBar({
                       aria-hidden
                       className="absolute -top-1 -right-2 min-w-4 rounded-full bg-foreground px-1 text-center text-xs leading-4 font-semibold text-background tabular-nums ring-2 ring-muted"
                     >
-                      {alertsCount}
+                      {format.number(alertsCount, 'integer')}
                     </span>
                   ) : null}
                 </span>

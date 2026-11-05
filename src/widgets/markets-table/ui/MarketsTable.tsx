@@ -27,6 +27,9 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Skeleton,
   Table,
   TableBody,
@@ -235,14 +238,20 @@ function MarketRow({
             <span className="font-mono text-xs text-muted-foreground">{row.code}</span> {row.name}
           </Button>
           {flag ? (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button type="button" variant="ghost" size="icon-sm" aria-label={flagLabel(flag)}>
+            // A popover, not a tooltip: a tap shows the rule names on touch too.
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="size-11"
+                  aria-label={flagLabel(flag)}
+                >
                   <AlertMark flag={flag} labelled={false} />
                 </Button>
-              </TooltipTrigger>
-              <TooltipContent className="max-w-64">{flagLabel(flag)}</TooltipContent>
-            </Tooltip>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto max-w-64 text-sm">{flagLabel(flag)}</PopoverContent>
+            </Popover>
           ) : null}
           {row.anomalies.map((a) => {
             const label = t('anomaly', { period: f.period(a.period), note: a.note });
@@ -252,9 +261,8 @@ function MarketRow({
                   <Button
                     type="button"
                     variant="ghost"
-                    size="icon-sm"
                     aria-label={label}
-                    className="text-status-off-track"
+                    className="size-11 text-status-off-track"
                   >
                     <TriangleAlertIcon aria-hidden />
                   </Button>

@@ -126,6 +126,13 @@ describe('AlertsPanel', () => {
     await user.type(screen.getByRole('textbox', { name: t.form.name }), 'Picked');
     await user.click(screen.getByRole('button', { name: t.form.save }));
     expect(await screen.findByText(t.form.errors.marketsRequired)).toBeInTheDocument();
+    // The first wrong field takes focus: the first market, which reads the error.
+    const first = within(group).getAllByRole('checkbox')[0];
+    expect(first).toHaveFocus();
+    expect(first).toHaveAccessibleDescription(t.form.errors.marketsRequired);
+    // The whole row is the target: a tap on the name ticks it.
+    await user.click(within(group).getByText('Italy'));
+    expect(within(group).getByRole('checkbox', { name: 'Italy' })).toBeChecked();
   });
 
   it('revenue is typed in millions, with a comma too', async () => {
@@ -170,6 +177,10 @@ describe('AlertsPanel', () => {
     expect(within(await rulesList()).getAllByRole('listitem')).toHaveLength(2);
     await user.click(screen.getByRole('button', { name: 'Delete Share below 10%' }));
     await user.click(await screen.findByRole('button', { name: t.delete.confirm }));
+    // Its row (and the button that opened the dialog) is gone: focus goes to New rule.
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: t.list.new })).toHaveFocus();
+    });
     await waitFor(() => {
       expect(api.rules().map((r) => r.id)).toEqual(['example-attainment']);
     });

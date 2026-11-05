@@ -76,6 +76,16 @@ export function AppShell({ header, main, assistant, alerts }: AppShellProps) {
     document.documentElement.removeAttribute('data-section');
   }, []);
 
+  // Opened in the app (the bell's push, or Forward), the sheet closes with
+  // Back, which takes away the entry it added; a link that opens on it has
+  // no entry before it to go back to, so closing replaces it.
+  const [shownSection, setShownSection] = useState(section);
+  const [alertsOpenedHere, setAlertsOpenedHere] = useState(false);
+  if (section !== shownSection) {
+    setShownSection(section);
+    setAlertsOpenedHere(section === 'alerts');
+  }
+
   const hidden = desktop ? collapsed : section !== 'assistant';
   // Seen again, however it happened (expand, tab bar, Back): clear the badge.
   const [wasHidden, setWasHidden] = useState(hidden);
@@ -189,12 +199,15 @@ export function AppShell({ header, main, assistant, alerts }: AppShellProps) {
           alertsCount={alertsCount}
         />
       </div>
-      {/* Desktop: the same `tab=alerts` opens a sheet over the dashboard;
-          closing replaces the entry, so Back does not open it again. */}
+      {/* Desktop: the same `tab=alerts` opens a sheet over the dashboard.
+          Closing goes Back when the app opened it, else replaces the entry:
+          either way Back afterwards neither reopens it nor stays put. */}
       <Sheet
         open={desktop && section === 'alerts'}
         onOpenChange={(open) => {
-          if (!open) setSection('overview', { history: 'replace' });
+          if (open) return;
+          if (alertsOpenedHere) window.history.back();
+          else setSection('overview', { history: 'replace' });
         }}
       >
         <SheetContent aria-describedby={undefined} className="w-full overflow-y-auto sm:max-w-md">

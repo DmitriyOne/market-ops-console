@@ -478,6 +478,7 @@
       "share": "Marktanteil unter 10 %"
     },
     "condition": "{operator, select, below {{metric} unter {threshold}} other {{metric} über {threshold}}}",
+    "full": "{condition} · {scope}",
     "metric": {
       "growth": "Wachstum",
       "attainment": "Planerfüllung",
@@ -589,7 +590,8 @@
     "tabs": {
       "label": "Alarm-Ansicht",
       "firing": "Ausgelöst",
-      "rules": "Regeln"
+      "rules": "Regeln",
+      "withCount": "{tab} · {count, number}"
     }
   }
 }
