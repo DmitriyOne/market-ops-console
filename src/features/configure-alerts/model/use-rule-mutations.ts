@@ -91,19 +91,24 @@ async function send(vars: WriteVars, locale: string): Promise<AlertRule | null> 
  * a failure puts that one rule back and says so with Retry; the list is
  * refetched once no write is left in flight.
  */
-export function useRuleMutations() {
-  const client = useQueryClient();
+/** Why a write failed, in words: the API's code translated, else the general message. */
+function useReason() {
   const t = useTranslations('alerts');
-  const locale = useLocale();
   const errorMessage = useErrorMessage();
-
-  const reason = useCallback(
+  return useCallback(
     (error: unknown) => {
       if (error instanceof HttpError && isCode(error.code)) return t(`errors.${error.code}`);
       return errorMessage(error) ?? '';
     },
     [errorMessage, t],
   );
+}
+
+export function useRuleMutations() {
+  const client = useQueryClient();
+  const t = useTranslations('alerts');
+  const locale = useLocale();
+  const reason = useReason();
 
   const mutation = useMutation({
     mutationKey: WRITE_KEY,
@@ -158,9 +163,72 @@ export function useRuleMutations() {
         const index = rules(client).findIndex((r) => r.id === rule.id);
         if (index >= 0) mutate({ kind: 'remove', rule, index });
       },
+      /** The failed write again, as it was (the same as the toast's Retry). */
+      retry: (failed: FailedWrite) => {
+        mutate(failed.vars);
+      },
+      /** Stop offering Retry for it. */
+      dismiss: (failed: FailedWrite) => {
+        const cache = client.getMutationCache();
+        const found = cache.getAll().find((m) => m.mutationId === failed.id);
+        if (found) cache.remove(found);
+      },
     }),
     [client, mutate],
   );
+}
+
+/**
+ * A write that failed and was not made again since. The panel offers Retry
+ * for it next to the rule, so it is in reach of the keyboard too: the toast
+ * is outside the modal sheet, where focus can't go.
+ */
+export type FailedWrite = {
+  /** The mutation's id (Dismiss forgets it). */
+  id: number;
+  kind: WriteVars['kind'];
+  /** The list row it belongs to; a failed create's row is gone, a Retry brings it back under this id. */
+  target: string;
+  name: string;
+  reason: string;
+  vars: WriteVars;
+};
+
+const targetOf = (vars: WriteVars) => (vars.kind === 'create' ? vars.tempId : vars.rule.id);
+
+/** The writes to offer Retry for: per rule, the latest write, if it failed. */
+export function useFailedWrites(): readonly FailedWrite[] {
+  const reason = useReason();
+  const writes = useMutationState({
+    filters: { mutationKey: WRITE_KEY },
+    select: (m) => ({
+      id: m.mutationId,
+      status: m.state.status,
+      vars: m.state.variables,
+      error: m.state.error,
+    }),
+  });
+  return useMemo(() => {
+    // The cache keeps writes in the order they were made, so a later write wins.
+    const latest = new Map<string, (typeof writes)[number] & { vars: WriteVars }>();
+    for (const w of writes) {
+      const { vars } = w;
+      if (isWriteVars(vars)) latest.set(targetOf(vars), { ...w, vars });
+    }
+    const failed: FailedWrite[] = [];
+    for (const [target, w] of latest) {
+      if (w.status !== 'error') continue;
+      const { vars } = w;
+      const name =
+        vars.kind === 'create'
+          ? vars.input.name
+          : vars.kind === 'update'
+            ? vars.previous.name
+            : vars.rule.name;
+      failed.push({ id: w.id, kind: vars.kind, target, name, reason: reason(w.error), vars });
+    }
+    return failed;
+  }, [writes, reason]);
 }
 
 /** Ids of rules with a write in flight, shown as "Saving…". */

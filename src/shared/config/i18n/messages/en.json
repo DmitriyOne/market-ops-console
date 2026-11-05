@@ -593,6 +593,15 @@
       "firing": "Firing",
       "rules": "Rules",
       "withCount": "{tab} · {count, number}"
+    },
+    "failed": {
+      "create": "“{name}” wasn't saved. {reason}",
+      "update": "Not saved. {reason}",
+      "remove": "Not deleted. {reason}",
+      "retry": "Retry",
+      "retryRule": "Retry: {name}",
+      "dismiss": "Dismiss",
+      "dismissRule": "Dismiss: {name}"
     }
   }
 }

@@ -29,6 +29,13 @@ function setup(searchParams = '', api = alertsApi(), initial: AlertTab = 'rules'
 
 const rulesList = () => screen.findByRole('list', { name: t.list.label });
 
+async function ruleRow(name: string): Promise<HTMLElement> {
+  const rows = within(await rulesList()).getAllByRole('listitem');
+  const row = rows.find((li) => within(li).queryByText(name));
+  if (!row) throw new Error(`no row for ${name}`);
+  return row;
+}
+
 async function choose(user: ReturnType<typeof setup>['user'], label: string, option: string) {
   await user.click(screen.getByRole('combobox', { name: label }));
   await user.click(await screen.findByRole('option', { name: option }));
@@ -231,14 +238,90 @@ describe('AlertsPanel', () => {
     expect(screen.getByRole('switch', { name: t.simulate.label })).not.toBeChecked();
   });
 
+  it('a failed toggle offers Retry in the row, next after the switch for the keyboard', async () => {
+    const { user, api } = setup();
+    await rulesList();
+    await user.click(screen.getByRole('switch', { name: t.simulate.label }));
+    const share = screen.getByRole('switch', { name: 'Rule on: Share below 10%' });
+    await user.click(share);
+    const row = await ruleRow('Share below 10%');
+    expect(await within(row).findByText(/^Not saved\. Simulated failure/)).toBeInTheDocument();
+    expect(share).toBeChecked();
+    expect(share).toHaveFocus();
+    await user.tab();
+    expect(within(row).getByRole('button', { name: 'Retry: Share below 10%' })).toHaveFocus();
+    await user.keyboard('{Enter}');
+    // The button is gone with the failure; focus stays on the rule.
+    await waitFor(() => {
+      expect(row).toHaveFocus();
+    });
+    await waitFor(() => {
+      expect(api.rules().find((r) => r.id === 'example-share')?.enabled).toBe(false);
+    });
+    expect(within(row).queryByText(/^Not saved/)).not.toBeInTheDocument();
+  });
+
+  it('a failed new rule: the note above the list brings it back, or is dismissed', async () => {
+    const { user, api } = setup();
+    await rulesList();
+    await user.click(screen.getByRole('switch', { name: t.simulate.label }));
+    await user.click(screen.getByRole('button', { name: t.list.new }));
+    await user.type(screen.getByRole('textbox', { name: t.form.name }), 'Low attainment EU');
+    await user.click(screen.getByRole('button', { name: t.form.save }));
+    expect(await screen.findByText(/^“Low attainment EU” wasn't saved\./)).toBeInTheDocument();
+    expect(within(await rulesList()).getAllByRole('listitem')).toHaveLength(2);
+
+    await user.click(screen.getByRole('button', { name: 'Dismiss: Low attainment EU' }));
+    expect(screen.queryByText(/wasn't saved/)).not.toBeInTheDocument();
+    expect(api.rules()).toHaveLength(2);
+
+    // Again, and this time Retry: the rule is back and saved; focus is on the list.
+    await user.click(screen.getByRole('switch', { name: t.simulate.label }));
+    await user.click(screen.getByRole('button', { name: t.list.new }));
+    await user.type(screen.getByRole('textbox', { name: t.form.name }), 'Low attainment EU');
+    await user.click(screen.getByRole('button', { name: t.form.save }));
+    await user.click(await screen.findByRole('button', { name: 'Retry: Low attainment EU' }));
+    const list = await rulesList();
+    expect(await within(list).findByText('Low attainment EU')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(list.parentElement).toHaveFocus();
+    });
+    await waitFor(() => {
+      expect(api.rules()).toHaveLength(3);
+    });
+  });
+
+  it('a failed delete puts the rule back with Retry; the retried delete leaves focus on the list', async () => {
+    const { user, api } = setup();
+    await rulesList();
+    await user.click(screen.getByRole('switch', { name: t.simulate.label }));
+    await user.click(screen.getByRole('button', { name: 'Delete Share below 10%' }));
+    await user.click(await screen.findByRole('button', { name: t.delete.confirm }));
+    expect(await screen.findByText(/^Not deleted\./)).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Retry: Share below 10%' }));
+    await waitFor(() => {
+      expect(api.rules().map((r) => r.id)).toEqual(['example-attainment']);
+    });
+    const list = await rulesList();
+    await waitFor(() => {
+      expect(list.parentElement).toHaveFocus();
+    });
+  });
+
   it('a rule being saved is dimmed, busy and says "Saving…" until the server answers', async () => {
     const { user, api } = setup();
     await rulesList();
     const release = api.hold();
     await user.click(screen.getByRole('switch', { name: 'Rule on: Share below 10%' }));
-    const row = within(await rulesList()).getAllByRole('listitem')[1];
+    const row = await ruleRow('Share below 10%');
     expect(row).toHaveAttribute('aria-busy', 'true');
     expect(row).toHaveTextContent(t.list.saving);
+    // Still focused and focusable, but a second press waits for the first.
+    const share = within(row).getByRole('switch');
+    expect(share).toHaveFocus();
+    expect(share).toHaveAttribute('aria-disabled', 'true');
+    await user.click(share);
+    expect(share).not.toBeChecked();
     release();
     await waitFor(() => {
       expect(row).not.toHaveAttribute('aria-busy');
