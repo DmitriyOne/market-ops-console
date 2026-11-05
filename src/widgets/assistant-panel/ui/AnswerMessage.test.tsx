@@ -19,7 +19,7 @@ const answer = (text: string): ChatMessage => ({
   question: 'How is Germany doing?',
   text,
   status: 'done',
-  kind: 'answer',
+  kind: 'normal',
   citations: [{ marketId: 'de', period: ds.meta.latestPeriod, label: 'Germany' }],
   confidence: 'high',
   error: null,
