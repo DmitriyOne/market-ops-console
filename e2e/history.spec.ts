@@ -45,6 +45,8 @@ test('selected markets: Back takes off the last one, and the table follows', asy
   // Shift+Enter, as from the keyboard (Europe is small on the world map).
   const map = page.getByRole('group', { name: /^World map of markets/ });
   await map.getByRole('button', { name: /^France,/ }).press('Shift+Enter');
+  // Two picks within nuqs's URL throttle would share one history entry.
+  await expect(page).toHaveURL(/markets=fr(&|$)/);
   await map.getByRole('button', { name: /^Spain,/ }).press('Shift+Enter');
   await expect(page).toHaveURL(/markets=fr&markets=es/);
 

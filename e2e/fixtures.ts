@@ -14,6 +14,16 @@ export const test = base.extend<Fixtures>({
   // mistake it for a hook.
   expectNoAxeViolations: async ({ page }, provide) => {
     await provide(async (target = page) => {
+      // A sheet or popover still fading in reads as low contrast: let every
+      // finite animation end first (spinners and pulses never do).
+      await target.evaluate(() =>
+        Promise.all(
+          document
+            .getAnimations()
+            .filter((a) => a.effect?.getComputedTiming().iterations !== Infinity)
+            .map((a) => a.finished.catch(() => undefined)),
+        ),
+      );
       const { violations } = await new AxeBuilder({ page: target }).withTags(WCAG_TAGS).analyze();
       const lines = violations.map(
         (v) =>
