@@ -60,6 +60,16 @@ export {
 } from './model/markets-table';
 export { type OverviewKpis, overviewKpis, type RiskCount } from './model/overview';
 export { periodToDate } from './model/period';
+export {
+  comparisonRadar,
+  RADAR_AXES,
+  RADAR_LIMIT,
+  type RadarAxis,
+  type RadarAxisNotice,
+  type RadarSeries,
+  type RadarValue,
+  type RadarView,
+} from './model/radar';
 export { getMarket, getProduct, getRegion, scopeLabel } from './model/reference';
 export {
   isLatestSnapshot,
