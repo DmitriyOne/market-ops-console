@@ -204,7 +204,15 @@
     "resetHint": "Portfolio, latest month, Executive"
   },
   "overview": {
-    "summary": "{markets, plural, one {# market} other {# markets}} · {products, plural, one {# product} other {# products}} · latest data {period}"
+    "summary": "{markets, plural, one {# market} other {# markets}} · {products, plural, one {# product} other {# products}} · latest data {period}",
+    "modeBadge": {
+      "executive": "Executive view",
+      "analyst": "Analyst view"
+    },
+    "modeNote": {
+      "executive": "Headlines: KPIs, market status, risks and the revenue trend.",
+      "analyst": "Adds the map metric, the comparison radar, the markets table and the heat map below."
+    }
   },
   "kpi": {
     "title": "Key figures",
@@ -350,6 +358,77 @@
     "notePerProduct": "Share is not available per product.",
     "noteCalculated": "All figures are calculated from monthly data, so a row adds up and the total is the sum of the rows. Share and status are the stored latest-month figures; the tiles show stored KPIs, which can differ by about 1 point.",
     "anomaly": "Anomaly, {period}: {note}"
+  },
+  "heatMap": {
+    "title": "Heat map",
+    "subtitle": "{metric} by month",
+    "notice": {
+      "statusPerMonth": "Status is set for the latest month only; the heat map shows growth YoY.",
+      "sharePerMonth": "Market share is set for the latest month only; the heat map shows growth YoY."
+    },
+    "gridLabel": "{metric} by market and month",
+    "market": "Market",
+    "cell": "{market}, {month}: {value}",
+    "stepBelow": "below {to}",
+    "stepBetween": "{from} – {to}",
+    "stepAbove": "{from} and above",
+    "anomaly": "anomaly: {note}",
+    "selected": "selected",
+    "current": "open now",
+    "inWindow": "in the selected window",
+    "open": "Open {market}, {month}",
+    "add": "Add {market} to selection",
+    "remove": "Remove {market} from selection",
+    "pick": "Pick a cell to see its value.",
+    "hint": "Arrow keys move, Enter opens the market at that month, Shift+click or Shift+Enter selects it.",
+    "showTable": "Show as table",
+    "showChart": "Show as chart",
+    "caption": "{metric} by month for {scope}",
+    "legend": "Legend",
+    "noteCalculated": "Calculated from monthly series: values can differ from the stored KPIs by about a point.",
+    "perProduct": "Values are for {product}.",
+    "revenueUnit": "Revenue in US dollars.",
+    "anomalyMarket": "anomaly in the whole market: {note}",
+    "anomalies": "Anomalies",
+    "anomalyMark": "anomaly"
+  },
+  "radar": {
+    "title": "Comparison",
+    "basis": {
+      "selection": "Selected markets against the portfolio",
+      "market": "{market} and its neighbours in {region}, against the portfolio",
+      "region": "Markets of {region} against the portfolio",
+      "regions": "Regions against the portfolio"
+    },
+    "portfolio": "Portfolio average",
+    "compared": "Compared",
+    "axis": {
+      "growth": "Growth YoY",
+      "attainment": "Attainment",
+      "share": "Market share",
+      "revenue": "Revenue",
+      "momentum": "Momentum"
+    },
+    "scaleMarkets": "Each axis runs from the weakest (centre) to the strongest (edge) of the 13 markets.",
+    "scaleRegions": "Each axis runs from the weakest (centre) to the strongest (edge) of the 4 regions.",
+    "momentumNote": "Momentum: growth YoY over the last 3 months minus the 3 months before, in percentage points.",
+    "removed": {
+      "shareLatestOnly": "Market share is set for the latest month only; its axis is left out.",
+      "momentumTooEarly": "Momentum needs six months of data; its axis is left out."
+    },
+    "hidden": {
+      "selection": "Showing the first {shown} of {total} selected markets.",
+      "neighbours": "Showing {shown} of {total} markets of {region}."
+    },
+    "productIgnored": "Compares markets, not products: {product} is not applied here.",
+    "pickHint": "To compare other markets, Shift+click them on the map or pick them in the table filter.",
+    "tooFewAxes": "Too few axes have data for a chart; the table shows the values.",
+    "showTable": "Show as table",
+    "showChart": "Show as chart",
+    "caption": "{names} against the portfolio average, {window}",
+    "chartLabel": "Radar chart: {names} against the portfolio average",
+    "pp": "{value} pp",
+    "legend": "Legend"
   },
   "exportMarkets": {
     "button": "Export",

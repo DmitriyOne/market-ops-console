@@ -3,10 +3,10 @@
 import { useTranslations } from 'next-intl';
 import { useId } from 'react';
 
-import { type MarketMapView, StatusIcon, useStatusLabel } from '@/entities/performance';
+import { type MarketMapView, StatusIcon, toneFill, useStatusLabel } from '@/entities/performance';
 import type { MarketStatus } from '@/shared/api';
 
-import { STATUS_FILL, toneFill } from './map-colours';
+import { STATUS_FILL } from './map-colours';
 import { useMapFormat } from './use-map-format';
 
 const STATUSES: MarketStatus[] = ['on_track', 'at_risk', 'off_track'];
