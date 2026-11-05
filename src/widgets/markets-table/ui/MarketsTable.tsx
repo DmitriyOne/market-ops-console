@@ -39,9 +39,6 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
 } from '@/shared/ui';
 
 import { useTableSort } from '../model/use-table-sort';
@@ -250,14 +247,17 @@ function MarketRow({
                   <AlertMark flag={flag} labelled={false} />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto max-w-64 text-sm">{flagLabel(flag)}</PopoverContent>
+              <PopoverContent aria-label={flagLabel(flag)} className="w-auto max-w-64 text-sm">
+                {flagLabel(flag)}
+              </PopoverContent>
             </Popover>
           ) : null}
           {row.anomalies.map((a) => {
             const label = t('anomaly', { period: f.period(a.period), note: a.note });
             return (
-              <Tooltip key={`${a.period}:${a.note}`}>
-                <TooltipTrigger asChild>
+              // A popover like the bell's: a tap shows the note on touch too.
+              <Popover key={`${a.period}:${a.note}`}>
+                <PopoverTrigger asChild>
                   <Button
                     type="button"
                     variant="ghost"
@@ -266,9 +266,11 @@ function MarketRow({
                   >
                     <TriangleAlertIcon aria-hidden />
                   </Button>
-                </TooltipTrigger>
-                <TooltipContent className="max-w-64">{label}</TooltipContent>
-              </Tooltip>
+                </PopoverTrigger>
+                <PopoverContent aria-label={label} className="w-auto max-w-64 text-sm">
+                  {label}
+                </PopoverContent>
+              </Popover>
             );
           })}
         </div>

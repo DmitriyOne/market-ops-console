@@ -23,37 +23,49 @@ function Toaster(props: ToasterProps) {
 }
 
 type ToastAction = { label: string; onClick: () => void };
+/** `id`: a second toast with the same id replaces the first, and `toast.dismiss(id)` closes it. */
+type ToastOptions = { id?: string };
 
-function show(kind: 'success' | 'error', message: string, action?: ToastAction) {
-  return sonner.custom((id) => (
-    <div className="mx-auto flex w-fit max-w-full items-center gap-2 rounded-lg border border-border bg-popover px-4 py-3 text-sm text-popover-foreground shadow-sm">
-      {kind === 'success' ? (
-        <CircleCheckIcon aria-hidden className="size-4 shrink-0" />
-      ) : (
-        <OctagonXIcon aria-hidden className="size-4 shrink-0 text-destructive" />
-      )}
-      <span>{message}</span>
-      {action ? (
-        <button
-          type="button"
-          className="ml-1 inline-flex min-h-11 shrink-0 items-center rounded-md px-2 font-semibold underline-offset-4 outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/50"
-          onClick={() => {
-            sonner.dismiss(id);
-            action.onClick();
-          }}
-        >
-          {action.label}
-        </button>
-      ) : null}
-    </div>
-  ));
+function show(
+  kind: 'success' | 'error',
+  message: string,
+  action?: ToastAction,
+  options?: ToastOptions,
+) {
+  return sonner.custom(
+    (id) => (
+      <div className="mx-auto flex w-fit max-w-full items-center gap-2 rounded-lg border border-border bg-popover px-4 py-3 text-sm text-popover-foreground shadow-sm">
+        {kind === 'success' ? (
+          <CircleCheckIcon aria-hidden className="size-4 shrink-0" />
+        ) : (
+          <OctagonXIcon aria-hidden className="size-4 shrink-0 text-destructive" />
+        )}
+        <span>{message}</span>
+        {action ? (
+          <button
+            type="button"
+            className="ml-1 inline-flex min-h-11 shrink-0 items-center rounded-md px-2 font-semibold underline-offset-4 outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/50"
+            onClick={() => {
+              sonner.dismiss(id);
+              action.onClick();
+            }}
+          >
+            {action.label}
+          </button>
+        ) : null}
+      </div>
+    ),
+    options,
+  );
 }
 
 /** Short confirmations and failures; sonner announces them in its live region. */
 const toast = {
   success: (message: string, action?: ToastAction) => show('success', message, action),
   /** With `action`, a button in the toast (e.g. Retry after a rollback). */
-  error: (message: string, action?: ToastAction) => show('error', message, action),
+  error: (message: string, action?: ToastAction, options?: ToastOptions) =>
+    show('error', message, action, options),
+  dismiss: (id: string) => sonner.dismiss(id),
 };
 
 export { toast, Toaster };

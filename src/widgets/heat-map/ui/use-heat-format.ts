@@ -2,7 +2,7 @@
 
 import { useFormatter, useTranslations } from 'next-intl';
 
-import { type HeatCell, type HeatMetric, type HeatRow, periodToDate } from '@/entities/performance';
+import { type HeatCell, type HeatMetric, periodToDate } from '@/entities/performance';
 import type { Period } from '@/shared/api';
 
 /** Numbers and words of the heat map: short in a cell, one decimal in names and the detail line. */
@@ -31,17 +31,17 @@ export function useHeatFormat(metric: HeatMetric, marketNotes = false) {
   const note = (text: string) =>
     marketNotes ? t('anomalyMarket', { note: text }) : t('anomaly', { note: text });
 
-  const cellName = (row: HeatRow, cell: HeatCell) => {
-    // The cell's visible (rounded) figure is part of its name (label in
-    // name, WCAG 2.5.3), the exact one follows: "Canada, Dec 2024: +12% (+11.7%)".
-    const where = { market: row.name, month: month(cell.period) };
+  const cellName = (cell: HeatCell) => {
+    // Only what the cell adds: the row and column headers name the market and
+    // the month, and a screen reader in the grid reads them as focus moves.
+    // The visible (rounded) figure is part of the name (label in name, WCAG
+    // 2.5.3), the exact one follows: "+12% (+11.7%)".
     const parts = [
       cell.value === null
-        ? t('cell', { ...where, value: dash })
-        : t('cellRounded', { ...where, shown: short(cell.value), value: long(cell.value) }),
+        ? t('cell', { value: dash })
+        : t('cellRounded', { shown: short(cell.value), value: long(cell.value) }),
     ];
     if (cell.anomaly) parts.push(note(cell.anomaly.note));
-    if (row.selected) parts.push(t('selected'));
     return parts.join(', ');
   };
 

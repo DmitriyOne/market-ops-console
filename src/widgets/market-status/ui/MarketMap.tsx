@@ -2,7 +2,17 @@
 
 import { MinusIcon, PlusIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import {
+  memo,
+  type Ref,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { ComposableMap, useGeographies, useMapContext } from 'react-simple-maps/core';
 import { ZoomableGroup } from 'react-simple-maps/zoom';
 import topology from 'world-atlas/countries-110m.json';
@@ -63,6 +73,8 @@ function useMapPosition() {
   const [pos, setPos] = useState<MapView>(WORLD);
   const frame = useRef<number | null>(null);
   const latest = useRef(pos);
+  // Where the current flight is going (or the view, once it is there).
+  const aim = useRef(pos);
   useEffect(() => {
     latest.current = pos;
   }, [pos]);
@@ -75,6 +87,7 @@ function useMapPosition() {
   const flyTo = useCallback(
     (target: MapView, instant = false) => {
       stop();
+      aim.current = target;
       // No frame in between: the first fit lands before the map is painted.
       if (instant || still) {
         latest.current = target;
@@ -101,8 +114,20 @@ function useMapPosition() {
     [still, stop],
   );
 
+  /**
+   * Bring a point to the middle at once, at the zoom the view has or is
+   * flying to (a flight cut short by it would leave a zoom from halfway).
+   */
+  const recentre = useCallback(
+    (center: MapView['center']) => {
+      const zoom = frame.current === null ? latest.current.zoom : aim.current.zoom;
+      flyTo({ center, zoom }, true);
+    },
+    [flyTo],
+  );
+
   useEffect(() => stop, [stop]);
-  return { pos, setPos, flyTo, stop };
+  return { pos, setPos, flyTo, stop, recentre };
 }
 
 export type MarketMapProps = {
@@ -127,7 +152,7 @@ export function MarketMap({ view, tall = false, fitIds, onOpen, onToggle }: Mark
   const frame: MapFrame = tall ? FRAMES.tall : FRAMES.wide;
   const t = useTranslations('marketStatus');
   const m = useMapFormat();
-  const { pos, setPos, flyTo, stop } = useMapPosition();
+  const { pos, setPos, flyTo, stop, recentre } = useMapPosition();
   const [tip, setTip] = useState<TooltipState | null>(null);
   // Hidden behind its skeleton until the first fit: never the whole world, then a jump.
   // Per frame: a new frame remounts the map and fits again.
@@ -180,6 +205,7 @@ export function MarketMap({ view, tall = false, fitIds, onOpen, onToggle }: Mark
             onMoveEnd={setPos}
             onGesture={stop}
             flyTo={flyTo}
+            onReveal={recentre}
             onOpen={onOpen}
             onToggle={onToggle}
             onTip={setTip}
@@ -252,6 +278,7 @@ type MapLayersProps = Pick<MarketMapProps, 'view' | 'fitIds' | 'onOpen' | 'onTog
   onMoveEnd: (pos: MapView) => void;
   onGesture: () => void;
   flyTo: (target: MapView, instant?: boolean) => void;
+  onReveal: CountriesProps['onReveal'];
   onTip: CountriesProps['onTip'];
   /** The first fit is in place: the map can be shown. */
   fitted: boolean;
@@ -273,6 +300,7 @@ function MapLayers({
   onMoveEnd,
   onGesture,
   flyTo,
+  onReveal,
   onOpen,
   onToggle,
   onTip,
@@ -324,7 +352,14 @@ function MapLayers({
       }}
     >
       <Patterns zoom={pos.zoom} />
-      <Countries view={view} shapes={shapes} onOpen={onOpen} onToggle={onToggle} onTip={onTip} />
+      <Countries
+        view={view}
+        shapes={shapes}
+        onOpen={onOpen}
+        onToggle={onToggle}
+        onTip={onTip}
+        onReveal={onReveal}
+      />
     </ZoomableGroup>
   );
 }
@@ -365,6 +400,8 @@ type CountriesProps = {
   onOpen: (marketId: string) => void;
   onToggle: MarketMapProps['onToggle'];
   onTip: (update: (prev: TooltipState | null) => TooltipState | null) => void;
+  /** Bring a point (longitude, latitude) to the middle of the view. */
+  onReveal: (center: MapView['center']) => void;
 };
 
 /** Every country: plain land, then the markets in Tab order, then patterns and rings on top. */
@@ -374,22 +411,54 @@ const Countries = memo(function Countries({
   onOpen,
   onToggle,
   onTip,
+  onReveal,
 }: CountriesProps) {
   const m = useMapFormat();
   const { projection } = useMapContext();
-  // Above the main part of the country (not France with French Guiana, the US with Alaska).
-  const focusPoint = (path: SVGPathElement, item: MapItem): [number, number] => {
+  // The main part of the country (not France with French Guiana, the US with Alaska).
+  const boxOf = (item: MapItem): Box | null => {
     const geometry = shapes.get(item.numericIso)?.geometry;
-    const box =
-      geometry && isArea(geometry) ? mainBox(geometry, (p) => projection(p) ?? null) : null;
+    return geometry && isArea(geometry) ? mainBox(geometry, (p) => projection(p) ?? null) : null;
+  };
+  // That part on screen: [left, top, right, bottom], or null without layout (tests).
+  const onScreen = (
+    path: SVGPathElement,
+    item: MapItem,
+  ): readonly [number, number, number, number] | null => {
+    const box = boxOf(item);
     const ctm = box && typeof path.getScreenCTM === 'function' ? path.getScreenCTM() : null;
-    if (box && ctm) {
-      const p = new DOMPoint((box[0][0] + box[1][0]) / 2, box[0][1]).matrixTransform(ctm);
-      return [p.x, p.y];
-    }
+    if (!box || !ctm) return null;
+    const a = new DOMPoint(box[0][0], box[0][1]).matrixTransform(ctm);
+    const b = new DOMPoint(box[1][0], box[1][1]).matrixTransform(ctm);
+    return [a.x, a.y, b.x, b.y];
+  };
+  // Above the main part of the country.
+  const focusPoint = (path: SVGPathElement, item: MapItem): [number, number] => {
+    const box = onScreen(path, item);
+    if (box) return [(box[0] + box[2]) / 2, box[1]];
     const r = path.getBoundingClientRect();
     return [r.left + r.width / 2, r.top];
   };
+  // The middle of the main part is in the frame: a big country (the US,
+  // Brazil) zoomed in never fits whole, and needn't to be found.
+  const inView = (path: SVGPathElement, item: MapItem) => {
+    const box = onScreen(path, item);
+    const frame = path.ownerSVGElement?.getBoundingClientRect();
+    if (!box || !frame) return true;
+    const x = (box[0] + box[2]) / 2;
+    const y = (box[1] + box[3]) / 2;
+    return x >= frame.left && x <= frame.right && y >= frame.top && y <= frame.bottom;
+  };
+  const centreOf = (item: MapItem): MapView['center'] | null => {
+    const box = boxOf(item);
+    const centre = box
+      ? projection.invert?.([(box[0][0] + box[1][0]) / 2, (box[0][1] + box[1][1]) / 2])
+      : null;
+    return centre ? [centre[0], centre[1]] : null;
+  };
+  // The market Tab is on, ringed on top of every layer (its own component,
+  // so moving the ring does not render every market again).
+  const ring = useRef<RingHandle>(null);
   // Whether the next click and focus come from a finger, and whether a press is under way.
   const pointer = useRef({ type: 'mouse', down: false });
   const iso = new Set(view.items.map((i) => i.numericIso));
@@ -443,7 +512,7 @@ const Countries = memo(function Countries({
             stroke={item.inScope ? 'var(--card)' : 'var(--muted-foreground)'}
             strokeWidth={item.inScope ? 0.75 : 0.6}
             style={NON_SCALING}
-            className="cursor-pointer outline-none focus-visible:stroke-foreground focus-visible:[stroke-width:2.5]"
+            className="cursor-pointer outline-none"
             data-market={item.id}
             onPointerDown={(e) => {
               pointer.current = { type: e.pointerType, down: true };
@@ -467,11 +536,32 @@ const Countries = memo(function Countries({
               else act(item, e.shiftKey);
             }}
             onFocus={(e) => {
-              // A press focuses too; the tooltip on focus is for the keyboard.
-              if (pointer.current.down) return;
-              show(item.id, focusPoint(e.currentTarget, item), 'focus');
+              // The ring, the move and the tooltip are for the keyboard. A
+              // press or a tap focuses too (a tap after its pointerup, so the
+              // press flag alone misses it); :focus-visible tells them apart.
+              const path = e.currentTarget;
+              if (pointer.current.down || !path.matches(':focus-visible')) return;
+              ring.current?.show(item.id);
+              const centre = inView(path, item) ? null : centreOf(item);
+              if (!centre) {
+                show(item.id, focusPoint(path, item), 'focus');
+                return;
+              }
+              onReveal(centre);
+              // The zoom group takes the new centre a frame or more later:
+              // point the tooltip once the country is in view (or give up
+              // waiting after a few frames and point where it is).
+              const place = (frames: number) => {
+                requestAnimationFrame(() => {
+                  if (document.activeElement !== path) return;
+                  if (frames > 0 && !inView(path, item)) place(frames - 1);
+                  else show(item.id, focusPoint(path, item), 'focus');
+                });
+              };
+              place(10);
             }}
             onBlur={() => {
+              ring.current?.hide(item.id);
               hideIf((prev) => prev.via === 'focus');
             }}
             onKeyDown={(e) => {
@@ -512,7 +602,46 @@ const Countries = memo(function Countries({
             </g>
           );
         })}
+        <FocusRing ref={ring} markets={markets} shapes={shapes} />
       </g>
     </>
   );
 });
+
+type RingHandle = { show: (id: string) => void; hide: (id: string) => void };
+
+/**
+ * The keyboard focus ring, drawn last: on the path itself it was partly
+ * under the neighbours and the patterns drawn after it.
+ */
+function FocusRing({
+  ref,
+  markets,
+  shapes,
+}: {
+  ref: Ref<RingHandle>;
+  markets: readonly MapItem[];
+  shapes: ReadonlyMap<string, Geography>;
+}) {
+  const [id, setId] = useState<string | null>(null);
+  useImperativeHandle(
+    ref,
+    () => ({
+      show: setId,
+      hide: (gone) => {
+        setId((prev) => (prev === gone ? null : prev));
+      },
+    }),
+    [],
+  );
+  const item = markets.find((i) => i.id === id);
+  const d = item ? (shapes.get(item.numericIso)?.svgPath ?? undefined) : undefined;
+  if (!d) return null;
+  return (
+    <g>
+      {/* A card-coloured halo under the ring keeps it clear of any fill. */}
+      <path d={d} fill="none" stroke="var(--card)" strokeWidth={5} style={NON_SCALING} />
+      <path d={d} fill="none" stroke="var(--foreground)" strokeWidth={2.5} style={NON_SCALING} />
+    </g>
+  );
+}

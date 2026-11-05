@@ -373,8 +373,8 @@
     },
     "gridLabel": "{metric} nach Markt und Monat",
     "market": "Markt",
-    "cell": "{market}, {month}: {value}",
-    "cellRounded": "{market}, {month}: {shown} ({value})",
+    "cell": "{value}",
+    "cellRounded": "{shown} ({value})",
     "stepBelow": "unter {to}",
     "stepBetween": "{from} – {to}",
     "stepAbove": "ab {from}",
@@ -593,6 +593,15 @@
       "firing": "Ausgelöst",
       "rules": "Regeln",
       "withCount": "{tab} · {count, number}"
+    },
+    "failed": {
+      "create": "„{name}“ wurde nicht gespeichert. {reason}",
+      "update": "Nicht gespeichert. {reason}",
+      "remove": "Nicht gelöscht. {reason}",
+      "retry": "Erneut versuchen",
+      "retryRule": "Erneut versuchen: {name}",
+      "dismiss": "Ausblenden",
+      "dismissRule": "Ausblenden: {name}"
     }
   }
 }

@@ -373,8 +373,8 @@
     },
     "gridLabel": "{metric} по рынкам и месяцам",
     "market": "Рынок",
-    "cell": "{market}, {month}: {value}",
-    "cellRounded": "{market}, {month}: {shown} ({value})",
+    "cell": "{value}",
+    "cellRounded": "{shown} ({value})",
     "stepBelow": "ниже {to}",
     "stepBetween": "{from} – {to}",
     "stepAbove": "{from} и выше",
@@ -593,6 +593,15 @@
       "firing": "Сработало",
       "rules": "Правила",
       "withCount": "{tab} · {count, number}"
+    },
+    "failed": {
+      "create": "«{name}» не сохранено. {reason}",
+      "update": "Не сохранено. {reason}",
+      "remove": "Не удалено. {reason}",
+      "retry": "Повторить",
+      "retryRule": "Повторить: {name}",
+      "dismiss": "Скрыть",
+      "dismissRule": "Скрыть: {name}"
     }
   }
 }

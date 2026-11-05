@@ -189,12 +189,21 @@ describe('MarketStatus map', () => {
   });
 
   const mapGroup = () => screen.findByRole('group', { name: /^World map of markets/ });
+  /**
+   * Focus as a keyboard user gets it, by Tab: the map rings and explains a
+   * market on keyboard focus only (`:focus-visible`), which a bare `focus()`
+   * after an earlier test's click is not.
+   */
+  const focusByKeyboard = async (user: ReturnType<typeof setup>['user'], el: HTMLElement) => {
+    for (let i = 0; i < 300 && document.activeElement !== el; i++) await user.tab();
+    expect(el).toHaveFocus();
+  };
 
   it('the map tooltip names the rules that flag the market', async () => {
     server.use(...alertsApi().handlers);
-    setup();
+    const { user } = setup();
     const us = await within(await mapGroup()).findByRole('button', { name: /^United States,/ });
-    us.focus();
+    await focusByKeyboard(user, us);
     const tip = await screen.findByRole('dialog');
     await waitFor(() => {
       expect(tip).toHaveTextContent('Alert: Share below 10%');
@@ -237,7 +246,7 @@ describe('MarketStatus map', () => {
   it('Enter on a market drills into it', async () => {
     const { user, lastUpdate } = setup();
     const germany = await within(await mapGroup()).findByRole('button', { name: /^Germany,/ });
-    germany.focus();
+    await focusByKeyboard(user, germany);
     await user.keyboard('{Enter}');
     await waitFor(() => {
       expect(Object.fromEntries(lastUpdate()?.searchParams ?? [])).toEqual({
@@ -312,7 +321,7 @@ describe('MarketStatus map', () => {
   it('keyboard focus shows the tooltip; Esc hides it', async () => {
     const { user } = setup();
     const germany = await within(await mapGroup()).findByRole('button', { name: /^Germany,/ });
-    germany.focus();
+    await focusByKeyboard(user, germany);
     const tip = await screen.findByRole('dialog');
     expect(tip).toHaveTextContent('Germany');
     expect(tip).toHaveTextContent('92.0%');
