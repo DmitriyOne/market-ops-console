@@ -88,7 +88,7 @@ Points the owner wants explained in the README, in his own words:
 - **The threshold field reads "1,000" as 1** in English, and "5." or "1.000,5" say "required" instead of "not a number" (`parseThreshold`). Nobody types a thousands separator in a field that holds up to 200 % or a few million dollars. **Accepted (owner, 2026-11-05)**.
 - **A revenue threshold is shown with one decimal** ("$1.3M" for 1.25 M$, `useThresholdFormat` uses `compactCurrency`), in the rule list and the Firing reasons. Fixed (owner, 2026-11-05): a `thresholdCurrency` format with two decimals shows it as typed. Closed.
 - **The anomaly ⚠ in the markets table has a hover tooltip only**, so a touch screen can't read its note (the alert bell next to it became a popover in 0.9.0). Same fix if wanted. **Hardening plan**.
-- **Alerts checked in jsdom only** (no browser run this round): the sheet's look and focus return on desktop, the phone tab with the keyboard open, Radix Select inside the sheet on a phone. **Owner check**.
+- **Alerts checked in the browser (Playwright on the dev server, 2026-11-05)**: Back after closing the sheet (X, Escape, overlay; a deep link), two quick writes kept after a reload, the saved toast while another rule is switched, ru examples kept after a write, focus after a delete and on a missing market, 44 px rows and switch, the table bell on a tap (touch emulation). Not checked: a real phone, the keyboard open over the form. **Owner check**.
 
 ## Currency picker (owner, 2026-11-04) — after the required work, its own release before the README
 
