@@ -90,6 +90,12 @@ Points the owner wants explained in the README, in his own words:
 - **The E2E run on Vercel previews** (`deployment_status`, `BASE_URL` = the preview URL, filtered to `release/*` previews to spare minutes; protection bypass or Trusted Sources) comes with the deploy. **0.12.0**.
 - **The phone tab's name reads "Alerts , 5 markets flagged"** in Chromium (a space before the comma from the inline count). Screen readers ignore it. Cosmetic.
 
+## From the 0.11.0 review (2026-11-05)
+
+- **The alerts sheet stays usable behind the offline notice**: it is portalled outside the wrapper the notice makes inert, and Radix keeps focus inside it, so the keyboard can still switch rules while offline (pre-existing). Mark portalled layers inert too, or close the sheet's focus trap while offline. **Hardening plan**.
+- **A failure shown in the panel is forgotten after ~5 minutes**: failed writes keep TanStack's default `gcTime` (5 min); only the newest stays while the panel is open, and the toast is gone long before. Set a `gcTime` on the write mutation if it matters. **Accepted**.
+- **"Not saved. " with an empty reason** (`alerts.failed.update/remove` when `errorMessage` gives `''`): never seen, every failure has a reason. Cosmetic.
+
 ## Currency picker (owner, 2026-11-04) — after the required work, its own release before the README
 
 - Money everywhere shows a plain `$` (`currencyDisplay: 'narrowSymbol'` in `formats.ts`), not `US$`.
