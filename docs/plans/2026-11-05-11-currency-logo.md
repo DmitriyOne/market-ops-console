@@ -85,3 +85,21 @@ preview move to 0.13.0.
   happens, the money parts wait like the other browser-read parts.
 - German compact currency does not shorten thousands (backlog, 0.6.0); the
   same holds for `€` and `£`.
+
+## Found during the release
+
+- **The USD flash is a `next dev` effect only.** With EUR stored, `:3000`
+  showed `$22.9m` for ~150 ms; a production build (static HTML = skeletons)
+  showed no `$` at any frame in en-GB, de-DE, ru-RU, Executive and Analyst.
+  The owner suggested skeletons: that is what production already does. No
+  change; backlog note.
+- **axe: the header trigger's name lacked its visible text** ("USD" vs
+  "Currency: US dollar"). Named "Currency: USD, US dollar" now.
+- The settings button's name listed language, theme, reset; currency added.
+- The mock assistant never quotes an amount, so the USD note does not show
+  with it (unit-tested on a made-up answer).
+- **Checked by hand:** Excel (EUR file opened in Microsoft Excel: Germany
+  €1,493,754 = 1,676,586 × 0.89095, total €20,358,580, share 21.9 % and
+  attainment 100.4 % unchanged, the Germany + Spain filter recomputes the
+  totals); no `$` text node or attribute left in Analyst with EUR; the phone
+  sheet and menu (ru); the logo in light and dark.

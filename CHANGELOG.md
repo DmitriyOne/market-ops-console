@@ -2,6 +2,16 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/). The top version must match `package.json` and the `release/X.Y.Z` branch.
 
+## [0.12.0] - Unreleased
+
+### Added
+- Currency: amounts in US dollars, euros or British pounds, chosen in the header (desktop) or the ⚙︎ settings sheet (phone) and remembered in this browser. ECB rates of 5 November 2026 (1 USD = 0.89095 EUR = 0.74299 GBP), fixed in the code for this demo; a live app would get them from the backend API, and the menu says so. One rate for every month, so growth, attainment and share stay as they are. Everything that shows an amount converts: KPIs, charts, the markets table, heat map, radar, map and its revenue steps (round in the chosen currency), Top risks, the assistant's evidence cards, alerts (revenue thresholds typed in the chosen currency, stored in USD) and the Excel export (the About sheet names the rate and its date). CSV stays raw USD. The assistant's answer text is shown as received; when it quotes dollars in another currency, a line says so (ADR 0017).
+- The "M" logo next to the app name, from the design; it inverts in dark mode.
+
+### Changed
+- Money shows a bare symbol everywhere: `$22.9m`, not `US$22.9m` in British English.
+- The settings button's name lists the currency.
+
 ## [0.11.1] - Unreleased
 
 ### Changed

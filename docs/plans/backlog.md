@@ -30,7 +30,7 @@ Format: **Item**: what is wrong (file). Why it can wait. Where it goes.
 
 ## From the owner check of 0.5.0 (2026-11-04)
 
-- **No favicon**: every page requests `/favicon.ico` and gets a 404 (console error in the browser). Add an `app/icon.svg` (or `favicon.ico`) in the app's style. **0.12.0, with the deploy** (owner, 2026-11-05: together with the title, description and preview image).
+- **No favicon**: every page requests `/favicon.ico` and gets a 404 (console error in the browser). Add an `app/icon.svg` (or `favicon.ico`) in the app's style. **0.13.0, with the deploy** (owner, 2026-11-05: together with the title, description and preview image; the 0.12.0 `Logo` is the mark to reuse).
 
 ## README notes (owner, 2026-11-04)
 
@@ -84,7 +84,7 @@ Points the owner wants explained in the README, in his own words:
 
 ## From the 0.10.0 E2E build (2026-11-05)
 
-- **The E2E run on Vercel previews** (`deployment_status`, `BASE_URL` = the preview URL, filtered to `release/*` previews to spare minutes; protection bypass or Trusted Sources) comes with the deploy. **0.12.0**.
+- **The E2E run on Vercel previews** (`deployment_status`, `BASE_URL` = the preview URL, filtered to `release/*` previews to spare minutes; protection bypass or Trusted Sources) comes with the deploy. **0.13.0** (0.12.0 became the currency picker, owner 2026-11-05).
 - **The phone tab's name reads "Alerts , 5 markets flagged"** in Chromium (a space before the comma from the inline count). Screen readers ignore it. Cosmetic.
 
 ## From the 0.11.0 review (2026-11-05)
@@ -99,11 +99,9 @@ Points the owner wants explained in the README, in his own words:
 - **Column letters are written by hand** in the totals (`'D'`, `'J'`, as in the attainment and growth totals): moving a column breaks them silently. Derive them from the column list if columns ever move. **Hardening plan**.
 - **A new lockfile makes the parallel jobs race to save one pnpm cache key** ("Unable to reserve cache" warnings, harmless). **Accepted**.
 
-## Currency picker (owner, 2026-11-04) — after the required work, its own release before the README
+## Currency picker — done in 0.12.0 (ADR 0017)
 
-- Money everywhere shows a plain `$` (`currencyDisplay: 'narrowSymbol'` in `formats.ts`), not `US$`.
-- A currency choice (USD / EUR / GBP) in the menu next to language and theme (desktop header and the phone ⚙︎ sheet), remembered per browser, not in the URL (a display preference like the locale).
-- One rate for all 24 months, so growth and attainment % never change; only amounts do.
-- Rates fixed in code with their date (no network request, owner's choice); the menu shows "rate of <date>".
-- Converted: KPIs, charts, tables, map legend and revenue steps, evidence cards, "What the data shows". Not converted: AI answer text (shown as received, spec anti-goal), with a note "AI answers quote USD". CSV export stays raw USD (decided in 0.7.0; the header says `_usd`).
-- README and CHANGELOG say it is a convenience view over USD data.
+- **Rates are a snapshot** (ECB, 2026-11-05) in `shared/config/currency.ts`; they age. A real backend sends rates with the data. **Accepted (owner: static rates for the demo)**.
+- **The assistant's USD note never shows with the mock fixtures**: no answer quotes an amount. It is unit-tested on a made-up answer. **Accepted**.
+- **`next dev` shows USD for a moment** with EUR or GBP stored (the dev server renders amounts on the server); a production build shows skeletons, then the chosen currency (checked 2026-11-05, no `$` at any frame). **Accepted**.
+- **A market near a revenue break may change colour with the currency** (steps stay round in the chosen currency, owner's choice). **Accepted**.
