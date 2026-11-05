@@ -157,11 +157,14 @@
     "sections": "Bereiche",
     "tabs": {
       "overview": "Übersicht",
-      "assistant": "Assistent"
+      "assistant": "Assistent",
+      "alerts": "Alarme"
     },
     "collapse": "Assistent ausblenden",
     "expand": "Assistent einblenden",
-    "newAnswers": "{count, plural, one {# neue Antwort} other {# neue Antworten}}"
+    "newAnswers": "{count, plural, one {# neue Antwort} other {# neue Antworten}}",
+    "flagged": "{count, plural, one {, # Markt markiert} other {, # Märkte markiert}}",
+    "alerts": "Alarme"
   },
   "monthPicker": {
     "previousYear": "Vorheriges Jahr",

@@ -1,19 +1,21 @@
 'use client';
 
-import { LayoutDashboardIcon, SparklesIcon } from 'lucide-react';
+import { BellIcon, LayoutDashboardIcon, SparklesIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 import { cn } from '@/shared/lib';
 
 import { type Section, SECTIONS } from '../model/use-section';
 
-const ICONS = { overview: LayoutDashboardIcon, assistant: SparklesIcon } as const;
+const ICONS = { overview: LayoutDashboardIcon, assistant: SparklesIcon, alerts: BellIcon } as const;
 
 type SectionTabBarProps = {
   section: Section;
   onChange: (s: Section) => void;
   /** Unread answers, shown on the Assistant tab. */
   badge?: number;
+  /** Markets flagged by the alert rules, shown on the Alerts tab (null: not known yet). */
+  alertsCount?: number | null;
 };
 
 /**
@@ -21,7 +23,12 @@ type SectionTabBarProps = {
  * (owner, variant E): the current section is a raised card chip on a muted
  * track. Labels always shown, targets over 44px.
  */
-export function SectionTabBar({ section, onChange, badge = 0 }: SectionTabBarProps) {
+export function SectionTabBar({
+  section,
+  onChange,
+  badge = 0,
+  alertsCount = null,
+}: SectionTabBarProps) {
   const t = useTranslations('shell');
   return (
     <nav
@@ -55,10 +62,21 @@ export function SectionTabBar({ section, onChange, badge = 0 }: SectionTabBarPro
                       className="absolute top-0 -right-0.5 size-2.5 rounded-full bg-surface-ai-label ring-2 ring-muted"
                     />
                   ) : null}
+                  {s === 'alerts' && alertsCount ? (
+                    <span
+                      aria-hidden
+                      className="absolute -top-1 -right-2 min-w-4 rounded-full bg-foreground px-1 text-center text-xs leading-4 font-semibold text-background tabular-nums ring-2 ring-muted"
+                    >
+                      {alertsCount}
+                    </span>
+                  ) : null}
                 </span>
                 {t(`tabs.${s}`)}
                 {s === 'assistant' && badge > 0 ? (
                   <span className="sr-only">{t('newAnswers', { count: badge })}</span>
+                ) : null}
+                {s === 'alerts' && alertsCount ? (
+                  <span className="sr-only">{t('flagged', { count: alertsCount })}</span>
                 ) : null}
               </button>
             </li>

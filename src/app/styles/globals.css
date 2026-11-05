@@ -6,8 +6,9 @@
 
 /* Desktop assistant collapsed: set on <html> before first paint (widgets/app-shell). */
 @custom-variant assistant-collapsed (&:where([data-assistant-collapsed] *));
-/* Phone link to the Assistant tab: set on <html> before first paint (features/switch-section). */
+/* Phone link to the Assistant or Alerts tab: set on <html> before first paint (features/switch-section). */
 @custom-variant section-assistant (&:where([data-section='assistant'] *));
+@custom-variant section-alerts (&:where([data-section='alerts'] *));
 /* Analyst link: set before first paint, then kept in step with the URL (features/switch-mode). */
 @custom-variant mode-analyst (&:where([data-mode='analyst'] *));
 /* Hover and press feedback only for controls that can act (DESIGN.md §4). */

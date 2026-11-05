@@ -1,10 +1,13 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { NextIntlClientProvider } from 'next-intl';
 import { NuqsTestingAdapter, type UrlUpdateEvent } from 'nuqs/adapters/testing';
+import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { enMessages as en } from '@/shared/config';
+import { alertsApi, datasetHandler, server } from '@/shared/lib/test';
 
 import { applyPanelCollapsed } from '../model/panel-collapsed-script';
 import { AppShell, type AssistantApi } from './AppShell';
@@ -26,24 +29,28 @@ function viewport(desktop: boolean) {
 function setup(searchParams = '') {
   const onUrlUpdate = vi.fn<(event: UrlUpdateEvent) => void>();
   const api: { current: AssistantApi | null } = { current: null };
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   const withUrl = (search: string) => (
-    <NextIntlClientProvider locale="en-GB" messages={en}>
-      <NuqsTestingAdapter searchParams={search} onUrlUpdate={onUrlUpdate} hasMemory>
-        <AppShell
-          header={<span>Header</span>}
-          main={<p>Main content</p>}
-          assistant={(a) => {
-            api.current = a;
-            return (
-              <div>
-                {a.headerAction}
-                <p>Assistant content</p>
-              </div>
-            );
-          }}
-        />
-      </NuqsTestingAdapter>
-    </NextIntlClientProvider>
+    <QueryClientProvider client={client}>
+      <NextIntlClientProvider locale="en-GB" messages={en}>
+        <NuqsTestingAdapter searchParams={search} onUrlUpdate={onUrlUpdate} hasMemory>
+          <AppShell
+            header={<span>Header</span>}
+            main={<p>Main content</p>}
+            alerts={<p>Alerts content</p>}
+            assistant={(a) => {
+              api.current = a;
+              return (
+                <div>
+                  {a.headerAction}
+                  <p>Assistant content</p>
+                </div>
+              );
+            }}
+          />
+        </NuqsTestingAdapter>
+      </NextIntlClientProvider>
+    </QueryClientProvider>
   );
   const ui = withUrl(searchParams);
   const view = render(ui);
@@ -58,6 +65,7 @@ describe('AppShell', () => {
     scrollTo.mockClear();
     Element.prototype.scrollTo = scrollTo;
     localStorage.clear();
+    server.use(datasetHandler(), ...alertsApi().handlers);
     document.documentElement.removeAttribute('data-assistant-collapsed');
   });
   afterEach(() => {
@@ -242,24 +250,77 @@ describe('AppShell', () => {
     const Boom = (): never => {
       throw new Error('render failed');
     };
+    const client = new QueryClient();
+    const frame = (ui: ReactNode) => (
+      <QueryClientProvider client={client}>
+        <NextIntlClientProvider locale="en-GB" messages={en}>
+          <NuqsTestingAdapter>{ui}</NuqsTestingAdapter>
+        </NextIntlClientProvider>
+      </QueryClientProvider>
+    );
     const first = render(
-      <NextIntlClientProvider locale="en-GB" messages={en}>
-        <NuqsTestingAdapter>
-          <AppShell header={null} main={<p>Main content</p>} assistant={() => <Boom />} />
-        </NuqsTestingAdapter>
-      </NextIntlClientProvider>,
+      frame(
+        <AppShell
+          header={null}
+          main={<p>Main content</p>}
+          assistant={() => <Boom />}
+          alerts={null}
+        />,
+      ),
     );
     expect(screen.getByText('Main content')).toBeInTheDocument();
     expect(within(assistantPane()).getByText(en.errors.sectionTitle)).toBeInTheDocument();
     first.unmount();
     render(
-      <NextIntlClientProvider locale="en-GB" messages={en}>
-        <NuqsTestingAdapter>
-          <AppShell header={null} main={<Boom />} assistant={() => <p>Assistant content</p>} />
-        </NuqsTestingAdapter>
-      </NextIntlClientProvider>,
+      frame(
+        <AppShell
+          header={null}
+          main={<Boom />}
+          assistant={() => <p>Assistant content</p>}
+          alerts={null}
+        />,
+      ),
     );
     expect(screen.getByText('Assistant content')).toBeInTheDocument();
     expect(within(screen.getByRole('main')).getByText(en.errors.sectionTitle)).toBeInTheDocument();
+  });
+
+  it('phone: the Alerts tab shows the panel full screen with the flagged count', async () => {
+    viewport(false);
+    const { user } = setup();
+    const tab = screen.getByRole('button', { name: /^Alerts/ });
+    await waitFor(() => {
+      expect(tab).toHaveAccessibleName('Alerts, 5 markets flagged');
+    });
+    await user.click(tab);
+    expect(await screen.findByRole('heading', { level: 1, name: t.alerts })).toBeInTheDocument();
+    expect(screen.getByText('Alerts content')).toBeInTheDocument();
+    expect(screen.getByRole('banner')).toHaveClass('max-lg:hidden');
+    expect(screen.getByRole('main')).toHaveClass('max-lg:hidden');
+  });
+
+  it('desktop: tab=alerts opens the sheet; Escape closes it with a replace', async () => {
+    viewport(true);
+    const { user, onUrlUpdate } = setup('?tab=alerts');
+    const dialog = await screen.findByRole('dialog', { name: t.alerts });
+    expect(within(dialog).getByText('Alerts content')).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { level: 1, name: t.alerts })).not.toBeInTheDocument();
+    await user.keyboard('{Escape}');
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+    const event = onUrlUpdate.mock.calls.at(-1)?.[0];
+    expect(event?.queryString).toBe('');
+    expect(event?.options.history).toBe('replace');
+  });
+
+  it('Back while the sheet is open closes it', async () => {
+    viewport(true);
+    const { rerender, withUrl } = setup('?tab=alerts');
+    await screen.findByRole('dialog', { name: t.alerts });
+    rerender(withUrl(''));
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
   });
 });

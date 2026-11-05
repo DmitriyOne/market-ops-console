@@ -157,11 +157,14 @@
     "sections": "Разделы",
     "tabs": {
       "overview": "Обзор",
-      "assistant": "Ассистент"
+      "assistant": "Ассистент",
+      "alerts": "Алерты"
     },
     "collapse": "Скрыть ассистента",
     "expand": "Показать ассистента",
-    "newAnswers": "{count, plural, one {# новый ответ} few {# новых ответа} many {# новых ответов} other {# новых ответа}}"
+    "newAnswers": "{count, plural, one {# новый ответ} few {# новых ответа} many {# новых ответов} other {# новых ответа}}",
+    "flagged": "{count, plural, one {, отмечен # рынок} few {, отмечено # рынка} many {, отмечено # рынков} other {, отмечено # рынка}}",
+    "alerts": "Алерты"
   },
   "monthPicker": {
     "previousYear": "Предыдущий год",

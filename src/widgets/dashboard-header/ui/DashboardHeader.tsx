@@ -12,6 +12,7 @@ import { ThemeSwitch } from '@/features/switch-theme';
 import { cn } from '@/shared/lib';
 import { Skeleton } from '@/shared/ui';
 
+import { AlertsButton } from './AlertsButton';
 import { DrillBreadcrumbs } from './DrillBreadcrumbs';
 import { SettingsSheet } from './SettingsSheet';
 
@@ -43,7 +44,7 @@ function AppName({ live = false }: { live?: boolean }) {
 }
 
 /**
- * Desktop: name · path · period · mode · language · theme in one row.
+ * Desktop: name · path · period · mode · alerts · language · theme in one row.
  * Phone: name and ⚙︎ on the first row, the path below, then period and
  * mode full width.
  */
@@ -71,7 +72,11 @@ export function DashboardHeader() {
         </div>
       </DatasetGate>
       <div className="flex items-center gap-1 max-lg:hidden">
-        {/* Reads search params, which static HTML does not have. */}
+        {/* Reads search params, which static HTML does not have. Phones
+            reach alerts from the tab bar. */}
+        <Suspense fallback={<Skeleton aria-hidden className="size-11" />}>
+          <AlertsButton />
+        </Suspense>
         <Suspense>
           <LocaleSwitch />
         </Suspense>
@@ -109,6 +114,7 @@ export function DashboardHeaderSkeleton() {
         <ControlsSkeleton />
       </div>
       <div className="flex items-center gap-1 max-lg:hidden">
+        <Skeleton className="size-11" />
         <Skeleton className="size-9" />
         <Skeleton className="size-9" />
       </div>

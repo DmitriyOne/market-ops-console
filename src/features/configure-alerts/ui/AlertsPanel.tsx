@@ -31,11 +31,13 @@ export function useAlertsHeading(): { title: string; description: string } {
 
 /**
  * The alerts configurator: the rule list, or the form for one rule, and the
- * demo switch. Needs the dataset (inside Suspense); the frame gives the title.
+ * demo switch. Needs the dataset (inside Suspense); the frame (desktop
+ * sheet or phone tab) gives the title.
  */
 export function AlertsPanel() {
   const t = useTranslations('alerts');
   const { ds, state } = useDashboard();
+  const { period } = useKpiFormat();
   const rules = useAlertRules();
   const saving = useSavingIds();
   const { create, update, toggle, remove } = useRuleMutations();
@@ -82,6 +84,9 @@ export function AlertsPanel() {
 
   return (
     <div className="flex flex-col gap-4">
+      <p className="text-sm text-muted-foreground">
+        {t('description', { period: period(ds.meta.latestPeriod) })}
+      </p>
       {rules.isPending ? (
         <div aria-busy className="flex flex-col gap-3">
           <span className="sr-only">{t('list.loading')}</span>
@@ -160,6 +165,18 @@ export function AlertsPanel() {
         }}
         onConfirm={remove}
       />
+    </div>
+  );
+}
+
+/** Before the dataset arrives: the description line and two rules. */
+export function AlertsPanelSkeleton() {
+  return (
+    <div aria-hidden className="flex flex-col gap-4">
+      <Skeleton className="h-4 w-3/4" />
+      <Skeleton className="h-16" />
+      <Skeleton className="h-16" />
+      <Skeleton className="h-11 w-32" />
     </div>
   );
 }

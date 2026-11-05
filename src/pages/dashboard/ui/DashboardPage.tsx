@@ -2,6 +2,8 @@
 
 import { Suspense } from 'react';
 
+import { DatasetGate } from '@/entities/performance';
+import { AlertsPanel, AlertsPanelSkeleton } from '@/features/configure-alerts';
 import { AppShell, AppShellFallback } from '@/widgets/app-shell';
 import { AssistantPanel, AssistantPanelSkeleton } from '@/widgets/assistant-panel';
 import { DashboardHeader, DashboardHeaderSkeleton } from '@/widgets/dashboard-header';
@@ -18,6 +20,7 @@ export function DashboardPage() {
           header={<DashboardHeaderSkeleton />}
           main={<OverviewSkeleton />}
           assistant={<AssistantPanelSkeleton />}
+          alerts={<AlertsPanelSkeleton />}
         />
       }
     >
@@ -31,6 +34,14 @@ export function DashboardPage() {
             headerAction={api.headerAction}
           />
         )}
+        alerts={
+          // The dashboard says once when the data fails; the panel stays quiet.
+          <DatasetGate fallback={null}>
+            <Suspense fallback={<AlertsPanelSkeleton />}>
+              <AlertsPanel />
+            </Suspense>
+          </DatasetGate>
+        }
       />
     </Suspense>
   );

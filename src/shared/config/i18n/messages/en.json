@@ -157,11 +157,14 @@
     "sections": "Sections",
     "tabs": {
       "overview": "Overview",
-      "assistant": "Assistant"
+      "assistant": "Assistant",
+      "alerts": "Alerts"
     },
     "collapse": "Hide assistant",
     "expand": "Show assistant",
-    "newAnswers": "{count, plural, one {# new answer} other {# new answers}}"
+    "newAnswers": "{count, plural, one {# new answer} other {# new answers}}",
+    "flagged": "{count, plural, one {, # market flagged} other {, # markets flagged}}",
+    "alerts": "Alerts"
   },
   "monthPicker": {
     "previousYear": "Previous year",

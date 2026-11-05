@@ -16,6 +16,12 @@ describe('applySection (runs in <head> before the first paint)', () => {
     expect(section()).toBe('assistant');
   });
 
+  it('marks <html> when the link opens the alerts tab', () => {
+    window.history.replaceState(null, '', '/dashboard?tab=alerts');
+    applySection();
+    expect(section()).toBe('alerts');
+  });
+
   it('leaves Overview links alone', () => {
     window.history.replaceState(null, '', '/dashboard?tab=overview');
     applySection();
