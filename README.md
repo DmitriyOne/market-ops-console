@@ -53,7 +53,7 @@ pnpm e2e --project=phone     # one project (desktop | phone); --headed shows the
 ## Testing
 
 - **Unit and component** (Vitest + Testing Library + MSW, next to the code): parsing the stream, schemas, selectors, formatters; streaming, stop, abstain / low confidence / error, citations, drill-down into the URL, alert validation and optimistic rollback, the charts' table alternatives.
-- **End-to-end** (Playwright, `e2e/`): the brief's happy path, Back and Forward in a real browser, the phone tab bar, and axe accessibility scans (WCAG 2.1 A/AA) on desktop and a phone emulation. They run locally (`pnpm e2e`) and on every PR into `develop`; `BASE_URL=https://… pnpm e2e` tests a deployed copy.
+- **End-to-end** (Playwright, `e2e/`): the brief's happy path, Back and Forward in a real browser, the phone tab bar, the alert form's optimistic save and rollback on the real API, the assistant's error and "can't answer" states, offline and a failing API, and axe accessibility scans (WCAG 2.1 A/AA) on desktop and a phone emulation. They run locally (`pnpm e2e`) and on every PR into `develop`; `BASE_URL=https://… pnpm e2e` tests a deployed copy.
 - **Skipped on purpose:** visual regression, a cross-browser matrix, Storybook (ADR 0008).
 
 ## Project structure
