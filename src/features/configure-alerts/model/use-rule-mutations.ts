@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  type Mutation,
   type QueryClient,
   useMutation,
   useMutationState,
@@ -86,11 +87,6 @@ async function send(vars: WriteVars, locale: string): Promise<AlertRule | null> 
   return null;
 }
 
-/**
- * Rule writes with an optimistic update (spec §9): the list changes at once,
- * a failure puts that one rule back and says so with Retry; the list is
- * refetched once no write is left in flight.
- */
 /** Why a write failed, in words: the API's code translated, else the general message. */
 function useReason() {
   const t = useTranslations('alerts');
@@ -104,6 +100,45 @@ function useReason() {
   );
 }
 
+const targetOf = (vars: WriteVars) => (vars.kind === 'create' ? vars.tempId : vars.rule.id);
+
+/** One rollback toast per rule: a newer failure replaces it, Retry or Dismiss in the panel closes it. */
+const toastId = (target: string) => `alert-write-${target}`;
+
+/** The writes made for one rule (or one new rule), oldest first. */
+function writesFor(client: QueryClient, target: string) {
+  return client
+    .getMutationCache()
+    .findAll({ mutationKey: WRITE_KEY })
+    .filter((m) => {
+      const vars = m.state.variables;
+      return isWriteVars(vars) && targetOf(vars) === target;
+    });
+}
+
+/**
+ * Repeat a failed write, only while it is still the rule's latest and has
+ * failed: the toast's Retry and the panel's are two buttons for one action,
+ * and pressing both must not send it twice.
+ */
+function retryWrite(
+  client: QueryClient,
+  mutate: (vars: WriteVars) => void,
+  target: string,
+  isIt: (write: Mutation) => boolean,
+) {
+  const last = writesFor(client, target).at(-1);
+  const vars = last?.state.variables;
+  if (!last || !isIt(last) || last.state.status !== 'error' || !isWriteVars(vars)) return;
+  toast.dismiss(toastId(target));
+  mutate(vars);
+}
+
+/**
+ * Rule writes with an optimistic update (spec §9): the list changes at once,
+ * a failure puts that one rule back and says so with Retry; the list is
+ * refetched once no write is left in flight.
+ */
 export function useRuleMutations() {
   const client = useQueryClient();
   const t = useTranslations('alerts');
@@ -130,12 +165,17 @@ export function useRuleMutations() {
     },
     onError: (error, vars) => {
       revert(client, vars);
-      toast.error(t('rollback', { reason: reason(error) }), {
-        label: t('retry'),
-        onClick: () => {
-          mutation.mutate(vars);
+      toast.error(
+        t('rollback', { reason: reason(error) }),
+        {
+          label: t('retry'),
+          onClick: () => {
+            // The write's own variables: the cache holds this very object.
+            retryWrite(client, mutation.mutate, targetOf(vars), (m) => m.state.variables === vars);
+          },
         },
-      });
+        { id: toastId(targetOf(vars)) },
+      );
     },
     onSettled: () => {
       // This write still counts as running here.
@@ -163,15 +203,20 @@ export function useRuleMutations() {
         const index = rules(client).findIndex((r) => r.id === rule.id);
         if (index >= 0) mutate({ kind: 'remove', rule, index });
       },
-      /** The failed write again, as it was (the same as the toast's Retry). */
+      /** The failed write again, as it was (the same as the toast's Retry, which it closes). */
       retry: (failed: FailedWrite) => {
-        mutate(failed.vars);
+        retryWrite(client, mutate, failed.target, (m) => m.mutationId === failed.id);
       },
-      /** Stop offering Retry for it. */
+      /**
+       * Stop offering Retry for this rule: every settled write for it is
+       * forgotten, so an older failure does not come back in its place.
+       */
       dismiss: (failed: FailedWrite) => {
         const cache = client.getMutationCache();
-        const found = cache.getAll().find((m) => m.mutationId === failed.id);
-        if (found) cache.remove(found);
+        for (const m of writesFor(client, failed.target)) {
+          if (m.state.status !== 'pending') cache.remove(m);
+        }
+        toast.dismiss(toastId(failed.target));
       },
     }),
     [client, mutate],
@@ -184,17 +229,14 @@ export function useRuleMutations() {
  * is outside the modal sheet, where focus can't go.
  */
 export type FailedWrite = {
-  /** The mutation's id (Dismiss forgets it). */
+  /** The mutation's id. */
   id: number;
   kind: WriteVars['kind'];
   /** The list row it belongs to; a failed create's row is gone, a Retry brings it back under this id. */
   target: string;
   name: string;
   reason: string;
-  vars: WriteVars;
 };
-
-const targetOf = (vars: WriteVars) => (vars.kind === 'create' ? vars.tempId : vars.rule.id);
 
 /** The writes to offer Retry for: per rule, the latest write, if it failed. */
 export function useFailedWrites(): readonly FailedWrite[] {
@@ -225,7 +267,7 @@ export function useFailedWrites(): readonly FailedWrite[] {
           : vars.kind === 'update'
             ? vars.previous.name
             : vars.rule.name;
-      failed.push({ id: w.id, kind: vars.kind, target, name, reason: reason(w.error), vars });
+      failed.push({ id: w.id, kind: vars.kind, target, name, reason: reason(w.error) });
     }
     return failed;
   }, [writes, reason]);

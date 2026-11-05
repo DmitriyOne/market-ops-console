@@ -284,11 +284,47 @@ describe('AlertsPanel', () => {
     const list = await rulesList();
     expect(await within(list).findByText('Low attainment EU')).toBeInTheDocument();
     await waitFor(() => {
-      expect(list.parentElement).toHaveFocus();
+      expect(list).toHaveFocus();
     });
     await waitFor(() => {
       expect(api.rules()).toHaveLength(3);
     });
+  });
+
+  it('Retry in the row closes the toast: the same failure is never sent twice', async () => {
+    const { user, api } = setup();
+    await rulesList();
+    await user.click(screen.getByRole('switch', { name: t.simulate.label }));
+    await user.click(screen.getByRole('button', { name: t.list.new }));
+    await user.type(screen.getByRole('textbox', { name: t.form.name }), 'Low attainment EU');
+    await user.click(screen.getByRole('button', { name: t.form.save }));
+    const toastRetry = await screen.findByRole('button', { name: t.retry });
+    await user.click(screen.getByRole('button', { name: 'Retry: Low attainment EU' }));
+    await waitFor(() => {
+      expect(toastRetry).not.toBeInTheDocument();
+    });
+    await waitFor(() => {
+      expect(api.rules()).toHaveLength(3);
+    });
+    expect(within(await rulesList()).getAllByText('Low attainment EU')).toHaveLength(1);
+  });
+
+  it('Dismiss forgets every failure of the rule, not only the latest', async () => {
+    const { user } = setup();
+    await rulesList();
+    const fail = screen.getByRole('switch', { name: t.simulate.label });
+    // A failed toggle, then another failed toggle of the same rule.
+    await user.click(fail);
+    await user.click(screen.getByRole('switch', { name: 'Rule on: Share below 10%' }));
+    expect(await screen.findByText(/^Not saved\./)).toBeInTheDocument();
+    await user.click(fail);
+    await user.click(screen.getByRole('switch', { name: 'Rule on: Share below 10%' }));
+    await waitFor(() => {
+      expect(fail).not.toBeChecked();
+    });
+    expect(await screen.findByText(/^Not saved\./)).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Dismiss: Share below 10%' }));
+    expect(screen.queryByText(/^Not saved/)).not.toBeInTheDocument();
   });
 
   it('a failed delete puts the rule back with Retry; the retried delete leaves focus on the list', async () => {
@@ -304,7 +340,7 @@ describe('AlertsPanel', () => {
     });
     const list = await rulesList();
     await waitFor(() => {
-      expect(list.parentElement).toHaveFocus();
+      expect(list).toHaveFocus();
     });
   });
 

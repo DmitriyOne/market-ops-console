@@ -8,7 +8,7 @@ import {
   Trash2Icon,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { type ReactNode, useEffect, useRef, useState } from 'react';
+import { type ReactNode, useEffect, useRef } from 'react';
 
 import { AlertMark, ruleMarkets, useRuleText } from '@/entities/alert-rule';
 import type { AlertRule, Dataset } from '@/shared/api';
@@ -32,6 +32,8 @@ type RuleListProps = {
 
 /** Where focus goes once a Retry or a Dismiss has removed the button it was on. */
 const LIST = 'list';
+/** A focus ring for what only takes focus from code (a row, the list). */
+const FOCUS = 'rounded-md outline-none focus-visible:ring-3 focus-visible:ring-ring/50';
 
 /** The user's rules: what each checks, how many markets it flags now, on/off, edit, delete. */
 export function RuleList({
@@ -48,47 +50,54 @@ export function RuleList({
   const t = useTranslations('alerts');
   const text = useRuleText(ds);
   const root = useRef<HTMLDivElement>(null);
-  const [focusTo, setFocusTo] = useState<string | null>(null);
+  // A ref, not state: Retry and Dismiss change the list, which renders anyway.
+  const focusTo = useRef<string | null>(null);
 
-  // After the render that removed the button focus was on.
+  // After the render that removed the button focus was on. A row that is
+  // gone by then (deleted meanwhile) falls back to the list; either way the
+  // request is used up, so it can't move focus later.
   useEffect(() => {
-    if (focusTo === null) return;
-    const el =
-      focusTo === LIST
-        ? root.current
-        : Array.from(root.current?.querySelectorAll<HTMLElement>('[data-rule-id]') ?? []).find(
-            (row) => row.dataset.ruleId === focusTo,
-          );
-    if (el) {
-      el.focus();
-      setFocusTo(null);
-    }
-  }, [focusTo, rules, failed]);
+    const target = focusTo.current;
+    if (target === null) return;
+    focusTo.current = null;
+    const rows = Array.from(root.current?.querySelectorAll<HTMLElement>('[data-rule-id]') ?? []);
+    const row = rows.find((r) => r.dataset.ruleId === target);
+    const list = root.current?.querySelector<HTMLElement>('[data-rule-list]');
+    (row ?? list)?.focus();
+  });
 
   const retry = (f: FailedWrite) => {
     onRetry(f);
     // Only an edit keeps its row: a retried delete takes it away, and a new
     // rule's row is replaced once the server gives it its id.
-    setFocusTo(f.kind === 'update' ? f.target : LIST);
+    focusTo.current = f.kind === 'update' ? f.target : LIST;
   };
   const dismiss = (f: FailedWrite) => {
     onDismiss(f);
-    setFocusTo(f.kind === 'create' ? LIST : f.target);
+    focusTo.current = f.kind === 'create' ? LIST : f.target;
   };
   const failedFor = new Map(failed.filter((f) => f.kind !== 'create').map((f) => [f.target, f]));
   const created = failed.filter((f) => f.kind === 'create');
 
   return (
-    <div ref={root} tabIndex={-1} className="flex flex-col gap-3 outline-none">
+    <div ref={root} className="flex flex-col gap-3">
       {created.map((f) => (
         <FailedLine key={f.id} failed={f} onRetry={retry} onDismiss={dismiss}>
           {t('failed.create', { name: f.name, reason: f.reason })}
         </FailedLine>
       ))}
       {rules.length === 0 ? (
-        <p className="text-sm text-muted-foreground">{t('list.empty')}</p>
+        <p data-rule-list tabIndex={-1} className={cn('text-sm text-muted-foreground', FOCUS)}>
+          {t('list.empty')}
+        </p>
       ) : (
-        <ul aria-label={t('list.label')} className="flex flex-col">
+        // Named, so focus landing here says where it is.
+        <ul
+          data-rule-list
+          tabIndex={-1}
+          aria-label={t('list.label')}
+          className={cn('flex flex-col', FOCUS)}
+        >
           {rules.map((rule) => {
             // A rule still being written has no stable id to edit yet.
             const busy = saving.has(rule.id);
@@ -101,7 +110,8 @@ export function RuleList({
                 tabIndex={-1}
                 aria-busy={busy || undefined}
                 className={cn(
-                  'flex flex-col gap-2 border-t border-border py-3 transition-opacity outline-none first:border-t-0 focus-visible:ring-3 focus-visible:ring-ring/50',
+                  'flex flex-col gap-2 border-t border-border py-3 transition-opacity first:border-t-0',
+                  FOCUS,
                   busy && 'opacity-60',
                 )}
               >
