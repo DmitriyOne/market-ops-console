@@ -178,6 +178,7 @@ Rules:
 - Top movers bars: `chart-5` for growth, `chart-4` for decline (chart tokens, not status ones); the signed number is the signal.
 - Line patterns in charts: actual solid `chart-1`, forecast dashed `chart-5`, prior year dotted `chart-3`, anomaly ring `chart-4`; the legend draws the pattern, not just the colour.
 - Heat map (0.8.0): a `<table role="grid">`; cells are 44px buttons (`min-w-10`) with a 2px gap, filled with the step's `scale-*` token and its `-foreground` ink; `font-mono tabular-nums`; focus `ring-4 ring-ring`; anomaly a ⚠ in the top-right corner; the window's headers `bg-foreground text-background` and its cells framed by the same colour in the gap; a selected row has a ◉ icon and semibold name, the open market "· open now"; the line under the grid has two outline `sm` buttons (`min-h-11`), Open and Select. Legend: swatches with "from – to" in the cell's long format.
+- Mode badge (0.8.0): next to the page `h1`, a `rounded-full text-xs` chip with an icon and the view's name, `bg-foreground text-background` in Analyst and `bg-muted` in Executive (the words differ too); the line under it is `aria-live="polite"`.
 - Comparison radar (0.8.0): series `series-1…4`, solid / dashed / dotted / dash-dot with circle / square / triangle / diamond markers, fill at 6 %; portfolio `muted-foreground` dashed, no fill; no radius ticks (positions are relative); the HTML legend draws line + marker; tooltip and table show real values.
 
 ### Assistant building blocks (`src/widgets/assistant-panel/ui`)

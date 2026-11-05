@@ -272,6 +272,12 @@ export function comparisonRadar(ds: Dataset, scope: Scope, period: Period, range
 - [ ] Independent branch review by an agent (correctness, a11y, FSD, tests); fix or record each finding in the backlog.
 - [ ] Owner check on his dev server; fixes; plan status → built.
 
+## Owner check 1 (2026-11-05)
+
+- **Mode switch was invisible** (the top of the page is the same in both modes; on a phone the Analyst parts are all below): the page title gets a badge with the view's name and a line of what it shows (Analyst: what it adds below), read out on change. Options offered: badge, toast with "Show", auto-scroll, anchor links; the owner chose the badge.
+- **Heat map widened the page on a phone** after a tap: the two buttons under the grid ("Open United Kingdom, May 2026", "Add United Kingdom to selection") did not wrap. They wrap now, and so do their labels; the grid has `min-w-0`. Not testable in jsdom: owner check.
+- **Radar stayed on regions after opening UK on the map** (a drill clears the selection, and the radar ignored the open market): with nothing selected it now follows the open scope: the open market and its region's neighbours (it first), else the open region's markets, else the regions.
+
 ## Built differently from the tasks
 
 - The grid's focus logic stayed in `HeatGrid.tsx` (no `use-grid-focus.ts`); its behaviour is covered by `HeatMap.test.tsx`.
