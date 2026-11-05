@@ -6,9 +6,8 @@ import { expect, test } from './fixtures';
 const LINK =
   '/dashboard?region=eu&market=de&period=2026-03&range=3m&mode=analyst&kpi=growth&markets=de&markets=fr';
 
-test('a shared link opens the same view in a fresh browser', async ({ browser }) => {
-  const colleague = await browser.newContext({ viewport: { width: 1440, height: 900 } });
-  const page = await colleague.newPage();
+// Every test starts in a fresh browser context: no cookies, storage or history.
+test('a shared link opens the same view in a fresh browser', async ({ page }) => {
   await page.goto(LINK);
 
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Germany');
@@ -19,7 +18,6 @@ test('a shared link opens the same view in a fresh browser', async ({ browser })
   await expect(selected.getByRole('button', { name: 'Remove Germany' })).toBeVisible();
   await expect(selected.getByRole('button', { name: 'Remove France' })).toBeVisible();
   await expect(page.getByRole('grid', { name: /^Growth YoY by market and month/ })).toBeVisible();
-  await colleague.close();
 });
 
 test('Executive ↔ Analyst is in the URL, and Back undoes the switch', async ({ page }) => {

@@ -23,8 +23,9 @@ jobs:
   check:
     if: github.event.action != 'edited' || github.event.changes.base != null
     runs-on: ubuntu-latest
-    # Unit tests ~5 min on the 2-core runner, E2E ~2 more (ADR 0008).
-    timeout-minutes: 14
+    # Unit tests ~4 min on the 2-core runner, E2E ~3–5 more (ADR 0008); room
+    # until the first real runs show the numbers.
+    timeout-minutes: 20
     steps:
       - name: Require a release/X.Y.Z head branch
         env:
@@ -78,8 +79,18 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit == 'true'
         run: pnpm exec playwright install-deps chromium
 
-      # Builds the app and starts it on :3100 (playwright.config.ts).
+      # Next's build cache (the Next docs' advice for CI): later builds reuse it.
+      - name: Cache the Next.js build
+        uses: actions/cache@v6
+        with:
+          path: .next/cache
+          key: nextjs-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('src/**', 'app/**') }}
+          restore-keys: nextjs-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
+
+      # Builds the app and starts it on :3100 (playwright.config.ts). Its own
+      # limit, so a hang fails this step and the report below is still uploaded.
       - run: pnpm e2e
+        timeout-minutes: 10
 
       - name: Upload the Playwright report
         if: failure()

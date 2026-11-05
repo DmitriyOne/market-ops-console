@@ -14,7 +14,11 @@ export default defineConfig({
   retries: ci ? 1 : 0,
   reporter: ci
     ? [['list'], ['html', { open: 'never' }]]
-    : [['list'], ['html', { open: 'on-failure' }]],
+    : // Never opens a report server that waits for Ctrl+C (agents run this too);
+      // `pnpm exec playwright show-report` opens the last one.
+      [['list'], ['html', { open: 'never' }]],
+  // A whole answer, or a preview's cold start, can take longer than 5 s.
+  expect: { timeout: 10_000 },
   use: {
     baseURL,
     trace: 'on-first-retry',
@@ -38,7 +42,9 @@ export default defineConfig({
     : {
         command: `pnpm build && pnpm start --port ${String(PORT)}`,
         url: baseURL,
-        reuseExistingServer: !ci,
+        // Reuse a running :3100 only when asked: a server left over from an
+        // older build or another branch would test old code and pass.
+        reuseExistingServer: process.env.E2E_REUSE === '1',
         timeout: 180_000,
         env: {
           // An answer streams word by word: ~1 s for a short one, ~3.5 s for

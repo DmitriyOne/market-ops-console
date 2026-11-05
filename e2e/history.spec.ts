@@ -15,10 +15,14 @@ async function pick(page: Page, trigger: RegExp, item: string) {
 
 test('drill-down: Back steps up one level at a time, Forward comes back', async ({ page }) => {
   await page.goto('/dashboard');
+  // Each pick is checked in the URL: two inside nuqs's throttle would share
+  // one history entry.
   await pick(page, /^Choose a region/, 'Europe');
   await expect(title(page)).toHaveText('Europe');
+  await expect(page).toHaveURL(/[?&]region=eu(&|$)/);
   await pick(page, /^Choose a market/, 'Germany');
   await expect(title(page)).toHaveText('Germany');
+  await expect(page).toHaveURL(/[?&]market=de(&|$)/);
   await pick(page, /^Choose a product/, 'Veltrix');
   await expect(page).toHaveURL(/[?&]product=veltrix(&|$)/);
 
@@ -106,8 +110,6 @@ test('heat map: Back to a scope without the focused row keeps focus in the grid'
   await page.goBack();
   await expect(title(page)).toHaveText('Europe');
   await expect(grid.getByRole('button', { name: /^Japan/ })).toHaveCount(0);
-  // Focus lands on a row that is still there (a European market).
-  await expect(grid.locator(':focus')).toHaveAccessibleName(
-    /^(Germany|United Kingdom|France|Italy|Spain), /,
-  );
+  // Focus lands on the clamped row: Europe's last market, same month.
+  await expect(grid.getByRole('button', { name: /^United Kingdom, May 2026/ })).toBeFocused();
 });

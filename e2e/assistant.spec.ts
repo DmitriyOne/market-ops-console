@@ -19,12 +19,13 @@ test('a failed answer says so, and Try again asks again', async ({ page }) => {
   await expect(log).toContainText('No answer');
   await expect(log).not.toContainText('Confidence:');
 
-  const retried = page.waitForRequest(
-    (request) => request.url().includes('/api/v1/chat') && request.method() === 'POST',
+  const retried = page.waitForResponse(
+    (response) => response.url().includes('/api/v1/chat') && response.request().method() === 'POST',
   );
   await log.getByRole('button', { name: 'Try again' }).click();
   await retried;
-  await expect(log).toContainText('No answer');
+  // Try again asks once more: a second answer, which fails the same way.
+  await expect(log.getByText('No answer')).toHaveCount(2);
 });
 
 test('a question past the data says it cannot answer, with no sources', async ({ page }) => {
@@ -44,7 +45,12 @@ test('Stop mid-answer keeps the words so far, without sources or confidence', as
   const log = assistant.getByRole('log');
   await expect(log).toContainText("Here's the portfolio at a glance.");
 
+  // Stop must cancel the request itself, not only change what is shown.
+  const aborted = page.waitForEvent('requestfailed', (request) =>
+    request.url().includes('/api/v1/chat'),
+  );
   await assistant.getByRole('button', { name: 'Stop answer' }).click();
+  expect((await aborted).failure()?.errorText).toContain('ERR_ABORTED');
   await expect(log).toContainText('Stopped — answer incomplete.');
   await expect(log).toContainText('No sources or confidence for a partial answer.');
   // The words that came stay; the rest never arrives.
