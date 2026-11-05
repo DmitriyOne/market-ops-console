@@ -12,6 +12,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 - Assistant: clicking a source (Germany, Italy, …) to open it on the dashboard made its card blink: it closed, reopened and closed again while the pointer was still on the button. It now closes once and shows again only after the pointer or focus leaves the button and comes back.
 - Markets table: the "Total" cell was a shade darker than the rest of its row (and the row tinted on hover). They are one tone now.
 - Excel export: the total row has the share too, revenue-weighted like the table's, and it follows the Excel filter like the other totals. Blank where the table shows none (not the latest month, or a product).
+- CI: the Branch & version check (into `develop`) and the check into `master` failed at Node's setup, which since v5 caches pnpm's store on its own because `package.json` names pnpm, and these jobs install no pnpm. That cache is off for them now.
 
 ## [0.11.0] - Unreleased
 

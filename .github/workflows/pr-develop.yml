@@ -49,10 +49,12 @@ jobs:
         with:
           persist-credentials: false
 
-      # No install: the script runs on Node's own type stripping.
+      # No install: the script runs on Node's own type stripping. Without pnpm,
+      # setup-node v5's own cache (from package.json's packageManager) fails.
       - uses: actions/setup-node@v5
         with:
           node-version-file: .nvmrc
+          package-manager-cache: false
 
       - name: Version check
         # GITHUB_HEAD_REF is set by Actions on pull_request events.
