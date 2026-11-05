@@ -364,6 +364,25 @@ describe('MarketStatus map', () => {
     });
   });
 
+  it('a reload with a selection never shows the whole world first (no jump to it)', async () => {
+    // Every DOM state the browser could paint: is the map visible, and at what zoom?
+    const seen: number[] = [];
+    const observer = new MutationObserver(() => {
+      const svg = document.querySelector('svg.rsm-svg');
+      if (!svg || svg.classList.contains('invisible')) return;
+      const transform = svg.querySelector('.rsm-zoomable-group')?.getAttribute('transform') ?? '';
+      seen.push(Number(/scale\(([\d.]+)\)/.exec(transform)?.[1] ?? 1));
+    });
+    observer.observe(document.body, { subtree: true, childList: true, attributes: true });
+    setup('?markets=cn');
+    await mapGroup();
+    await waitFor(() => {
+      expect(seen.length).toBeGreaterThan(0);
+    });
+    observer.disconnect();
+    expect(Math.min(...seen)).toBeGreaterThan(1.5);
+  });
+
   const zoomOf = (map: HTMLElement) =>
     Number(
       /scale\(([\d.]+)\)/.exec(

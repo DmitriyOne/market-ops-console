@@ -13,6 +13,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 - Analyst-shaped skeletons for an Analyst link: the static page knows `?mode=analyst` before the first paint, so the markets table and the map card's metric picker and hint have their place from the start and nothing jumps on load.
 
 ### Fixed
+- A page opened with a drill or a selection (e.g. China) no longer shows the whole world for a moment and then jumps: the map appears already fitted.
 - Menus, popovers and tooltips in the dashboard no longer slide over the header when the page scrolls under them: they stay within the scroll area and hide once their button has scrolled away.
 - A market listed twice in a link is kept once; removing a chip keeps keyboard focus in the chips.
 

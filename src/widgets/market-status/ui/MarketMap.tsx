@@ -2,14 +2,14 @@
 
 import { MinusIcon, PlusIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { ComposableMap, useGeographies, useMapContext } from 'react-simple-maps/core';
 import { ZoomableGroup } from 'react-simple-maps/zoom';
 import topology from 'world-atlas/countries-110m.json';
 
 import type { MapItem, MarketMapView } from '@/entities/performance';
-import { useMediaQuery } from '@/shared/lib';
-import { Button } from '@/shared/ui';
+import { cn, useMediaQuery } from '@/shared/lib';
+import { Button, Skeleton } from '@/shared/ui';
 
 import {
   type Box,
@@ -75,10 +75,16 @@ function useMapPosition() {
   const flyTo = useCallback(
     (target: MapView, instant = false) => {
       stop();
+      // No frame in between: the first fit lands before the map is painted.
+      if (instant || still) {
+        latest.current = target;
+        setPos(target);
+        return;
+      }
       const from = latest.current;
       const begin = performance.now();
       const tick = (now: number) => {
-        const p = instant || still ? 1 : Math.min(1, (now - begin) / FLY_MS);
+        const p = Math.min(1, (now - begin) / FLY_MS);
         const e = 1 - (1 - p) ** 3;
         setPos({
           center: [
@@ -123,6 +129,11 @@ export function MarketMap({ view, tall = false, fitIds, onOpen, onToggle }: Mark
   const m = useMapFormat();
   const { pos, setPos, flyTo, stop } = useMapPosition();
   const [tip, setTip] = useState<TooltipState | null>(null);
+  // Hidden behind its skeleton until the first fit: never the whole world, then a jump.
+  // Per frame: a new frame remounts the map and fits again.
+  const frameKey = tall ? 'tall' : 'wide';
+  const [fittedFrame, setFittedFrame] = useState<string | null>(null);
+  const fitted = fittedFrame === frameKey;
   const item = tip ? view.items.find((i) => i.id === tip.id) : undefined;
   const touchTip = tip?.via === 'touch';
 
@@ -145,30 +156,41 @@ export function MarketMap({ view, tall = false, fitIds, onOpen, onToggle }: Mark
 
   return (
     <div>
-      <ComposableMap
-        // A new frame is a new projection: remount and fit again.
-        key={tall ? 'tall' : 'wide'}
-        width={frame.width}
-        height={frame.height}
-        projection="geoEqualEarth"
-        projectionConfig={{ scale: frame.scale, center: WORLD.center }}
-        role="group"
-        aria-label={t('mapLabel', { metric: m.metricLabel(view.metric) })}
-        className="block h-auto w-full touch-pan-x touch-pan-y rounded-md bg-map-sea select-none"
-      >
-        <MapLayers
-          frame={frame}
-          view={view}
-          fitIds={fitIds}
-          pos={pos}
-          onMoveEnd={setPos}
-          onGesture={stop}
-          flyTo={flyTo}
-          onOpen={onOpen}
-          onToggle={onToggle}
-          onTip={setTip}
-        />
-      </ComposableMap>
+      <div className="relative">
+        <ComposableMap
+          // A new frame is a new projection: remount and fit again.
+          key={frameKey}
+          width={frame.width}
+          height={frame.height}
+          projection="geoEqualEarth"
+          projectionConfig={{ scale: frame.scale, center: WORLD.center }}
+          role="group"
+          aria-label={t('mapLabel', { metric: m.metricLabel(view.metric) })}
+          aria-hidden={fitted ? undefined : true}
+          className={cn(
+            'block h-auto w-full touch-pan-x touch-pan-y rounded-md bg-map-sea select-none',
+            !fitted && 'invisible',
+          )}
+        >
+          <MapLayers
+            frame={frame}
+            view={view}
+            fitIds={fitIds}
+            pos={pos}
+            onMoveEnd={setPos}
+            onGesture={stop}
+            flyTo={flyTo}
+            onOpen={onOpen}
+            onToggle={onToggle}
+            onTip={setTip}
+            fitted={fitted}
+            onFitted={() => {
+              setFittedFrame(frameKey);
+            }}
+          />
+        </ComposableMap>
+        {fitted ? null : <Skeleton aria-hidden className="absolute inset-0 rounded-md" />}
+      </div>
       <div className="mt-2 flex justify-end gap-2 md:gap-1">
         <Button
           type="button"
@@ -231,11 +253,17 @@ type MapLayersProps = Pick<MarketMapProps, 'view' | 'fitIds' | 'onOpen' | 'onTog
   onGesture: () => void;
   flyTo: (target: MapView, instant?: boolean) => void;
   onTip: CountriesProps['onTip'];
+  /** The first fit is in place: the map can be shown. */
+  fitted: boolean;
+  onFitted: () => void;
 };
 
 /**
  * Shapes, zoom and fit. Flies to fit `fitIds` when they change, so a zoom
- * set by hand survives a month, window or metric change; the first fit is instant.
+ * set by hand survives a month, window or metric change. The first fit is
+ * set in a layout effect, before the browser paints, and the zoom group
+ * mounts with it, so a reload with a drill or a selection opens on it
+ * instead of the whole world.
  */
 function MapLayers({
   frame,
@@ -248,6 +276,8 @@ function MapLayers({
   onOpen,
   onToggle,
   onTip,
+  fitted: shown,
+  onFitted,
 }: MapLayersProps) {
   const { projection } = useMapContext();
   const { geographies } = useGeographies({ geography: TOPOLOGY, parseGeographies: dropAntarctica });
@@ -255,7 +285,7 @@ function MapLayers({
   const key = fitIds.join(',');
   const fitted = useRef<string | null>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (shapes.size === 0 || fitted.current === key) return;
     const first = fitted.current === null;
     fitted.current = key;
@@ -271,8 +301,12 @@ function MapLayers({
       fitView(boxes, frame, (p) => projection.invert?.(p) ?? null),
       first,
     );
-  }, [fitIds, flyTo, frame, key, projection, shapes, view.items]);
+    if (first) onFitted();
+  }, [fitIds, flyTo, frame, key, onFitted, projection, shapes, view.items]);
 
+  // ZoomableGroup takes later center/zoom changes in an effect (a frame late)
+  // but its first position from props: mount it once the first fit is known.
+  if (!shown) return null;
   return (
     <ZoomableGroup
       center={pos.center}
