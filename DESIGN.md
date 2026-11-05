@@ -148,7 +148,7 @@ Rules:
 |---|---|
 | `Button` | every button; variants `default`, `outline`, `secondary`, `ghost`, `destructive`, `link` |
 | `Textarea` | the composer (`rows={1}`, grows with content) |
-| `HoverCard` | evidence card on fine pointers (hover and keyboard focus) |
+| `HoverCard` | evidence card on fine pointers (hover and keyboard focus); a click or Enter on the source closes it until the pointer or focus leaves the button (0.11.1, it blinked) |
 | `Popover` | the same card on coarse pointers (tap); the map tooltip (virtual anchor at the pointer or the country) |
 | `Collapsible` | "What the data shows" (closed by default) |
 | `DropdownMenu` | theme and locale switches, breadcrumb steps, the map metric picker (`modal={false}`, one trigger width), the markets filter and `Export ▾` |
