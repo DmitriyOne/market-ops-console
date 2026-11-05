@@ -10,14 +10,10 @@ Format: **Item**: what is wrong (file). Why it can wait. Where it goes.
 - **Arbitrary Tailwind values in shadcn components** (`src/shared/ui/*`), against `.claude/rules/ui.md`. Generated code. **Design pass**, with the semantic tokens.
 - **Offline overlay does not return focus** to where it was after closing (`src/features/network-status/ui/OfflineGuard.tsx`). **Hardening plan**, accessibility pass.
 
-## From the error-handling review (2026-11-03)
-
-- **TanStack `CancelledError` would be logged as a failure** (`src/app/providers/query-client.ts`). No `cancelQueries` in the code (checked in 0.7.0; Plan 2 did not need it). **Hardening plan**, if anything starts cancelling queries; add a test.
-
 ## From the design pass (2026-11-03)
 
 - **D screens drawn on the canvas (2026-11-03)**: Analyst, phone (Overview / Assistant / Alerts), widget and assistant states. The heat-map and radar calls were built in 0.8.0. Still open: in Analyst the assistant is shown collapsed with a badge (today the panel keeps the user's own choice). **Owner**, decide or drop.
-- **Not drawn yet**: tablet, Alerts as a desktop sheet. **Alerts plan** (tablet is cut line 2, spec §14). The evidence card (0.4.0) and product drill-down (0.5.0–0.6.0) were built from the tokens without a board.
+- **Not drawn yet**: tablet (cut line 2, spec §14). The evidence card (0.4.0), product drill-down (0.5.0–0.6.0) and the desktop alerts sheet (0.9.0, owner, 2026-11-05) were built from the tokens without a board.
 
 ## From Plan 2 (assistant, 2026-11-03)
 
@@ -84,6 +80,12 @@ Points the owner wants explained in the README, in his own words:
 - **Heat-map focus fallback is untested**: when the focused row disappears (browser Back from the portfolio to a region with focus on a row outside it) focus should land on the clamped row. Code reads right; no in-app action reaches it. **E2E** happy path.
 - **A radar series without a value on a kept axis** would be drawn by Recharts at the centre (as "worst"). Cannot happen with this data (no zero forecast or prior year). Drop the axis or the series if it ever can. **Hardening plan**.
 - **Heat-map and radar checked in jsdom only** (no browser run this round; the owner checked on his phone): layout at xl with the assistant open, phone scroll to the selected month, the Recharts radar's look in both themes. **Owner check**.
+
+## From the 0.9.0 alerts build (2026-11-05)
+
+- **A Retry from the rollback toast resends the change as it was**: for an edit or a toggle, a rule changed again in between gets the older version back. Rare (two edits of one rule inside one failed save). **Hardening plan**, if it shows.
+- **Two writes to one rule in flight** (toggle twice before the first answer): each undoes only itself, but a failed first write puts back its `previous`, which the second had already replaced. The list is refetched when the last write settles, so the server's state wins in the end. **Accepted**.
+- **Alerts checked in jsdom only** (no browser run this round): the sheet's look and focus return on desktop, the phone tab with the keyboard open, Radix Select inside the sheet on a phone. **Owner check**.
 
 ## Currency picker (owner, 2026-11-04) — after the required work, its own release before the README
 

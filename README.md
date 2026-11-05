@@ -4,7 +4,7 @@ A console for a commercial operations team: a **streaming AI assistant** that an
 
 Take-home assignment for the Frontend Engineer role at NewPage Solutions.
 
-> Status: `0.8.0` heat map and radar, built and reviewed, waiting for the owner's check and push. Done: foundation (0.2.0), design direction and tokens (0.3.0), assistant (0.4.0), dashboard shell (0.5.0), market map (0.6.0), Analyst markets table (0.7.0). Next, one release each: alerts, then end-to-end test and deploy. Full list: `CHANGELOG.md`.
+> Status: `0.9.0` alerts, built, waiting for the owner's check and the review. Done: foundation (0.2.0), design direction and tokens (0.3.0), assistant (0.4.0), dashboard shell (0.5.0), market map (0.6.0), Analyst markets table (0.7.0), heat map and radar (0.8.0). Next: end-to-end test and deploy. Full list: `CHANGELOG.md`.
 
 ## What works now
 
@@ -16,9 +16,10 @@ Take-home assignment for the Frontend Engineer role at NewPage Solutions.
 - **History** survives a reload of the same tab (`sessionStorage`) and ends with the tab.
 - **Dashboard, Executive view**: drill-down path `Portfolio › Region › Market › Product`, a month picker with a 1 / 3 / 12-month window, KPI cards (revenue, forecast attainment, growth, markets at risk), market status as a world map, tiles by region or a table (map coloured by status; in Analyst also by attainment, growth, share or revenue), top risks, top movers and the revenue trend (actual vs forecast vs prior year) with a table alternative. Every view is in the URL: links can be shared, Back and Forward work (mode included), a broken link is corrected in place; the app name returns to the clean view (phone: also ⚙︎ › Reset view). A source click in the assistant moves the whole dashboard and scrolls it to the top. The chosen view (map, tiles, table; chart or table) is remembered per browser.
 - **Dashboard, Analyst view**: everything above plus the map metric picker, a markets table with every KPI (gap to forecast included) calculated from monthly data, so each row adds up and the total is their sum, a total row and sortable headers, a markets filter fed by the map (Shift+click) and the tiles, "Export" of the rows as shown (Excel with formats and filters, or CSV), units in the revenue trend, a comparison radar next to the map (the selected markets, else the open market and its neighbours, else the regions, against the portfolio average) and a heat map of markets × 24 months in the map's metric (Germany's March 2026 dip shows as growth), both with table alternatives. Selection and sort are in the URL too. The page title says which view is on ("Executive view" / "Analyst view").
+- **Alerts**: threshold rules ("attainment below 95 %", for all markets, a region or chosen ones; warning or critical) in a form validated by the same schema as the server, with a live preview of the markets a rule flags now. Saved optimistically and rolled back with a message and Retry when the save fails (a demo switch makes the next save fail). Flagged markets get a bell in the header count, Top risks, the markets table and the map's tooltip and table. A right sheet on desktop, a tab on phones, both `tab=alerts`.
 - 4 locales (en-GB, en-US, de-DE, ru-RU), light and dark themes, an offline screen, error boundaries per widget.
 
-Try it: run `pnpm dev`, switch to Analyst and Shift+click Germany and Spain on the map to narrow the markets table, look at the heat map for Germany's March 2026 dip and press Enter on it, click Europe › Germany in the path or Germany on the map, then open the assistant and pick a suggested question, or ask "Why did Germany dip in March?", "What will sales be next year?" (can't answer) or "force error" (error and Retry).
+Try it: run `pnpm dev`, open the bell in the header (Alerts): add a rule "Growth below 0%" and watch the preview, then tick "Fail the next save (demo)" and switch a rule off to see the rollback. Switch to Analyst and Shift+click Germany and Spain on the map to narrow the markets table, look at the heat map for Germany's March 2026 dip and press Enter on it, click Europe › Germany in the path or Germany on the map, then open the assistant and pick a suggested question, or ask "Why did Germany dip in March?", "What will sales be next year?" (can't answer) or "force error" (error and Retry).
 
 ## Start here (5 minutes)
 
@@ -56,9 +57,9 @@ src/
   app/               providers, global styles, design tokens
   pages/             page composition, no logic (dashboard)
   widgets/           screen blocks: app-shell, assistant-panel, dashboard-header, kpi-strip, market-status (tiles, table and map), markets-table, heat-map, comparison-radar, top-risks, top-movers, revenue-trend
-  features/          user actions: ask-question (chat stream, composer, history), drill-down, reset-view, select-period, select-metric, select-markets, export-markets, switch-mode, switch-section, switch-locale, switch-theme, network-status; planned: alerts
-  entities/          performance (dataset, dashboard URL state, KPI and status selectors, map scales and the map selector, the markets table, heat map and radar selectors, citations, status chip)
-  shared/            ui (shadcn, error boundaries, toasts), lib (cn, csv, dom, errors, events, media, storage), api (HTTP client, SSE, contracts, dataset), config (env, API routes, i18n)
+  features/          user actions: ask-question (chat stream, composer, history), drill-down, reset-view, select-period, select-metric, select-markets, export-markets, switch-mode, switch-section, switch-locale, switch-theme, network-status, configure-alerts (rule form, list, optimistic saves)
+  entities/          alert-rule (rules query and requests, which markets a rule flags, the bell), performance (dataset, dashboard URL state, KPI and status selectors, map scales and the map selector, the markets table, heat map and radar selectors, citations, status chip)
+  shared/            ui (shadcn, error boundaries, toasts), lib (cn, csv, dom, errors, events, media, storage), api (HTTP client, SSE, contracts, dataset, alert rule schema and mock store), config (env, API routes, i18n)
 data/                data.json, fixtures.json (source of truth)
 docs/
   decisions/         architecture decision records
