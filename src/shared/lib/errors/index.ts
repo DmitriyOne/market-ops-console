@@ -1,6 +1,7 @@
 export {
   AppError,
   type AppErrorCode,
+  ConflictError,
   DataIntegrityError,
   NotFoundError,
   ValidationError,

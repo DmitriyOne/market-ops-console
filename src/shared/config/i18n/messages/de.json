@@ -466,5 +466,11 @@
       "statusValue": "In den Daten nur für den letzten Monat gesetzt.",
       "link": "Diese Ansicht öffnen"
     }
+  },
+  "alerts": {
+    "examples": {
+      "attainment": "Planerfüllung unter 95 %",
+      "share": "Marktanteil unter 10 %"
+    }
   }
 }

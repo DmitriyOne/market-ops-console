@@ -466,5 +466,11 @@
       "statusValue": "Set in the data for the latest month only.",
       "link": "Open this view"
     }
+  },
+  "alerts": {
+    "examples": {
+      "attainment": "Attainment below 95%",
+      "share": "Share below 10%"
+    }
   }
 }
