@@ -381,6 +381,37 @@
     "perProduct": "Werte für {product}.",
     "revenueUnit": "Umsatz in US-Dollar."
   },
+  "radar": {
+    "title": "Vergleich",
+    "regions": "Regionen im Vergleich zum Portfolio",
+    "markets": "Ausgewählte Märkte im Vergleich zum Portfolio",
+    "portfolio": "Portfolio-Durchschnitt",
+    "compared": "Verglichen",
+    "axis": {
+      "growth": "Wachstum ggü. VJ",
+      "attainment": "Planerfüllung",
+      "share": "Marktanteil",
+      "revenue": "Umsatz",
+      "momentum": "Dynamik"
+    },
+    "scaleMarkets": "Jede Achse reicht vom schwächsten (Mitte) bis zum stärksten (Rand) der 13 Märkte.",
+    "scaleRegions": "Jede Achse reicht von der schwächsten (Mitte) bis zur stärksten (Rand) der 4 Regionen.",
+    "momentumNote": "Dynamik: Wachstum ggü. Vorjahr in den letzten 3 Monaten minus die 3 Monate davor, in Prozentpunkten.",
+    "removed": {
+      "shareLatestOnly": "Der Marktanteil liegt nur für den letzten Monat vor; seine Achse fehlt.",
+      "momentumTooEarly": "Die Dynamik braucht sechs Monate Daten; ihre Achse fehlt."
+    },
+    "hidden": "Die ersten {shown} von {total} ausgewählten Märkten.",
+    "productIgnored": "Vergleicht Märkte, nicht Produkte: {product} gilt hier nicht.",
+    "pickHint": "Wählen Sie Märkte auf der Karte oder im Tabellenfilter, um sie zu vergleichen.",
+    "tooFewAxes": "Zu wenige Achsen mit Daten für ein Diagramm; die Tabelle zeigt die Werte.",
+    "showTable": "Als Tabelle anzeigen",
+    "showChart": "Als Diagramm anzeigen",
+    "caption": "{names} im Vergleich zum Portfolio-Durchschnitt, {window}",
+    "chartLabel": "Netzdiagramm: {names} im Vergleich zum Portfolio-Durchschnitt",
+    "pp": "{value} Pp.",
+    "legend": "Legende"
+  },
   "exportMarkets": {
     "button": "Exportieren",
     "preparing": "Wird erstellt…",

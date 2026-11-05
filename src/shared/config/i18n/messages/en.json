@@ -381,6 +381,37 @@
     "perProduct": "Values are for {product}.",
     "revenueUnit": "Revenue in US dollars."
   },
+  "radar": {
+    "title": "Comparison",
+    "regions": "Regions against the portfolio",
+    "markets": "Selected markets against the portfolio",
+    "portfolio": "Portfolio average",
+    "compared": "Compared",
+    "axis": {
+      "growth": "Growth YoY",
+      "attainment": "Attainment",
+      "share": "Market share",
+      "revenue": "Revenue",
+      "momentum": "Momentum"
+    },
+    "scaleMarkets": "Each axis runs from the weakest (centre) to the strongest (edge) of the 13 markets.",
+    "scaleRegions": "Each axis runs from the weakest (centre) to the strongest (edge) of the 4 regions.",
+    "momentumNote": "Momentum: growth YoY over the last 3 months minus the 3 months before, in percentage points.",
+    "removed": {
+      "shareLatestOnly": "Market share is set for the latest month only; its axis is left out.",
+      "momentumTooEarly": "Momentum needs six months of data; its axis is left out."
+    },
+    "hidden": "Showing the first {shown} of {total} selected markets.",
+    "productIgnored": "Compares markets, not products: {product} is not applied here.",
+    "pickHint": "Select markets on the map or in the table filter to compare them.",
+    "tooFewAxes": "Too few axes have data for a chart; the table shows the values.",
+    "showTable": "Show as table",
+    "showChart": "Show as chart",
+    "caption": "{names} against the portfolio average, {window}",
+    "chartLabel": "Radar chart: {names} against the portfolio average",
+    "pp": "{value} pp",
+    "legend": "Legend"
+  },
   "exportMarkets": {
     "button": "Export",
     "preparing": "Preparing…",

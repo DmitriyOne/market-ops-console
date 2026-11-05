@@ -197,7 +197,7 @@ export function comparisonRadar(ds: Dataset, scope: Scope, period: Period, range
 
 - [ ] **Step 1: failing tests**:
   - nothing selected → `compared: 'regions'`, 4 series in data order, reference `kind: 'portfolio'`.
-  - selected `['de','es']`, latest 1m → 2 market series; DE growth raw = stored −10.0 (computeKpis, `data`); DE momentum raw within 0.1 of −11.8; every `scaled` in [0, 1]; the best of the 13 on growth (CN) would scale to 1.
+  - selected `['de','es']`, latest 1m → 2 market series; DE growth raw = stored −9.7 (computeKpis, `data`); DE momentum raw within 0.1 of −11.8; every `scaled` in [0, 1]; the best of the 13 on growth (CN) would scale to 1.
   - 5 selected → 4 series, `hiddenSelected: 1`, order kept.
   - `range: '3m'` → share removed with `shareLatestOnly`; `period: '2024-08'` → momentum removed with `momentumTooEarly`, 3 axes left.
   - regions compared: revenue scaled across the 4 regions (EU not clamped to 1 because a market is smaller); reference revenue = mean of the 4.
@@ -249,7 +249,7 @@ export function comparisonRadar(ds: Dataset, scope: Scope, period: Period, range
 
 - [ ] **Step 1: failing tests**:
   - nothing selected → title "Regions compared", a legend with 4 regions + "Portfolio average", each legend item draws its dash pattern (an element per pattern, not colour only).
-  - `markets=de&markets=es` → legend Germany, Spain + portfolio; the table view lists real values (DE growth "−10.0%").
+  - `markets=de&markets=es` → legend Germany, Spain + portfolio; the table view lists real values (DE growth "−9.7%").
   - 5 selected → "Showing 4 of 5 selected".
   - `range=3m` → share notice; `product=veltrix` → "Compares markets, not products" notice.
   - fewer than 3 axes → the table shows without the chart toggle.

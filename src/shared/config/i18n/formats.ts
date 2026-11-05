@@ -23,6 +23,12 @@ export const formats = {
     compact: { notation: 'compact', maximumFractionDigits: 1 },
     integer: { maximumFractionDigits: 0 },
     percent: { style: 'percent', minimumFractionDigits: 1, maximumFractionDigits: 1 },
+    /** A change in percentage points (radar momentum): "+1.2". */
+    signedDecimal: {
+      minimumFractionDigits: 1,
+      maximumFractionDigits: 1,
+      signDisplay: 'exceptZero',
+    },
     /** Heat-map cells: whole percent, the decimal shows on focus. */
     wholePercent: { style: 'percent', maximumFractionDigits: 0 },
     signedWholePercent: { style: 'percent', maximumFractionDigits: 0, signDisplay: 'exceptZero' },
