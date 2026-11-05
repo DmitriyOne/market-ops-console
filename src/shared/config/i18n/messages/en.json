@@ -450,7 +450,7 @@
     "preparing": "Preparing…",
     "title": "Rows as shown",
     "excel": "Excel (.xlsx)",
-    "excelHint": "Formatted, with filters",
+    "excelHint": "Formatted, with filters; amounts in {currency}",
     "csv": "CSV",
     "csvHint": "Raw numbers in USD, for other tools",
     "failed": "Couldn't create the file. Try again.",
@@ -467,6 +467,9 @@
     "about": {
       "source": "Source",
       "sourceValue": "data.json, generated {date}; amounts in USD",
+      "currency": "Currency",
+      "currencyUsd": "{code} ({name}), as in the data",
+      "currencyConverted": "{code} ({name}), converted from USD at 1 USD = {rate} {code}, ECB rate of {date}. Fixed for this demo; a live app would get rates from the backend API.",
       "view": "View",
       "product": "Product",
       "selection": "Selected markets",

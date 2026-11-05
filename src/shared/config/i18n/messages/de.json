@@ -450,7 +450,7 @@
     "preparing": "Wird erstellt…",
     "title": "Zeilen wie angezeigt",
     "excel": "Excel (.xlsx)",
-    "excelHint": "Formatiert, mit Filtern",
+    "excelHint": "Formatiert, mit Filtern; Beträge in {currency}",
     "csv": "CSV",
     "csvHint": "Rohwerte in USD, für andere Programme",
     "failed": "Datei konnte nicht erstellt werden. Bitte erneut versuchen.",
@@ -467,6 +467,9 @@
     "about": {
       "source": "Quelle",
       "sourceValue": "data.json, erstellt am {date}; Beträge in USD",
+      "currency": "Währung",
+      "currencyUsd": "{code} ({name}), wie in den Daten",
+      "currencyConverted": "{code} ({name}), aus USD umgerechnet zu 1 USD = {rate} {code}, EZB-Kurs vom {date}. Für diese Demo fest hinterlegt; eine echte App holt die Kurse über die Backend-API.",
       "view": "Ansicht",
       "product": "Produkt",
       "selection": "Ausgewählte Märkte",

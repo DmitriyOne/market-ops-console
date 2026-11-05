@@ -1,8 +1,11 @@
 import { screen, waitFor } from '@testing-library/react';
 import { Suspense } from 'react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { enMessages as en } from '@/shared/config';
+import raw from '@/data/data.json';
+import { inCurrency, marketsTable } from '@/entities/performance';
+import { datasetSchema } from '@/shared/api';
+import { enMessages as en, USD_RATES } from '@/shared/config';
 import { datasetHandler, renderWithProviders, server } from '@/shared/lib/test';
 
 import * as xlsx from '../model/markets-xlsx';
@@ -78,6 +81,49 @@ describe('ExportMenu', () => {
     const [view, months] = marketsXlsx.mock.calls[0] ?? [];
     expect(view?.rows.map((r) => r.id)).toEqual(['de', 'es']);
     expect(months).toHaveLength(6);
+  });
+
+  describe('in euros (ADR 0017)', () => {
+    const ds = datasetSchema.parse(raw);
+    const view = (d: typeof ds) => marketsTable(d, {}, '2026-05', '3m', ['de', 'es'], null);
+    afterEach(() => {
+      localStorage.clear();
+    });
+
+    it('Excel: amounts in euros, the currency and its rate on the About sheet', async () => {
+      localStorage.setItem('mo:currency', 'EUR');
+      const { user } = setup();
+      await user.click(await screen.findByRole('button', { name: t.button }));
+      expect(
+        await screen.findByRole('menuitem', { name: /Excel.*amounts in EUR/ }),
+      ).toBeInTheDocument();
+      await user.click(screen.getByRole('menuitem', { name: /^Excel/ }));
+      await waitFor(() => {
+        expect(marketsXlsx).toHaveBeenCalled();
+      });
+      const [shown, , labels, currency] = marketsXlsx.mock.calls[0] ?? [];
+      expect(currency).toBe('EUR');
+      const de = shown?.rows.find((r) => r.id === 'de');
+      const usd = view(ds).rows.find((r) => r.id === 'de');
+      expect(de?.revenue.value).toBeCloseTo((usd?.revenue.value ?? 0) * USD_RATES.EUR, 2);
+      expect(de?.attainmentPct.value).toBeCloseTo(usd?.attainmentPct.value ?? Number.NaN, 9);
+      expect(view(inCurrency(ds, 'EUR')).rows.find((r) => r.id === 'de')).toEqual(de);
+      expect(labels?.about).toContainEqual({
+        label: t.about.currency,
+        value:
+          'EUR (Euro), converted from USD at 1 USD = 0.89095 EUR, ECB rate of 5 November 2026. Fixed for this demo; a live app would get rates from the backend API.',
+      });
+    });
+
+    it('CSV stays raw USD', async () => {
+      localStorage.setItem('mo:currency', 'EUR');
+      const { user } = setup();
+      await user.click(await screen.findByRole('button', { name: t.button }));
+      await user.click(await screen.findByRole('menuitem', { name: /^CSV/ }));
+      const usd = view(ds).rows.find((r) => r.id === 'de');
+      const csv = String(downloadText.mock.calls[0]?.[1]);
+      expect(csv).toContain(`de,DE,Germany,Europe,${String(Math.round(usd?.revenue.value ?? 0))},`);
+    });
   });
 
   it('nothing to save: the button is disabled', async () => {
