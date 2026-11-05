@@ -81,6 +81,8 @@ Points the owner wants explained in the README, in his own words:
 
 - **Radar colours follow the selection order**, not the market: removing the first selected market moves the others to the next colour (dataviz rule "colour follows the entity"). Four slots for 13 markets cannot be fixed per market; a stable slot per selection would need memory outside the URL. Legend, dash and marker always match. **Design pass**, if it confuses.
 - **Heat-map cell names repeat for each of the 312 buttons** (market, month, value, anomaly); a screen reader reads the row header too, so the market name is said twice. Row and column headers would carry it if the cells were `gridcell`s instead of buttons. **Hardening plan**, a11y pass with a screen reader.
+- **Heat-map focus fallback is untested**: when the focused row disappears (browser Back from the portfolio to a region with focus on a row outside it) focus should land on the clamped row. Code reads right; no in-app action reaches it. **E2E** happy path.
+- **A radar series without a value on a kept axis** would be drawn by Recharts at the centre (as "worst"). Cannot happen with this data (no zero forecast or prior year). Drop the axis or the series if it ever can. **Hardening plan**.
 - **Heat-map and radar checked in jsdom only** (owner did not allow Playwright this round): layout at xl with the assistant open, phone scroll to the selected month, the Recharts radar's look in both themes. **Owner check**.
 
 ## Currency picker (owner, 2026-11-04) — after the required work, its own release before the README

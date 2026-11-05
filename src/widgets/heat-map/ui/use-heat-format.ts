@@ -6,7 +6,7 @@ import { type HeatCell, type HeatMetric, type HeatRow, periodToDate } from '@/en
 import type { Period } from '@/shared/api';
 
 /** Numbers and words of the heat map: short in a cell, one decimal in names and the detail line. */
-export function useHeatFormat(metric: HeatMetric) {
+export function useHeatFormat(metric: HeatMetric, marketNotes = false) {
   const t = useTranslations('heatMap');
   const tMetric = useTranslations('marketStatus.metric');
   const tData = useTranslations('dataCheck');
@@ -27,14 +27,18 @@ export function useHeatFormat(metric: HeatMetric) {
   const monthShort = (p: Period) => format.dateTime(periodToDate(p), 'periodShort');
   const metricName = tMetric(metric);
 
+  /** The data's note; in a product view it is said to be the market's. */
+  const note = (text: string) =>
+    marketNotes ? t('anomalyMarket', { note: text }) : t('anomaly', { note: text });
+
   const cellName = (row: HeatRow, cell: HeatCell) => {
     const parts = [
       t('cell', { market: row.name, month: month(cell.period), value: long(cell.value) }),
     ];
-    if (cell.anomaly) parts.push(t('anomaly', { note: cell.anomaly.note }));
+    if (cell.anomaly) parts.push(note(cell.anomaly.note));
     if (row.selected) parts.push(t('selected'));
     return parts.join(', ');
   };
 
-  return { short, long, month, monthShort, metricName, cellName };
+  return { short, long, month, monthShort, metricName, note, cellName };
 }

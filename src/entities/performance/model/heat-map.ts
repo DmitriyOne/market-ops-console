@@ -36,6 +36,8 @@ export type HeatMapView = {
   periods: Period[];
   window: Period[];
   rows: HeatRow[];
+  /** A product is open: anomaly notes still describe the whole market (data.json has no per-product notes). */
+  marketNotes: boolean;
 };
 
 function resolveHeatMetric(kpi: MapMetric): { metric: HeatMetric; notice: HeatNotice | null } {
@@ -105,5 +107,5 @@ export function heatMap(
     };
   });
 
-  return { metric, notice, periods, window, rows };
+  return { metric, notice, periods, window, rows, marketNotes: Boolean(scope.productId) };
 }

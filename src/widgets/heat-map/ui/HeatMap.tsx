@@ -1,6 +1,6 @@
 'use client';
 
-import { ChartColumnIcon, TableIcon } from 'lucide-react';
+import { ChartColumnIcon, CircleDotIcon, TableIcon, TriangleAlertIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useId, useMemo } from 'react';
 
@@ -17,7 +17,7 @@ import {
 import { useDrillDown } from '@/features/drill-down';
 import { useMarketSelection } from '@/features/select-markets';
 import { MetricPicker } from '@/features/select-metric';
-import { useStoredFlag } from '@/shared/lib';
+import { cn, useStoredFlag } from '@/shared/lib';
 import {
   Button,
   Card,
@@ -148,34 +148,70 @@ function Legend({ view }: { view: HeatMapView }) {
 
 function HeatTable({ view, caption }: { view: HeatMapView; caption: string }) {
   const t = useTranslations('heatMap');
-  const h = useHeatFormat(view.metric);
+  const h = useHeatFormat(view.metric, view.marketNotes);
+  const anomalies = view.rows.flatMap((row) =>
+    row.cells.flatMap((c) => (c.anomaly ? [{ row, cell: c, note: c.anomaly.note }] : [])),
+  );
   return (
-    <Table>
-      <TableCaption className="sr-only">{caption}</TableCaption>
-      <TableHeader>
-        <TableRow>
-          <TableHead className="sticky left-0 z-10 bg-card">{t('market')}</TableHead>
-          {view.periods.map((p) => (
-            <TableHead key={p} className="text-right whitespace-nowrap">
-              {h.monthShort(p)}
-            </TableHead>
-          ))}
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {view.rows.map((row) => (
-          <TableRow key={row.id}>
-            <TableHead scope="row" className="sticky left-0 z-10 bg-card font-medium">
-              {row.name}
-            </TableHead>
-            {row.cells.map((c) => (
-              <TableCell key={c.period} className="text-right font-mono tabular-nums">
-                {h.long(c.value)}
-              </TableCell>
+    <div className="flex flex-col gap-2">
+      <Table>
+        <TableCaption className="sr-only">{caption}</TableCaption>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="sticky left-0 z-10 bg-card">{t('market')}</TableHead>
+            {view.periods.map((p) => (
+              <TableHead key={p} className="text-right whitespace-nowrap">
+                {h.monthShort(p)}
+              </TableHead>
             ))}
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+        </TableHeader>
+        <TableBody>
+          {view.rows.map((row) => (
+            <TableRow key={row.id} aria-current={row.current ? 'true' : undefined}>
+              <TableHead
+                scope="row"
+                className={cn(
+                  'sticky left-0 z-10 bg-card font-medium whitespace-nowrap',
+                  (row.current || row.selected) && 'font-semibold',
+                )}
+              >
+                <span className="flex items-center gap-1">
+                  {row.selected ? <CircleDotIcon aria-hidden className="size-3.5" /> : null}
+                  {row.name}
+                  {row.selected ? <span className="sr-only">{`, ${t('selected')}`}</span> : null}
+                  {row.current ? (
+                    <span className="text-muted-foreground">{`· ${t('current')}`}</span>
+                  ) : null}
+                </span>
+              </TableHead>
+              {row.cells.map((c) => (
+                <TableCell key={c.period} className="text-right font-mono tabular-nums">
+                  {h.long(c.value)}
+                  {c.anomaly ? (
+                    <>
+                      <TriangleAlertIcon aria-hidden className="ml-1 inline size-3.5" />
+                      <span className="sr-only">{`, ${t('anomalyMark')}`}</span>
+                    </>
+                  ) : null}
+                </TableCell>
+              ))}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+      {anomalies.length > 0 ? (
+        <div className="text-xs">
+          <p className="font-medium">{t('anomalies')}</p>
+          <ul>
+            {anomalies.map((a) => (
+              <li key={`${a.row.id}:${a.cell.period}`}>
+                {`${a.row.name} · ${h.month(a.cell.period)}: ${h.note(a.note)}`}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+    </div>
   );
 }

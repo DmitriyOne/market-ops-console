@@ -100,10 +100,14 @@ describe('HeatMap', () => {
     expect(document.activeElement).toHaveAccessibleName(/^Mexico, May 2026/);
   });
 
-  it('a click shows the cell and its actions under the grid', async () => {
+  it('the line under the grid previews the hovered cell and acts on the pinned one', async () => {
     const { user, lastUpdate } = setup('?mode=analyst&kpi=attainment');
-    await grid();
-    await user.hover(cell(/^Spain, Jan 2026/));
+    const g = await grid();
+    cell(/^Spain, Jan 2026/).focus();
+    await user.hover(cell(/^Mexico, Jan 2026/));
+    expect(screen.getByText(/Mexico · Jan 2026 · Attainment/)).toBeInTheDocument();
+    // On the way to the buttons the mouse leaves the grid: the pinned cell is back.
+    await user.unhover(g);
     expect(screen.getByText(/Spain · Jan 2026 · Attainment 10\d\.\d%/)).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Add Spain to selection' }));
     await waitFor(() => {
@@ -130,5 +134,25 @@ describe('HeatMap', () => {
     unmount();
     setup('?mode=analyst');
     expect(await screen.findByRole('table')).toBeInTheDocument();
+  });
+
+  it('the table keeps what the grid shows: anomalies, selected and open markets', async () => {
+    const { user } = setup('?mode=analyst&region=eu&market=fr&markets=de');
+    await grid();
+    await user.click(screen.getByRole('button', { name: t.showTable }));
+    const table = await screen.findByRole('table');
+    expect(within(table).getByRole('rowheader', { name: /Germany, selected/ })).toBeInTheDocument();
+    expect(within(table).getByRole('row', { name: /France\s*· open now/ })).toBeInTheDocument();
+    expect(
+      screen.getByText(/Germany · Mar 2026: anomaly: Revenue fell 27% versus the prior month/),
+    ).toBeInTheDocument();
+  });
+
+  it('in a product view the anomaly is said to be the whole market’s', async () => {
+    setup('?mode=analyst&region=eu&market=de&product=veltrix');
+    await grid();
+    expect(cell(/^Germany, Mar 2026/)).toHaveAccessibleName(
+      /anomaly in the whole market: Revenue fell 27%/,
+    );
   });
 });

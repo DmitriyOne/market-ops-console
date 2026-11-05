@@ -50,14 +50,16 @@ const clamp = (n: number, max: number) => Math.min(Math.max(n, 0), max);
  */
 export function HeatGrid({ view, period, label, onOpen, onToggle }: Props) {
   const t = useTranslations('heatMap');
-  const h = useHeatFormat(view.metric);
+  const h = useHeatFormat(view.metric, view.marketNotes);
   const { rows, periods } = view;
   const lastCol = periods.length - 1;
   const startCol = Math.max(0, periods.indexOf(period));
 
   const [active, setActive] = useState<Position | null>(null);
-  // What the line under the grid shows: the last cell hovered, focused or tapped.
-  const [shown, setShown] = useState<Position | null>(null);
+  // The line under the grid: the cell under the mouse while it is over the
+  // grid, else the cell last focused or tapped (pinned), which its buttons act on.
+  const [pinned, setPinned] = useState<Position | null>(null);
+  const [hovered, setHovered] = useState<Position | null>(null);
   const cells = useRef(new Map<string, HTMLButtonElement>());
   const scroller = useRef<HTMLDivElement>(null);
   const headers = useRef(new Map<Period, HTMLTableCellElement>());
@@ -147,6 +149,13 @@ export function HeatGrid({ view, period, label, onOpen, onToggle }: Props) {
   const onPointerDown = (e: PointerEvent) => {
     pointer.current = e.pointerType;
   };
+  // A finger that scrolled and lifted gives no click: forget it, so a later
+  // key press is not taken for a tap.
+  const forgetPointer = () => {
+    pointer.current = '';
+  };
+
+  const shown = hovered ?? pinned;
 
   const shownRow = shown ? rows.find((r) => r.id === shown.id) : undefined;
   const shownCell = shown ? shownRow?.cells[shown.col] : undefined;
@@ -168,6 +177,11 @@ export function HeatGrid({ view, period, label, onOpen, onToggle }: Props) {
           onKeyDown={move}
           onFocus={() => {
             hadFocus.current = true;
+          }}
+          onPointerCancel={forgetPointer}
+          onKeyDownCapture={forgetPointer}
+          onMouseLeave={() => {
+            setHovered(null);
           }}
           onBlur={(e) => {
             if (!e.currentTarget.contains(e.relatedTarget)) hadFocus.current = false;
@@ -217,6 +231,7 @@ export function HeatGrid({ view, period, label, onOpen, onToggle }: Props) {
                         row={row}
                         cell={c}
                         metric={view.metric}
+                        marketNotes={view.marketNotes}
                         tabbable={isCurrent}
                         ref={(el) => {
                           if (el) cells.current.set(keyOf(pos), el);
@@ -225,16 +240,16 @@ export function HeatGrid({ view, period, label, onOpen, onToggle }: Props) {
                         onPointerDown={onPointerDown}
                         onFocus={() => {
                           setActive(pos);
-                          setShown(pos);
+                          setPinned(pos);
                         }}
                         onMouseEnter={() => {
-                          setShown(pos);
+                          setHovered(pos);
                         }}
                         onClick={(shift) => {
                           const touch = pointer.current === 'touch';
                           pointer.current = '';
                           setActive(pos);
-                          setShown(pos);
+                          setPinned(pos);
                           if (shift) onToggle(row.id);
                           else if (!touch) onOpen(row.id, c.period);
                         }}
@@ -251,6 +266,7 @@ export function HeatGrid({ view, period, label, onOpen, onToggle }: Props) {
         row={shownRow}
         cell={shownCell}
         metric={view.metric}
+        marketNotes={view.marketNotes}
         onOpen={onOpen}
         onToggle={onToggle}
       />
@@ -282,6 +298,7 @@ type CellProps = {
   row: HeatRow;
   cell: HeatCell;
   metric: HeatMapView['metric'];
+  marketNotes: boolean;
   tabbable: boolean;
   ref: (el: HTMLButtonElement | null) => void;
   onPointerDown: (e: PointerEvent) => void;
@@ -294,6 +311,7 @@ function CellButton({
   row,
   cell,
   metric,
+  marketNotes,
   tabbable,
   ref,
   onPointerDown,
@@ -301,7 +319,7 @@ function CellButton({
   onMouseEnter,
   onClick,
 }: CellProps) {
-  const h = useHeatFormat(metric);
+  const h = useHeatFormat(metric, marketNotes);
   const scale = MAP_SCALES[metric];
   const tone = cell.step === null ? undefined : scale.tones[cell.step];
   return (
@@ -344,17 +362,19 @@ function CellDetail({
   row,
   cell,
   metric,
+  marketNotes,
   onOpen,
   onToggle,
 }: {
   row: HeatRow | undefined;
   cell: HeatCell | undefined;
   metric: HeatMapView['metric'];
+  marketNotes: boolean;
   onOpen: (marketId: string, period: Period) => void;
   onToggle: (marketId: string) => void;
 }) {
   const t = useTranslations('heatMap');
-  const h = useHeatFormat(metric);
+  const h = useHeatFormat(metric, marketNotes);
   if (!row || !cell) {
     return <p className="min-h-11 text-xs text-muted-foreground">{t('pick')}</p>;
   }
@@ -367,7 +387,7 @@ function CellDetail({
           <span className="text-muted-foreground">
             {' · '}
             <TriangleAlertIcon aria-hidden className="inline size-3.5 align-text-top" />{' '}
-            {cell.anomaly.note}
+            {h.note(cell.anomaly.note)}
           </span>
         ) : null}
       </p>

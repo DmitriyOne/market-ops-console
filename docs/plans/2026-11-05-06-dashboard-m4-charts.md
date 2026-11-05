@@ -74,13 +74,13 @@ States), §11, §14. ADR 0004, 0006, 0014, 0015.
   hovered cell is spelled out in a line under the grid with one decimal
   and the anomaly note ("Germany · Mar 2026 · Growth −30.6 % · ⚠ Revenue
   fell 27 % versus the prior month"). This line is also the touch path (a
-  tap shows it, a second tap opens). Anomaly cells carry a ⚠ corner mark
+  tap shows it; its Open button opens). Anomaly cells carry a ⚠ corner mark
   (not colour only). Values are calculated from series and the card says
   they can differ from stored KPIs by about a point.
 - **Keyboard:** one Tab stop (roving tabindex), arrows move, Home/End
   jump within a row, Ctrl+Home/End to the corners, Enter opens, Shift+Enter
   selects. `role="grid"` with row headers; each cell's name carries market,
-  month, value, step words and the anomaly.
+  month, value and the anomaly (the value says the step).
 - **Table alternative** for both charts, a `Chart / Table` button
   remembered per browser like the trend's (`useStoredFlag`).
 - **Radar axes:** growth, attainment, share, revenue, momentum. Each axis
@@ -277,6 +277,10 @@ export function comparisonRadar(ds: Dataset, scope: Scope, period: Period, range
 - **Mode switch was invisible** (the top of the page is the same in both modes; on a phone the Analyst parts are all below): the page title gets a badge with the view's name and a line of what it shows (Analyst: what it adds below), read out on change. Options offered: badge, toast with "Show", auto-scroll, anchor links; the owner chose the badge.
 - **Heat map widened the page on a phone** after a tap: the two buttons under the grid ("Open United Kingdom, May 2026", "Add United Kingdom to selection") did not wrap. They wrap now, and so do their labels; the grid has `min-w-0`. Not testable in jsdom: owner check. **Owner check 2:** the page still scrolled sideways in the chart view only. Real cause: the `sr-only` "in the window" text in the month headers is `position: absolute`, and no ancestor inside the scroll box was positioned, so it sat at its column (~1000 px) outside the box and widened the page. The scroll box is `relative` now (as shadcn's table container is, which is why the table view was fine).
 - **Radar stayed on regions after opening UK on the map** (a drill clears the selection, and the radar ignored the open market): with nothing selected it now follows the open scope: the open market and its region's neighbours (it first), else the open region's markets, else the regions.
+
+## Branch review (agent, 2026-11-05)
+
+Fixed: the line under the grid previews the hovered cell only while the mouse is over the grid and otherwise shows the cell last focused or tapped, which its buttons act on (the mouse crossed other rows on the way to them and they acted on the wrong market); the table view carries the anomaly marks and notes, "selected" and "open now"; in a product view the anomaly note is called the whole market's (data.json has no per-product notes); a cancelled touch no longer makes a later key press count as a tap; the skeleton has the card's lines; the radar's scaling skips an axis no peer has a value on. Plan text corrected (touch opens through the Open button; cell names carry the value, not step words). Deferred to the backlog: the focus fallback when the focused row disappears (only browser Back reaches it; E2E) and a radar series missing one value on a kept axis.
 
 ## Built differently from the tasks
 

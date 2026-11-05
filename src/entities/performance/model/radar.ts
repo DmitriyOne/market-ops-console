@@ -91,6 +91,8 @@ function scale(raw: Raw, peers: readonly Raw[], axes: readonly RadarAxis[]): Rad
     const v = raw[axis];
     if (v === undefined) continue;
     const known = peers.map((p) => p[axis]).filter((x) => x !== undefined);
+    // No peer has a value: nothing to place it between.
+    if (known.length === 0) continue;
     const min = Math.min(...known);
     const max = Math.max(...known);
     const scaled = max === min ? 0.5 : Math.min(1, Math.max(0, (v - min) / (max - min)));

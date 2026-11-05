@@ -387,7 +387,10 @@
     "legend": "Legende",
     "noteCalculated": "Aus den Monatsreihen berechnet: Werte können um etwa einen Punkt von den gespeicherten KPIs abweichen.",
     "perProduct": "Werte für {product}.",
-    "revenueUnit": "Umsatz in US-Dollar."
+    "revenueUnit": "Umsatz in US-Dollar.",
+    "anomalyMarket": "Auffälligkeit im ganzen Markt: {note}",
+    "anomalies": "Auffälligkeiten",
+    "anomalyMark": "Auffälligkeit"
   },
   "radar": {
     "title": "Vergleich",

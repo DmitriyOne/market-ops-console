@@ -67,6 +67,9 @@ describe('heatMap', () => {
     expect(row).toBeDefined();
     if (!row) return;
     expect(value(view, 'fr', '2025-01')).toBeCloseTo((row.actual / row.forecast) * 100, 6);
+    // The data's notes are per market: the view says so.
+    expect(view.marketNotes).toBe(true);
+    expect(heatMap(ds, {}, '2026-05', '1m', 'growth', []).marketNotes).toBe(false);
   });
 
   it('marks the window of the period and range', () => {

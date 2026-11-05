@@ -387,7 +387,10 @@
     "legend": "Legend",
     "noteCalculated": "Calculated from monthly series: values can differ from the stored KPIs by about a point.",
     "perProduct": "Values are for {product}.",
-    "revenueUnit": "Revenue in US dollars."
+    "revenueUnit": "Revenue in US dollars.",
+    "anomalyMarket": "anomaly in the whole market: {note}",
+    "anomalies": "Anomalies",
+    "anomalyMark": "anomaly"
   },
   "radar": {
     "title": "Comparison",
