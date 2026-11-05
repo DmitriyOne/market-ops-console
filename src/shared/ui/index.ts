@@ -7,6 +7,7 @@ export { ErrorBoundary } from './error-boundary';
 export { HoverCard, HoverCardContent, HoverCardTrigger } from './hover-card';
 export { MonthPicker } from './month-picker';
 export { Popover, PopoverAnchor, PopoverContent, PopoverTrigger } from './popover';
+export { PopperBoundary } from './popper-boundary';
 export * from './sheet';
 export { Skeleton } from './skeleton';
 export { toast, Toaster } from './sonner';

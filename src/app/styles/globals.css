@@ -6,8 +6,11 @@
 
 /* Desktop assistant collapsed: set on <html> before first paint (widgets/app-shell). */
 @custom-variant assistant-collapsed (&:where([data-assistant-collapsed] *));
-/* Hover and press feedback only for controls that can act (DESIGN.md §4). */
+/* Phone link to the Assistant tab: set on <html> before first paint (features/switch-section). */
 @custom-variant section-assistant (&:where([data-section='assistant'] *));
+/* Analyst link: set before first paint, then kept in step with the URL (features/switch-mode). */
+@custom-variant mode-analyst (&:where([data-mode='analyst'] *));
+/* Hover and press feedback only for controls that can act (DESIGN.md §4). */
 @custom-variant interactive (&:not(:disabled, [aria-disabled='true']));
 
 /* Off-track pattern: a second signal next to the ■ shape and the word (never colour alone). */

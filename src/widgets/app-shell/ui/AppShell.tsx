@@ -6,7 +6,7 @@ import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } fro
 
 import { SectionTabBar, useSection } from '@/features/switch-section';
 import { cn, scrollMainToTop, useMediaQuery } from '@/shared/lib';
-import { Button, WidgetBoundary } from '@/shared/ui';
+import { Button, PopperBoundary, WidgetBoundary } from '@/shared/ui';
 
 import { usePanelCollapsed } from '../model/use-panel-collapsed';
 
@@ -47,6 +47,8 @@ export function AppShell({ header, main, assistant }: AppShellProps) {
   const desktop = useMediaQuery(DESKTOP);
   const [section, setSection] = useSection();
   const [collapsed, setCollapsed] = usePanelCollapsed();
+  // State, not a ref: the popups read it, so they re-render once it is attached.
+  const [mainArea, setMainArea] = useState<HTMLElement | null>(null);
   const [unread, setUnread] = useState(0);
   // Focus moves to whichever of the two buttons is shown next.
   const collapseRef = useRef<HTMLButtonElement>(null);
@@ -118,9 +120,16 @@ export function AppShell({ header, main, assistant }: AppShellProps) {
       {/* Phone assistant: the whole screen, as a chat app. */}
       <header className={cn(HEADER, section === 'assistant' && 'max-lg:hidden')}>{header}</header>
       <div className="flex min-h-0 flex-1">
-        <main id="main" className={cn(MAIN, section === 'assistant' && 'max-lg:hidden')}>
-          {/* Each side fails on its own: a crash in one keeps the other. */}
-          <WidgetBoundary>{main}</WidgetBoundary>
+        <main
+          ref={setMainArea}
+          id="main"
+          className={cn(MAIN, section === 'assistant' && 'max-lg:hidden')}
+        >
+          {/* Popups here stay below the header (they are portalled to the body). */}
+          <PopperBoundary value={mainArea}>
+            {/* Each side fails on its own: a crash in one keeps the other. */}
+            <WidgetBoundary>{main}</WidgetBoundary>
+          </PopperBoundary>
         </main>
         <aside
           aria-label={t('assistant')}

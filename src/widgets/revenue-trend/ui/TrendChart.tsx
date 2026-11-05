@@ -28,15 +28,22 @@ const CHART_HEIGHT = 224;
 const TICK = { fontSize: 12 };
 const MARK = 'var(--color-muted-foreground)';
 
-type TrendChartProps = { view: TrendView; title: string };
+type TrendChartProps = {
+  view: TrendView;
+  title: string;
+  /** Analyst: the tooltip adds the month's units. */
+  units?: boolean;
+};
 
-/** Tooltip for one month: the three values in the project's currency format. */
+/** Tooltip for one month: the three values in the project's currency format (Analyst: units too). */
 function TrendTooltip({
   active,
   label,
   byPeriod,
+  units = false,
 }: Partial<Pick<TooltipContentProps, 'active' | 'label'>> & {
   byPeriod: Map<string, TrendView['points'][number]>;
+  units?: boolean;
 }) {
   const t = useTranslations('trend');
   const format = useFormatter();
@@ -56,6 +63,12 @@ function TrendTooltip({
             <dd className="text-right">{format.number(point[key], 'compactCurrency')}</dd>
           </div>
         ))}
+        {units ? (
+          <>
+            <dt className="font-sans text-muted-foreground">{t('units')}</dt>
+            <dd className="text-right">{format.number(point.units, 'integer')}</dd>
+          </>
+        ) : null}
       </dl>
     </div>
   );
@@ -66,7 +79,7 @@ function TrendTooltip({
  * for it. Keyboard: the chart takes focus and arrow keys move the tooltip
  * (Recharts accessibility layer); the table toggle is the full alternative.
  */
-export function TrendChart({ view, title }: TrendChartProps) {
+export function TrendChart({ view, title, units = false }: TrendChartProps) {
   const t = useTranslations('trend');
   const format = useFormatter();
   const wide = useMediaQuery('(min-width: 40rem)');
@@ -134,7 +147,7 @@ export function TrendChart({ view, title }: TrendChartProps) {
           domain={['auto', 'auto']}
         />
         <Tooltip
-          content={<TrendTooltip byPeriod={byPeriod} />}
+          content={<TrendTooltip byPeriod={byPeriod} units={units} />}
           cursor={{ stroke: 'var(--color-border)' }}
         />
         {KEYS.map((key) => (

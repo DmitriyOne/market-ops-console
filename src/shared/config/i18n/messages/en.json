@@ -234,7 +234,7 @@
     "title": "Market status",
     "tile": "{code} {name}, {status}, attainment {value}",
     "tileNoStatus": "{code} {name}, attainment {value}",
-    "highlighted": "highlighted from the assistant",
+    "current": "open now",
     "selected": "selected",
     "hatched": "hatched",
     "latestOnly": "Status is set for the latest month only; tiles show forecast attainment.",
@@ -276,7 +276,11 @@
     "between": "{from} – {to}",
     "above": "{from} and above",
     "dotted": "dotted",
-    "perProduct": "Values are for {product}; status is set per market."
+    "perProduct": "Values are for {product}; status is set per market.",
+    "addToFilter": "Add to filter",
+    "removeFromFilter": "Remove from filter",
+    "hintPointer": "Shift+click a market to add it to the table filter.",
+    "hintTouch": "Tap a market, then Add to filter."
   },
   "topRisks": {
     "title": "Top risks",
@@ -299,7 +303,8 @@
     "legend": "Legend",
     "name": "Revenue trend",
     "showChart": "Show as chart",
-    "windowRange": "{from} – {to}"
+    "windowRange": "{from} – {to}",
+    "units": "Units"
   },
   "topMovers": {
     "title": "Top movers",
@@ -307,5 +312,80 @@
     "risers": "Highest growth",
     "fallers": "Lowest growth",
     "empty": "Not enough markets to compare."
+  },
+  "marketFilter": {
+    "button": "Markets",
+    "buttonCount": "Markets ({count})",
+    "title": "Show only these markets",
+    "clear": "Clear selection",
+    "remove": "Remove {name}",
+    "count": "{selected} of {total} selected",
+    "selected": "Selected",
+    "region": "All of {region}",
+    "atRisk": "At risk or off track",
+    "atRiskLatestOnly": "Latest month only",
+    "clearAll": "Clear all"
+  },
+  "marketsTable": {
+    "title": "Markets",
+    "caption": "Markets in {scope}, {window}. Column headers sort the table.",
+    "total": "Total",
+    "totalCalculated": "Total of the rows shown, calculated from monthly data",
+    "sortHint": "Sort",
+    "column": {
+      "market": "Market",
+      "region": "Region",
+      "revenue": "Revenue",
+      "forecast": "Forecast",
+      "gap": "Gap to forecast",
+      "attainment": "Attainment",
+      "priorYear": "Prior year",
+      "growth": "Growth YoY",
+      "share": "Share",
+      "units": "Units",
+      "status": "Status"
+    },
+    "empty": "None of the selected markets is in this view. Clear the selection to see every market.",
+    "noteLatest": "Status and share are set for the latest month only.",
+    "notePerProduct": "Share is not available per product.",
+    "noteCalculated": "All figures are calculated from monthly data, so a row adds up and the total is the sum of the rows. Share and status are the stored latest-month figures; the tiles show stored KPIs, which can differ by about 1 point.",
+    "anomaly": "Anomaly, {period}: {note}"
+  },
+  "exportMarkets": {
+    "button": "Export",
+    "preparing": "Preparing…",
+    "title": "Rows as shown",
+    "excel": "Excel (.xlsx)",
+    "excelHint": "Formatted, with filters",
+    "csv": "CSV",
+    "csvHint": "Raw numbers in USD, for other tools",
+    "failed": "Couldn't create the file. Try again.",
+    "sheet": {
+      "markets": "Markets",
+      "months": "By month",
+      "about": "About",
+      "total": "Total",
+      "code": "Code",
+      "anomaly": "Anomaly",
+      "month": "Month",
+      "actual": "Actual"
+    },
+    "about": {
+      "source": "Source",
+      "sourceValue": "data.json, generated {date}; amounts in USD",
+      "view": "View",
+      "product": "Product",
+      "selection": "Selected markets",
+      "selectionAll": "All markets in the view",
+      "sort": "Order",
+      "sortDefault": "Region, then market",
+      "asc": "{column}, ascending",
+      "desc": "{column}, descending",
+      "calculated": "How values are made",
+      "calculatedValue": "Calculated from monthly data (revenue = Σ actual, attainment = Σ actual ÷ Σ forecast, growth = Σ actual ÷ Σ prior year − 1); share and status as stored for the latest month. Totals follow the Excel filter.",
+      "status": "Status",
+      "statusValue": "Set in the data for the latest month only.",
+      "link": "Open this view"
+    }
   }
 }

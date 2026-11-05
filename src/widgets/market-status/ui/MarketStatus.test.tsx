@@ -73,7 +73,7 @@ describe('MarketStatus', () => {
     setup('?markets=es&markets=fr');
     expect(
       await screen.findByRole('button', {
-        name: 'ES Spain, Off track, attainment 104.5% · highlighted from the assistant',
+        name: 'ES Spain, Off track, attainment 104.5% · selected',
       }),
     ).toBeInTheDocument();
   });
@@ -362,5 +362,133 @@ describe('MarketStatus map', () => {
       const transform = map.querySelector('.rsm-zoomable-group')?.getAttribute('transform') ?? '';
       expect(Number(/scale\(([\d.]+)\)/.exec(transform)?.[1])).toBeGreaterThan(1.5);
     });
+  });
+
+  it('a reload with a selection never shows the whole world first (no jump to it)', async () => {
+    // Every DOM state the browser could paint: is the map visible, and at what zoom?
+    const seen: number[] = [];
+    const observer = new MutationObserver(() => {
+      const svg = document.querySelector('svg.rsm-svg');
+      if (!svg || svg.classList.contains('invisible')) return;
+      const transform = svg.querySelector('.rsm-zoomable-group')?.getAttribute('transform') ?? '';
+      seen.push(Number(/scale\(([\d.]+)\)/.exec(transform)?.[1] ?? 1));
+    });
+    observer.observe(document.body, { subtree: true, childList: true, attributes: true });
+    setup('?markets=cn');
+    await mapGroup();
+    await waitFor(() => {
+      expect(seen.length).toBeGreaterThan(0);
+    });
+    observer.disconnect();
+    expect(Math.min(...seen)).toBeGreaterThan(1.5);
+  });
+
+  const zoomOf = (map: HTMLElement) =>
+    Number(
+      /scale\(([\d.]+)\)/.exec(
+        map.querySelector('.rsm-zoomable-group')?.getAttribute('transform') ?? '',
+      )?.[1] ?? 1,
+    );
+
+  it('Analyst: Shift+click adds a market to the selection, without a drill or a flight', async () => {
+    const { user, lastUpdate } = setup('?mode=analyst');
+    const map = await mapGroup();
+    const germany = await within(map).findByRole('button', { name: /^Germany,/ });
+    await user.keyboard('{Shift>}');
+    await user.click(germany);
+    await user.keyboard('{/Shift}');
+    await waitFor(() => {
+      expect(lastUpdate()?.queryString).toBe('?mode=analyst&markets=de');
+    });
+    expect(lastUpdate()?.options.history).toBe('push');
+    expect(
+      await within(map).findByRole('button', { name: /^Germany,.*· selected$/ }),
+    ).toBeInTheDocument();
+    // A flight would have started within a few frames.
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    expect(zoomOf(map)).toBe(1);
+    expect(screen.getByText(t.hintPointer)).toBeInTheDocument();
+  });
+
+  it('Analyst: Shift+Enter toggles the focused market', async () => {
+    const { user, lastUpdate } = setup('?mode=analyst&markets=es');
+    const spain = await within(await mapGroup()).findByRole('button', { name: /^Spain,/ });
+    spain.focus();
+    await user.keyboard('{Shift>}{Enter}{/Shift}');
+    await waitFor(() => {
+      expect(lastUpdate()?.queryString).toBe('?mode=analyst');
+    });
+  });
+
+  it('a market outside the drilled region drills as usual, even with Shift', async () => {
+    const { lastUpdate } = setup('?mode=analyst&region=eu');
+    const japan = await within(await mapGroup()).findByRole('button', { name: /^Japan,/ });
+    // The region drill zooms in, where d3-zoom handles mousedown; jsdom gives it no view.
+    fireEvent.click(japan, { shiftKey: true });
+    await waitFor(() => {
+      expect(Object.fromEntries(lastUpdate()?.searchParams ?? [])).toMatchObject({ market: 'jp' });
+    });
+  });
+
+  it('Analyst touch tooltip adds to and removes from the filter', async () => {
+    const { user, lastUpdate } = setup('?mode=analyst');
+    tap(await within(await mapGroup()).findByRole('button', { name: /^Italy,/ }));
+    await user.click(await screen.findByRole('button', { name: t.addToFilter }));
+    await waitFor(() => {
+      expect(lastUpdate()?.queryString).toBe('?mode=analyst&markets=it');
+    });
+    tap(within(await mapGroup()).getByRole('button', { name: /^Italy,/ }));
+    await user.click(await screen.findByRole('button', { name: t.removeFromFilter }));
+    await waitFor(() => {
+      expect(lastUpdate()?.queryString).toBe('?mode=analyst');
+    });
+  });
+
+  it('Executive: no hint, no filter button, Shift+click drills', async () => {
+    const { user, lastUpdate } = setup();
+    const map = await mapGroup();
+    expect(screen.queryByText(t.hintPointer)).not.toBeInTheDocument();
+    tap(await within(map).findByRole('button', { name: /^Italy,/ }));
+    await screen.findByRole('button', { name: 'Open Italy' });
+    expect(screen.queryByRole('button', { name: t.addToFilter })).not.toBeInTheDocument();
+    await user.keyboard('{Escape}');
+    await user.keyboard('{Shift>}');
+    await user.click(within(map).getByRole('button', { name: /^Spain,/ }));
+    await user.keyboard('{/Shift}');
+    await waitFor(() => {
+      expect(Object.fromEntries(lastUpdate()?.searchParams ?? [])).toMatchObject({ market: 'es' });
+    });
+  });
+});
+
+describe('MarketStatus tiles selection', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    localStorage.setItem('mo:market-status-view', 'tiles');
+    server.use(datasetHandler());
+  });
+
+  it('Analyst: Shift+click on a tile toggles it', async () => {
+    const { user, lastUpdate } = setup('?mode=analyst');
+    await user.keyboard('{Shift>}');
+    await user.click(await screen.findByRole('button', { name: /^FR France,/ }));
+    await user.keyboard('{/Shift}');
+    await waitFor(() => {
+      expect(lastUpdate()?.queryString).toBe('?mode=analyst&markets=fr');
+    });
+    expect(
+      await screen.findByRole('button', { name: /^FR France,.*· selected$/ }),
+    ).toBeInTheDocument();
+  });
+
+  it('a selection shows as a bar with chips in Executive too; Clear empties it', async () => {
+    const { user, lastUpdate } = setup('?markets=fr&markets=es');
+    const bar = await screen.findByRole('group', { name: en.marketFilter.selected });
+    expect(within(bar).getByRole('button', { name: 'Remove France' })).toBeInTheDocument();
+    await user.click(within(bar).getByRole('button', { name: en.marketFilter.clear }));
+    await waitFor(() => {
+      expect(lastUpdate()?.queryString).toBe('');
+    });
+    expect(screen.getByRole('heading', { name: t.title })).toHaveFocus();
   });
 });

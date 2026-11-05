@@ -5,7 +5,7 @@ sees where the portfolio is off plan at a glance, colours the map by a KPI
 in Analyst mode, opens a market from the map with mouse, touch or keyboard,
 and gets the same facts from tiles or the table.
 
-**Status:** built on `feature/0.6.0/market-map` (2026-11-04), in review.
+**Status:** built on `feature/0.6.0/market-map` (2026-11-04); reviewed and owner-checked; merged into `develop` with `release/0.6.0` (PRs #18, #20).
 
 **Spec:** `docs/specs/2026-11-03-market-ops-console-design.md` §4 (ISO join),
 §5, §6 (`kpi`), §8 (Market map, Market status), §11, §13. Decisions: ADR

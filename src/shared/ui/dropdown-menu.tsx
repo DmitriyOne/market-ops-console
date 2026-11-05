@@ -1,9 +1,11 @@
 'use client';
 
 import { cn } from 'cn';
-import { CheckIcon, ChevronRightIcon } from 'lucide-react';
+import { CheckIcon, ChevronRightIcon, MinusIcon } from 'lucide-react';
 import { DropdownMenu as DropdownMenuPrimitive } from 'radix-ui';
 import * as React from 'react';
+
+import { usePopperBoundary } from './popper-boundary';
 
 function DropdownMenu({ ...props }: React.ComponentProps<typeof DropdownMenuPrimitive.Root>) {
   return <DropdownMenuPrimitive.Root data-slot="dropdown-menu" {...props} />;
@@ -27,9 +29,11 @@ function DropdownMenuContent({
   sideOffset = 4,
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Content>) {
+  const boundary = usePopperBoundary();
   return (
     <DropdownMenuPrimitive.Portal>
       <DropdownMenuPrimitive.Content
+        {...boundary}
         data-slot="dropdown-menu-content"
         sideOffset={sideOffset}
         align={align}
@@ -95,7 +99,8 @@ function DropdownMenuCheckboxItem({
         data-slot="dropdown-menu-checkbox-item-indicator"
       >
         <DropdownMenuPrimitive.ItemIndicator>
-          <CheckIcon />
+          {/* Part of a group picked: a dash, not a tick. */}
+          {checked === 'indeterminate' ? <MinusIcon /> : <CheckIcon />}
         </DropdownMenuPrimitive.ItemIndicator>
       </span>
       {children}

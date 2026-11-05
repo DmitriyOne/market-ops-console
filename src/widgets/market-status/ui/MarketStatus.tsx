@@ -3,7 +3,7 @@
 import { GlobeIcon, LayoutGridIcon, TableIcon } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
-import { useId, useMemo } from 'react';
+import { useId, useMemo, useRef, useState } from 'react';
 
 import {
   getProduct,
@@ -19,6 +19,7 @@ import {
   useStatusLabel,
 } from '@/entities/performance';
 import { useDrillDown } from '@/features/drill-down';
+import { SelectionBar, useMarketSelection } from '@/features/select-markets';
 import { MetricPicker } from '@/features/select-metric';
 import { LatestOnlyNotice } from '@/features/select-period';
 import type { MarketStatus as Status } from '@/shared/api';
@@ -74,9 +75,12 @@ function MapSkeleton() {
 export function MarketStatus() {
   const t = useTranslations('marketStatus');
   const titleId = useId();
+  const title = useRef<HTMLHeadingElement>(null);
   const { ds, state } = useDashboard();
   const { toMarket } = useDrillDown();
+  const { toggle } = useMarketSelection();
   const wide = useMediaQuery('(min-width: 48rem)');
+  const coarse = useMediaQuery('(pointer: coarse)');
   // The view used to be an on/off table flag; a stored "table" still counts.
   const [legacyTable] = useStoredFlag('mo:market-status-table');
   const [view, setView] = useStoredChoice(
@@ -85,38 +89,56 @@ export function MarketStatus() {
     legacyTable ? 'table' : wide ? 'map' : 'tiles',
   );
 
-  const { scope, period, range, kpi, highlighted } = state;
+  const { scope, period, range, kpi, selected } = state;
+  const analyst = state.mode === 'analyst';
   const map = useMemo(
-    () => marketMap(ds, scope, period, range, kpi, highlighted),
-    [ds, scope, period, range, kpi, highlighted],
+    () => marketMap(ds, scope, period, range, kpi, selected),
+    [ds, scope, period, range, kpi, selected],
   );
-  // A drill fits its region (a market: its region, outlined); the assistant's markets win.
-  const fitIds = useMemo(
+  // A drill fits its region (a market: its region, outlined); a selection
+  // (assistant, table filter) wins.
+  const autoFit = useMemo(
     () =>
-      highlighted.length > 0
-        ? highlighted
+      selected.length > 0
+        ? selected
         : scope.regionId
           ? map.items.filter((i) => i.regionId === scope.regionId).map((i) => i.id)
           : [],
-    [highlighted, map.items, scope.regionId],
+    [selected, map.items, scope.regionId],
   );
+  // A pick on the map itself keeps the map still: it must not fly away from the pointer.
+  const [mapPick, setMapPick] = useState<{ selection: string; fit: readonly string[] } | null>(
+    null,
+  );
+  const fitIds = mapPick?.selection === selected.join(',') ? mapPick.fit : autoFit;
+  const toggleOnMap = (id: string) => {
+    const next = selected.includes(id) ? selected.filter((s) => s !== id) : [...selected, id];
+    setMapPick({ selection: next.join(','), fit: fitIds });
+    toggle(id);
+  };
 
   // The remembered view is read after hydration: keep the skeleton until then.
   if (view === null || legacyTable === null) return <MarketStatusSkeleton />;
 
-  const groups = marketTiles(ds, scope, period, range, highlighted);
+  const groups = marketTiles(ds, scope, period, range, selected);
   const product = scope.productId ? getProduct(ds, scope.productId) : undefined;
 
   return (
     <Card aria-labelledby={titleId} role="region" className={CARD}>
       <CardHeader className="flex flex-wrap items-center justify-between gap-2">
         <CardTitle>
-          <h2 id={titleId} className="text-base font-semibold">
+          {/* Focus lands here when the selection bar below is cleared and goes away. */}
+          <h2
+            ref={title}
+            id={titleId}
+            tabIndex={-1}
+            className="text-base font-semibold outline-none"
+          >
             {t('title')}
           </h2>
         </CardTitle>
         <div className="flex flex-wrap items-center gap-2">
-          {state.mode === 'analyst' && view !== 'tiles' ? <MetricPicker /> : null}
+          {analyst && view !== 'tiles' ? <MetricPicker /> : null}
           <ToggleGroup
             type="single"
             value={view}
@@ -144,12 +166,24 @@ export function MarketStatus() {
         </div>
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
+        <SelectionBar
+          onCleared={() => {
+            title.current?.focus();
+          }}
+        />
         {view === 'map' ? (
-          <MapView map={map} tall={!wide} fitIds={fitIds} onOpen={toMarket} />
+          <MapView
+            map={map}
+            tall={!wide}
+            fitIds={fitIds}
+            onOpen={toMarket}
+            onToggle={analyst ? toggleOnMap : undefined}
+            hint={analyst ? t(coarse ? 'hintTouch' : 'hintPointer') : null}
+          />
         ) : view === 'table' ? (
           <MarketTable groups={groups} map={map} />
         ) : (
-          <Tiles groups={groups} onOpen={toMarket} />
+          <Tiles groups={groups} onOpen={toMarket} onToggle={analyst ? toggle : undefined} />
         )}
         {product ? (
           <p className="text-xs text-muted-foreground">
@@ -177,17 +211,22 @@ function MapView({
   tall,
   fitIds,
   onOpen,
+  onToggle,
+  hint,
 }: {
   map: MarketMapView;
   tall: boolean;
   fitIds: readonly string[];
   onOpen: (id: string) => void;
+  onToggle: ((id: string) => void) | undefined;
+  hint: string | null;
 }) {
   return (
     <>
       <Notice map={map} />
-      <MarketMap view={map} tall={tall} fitIds={fitIds} onOpen={onOpen} />
+      <MarketMap view={map} tall={tall} fitIds={fitIds} onOpen={onOpen} onToggle={onToggle} />
       <MapLegend view={map} />
+      {hint ? <p className="text-xs text-muted-foreground">{hint}</p> : null}
     </>
   );
 }
@@ -215,7 +254,15 @@ function StatusLegend({ groups }: { groups: TileGroup[] }) {
   );
 }
 
-function Tiles({ groups, onOpen }: { groups: TileGroup[]; onOpen: (id: string) => void }) {
+function Tiles({
+  groups,
+  onOpen,
+  onToggle,
+}: {
+  groups: TileGroup[];
+  onOpen: (id: string) => void;
+  onToggle: ((id: string) => void) | undefined;
+}) {
   // A drill into one region gives it the whole width.
   const single = groups.length === 1;
   return (
@@ -233,9 +280,16 @@ function Tiles({ groups, onOpen }: { groups: TileGroup[]; onOpen: (id: string) =
                 <StatusTile
                   key={tile.id}
                   tile={tile}
-                  onSelect={() => {
+                  onOpen={() => {
                     onOpen(tile.id);
                   }}
+                  onToggle={
+                    onToggle
+                      ? () => {
+                          onToggle(tile.id);
+                        }
+                      : undefined
+                  }
                 />
               ))}
             </div>
@@ -314,6 +368,7 @@ function MarketTable({ groups, map }: { groups: TileGroup[]; map: MarketMapView 
 }
 
 /** The card's own frame: title, the view switch, a map-sized block on wide screens, tiles on a phone. */
+/** In the shape of the mode on screen: `mode-analyst` reads the <html> mark (features/switch-mode). */
 export function MarketStatusSkeleton() {
   return (
     <Card aria-hidden className={CARD}>
@@ -321,7 +376,11 @@ export function MarketStatusSkeleton() {
         <CardTitle>
           <Skeleton className="h-6 w-32" />
         </CardTitle>
-        <Skeleton className="h-13 w-64 rounded-xl" />
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Analyst: the metric picker next to the switch (map view, from md). */}
+          <Skeleton className="hidden h-11 w-40 rounded-lg md:mode-analyst:block" />
+          <Skeleton className="h-13 w-64 rounded-xl" />
+        </div>
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
         <div className="hidden md:block">
@@ -339,6 +398,8 @@ export function MarketStatusSkeleton() {
           ))}
         </div>
         <Skeleton className="h-4 w-64 max-w-full" />
+        {/* Analyst: the Shift+click hint under the map. */}
+        <Skeleton className="hidden h-4 w-72 max-w-full md:mode-analyst:block" />
       </CardContent>
     </Card>
   );
