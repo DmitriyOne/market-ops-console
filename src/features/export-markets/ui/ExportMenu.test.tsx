@@ -13,7 +13,7 @@ const { downloadBlob, downloadText, logError, marketsXlsx, toastError } = vi.hoi
   downloadBlob: vi.fn(),
   downloadText: vi.fn(),
   logError: vi.fn(),
-  marketsXlsx: vi.fn(),
+  marketsXlsx: vi.fn<typeof import('../model/markets-xlsx').marketsXlsx>(),
 }));
 vi.mock('@/shared/lib', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/shared/lib')>()),
@@ -29,7 +29,9 @@ vi.mock('../model/markets-xlsx', async (importOriginal) => ({
   ...(await importOriginal<typeof xlsx>()),
   marketsXlsx,
 }));
-const { marketsXlsx: realXlsx } = await vi.importActual<typeof xlsx>('../model/markets-xlsx');
+// The workbook itself is tested in markets-xlsx.test.ts; building a real one
+// here (ExcelJS) is slow under a full parallel run and made this file flaky.
+const WORKBOOK = new Blob(['xlsx']);
 
 const t = en.exportMarkets;
 const SEARCH = '?mode=analyst&range=3m&markets=de&markets=es&sort=-units';
@@ -49,7 +51,7 @@ describe('ExportMenu', () => {
     downloadText.mockReset();
     logError.mockReset();
     toastError.mockReset();
-    marketsXlsx.mockReset().mockImplementation(realXlsx);
+    marketsXlsx.mockReset().mockResolvedValue(WORKBOOK);
     server.use(datasetHandler());
   });
 
@@ -70,8 +72,12 @@ describe('ExportMenu', () => {
     await user.click(await screen.findByRole('button', { name: t.button }));
     await user.click(await screen.findByRole('menuitem', { name: /^Excel/ }));
     await waitFor(() => {
-      expect(downloadBlob).toHaveBeenCalledWith('markets-2026-05-3m.xlsx', expect.any(Blob));
+      expect(downloadBlob).toHaveBeenCalledWith('markets-2026-05-3m.xlsx', WORKBOOK);
     });
+    // Built from the rows as shown (filter and sort), with the months behind them.
+    const [view, months] = marketsXlsx.mock.calls[0] ?? [];
+    expect(view?.rows.map((r) => r.id)).toEqual(['de', 'es']);
+    expect(months).toHaveLength(6);
   });
 
   it('nothing to save: the button is disabled', async () => {
