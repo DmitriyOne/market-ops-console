@@ -7,7 +7,9 @@ import { useId, useMemo } from 'react';
 
 import {
   comparisonRadar,
+  getMarket,
   getProduct,
+  getRegion,
   RADAR_LIMIT,
   type RadarView,
   useDashboard,
@@ -45,8 +47,9 @@ const CARD = 'gap-3 border border-border ring-0';
 const MIN_AXES = 3;
 
 /**
- * The comparison radar (spec §8): the first four selected markets, or the
- * regions, against the portfolio average. Follows the period and the
+ * The comparison radar (spec §8): the selection, else the open market and
+ * its neighbours, else the open region's markets, else the regions (up to
+ * four lines), against the portfolio average. Follows the period and the
  * window; ignores a product (it compares markets).
  */
 export function ComparisonRadar() {
@@ -73,6 +76,16 @@ export function ComparisonRadar() {
       ? k.period(period)
       : tPeriod('label', { period: k.period(period), range: tPeriod(`range.${range}`) });
   const product = scope.productId ? getProduct(ds, scope.productId)?.name : undefined;
+  const openMarket = scope.marketId ? getMarket(ds, scope.marketId) : undefined;
+  const regionId = openMarket?.regionId ?? scope.regionId;
+  const region = (regionId ? getRegion(ds, regionId)?.name : undefined) ?? '';
+  const subtitle =
+    view.basis === 'market'
+      ? t('basis.market', { market: openMarket?.name ?? '', region })
+      : view.basis === 'region'
+        ? t('basis.region', { region })
+        : t(`basis.${view.basis}`);
+  const total = RADAR_LIMIT + view.hidden;
   const items = [
     ...view.series.map((s, i) => ({ s, style: seriesStyle(i) })),
     { s: view.reference, style: REFERENCE },
@@ -85,9 +98,7 @@ export function ComparisonRadar() {
           <h2 id={titleId} className="text-base font-semibold">
             {t('title')}
           </h2>
-          <p className="text-sm font-normal text-muted-foreground">
-            {view.compared === 'markets' ? t('markets') : t('regions')}
-          </p>
+          <p className="text-sm font-normal text-muted-foreground">{subtitle}</p>
         </CardTitle>
         {chartable ? (
           <Button
@@ -118,12 +129,11 @@ export function ComparisonRadar() {
           <RadarChart view={view} title={t('chartLabel', { names })} />
         )}
         <ul className="flex flex-col gap-0.5 text-xs text-muted-foreground">
-          {view.hiddenSelected > 0 ? (
+          {view.hidden > 0 ? (
             <li>
-              {t('hidden', {
-                shown: RADAR_LIMIT,
-                total: RADAR_LIMIT + view.hiddenSelected,
-              })}
+              {view.basis === 'selection'
+                ? t('hidden.selection', { shown: RADAR_LIMIT, total })
+                : t('hidden.neighbours', { shown: RADAR_LIMIT, total, region })}
             </li>
           ) : null}
           {product && view.productIgnored ? <li>{t('productIgnored', { product })}</li> : null}
@@ -133,7 +143,7 @@ export function ComparisonRadar() {
           {chartable ? null : <li>{t('tooFewAxes')}</li>}
           <li>{view.compared === 'markets' ? t('scaleMarkets') : t('scaleRegions')}</li>
           {view.axes.includes('momentum') ? <li>{t('momentumNote')}</li> : null}
-          {view.compared === 'regions' ? <li>{t('pickHint')}</li> : null}
+          {view.basis === 'selection' ? null : <li>{t('pickHint')}</li>}
         </ul>
       </CardContent>
     </Card>

@@ -204,7 +204,15 @@
     "resetHint": "Portfolio, letzter Monat, Management"
   },
   "overview": {
-    "summary": "{markets, plural, one {# Markt} other {# Märkte}} · {products, plural, one {# Produkt} other {# Produkte}} · neueste Daten {period}"
+    "summary": "{markets, plural, one {# Markt} other {# Märkte}} · {products, plural, one {# Produkt} other {# Produkte}} · neueste Daten {period}",
+    "modeBadge": {
+      "executive": "Ansicht Management",
+      "analyst": "Ansicht Analyse"
+    },
+    "modeNote": {
+      "executive": "Das Wichtigste: KPIs, Marktstatus, Risiken und Umsatztrend.",
+      "analyst": "Zusätzlich unten: Kartenkennzahl, Vergleichsnetz, Markttabelle und Heatmap."
+    }
   },
   "kpi": {
     "title": "Kennzahlen",
@@ -383,8 +391,12 @@
   },
   "radar": {
     "title": "Vergleich",
-    "regions": "Regionen im Vergleich zum Portfolio",
-    "markets": "Ausgewählte Märkte im Vergleich zum Portfolio",
+    "basis": {
+      "selection": "Ausgewählte Märkte im Vergleich zum Portfolio",
+      "market": "{market} und seine Nachbarn in {region} im Vergleich zum Portfolio",
+      "region": "Märkte in {region} im Vergleich zum Portfolio",
+      "regions": "Regionen im Vergleich zum Portfolio"
+    },
     "portfolio": "Portfolio-Durchschnitt",
     "compared": "Verglichen",
     "axis": {
@@ -401,9 +413,12 @@
       "shareLatestOnly": "Der Marktanteil liegt nur für den letzten Monat vor; seine Achse fehlt.",
       "momentumTooEarly": "Die Dynamik braucht sechs Monate Daten; ihre Achse fehlt."
     },
-    "hidden": "Die ersten {shown} von {total} ausgewählten Märkten.",
+    "hidden": {
+      "selection": "Die ersten {shown} von {total} ausgewählten Märkten.",
+      "neighbours": "{shown} von {total} Märkten in {region}."
+    },
     "productIgnored": "Vergleicht Märkte, nicht Produkte: {product} gilt hier nicht.",
-    "pickHint": "Wählen Sie Märkte auf der Karte oder im Tabellenfilter, um sie zu vergleichen.",
+    "pickHint": "Um andere Märkte zu vergleichen, klicken Sie sie mit Umschalt auf der Karte an oder wählen Sie sie im Tabellenfilter.",
     "tooFewAxes": "Zu wenige Achsen mit Daten für ein Diagramm; die Tabelle zeigt die Werte.",
     "showTable": "Als Tabelle anzeigen",
     "showChart": "Als Diagramm anzeigen",

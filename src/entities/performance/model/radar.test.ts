@@ -13,7 +13,8 @@ describe('comparisonRadar', () => {
     expect(view.reference.kind).toBe('portfolio');
     expect(view.axes).toEqual(['growth', 'attainment', 'share', 'revenue', 'momentum']);
     expect(view.removed).toEqual([]);
-    expect(view.hiddenSelected).toBe(0);
+    expect(view.basis).toBe('regions');
+    expect(view.hidden).toBe(0);
   });
 
   it('selected markets: stored KPIs at the latest month, momentum from series', () => {
@@ -41,7 +42,29 @@ describe('comparisonRadar', () => {
   it('more than four selected: the first four, in selection order', () => {
     const view = comparisonRadar(ds, {}, '2026-05', '1m', ['jp', 'de', 'es', 'fr', 'it']);
     expect(view.series.map((s) => s.id)).toEqual(['jp', 'de', 'es', 'fr']);
-    expect(view.hiddenSelected).toBe(1);
+    expect(view.basis).toBe('selection');
+    expect(view.hidden).toBe(1);
+  });
+
+  it('nothing selected, a region open: its markets, the first four', () => {
+    const view = comparisonRadar(ds, { regionId: 'eu' }, '2026-05', '1m', []);
+    expect(view).toMatchObject({ compared: 'markets', basis: 'region', hidden: 1 });
+    expect(view.series.map((s) => s.id)).toEqual(['fr', 'de', 'it', 'es']);
+  });
+
+  it('nothing selected, a market open: it first, then its region’s neighbours', () => {
+    const view = comparisonRadar(ds, { regionId: 'eu', marketId: 'gb' }, '2026-05', '1m', []);
+    expect(view).toMatchObject({ compared: 'markets', basis: 'market', hidden: 1 });
+    expect(view.series.map((s) => s.id)).toEqual(['gb', 'fr', 'de', 'it']);
+    const small = comparisonRadar(ds, { regionId: 'na', marketId: 'us' }, '2026-05', '1m', []);
+    expect(small.series.map((s) => s.id)).toEqual(['us', 'ca']);
+    expect(small.hidden).toBe(0);
+  });
+
+  it('a selection wins over the open market', () => {
+    const view = comparisonRadar(ds, { regionId: 'eu', marketId: 'gb' }, '2026-05', '1m', ['jp']);
+    expect(view.basis).toBe('selection');
+    expect(view.series.map((s) => s.id)).toEqual(['jp']);
   });
 
   it('unknown ids in the selection are ignored', () => {

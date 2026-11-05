@@ -204,7 +204,15 @@
     "resetHint": "Portfolio, latest month, Executive"
   },
   "overview": {
-    "summary": "{markets, plural, one {# market} other {# markets}} · {products, plural, one {# product} other {# products}} · latest data {period}"
+    "summary": "{markets, plural, one {# market} other {# markets}} · {products, plural, one {# product} other {# products}} · latest data {period}",
+    "modeBadge": {
+      "executive": "Executive view",
+      "analyst": "Analyst view"
+    },
+    "modeNote": {
+      "executive": "Headlines: KPIs, market status, risks and the revenue trend.",
+      "analyst": "Adds the map metric, the comparison radar, the markets table and the heat map below."
+    }
   },
   "kpi": {
     "title": "Key figures",
@@ -383,8 +391,12 @@
   },
   "radar": {
     "title": "Comparison",
-    "regions": "Regions against the portfolio",
-    "markets": "Selected markets against the portfolio",
+    "basis": {
+      "selection": "Selected markets against the portfolio",
+      "market": "{market} and its neighbours in {region}, against the portfolio",
+      "region": "Markets of {region} against the portfolio",
+      "regions": "Regions against the portfolio"
+    },
     "portfolio": "Portfolio average",
     "compared": "Compared",
     "axis": {
@@ -401,9 +413,12 @@
       "shareLatestOnly": "Market share is set for the latest month only; its axis is left out.",
       "momentumTooEarly": "Momentum needs six months of data; its axis is left out."
     },
-    "hidden": "Showing the first {shown} of {total} selected markets.",
+    "hidden": {
+      "selection": "Showing the first {shown} of {total} selected markets.",
+      "neighbours": "Showing {shown} of {total} markets of {region}."
+    },
     "productIgnored": "Compares markets, not products: {product} is not applied here.",
-    "pickHint": "Select markets on the map or in the table filter to compare them.",
+    "pickHint": "To compare other markets, Shift+click them on the map or pick them in the table filter.",
     "tooFewAxes": "Too few axes have data for a chart; the table shows the values.",
     "showTable": "Show as table",
     "showChart": "Show as chart",

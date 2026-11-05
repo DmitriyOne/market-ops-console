@@ -3,7 +3,7 @@ import type { Dataset, Period } from '@/shared/api';
 import { computeKpis, type KpiName } from './kpis';
 import { getMarket } from './reference';
 import { rowsInScope, sumRows } from './rows';
-import { isLatestSnapshot, type Range, type Scope } from './scope';
+import { isLatestSnapshot, marketsInOrder, type Range, type Scope } from './scope';
 
 export const RADAR_AXES = ['growth', 'attainment', 'share', 'revenue', 'momentum'] as const;
 export type RadarAxis = (typeof RADAR_AXES)[number];
@@ -19,16 +19,23 @@ export type RadarSeries = {
   values: Partial<Record<RadarAxis, RadarValue>>;
 };
 
+/**
+ * What is compared, first match wins: the selection; the open market and its
+ * region's neighbours; the open region's markets; the four regions.
+ */
+export type RadarBasis = 'selection' | 'market' | 'region' | 'regions';
+
 export type RadarView = {
   compared: 'markets' | 'regions';
+  basis: RadarBasis;
   /** Axes with data, in RADAR_AXES order. */
   axes: RadarAxis[];
   removed: { axis: RadarAxis; notice: RadarAxisNotice }[];
   series: RadarSeries[];
   /** "Portfolio average", drawn as a dashed outline. */
   reference: RadarSeries;
-  /** Selected markets beyond the first four. */
-  hiddenSelected: number;
+  /** Markets of the basis beyond the first four. */
+  hidden: number;
   /** A product is open, but the radar compares markets or regions (spec §6). */
   productIgnored: boolean;
 };
@@ -93,8 +100,9 @@ function scale(raw: Raw, peers: readonly Raw[], axes: readonly RadarAxis[]): Rad
 }
 
 /**
- * The comparison radar (spec §8): the first four selected markets, or the
- * regions when nothing is selected, against the portfolio. Every axis is
+ * The comparison radar (spec §8): up to four markets of the basis (the
+ * selection, else the open market with its neighbours, else the open
+ * region's markets), or the four regions, against the portfolio. Every axis is
  * "higher is better" and scaled across the compared group's peers (the 13
  * markets, or the 4 regions), so a region's revenue is not measured
  * against one market's. An axis the data cannot fill is removed rather
@@ -118,7 +126,23 @@ export function comparisonRadar(
   const axes = RADAR_AXES.filter((a) => !gone.has(a));
 
   const picked = selected.filter((id) => getMarket(ds, id) !== undefined);
-  const compared = picked.length > 0 ? 'markets' : 'regions';
+  const neighbours = (regionId: string) =>
+    marketsInOrder(ds)
+      .filter((m) => m.regionId === regionId)
+      .map((m) => m.id);
+  const open = scope.marketId ? getMarket(ds, scope.marketId) : undefined;
+  const { basis, ids } = ((): { basis: RadarBasis; ids: string[] } => {
+    if (picked.length > 0) return { basis: 'selection', ids: picked };
+    if (open) {
+      return {
+        basis: 'market',
+        ids: [open.id, ...neighbours(open.regionId).filter((id) => id !== open.id)],
+      };
+    }
+    if (scope.regionId) return { basis: 'region', ids: neighbours(scope.regionId) };
+    return { basis: 'regions', ids: [] };
+  })();
+  const compared = basis === 'regions' ? 'regions' : 'markets';
   // Peers: every entity of the compared kind, as its own scope (no product).
   const peers =
     compared === 'markets'
@@ -133,7 +157,7 @@ export function comparisonRadar(
 
   const shown =
     compared === 'markets'
-      ? picked.slice(0, RADAR_LIMIT).flatMap((id) => peers.filter((p) => p.id === id))
+      ? ids.slice(0, RADAR_LIMIT).flatMap((id) => peers.filter((p) => p.id === id))
       : peers;
   const series = shown.map((p): RadarSeries => ({
     id: p.id,
@@ -157,11 +181,12 @@ export function comparisonRadar(
 
   return {
     compared,
+    basis,
     axes,
     removed,
     series,
     reference,
-    hiddenSelected: Math.max(0, picked.length - RADAR_LIMIT),
+    hidden: Math.max(0, ids.length - RADAR_LIMIT),
     productIgnored: Boolean(scope.productId),
   };
 }

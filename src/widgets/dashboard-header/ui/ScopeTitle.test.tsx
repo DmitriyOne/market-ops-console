@@ -39,4 +39,20 @@ describe('ScopeTitle', () => {
     ).toBeInTheDocument();
     expect(screen.getByText('1 market · 1 product · latest data May 2026')).toBeInTheDocument();
   });
+
+  it('names the view and what it adds, so a mode switch shows at the top', async () => {
+    const { unmount } = setup();
+    expect(await screen.findByText('Executive view')).toBeInTheDocument();
+    expect(
+      screen.getByText('Headlines: KPIs, market status, risks and the revenue trend.'),
+    ).toBeInTheDocument();
+    unmount();
+    setup('?mode=analyst');
+    expect(await screen.findByText('Analyst view')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Adds the map metric, the comparison radar, the markets table and the heat map below.',
+      ),
+    ).toHaveAttribute('aria-live', 'polite');
+  });
 });

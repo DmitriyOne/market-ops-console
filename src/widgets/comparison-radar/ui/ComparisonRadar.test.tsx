@@ -29,7 +29,7 @@ describe('ComparisonRadar', () => {
   it('nothing selected: the four regions and the portfolio, each with its own line pattern', async () => {
     setup();
     expect(await screen.findByRole('region', { name: t.title })).toBeInTheDocument();
-    expect(screen.getByText(t.regions)).toBeInTheDocument();
+    expect(screen.getByText(t.basis.regions)).toBeInTheDocument();
     const items = within(await legend()).getAllByRole('listitem');
     expect(items.map((i) => i.textContent)).toEqual([
       'North America',
@@ -46,7 +46,7 @@ describe('ComparisonRadar', () => {
 
   it('selected markets, with real values in the table', async () => {
     const { user } = setup('?mode=analyst&markets=de&markets=es');
-    expect(await screen.findByText(t.markets)).toBeInTheDocument();
+    expect(await screen.findByText(t.basis.selection)).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: t.showTable }));
     const table = await screen.findByRole('table');
     expect(
@@ -66,6 +66,23 @@ describe('ComparisonRadar', () => {
       await screen.findByText('Showing the first 4 of 5 selected markets.'),
     ).toBeInTheDocument();
     expect(within(await legend()).getAllByRole('listitem')).toHaveLength(5);
+  });
+
+  it('a market opened on the map: it and its neighbours, not the regions', async () => {
+    setup('?mode=analyst&region=eu&market=gb');
+    expect(
+      await screen.findByText('United Kingdom and its neighbours in Europe, against the portfolio'),
+    ).toBeInTheDocument();
+    const items = within(await legend()).getAllByRole('listitem');
+    expect(items.map((i) => i.textContent)).toEqual([
+      'United Kingdom',
+      'France',
+      'Germany',
+      'Italy',
+      t.portfolio,
+    ]);
+    expect(screen.getByText('Showing 4 of 5 markets of Europe.')).toBeInTheDocument();
+    expect(screen.getByText(t.pickHint)).toBeInTheDocument();
   });
 
   it('a 3-month window leaves share out, with the reason', async () => {

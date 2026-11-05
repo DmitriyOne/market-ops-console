@@ -67,6 +67,7 @@ export {
   RADAR_LIMIT,
   type RadarAxis,
   type RadarAxisNotice,
+  type RadarBasis,
   type RadarSeries,
   type RadarValue,
   type RadarView,
