@@ -291,11 +291,13 @@
     "addToFilter": "Add to filter",
     "removeFromFilter": "Remove from filter",
     "hintPointer": "Shift+click a market to add it to the table filter.",
-    "hintTouch": "Tap a market, then Add to filter."
+    "hintTouch": "Tap a market, then Add to filter.",
+    "alerts": "Alerts",
+    "noAlerts": "None"
   },
   "topRisks": {
     "title": "Top risks",
-    "order": "Off track first, then by attainment",
+    "order": "Off track first, then by attainment; then markets your alerts flag",
     "reason": "{attainment} · {growth} YoY",
     "empty": "No markets at risk here."
   },

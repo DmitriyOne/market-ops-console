@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import raw from '@/data/data.json';
 import { type AlertRule, datasetSchema } from '@/shared/api';
 
-import { evaluateRules, ruleMarkets } from './evaluate';
+import { evaluateRules, flaggedIds, ruleMarkets } from './evaluate';
 
 const ds = datasetSchema.parse(raw);
 
@@ -60,6 +60,14 @@ describe('evaluateRules', () => {
     expect(flags.byMarket.get('de')).toMatchObject({ severity: 'critical' });
     expect(flags.byMarket.get('de')?.rules.map((r) => r.id)).toEqual(['a', 'b']);
     expect(flags.byMarket.get('us')).toMatchObject({ severity: 'warning' });
+  });
+
+  it('flagged ids: critical first', () => {
+    const flags = evaluateRules(ds, [
+      rule({ id: 'a', metric: 'share', threshold: 10 }),
+      rule({ id: 'b', severity: 'critical' }),
+    ]);
+    expect(flaggedIds(flags)).toEqual(['de', 'gb', 'it', 'us', 'au']);
   });
 
   it('a later warning does not lower a critical market', () => {

@@ -3,6 +3,7 @@ export { createRule, deleteRule, updateRule, type WriteOptions } from './api/ale
 export {
   type AlertFlags,
   evaluateRules,
+  flaggedIds,
   type MarketFlag,
   NO_FLAGS,
   ruleMarkets,

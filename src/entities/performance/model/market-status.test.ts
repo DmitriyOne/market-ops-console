@@ -89,6 +89,24 @@ describe('topRisks', () => {
     expect(apac).toEqual({ kind: 'list', items: [] });
   });
 
+  it('adds on-track markets flagged by alert rules after the rest, in the given order', () => {
+    // The example rules: attainment < 95 % (de, gb, it), share < 10 % (us, de, au).
+    const risks = topRisks(ds, {}, '2026-05', '1m', ['de', 'gb', 'it', 'us', 'au']);
+    expect(risks.kind === 'list' && risks.items.map((r) => r.id)).toEqual([
+      'de',
+      'es',
+      'it',
+      'gb',
+      'br',
+      'fr',
+      'us',
+      'au',
+    ]);
+    const apac = topRisks(ds, { regionId: 'apac' }, '2026-05', '1m', ['us', 'au']);
+    expect(apac.kind === 'list' && apac.items.map((r) => r.id)).toEqual(['au']);
+    expect(topRisks(ds, {}, '2026-04', '1m', ['us'])).toEqual({ kind: 'latestOnly' });
+  });
+
   it('status exists for the latest month only, and per market only', () => {
     expect(topRisks(ds, {}, '2026-04', '1m')).toEqual({ kind: 'latestOnly' });
     expect(topRisks(ds, {}, '2026-05', '12m')).toEqual({ kind: 'latestOnly' });

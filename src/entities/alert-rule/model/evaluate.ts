@@ -62,3 +62,10 @@ export function evaluateRules(ds: Dataset, rules: readonly AlertRule[]): AlertFl
   }
   return { byMarket, count: byMarket.size };
 }
+
+/** Flagged market ids, critical first, otherwise in dataset order. */
+export function flaggedIds(flags: AlertFlags): string[] {
+  const ids = [...flags.byMarket.keys()];
+  const critical = (id: string) => flags.byMarket.get(id)?.severity === 'critical';
+  return [...ids.filter(critical), ...ids.filter((id) => !critical(id))];
+}

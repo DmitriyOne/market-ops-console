@@ -7,7 +7,13 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import raw from '@/data/data.json';
 import { datasetSchema } from '@/shared/api';
 import { enMessages as en } from '@/shared/config';
-import { datasetHandler, renderWithProviders, server, TestProviders } from '@/shared/lib/test';
+import {
+  alertsApi,
+  datasetHandler,
+  renderWithProviders,
+  server,
+  TestProviders,
+} from '@/shared/lib/test';
 
 import { MarketStatus } from './MarketStatus';
 
@@ -25,7 +31,20 @@ function setup(searchParams = '') {
 describe('MarketStatus', () => {
   beforeEach(() => {
     localStorage.clear();
-    server.use(datasetHandler());
+    server.use(datasetHandler(), ...alertsApi([]).handlers);
+  });
+
+  it('the map table has an Alerts column naming the rules that flag each market', async () => {
+    server.use(...alertsApi().handlers);
+    const { user } = setup();
+    await user.click(await screen.findByRole('radio', { name: 'Table' }));
+    const table = screen.getByRole('table', { name: 'Market status by region, May 2026' });
+    expect(within(table).getByRole('columnheader', { name: t.alerts })).toBeInTheDocument();
+    const germany = within(table).getByRole('row', { name: /Germany/ });
+    await waitFor(() => {
+      expect(germany).toHaveTextContent('Critical alert: Attainment below 95% and Share below 10%');
+    });
+    expect(within(table).getByRole('row', { name: /Spain/ })).toHaveTextContent(t.noAlerts);
   });
 
   it('one tile per market, named with status and attainment', async () => {
@@ -164,10 +183,21 @@ describe('MarketStatus map', () => {
   beforeEach(() => {
     localStorage.clear();
     localStorage.setItem('mo:market-status-view', 'map');
-    server.use(datasetHandler());
+    server.use(datasetHandler(), ...alertsApi([]).handlers);
   });
 
   const mapGroup = () => screen.findByRole('group', { name: /^World map of markets/ });
+
+  it('the map tooltip names the rules that flag the market', async () => {
+    server.use(...alertsApi().handlers);
+    setup();
+    const us = await within(await mapGroup()).findByRole('button', { name: /^United States,/ });
+    us.focus();
+    const tip = await screen.findByRole('dialog');
+    await waitFor(() => {
+      expect(tip).toHaveTextContent('Alert: Share below 10%');
+    });
+  });
 
   it('markets are buttons in Tab order (regions, then names), named with value and status', async () => {
     setup();

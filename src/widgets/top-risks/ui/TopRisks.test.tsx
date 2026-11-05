@@ -2,8 +2,9 @@ import { screen, waitFor, within } from '@testing-library/react';
 import { Suspense } from 'react';
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import { AlertsPanel } from '@/features/configure-alerts';
 import { enMessages as en } from '@/shared/config';
-import { datasetHandler, renderWithProviders, server } from '@/shared/lib/test';
+import { alertsApi, datasetHandler, renderWithProviders, server } from '@/shared/lib/test';
 
 import { TopRisks } from './TopRisks';
 
@@ -20,7 +21,45 @@ function setup(searchParams = '') {
 
 describe('TopRisks', () => {
   beforeEach(() => {
-    server.use(datasetHandler());
+    // No rules: the status list alone.
+    server.use(datasetHandler(), ...alertsApi([]).handlers);
+  });
+
+  it('the example rules add the on-track US and Australia with a bell and the rule name', async () => {
+    server.use(...alertsApi().handlers);
+    setup();
+    const section = await screen.findByRole('region', { name: t.title });
+    await waitFor(() => {
+      expect(within(section).getAllByRole('listitem')).toHaveLength(8);
+    });
+    const rows = within(section).getAllByRole('listitem');
+    expect(rows[6]).toHaveTextContent('United States');
+    expect(rows[6]).toHaveTextContent('Alert: Share below 10%');
+    expect(rows[6]).toHaveTextContent('On track');
+    expect(rows[7]).toHaveTextContent('Australia');
+    // Germany keeps its place, with both rules and the critical bell.
+    expect(rows[0]).toHaveTextContent('Critical alert: Attainment below 95% and Share below 10%');
+    expect(rows[1]).not.toHaveTextContent('alert');
+  });
+
+  it('turning a rule off in the panel takes its markets out at once', async () => {
+    server.use(...alertsApi().handlers);
+    const { user } = renderWithProviders(
+      <Suspense>
+        <TopRisks />
+        <AlertsPanel />
+      </Suspense>,
+    );
+    const section = await screen.findByRole('region', { name: t.title });
+    await waitFor(() => {
+      expect(within(section).getAllByRole('listitem')).toHaveLength(8);
+    });
+    await user.click(screen.getByRole('switch', { name: 'Rule on: Share below 10%' }));
+    // Optimistic: before the server answers.
+    expect(within(section).getAllByRole('listitem')).toHaveLength(6);
+    expect(within(section).getAllByRole('listitem')[0]).toHaveTextContent(
+      'Critical alert: Attainment below 95%',
+    );
   });
 
   it('lists the six non-on-track markets, off track first then by attainment', async () => {

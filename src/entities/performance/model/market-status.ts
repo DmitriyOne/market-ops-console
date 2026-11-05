@@ -1,7 +1,7 @@
-import type { Dataset, MarketStatus, Period, Region } from '@/shared/api';
+import type { Dataset, Market, MarketStatus, Period, Region } from '@/shared/api';
 
 import { computeKpis, type KpiValue } from './kpis';
-import { isLatestSnapshot, type Range, type Scope } from './scope';
+import { isLatestSnapshot, marketsInScope, type Range, type Scope } from './scope';
 import { nonOnTrackMarkets, statusFor } from './status';
 
 export type MarketTile = {
@@ -71,16 +71,34 @@ export type RiskItem = {
 export type TopRisks =
   { kind: 'list'; items: RiskItem[] } | { kind: 'latestOnly' } | { kind: 'perProduct' };
 
-/** Non-on-track markets in scope, off track first, then by attainment (spec §8). */
-export function topRisks(ds: Dataset, scope: Scope, period: Period, range: Range): TopRisks {
+const riskItem = (m: Market): RiskItem => ({
+  id: m.id,
+  name: m.name,
+  status: m.kpis.status,
+  attainmentPct: m.kpis.forecastAttainmentPct,
+  growthPct: m.kpis.growthPct,
+});
+
+/**
+ * Non-on-track markets in scope, off track first, then by attainment
+ * (spec §8); then on-track markets the user's alert rules flag, in the
+ * order given (`flagged`, most severe first). Both are latest-month facts.
+ */
+export function topRisks(
+  ds: Dataset,
+  scope: Scope,
+  period: Period,
+  range: Range,
+  flagged: readonly string[] = [],
+): TopRisks {
   if (scope.productId) return { kind: 'perProduct' };
   if (!isLatestSnapshot(ds, period, range)) return { kind: 'latestOnly' };
-  const items = (nonOnTrackMarkets(ds, period, range, scope) ?? []).map((m) => ({
-    id: m.id,
-    name: m.name,
-    status: m.kpis.status,
-    attainmentPct: m.kpis.forecastAttainmentPct,
-    growthPct: m.kpis.growthPct,
-  }));
-  return { kind: 'list', items };
+  const risks = nonOnTrackMarkets(ds, period, range, scope) ?? [];
+  const inScope = new Set(marketsInScope(ds, scope).map((m) => m.id));
+  const listed = new Set(risks.map((m) => m.id));
+  const extra = flagged.flatMap((id) => {
+    const market = ds.markets.find((m) => m.id === id);
+    return market && inScope.has(id) && !listed.has(id) ? [market] : [];
+  });
+  return { kind: 'list', items: [...risks, ...extra].map(riskItem) };
 }
