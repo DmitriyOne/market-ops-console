@@ -12,6 +12,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 - `tab=alerts`: the Alerts tab on a phone (full screen, like the assistant) and a right sheet on desktop; Back closes it, closing it does not leave a step to come back to. A phone link to it shows the alerts area before the page loads.
 - `/api/v1/alerts` mock (GET, POST, PATCH, DELETE, ~600 ms): the list lives in one httpOnly cookie (compressed, so ten full rules fit), checked with the same schema; writes only from the app's own pages and as JSON.
 
+### Fixed
+- The browser console no longer warns "Encountered a script tag while rendering React component": the scripts that mark the page before it is painted (collapsed assistant, phone tab, Analyst mode) go into the server HTML only.
+
 ## [0.8.0] - Unreleased
 
 ### Added
