@@ -95,7 +95,7 @@ Points the owner wants explained in the README, in his own words:
 
 ## From the 0.11.1 review (2026-11-05)
 
-- **The share-total formula is not run by a spreadsheet in tests**: they check its text and redo its sum in JS. Open one export in Excel, filter a market out, and see the share total change (owner's check). LibreOffice may not take `SUBTOTAL` over `OFFSET` inside `SUMPRODUCT`; `IFERROR` would leave it blank. **Owner check**, then accepted or a note in About.
+- **The share-total formula is not run by a spreadsheet in tests**: they check its text and redo its sum in JS. Checked once in Microsoft Excel for Mac (2026-11-05): all markets 0.2187, Germany and Spain filtered 0.1178, the revenue-weighted share of the two. LibreOffice not checked: it may not take `SUBTOTAL` over `OFFSET` inside `SUMPRODUCT`, and `IFERROR` would leave the cell blank. **Accepted** (Excel is the target), or a note in About if LibreOffice matters.
 - **Column letters are written by hand** in the totals (`'D'`, `'J'`, as in the attainment and growth totals): moving a column breaks them silently. Derive them from the column list if columns ever move. **Hardening plan**.
 - **A new lockfile makes the parallel jobs race to save one pnpm cache key** ("Unable to reserve cache" warnings, harmless). **Accepted**.
 
