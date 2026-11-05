@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { resolveCitation, type ResolvedCitation, useKpiFormat } from '@/entities/performance';
 import type { Citation, Dataset } from '@/shared/api';
@@ -44,9 +44,21 @@ export function SourceButton({ citation, ds, dataError = null, onSelect }: Sourc
   ) : (
     <p className="text-sm text-muted-foreground">{dataError ?? t('loading')}</p>
   );
+  // A press or a pick hides the card until the pointer or focus leaves the
+  // button. Otherwise the press's focus and Radix's hover timer (the pointer
+  // is still over it) reopen it while the dashboard changes, and it blinks.
+  const picked = useRef(false);
+  const show = (next: boolean) => {
+    if (next && picked.current) return;
+    setOpen(next);
+  };
+  const release = () => {
+    picked.current = false;
+  };
   const select = () => {
     if (!resolved?.known) return;
     // Phones hide the panel next; an open card would stay over the dashboard.
+    picked.current = true;
     setOpen(false);
     onSelect(resolved);
   };
@@ -77,16 +89,22 @@ export function SourceButton({ citation, ds, dataError = null, onSelect }: Sourc
   }
 
   return (
-    <HoverCard open={open} onOpenChange={setOpen} openDelay={200}>
+    <HoverCard open={open} onOpenChange={show} openDelay={200}>
       <HoverCardTrigger asChild>
         <Button
           type="button"
           variant="outline"
           className={TRIGGER}
+          onPointerDown={() => {
+            picked.current = true;
+            setOpen(false);
+          }}
+          onPointerLeave={release}
           onFocus={() => {
-            setOpen(true);
+            show(true);
           }}
           onBlur={() => {
+            release();
             setOpen(false);
           }}
           onClick={select}

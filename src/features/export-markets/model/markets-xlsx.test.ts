@@ -110,9 +110,40 @@ describe('marketsXlsx', () => {
     );
   });
 
+  it('share total: revenue-weighted over the rows the filter shows, the number the UI shows', async () => {
+    const sheet = sheetOf(await book(['de', 'es'], '1m'), 'Markets');
+    expect(sheet.getRow(6).getCell(10).value).toEqual({
+      formula:
+        'IFERROR(SUMPRODUCT(SUBTOTAL(109,OFFSET(D4,ROW(D4:D5)-ROW(D4),0)),J4:J5)/SUBTOTAL(109,D4:D5),"")',
+    });
+    // What the formula gives with no filter, from the cells it reads…
+    const num = (row: number, col: number) => Number(sheet.getRow(row).getCell(col).value);
+    const weighted = (num(4, 10) * num(4, 4) + num(5, 10) * num(5, 4)) / (num(4, 4) + num(5, 4));
+    // …is the footer's share in the app (percent there, a fraction here).
+    const view = marketsTable(ds, {}, '2026-05', '1m', ['de', 'es'], null);
+    expect(weighted * 100).toBeCloseTo(view.totals.sharePct.value ?? Number.NaN, 2);
+  });
+
+  it('no share total off the latest month, as in the UI (the rows have no share)', async () => {
+    const total = sheetOf(await book(), 'Markets').getRow(17);
+    expect(total.getCell(1).value).toBe('Total');
+    expect(total.getCell(10).value).toBeNull();
+  });
+
+  it('no share total for a product, as in the UI (share is per market)', async () => {
+    const productId = ds.products[0]?.id ?? '';
+    const view = marketsTable(ds, { productId }, '2026-05', '1m', [], null);
+    expect(view.totals.sharePct.value).toBeNull();
+    const wb = new ExcelJS.Workbook();
+    await wb.xlsx.load(await (await marketsXlsx(view, [], LABELS)).arrayBuffer());
+    const total = sheetOf(wb, 'Markets').getRow(4 + view.rows.length);
+    expect(total.getCell(1).value).toBe('Total');
+    expect(total.getCell(10).value).toBeNull();
+  });
+
   it('ratio totals are blank, not #DIV/0!, when the filter hides every row', async () => {
     const total = sheetOf(await book(['de', 'es'], '1m'), 'Markets').getRow(6);
-    for (const col of [7, 9]) {
+    for (const col of [7, 9, 10]) {
       expect(JSON.stringify(total.getCell(col).value)).toMatch(/IFERROR\(.*,\\"\\"\)/);
     }
   });
