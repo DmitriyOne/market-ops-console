@@ -53,6 +53,18 @@ const span = (col: string, first: number, last: number) =>
   `${col}${String(first)}:${col}${String(last)}`;
 // Blank, not #DIV/0!, when the filter hides every row or the base is 0.
 const ratio = (formula: string) => `IFERROR(${formula},"")`;
+// Σ share × revenue ÷ Σ revenue over the rows the filter shows (the UI's
+// revenue-weighted share). SUBTOTAL over OFFSET gives each row's revenue, 0
+// when hidden, so SUMPRODUCT weighs only the visible shares. The weight is the
+// revenue column (the month's sum); the UI weighs by the stored revenue, a few
+// dollars apart in the data, so the two agree to about 1e-6 %.
+const weightedShare = (share: string, revenue: string, first: number, last: number) => {
+  const top = `${revenue}${String(first)}`;
+  const rows = `ROW(${span(revenue, first, last)})-ROW(${top})`;
+  return ratio(
+    `SUMPRODUCT(SUBTOTAL(109,OFFSET(${top},${rows},0)),${span(share, first, last)})/SUBTOTAL(109,${span(revenue, first, last)})`,
+  );
+};
 
 type Column = {
   header: string;
@@ -173,7 +185,14 @@ export async function marketsXlsx(
         total: (a, b) =>
           ratio(`SUBTOTAL(109,${span('D', a, b)})/SUBTOTAL(109,${span('H', a, b)})-1`),
       },
-      { header: h('share'), width: 10, numFmt: PERCENT },
+      {
+        header: h('share'),
+        width: 10,
+        numFmt: PERCENT,
+        // Only where every row has a share, as in the UI (latest month, no product).
+        total:
+          view.totals.sharePct.value === null ? undefined : (a, b) => weightedShare('J', 'D', a, b),
+      },
       { header: h('units'), width: 11, numFmt: INTEGER, total: 'sum' },
       { header: h('status'), width: 12 },
       { header: labels.anomaly, width: 48 },
