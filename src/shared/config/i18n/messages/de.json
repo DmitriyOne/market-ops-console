@@ -91,7 +91,8 @@
       "high": "Hoch",
       "medium": "Mittel",
       "low": "Niedrig",
-      "directional": "Nur als Richtwert verstehen"
+      "directional": "Nur als Richtwert verstehen",
+      "usdNote": "Beträge in dieser Antwort sind in USD, wie in den Daten; das Dashboard zeigt {currency}."
     },
     "stopped": {
       "title": "Gestoppt — Antwort unvollständig.",

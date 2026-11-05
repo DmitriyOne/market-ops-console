@@ -91,7 +91,8 @@
       "high": "High",
       "medium": "Medium",
       "low": "Low",
-      "directional": "Treat as directional"
+      "directional": "Treat as directional",
+      "usdNote": "Amounts in this answer are in USD, as the data; the dashboard shows {currency}."
     },
     "stopped": {
       "title": "Stopped — answer incomplete.",

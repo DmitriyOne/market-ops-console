@@ -8,7 +8,7 @@ import { resolveCitation, type ResolvedCitation, useKpiFormat } from '@/entities
 import type { ChatMessage } from '@/features/ask-question';
 import { SuggestedQuestions } from '@/features/ask-question';
 import type { Confidence, Dataset } from '@/shared/api';
-import { cn } from '@/shared/lib';
+import { cn, useCurrency } from '@/shared/lib';
 import { Button } from '@/shared/ui';
 
 import { buildDataCheck } from '../model/data-check';
@@ -248,6 +248,7 @@ export function AnswerMessage({
     <div className="flex flex-col gap-2">
       <AiSurface label={t('answer.label')}>
         <Paragraphs text={text} />
+        <UsdNote text={text} />
         {confidence ? <ConfidenceLine confidence={confidence} /> : null}
         {citations.length > 0 ? (
           <ul aria-label={t('answer.sources')} className="flex flex-wrap gap-1.5">
@@ -263,4 +264,18 @@ export function AnswerMessage({
       {ds && check ? <DataCheckBlock check={check} ds={ds} onHighlight={onHighlight} /> : null}
     </div>
   );
+}
+
+// An amount the answer quotes: "$1.2M", "1.2 M$", "USD". The text is shown as received.
+const QUOTES_USD = /\$|\bUSD\b/;
+
+/**
+ * The answer's text is not converted (shown as received): when it quotes
+ * dollars and another currency is chosen, say so (ADR 0017).
+ */
+function UsdNote({ text }: { text: string }) {
+  const t = useTranslations('assistant');
+  const currency = useCurrency();
+  if (currency === 'USD' || !QUOTES_USD.test(text)) return null;
+  return <p className="text-xs text-muted-foreground">{t('answer.usdNote', { currency })}</p>;
 }
