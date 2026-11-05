@@ -12,6 +12,14 @@ export {
   normalizeDashboardState,
   RANGES,
 } from './model/dashboard-state';
+export {
+  type HeatCell,
+  heatMap,
+  type HeatMapView,
+  type HeatMetric,
+  type HeatNotice,
+  type HeatRow,
+} from './model/heat-map';
 export { ISO3_TO_NUMERIC } from './model/iso-numeric';
 export { computeKpis, type KpiName, type Kpis, type KpiSource, type KpiValue } from './model/kpis';
 export {
