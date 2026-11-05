@@ -16,7 +16,7 @@ Format: **Item**: what is wrong (file). Why it can wait. Where it goes.
 
 ## From the design pass (2026-11-03)
 
-- **D screens drawn on the canvas (2026-11-03)**: Analyst, phone (Overview / Assistant / Alerts), widget and assistant states. Builder calls still open (Plan 3 built the shell without them; they belong to **M4** and the alerts plan): phone map has no labels (Top risks below carries the facts); heat-map cells show whole percent, one decimal on focus; heat map is calculated from the series, so it can differ from stored KPIs by a few tenths and says so; radar uses 4 token colours + 4 dash patterns, scaled worst-to-best across 13 markets; in Analyst the assistant is shown collapsed with a badge.
+- **D screens drawn on the canvas (2026-11-03)**: Analyst, phone (Overview / Assistant / Alerts), widget and assistant states. The heat-map and radar calls were built in 0.8.0. Still open: in Analyst the assistant is shown collapsed with a badge (today the panel keeps the user's own choice). **Owner**, decide or drop.
 - **Not drawn yet**: tablet, Alerts as a desktop sheet. **Alerts plan** (tablet is cut line 2, spec §14). The evidence card (0.4.0) and product drill-down (0.5.0–0.6.0) were built from the tokens without a board.
 
 ## From Plan 2 (assistant, 2026-11-03)
@@ -52,7 +52,6 @@ Points the owner wants explained in the README, in his own words:
 ## From the 0.6.0 map build (2026-11-04)
 
 - **German compact currency does not shorten thousands** ("999.960 $"), so a revenue value within $50 under a 1 M$ × months break can show below the break while painted in the upper step (en/ru show "$1M"). Step rule follows the en/ru display. **Accepted**, near zero cases in the data.
-- **Heat map uses the map's scale** (owner, 2026-11-04): attainment cells take the map's attainment steps and `--scale-div-*` tones, so a value has one colour on both; add a text colour per step (`--scale-div-N-foreground`, checked in `tokens.test.ts`). The unused 7-step `--scale-1…7` was removed in 0.6.0. **M4**.
 - **Skeleton vs stored view**: before hydration the card shows a map-shaped block from md up and tiles on a phone; a desktop user who chose tiles sees one layout change on load. The mode already uses ADR 0015's before-paint pattern (`data-mode`, 0.7.0); the stored view can take the same (`localStorage` is readable in the head script). **Hardening plan**.
 - **Touch flow checked in unit tests and Chrome emulation only**, not on a real phone (pinch, tap tooltip, page scroll over the map). **Owner check**.
 - **Europe is small at world zoom** in the narrow card column; markets stay reachable by Tab, zoom buttons and the table. Revisit if the layout gives the map more width.
@@ -78,9 +77,11 @@ Points the owner wants explained in the README, in his own words:
 - **Popups in the assistant's scroll area** (message list) have no scroll boundary yet (`PopperBoundary` covers `<main>` only): a source card's popup could follow its trigger over the panel header. Same fix if it shows. **Hardening plan**.
 - **Map Shift+click** builds the map's still-view key from the rendered selection (`toggleOnMap`), while the toggle itself now reads the URL as it is; two Shift+clicks inside one render could make the map fit once. Cosmetic.
 
-## For M4 (owner, 2026-11-04)
+## From the 0.8.0 heat map and radar (2026-11-05)
 
-- **Radar = selection**: the radar compares the selected markets (`markets`, first 4); with nothing selected it compares regions. No `compare` param and no "+ Compare" buttons. The heat map's multi-select changes the same list.
+- **Radar colours follow the selection order**, not the market: removing the first selected market moves the others to the next colour (dataviz rule "colour follows the entity"). Four slots for 13 markets cannot be fixed per market; a stable slot per selection would need memory outside the URL. Legend, dash and marker always match. **Design pass**, if it confuses.
+- **Heat-map cell names repeat for each of the 312 buttons** (market, month, value, anomaly); a screen reader reads the row header too, so the market name is said twice. Row and column headers would carry it if the cells were `gridcell`s instead of buttons. **Hardening plan**, a11y pass with a screen reader.
+- **Heat-map and radar checked in jsdom only** (owner did not allow Playwright this round): layout at xl with the assistant open, phone scroll to the selected month, the Recharts radar's look in both themes. **Owner check**.
 
 ## Currency picker (owner, 2026-11-04) — after the required work, its own release before the README
 

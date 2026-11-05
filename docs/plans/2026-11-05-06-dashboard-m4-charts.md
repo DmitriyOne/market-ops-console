@@ -1,8 +1,8 @@
 # Plan 6 · M4 — Analyst: heat map and comparison radar (0.8.0)
 
-> **For agentic workers:** REQUIRED SUB-SKILL: superpowers:executing-plans (owner's usual flow: build → owner check → review → owner check). Steps use `- [ ]`.
+> **For agentic workers:** REQUIRED SUB-SKILL: superpowers:executing-plans (owner's usual flow: build → owner check → review → owner check). Steps use `- [x]`.
 
-**Status:** draft, waiting for the owner's approval (2026-11-05).
+**Status:** approved by the owner (2026-11-05); Tasks 1–6 built on `feature/0.8.0/charts`; branch review and owner check next.
 
 **Goal.** Analyst mode gets the brief's two remaining charts: the
 **heat map** (markets × 24 months, the "advanced" chart, ADR 0004) and the
@@ -163,16 +163,16 @@ export function heatMap(ds: Dataset, scope: Scope, period: Period, range: Range,
   kpi: MapMetric, selected: readonly string[]): HeatMapView;
 ```
 
-- [ ] **Step 1: failing tests**:
+- [x] **Step 1: failing tests**:
   - portfolio, `kpi: 'status'` → `metric: 'growth'`, `notice: 'statusPerMonth'`, 13 rows × 24 cells in map Tab order.
   - DE · `2026-03` growth within 0.5 of −31, `step: 0`, `anomaly.type: 'dip'`; DE · `2026-02` has no anomaly.
   - `kpi: 'share'` → growth with `sharePerMonth`; `kpi: 'attainment'` → DE · `2026-03` ≈ 92, step 0; `kpi: 'revenue'` steps use 1 month (CN cells in the top two steps).
   - region `eu` → 5 rows; market `de` → 5 rows, only DE `current`; product `veltrix` → values from that product only.
   - `period: '2026-05', range: '3m'` → `window` = Mar–May and exactly those cells `inWindow`.
   - selected `['de','jp']` under `eu` → DE `selected`, JP absent (not in scope).
-- [ ] **Step 2:** run → FAIL.
-- [ ] **Step 3:** implement over `rowsInScope` per market and month (one pass grouping series by market and period, not 312 `computeKpis` calls); steps via `stepFor(metric, value, 1)`; anomalies from `markets[].kpis.anomalies`.
-- [ ] **Step 4:** green; commit `feat(heat-map): heatMap selector`.
+- [x] **Step 2:** run → FAIL.
+- [x] **Step 3:** implement over `rowsInScope` per market and month (one pass grouping series by market and period, not 312 `computeKpis` calls); steps via `stepFor(metric, value, 1)`; anomalies from `markets[].kpis.anomalies`.
+- [x] **Step 4:** green; commit `feat(heat-map): heatMap selector`.
 
 ### Task 2: `comparisonRadar` selector
 
@@ -195,7 +195,7 @@ export function comparisonRadar(ds: Dataset, scope: Scope, period: Period, range
   selected: readonly string[]): RadarView;
 ```
 
-- [ ] **Step 1: failing tests**:
+- [x] **Step 1: failing tests**:
   - nothing selected → `compared: 'regions'`, 4 series in data order, reference `kind: 'portfolio'`.
   - selected `['de','es']`, latest 1m → 2 market series; DE growth raw = stored −9.7 (computeKpis, `data`); DE momentum raw within 0.1 of −11.8; every `scaled` in [0, 1]; the best of the 13 on growth (CN) would scale to 1.
   - 5 selected → 4 series, `hiddenSelected: 1`, order kept.
@@ -203,21 +203,21 @@ export function comparisonRadar(ds: Dataset, scope: Scope, period: Period, range
   - regions compared: revenue scaled across the 4 regions (EU not clamped to 1 because a market is smaller); reference revenue = mean of the 4.
   - all peers equal on an axis → `scaled: 0.5`.
   - `scope.productId` set → values as without it, `productIgnored: true`.
-- [ ] **Step 2:** run → FAIL.
-- [ ] **Step 3:** implement with `computeKpis` per entity; momentum from two 3-month `sumRows` windows (growth YoY each, difference in pp).
-- [ ] **Step 4:** green; commit `feat(radar): comparisonRadar selector`.
+- [x] **Step 2:** run → FAIL.
+- [x] **Step 3:** implement with `computeKpis` per entity; momentum from two 3-month `sumRows` windows (growth YoY each, difference in pp).
+- [x] **Step 4:** green; commit `feat(radar): comparisonRadar selector`.
 
 ### Task 3: tokens — step text colours and radar series
 
 **Files:**
 - Modify: `src/app/styles/globals.css`, `src/app/styles/tokens.test.ts`, `DESIGN.md` (tokens table)
 
-- [ ] **Step 1: failing tests** in `tokens.test.ts`, for `:root` and `.dark`:
+- [x] **Step 1: failing tests** in `tokens.test.ts`, for `:root` and `.dark`:
   - every `--scale-div-N` (1–6) and `--scale-seq-N` (1–5) has a `-foreground` token with contrast ≥ 4.5:1 against it.
   - `--series-1…4` each ≥ 3:1 against `--card`, and pairwise ΔE ≥ 15 (the existing ΔE helper).
-- [ ] **Step 2:** run → FAIL.
-- [ ] **Step 3:** pick the series hues, then run `node <dataviz>/scripts/validate_palette.js "<hex×4>" --mode light` and `--mode dark` against the card surfaces; fix every FAIL. Foregrounds: the darkest or lightest neutral ink that passes, per step.
-- [ ] **Step 4:** green; commit `feat(tokens): heat-map step text and radar series colours`.
+- [x] **Step 2:** run → FAIL.
+- [x] **Step 3:** pick the series hues, then run `node <dataviz>/scripts/validate_palette.js "<hex×4>" --mode light` and `--mode dark` against the card surfaces; fix every FAIL. Foregrounds: the darkest or lightest neutral ink that passes, per step.
+- [x] **Step 4:** green; commit `feat(tokens): heat-map step text and radar series colours`.
 
 ### Task 4: `widgets/heat-map`
 
@@ -229,7 +229,7 @@ export function comparisonRadar(ds: Dataset, scope: Scope, period: Period, range
 - Consumes: `heatMap` (Task 1), `useDrillDown().toMarket`, `useMarketSelection().toggle`, `MAP_SCALES`, `toneFill`-like helper (move `toneFill` to `shared/lib` or duplicate in the widget — prefer moving it to `entities/performance/ui` so map and heat map share it), `useStoredFlag`.
 - Produces: `HeatMap`, `HeatMapSkeleton`.
 
-- [ ] **Step 1: failing tests** (RTL + nuqs test adapter):
+- [x] **Step 1: failing tests** (RTL + nuqs test adapter):
   - default Analyst state → title names growth, the notice text, a `grid` with 13 row headers; the DE · Mar 2026 cell's name includes "Germany", "March 2026", "−31%" and the anomaly note.
   - ArrowRight/ArrowDown/Home/End move focus (one cell has `tabIndex=0`); at the last column ArrowRight stays.
   - Enter on DE · Mar 2026 → URL `region=eu&market=de&period=2026-03`, range kept, `markets` cleared.
@@ -237,9 +237,9 @@ export function comparisonRadar(ds: Dataset, scope: Scope, period: Period, range
   - focus on row 13, then rerender with region `latam` (3 rows) → a cell of the grid has focus.
   - `Table` button → a table with 24 month columns; the choice survives a remount (stored flag).
   - the window band: 3 header cells labelled as in the window for `range=3m`.
-- [ ] **Step 2:** run → FAIL.
-- [ ] **Step 3:** implement. Grid = `role="grid"`, rows of `<button>` cells (44px tall), sticky row header, `overflow-x-auto` wrapper; on mount scroll the selected month into view (`scrollIntoView({ inline: 'center', block: 'nearest' })`, instant under reduced motion). Cell fill = step tone, text = step foreground token. The detail line under the grid is `aria-live="polite"` only for pointer/touch changes, not for every arrow key (the cell name already says it).
-- [ ] **Step 4:** green; commit `feat(heat-map): markets × months heat map with keyboard and table`.
+- [x] **Step 2:** run → FAIL.
+- [x] **Step 3:** implement. Grid = `role="grid"`, rows of `<button>` cells (44px tall), sticky row header, `overflow-x-auto` wrapper; on mount scroll the selected month into view (`scrollIntoView({ inline: 'center', block: 'nearest' })`, instant under reduced motion). Cell fill = step tone, text = step foreground token. The detail line under the grid is `aria-live="polite"` only for pointer/touch changes, not for every arrow key (the cell name already says it).
+- [x] **Step 4:** green; commit `feat(heat-map): markets × months heat map with keyboard and table`.
 
 ### Task 5: `widgets/comparison-radar`
 
@@ -247,30 +247,37 @@ export function comparisonRadar(ds: Dataset, scope: Scope, period: Period, range
 - Create: `src/widgets/comparison-radar/{index.ts, ui/ComparisonRadar.tsx, ui/RadarChart.tsx (lazy), ui/ComparisonRadar.test.tsx, ui/ComparisonRadarSkeleton.tsx}`
 - Modify: i18n en/de/ru (`radar.*`)
 
-- [ ] **Step 1: failing tests**:
+- [x] **Step 1: failing tests**:
   - nothing selected → title "Regions compared", a legend with 4 regions + "Portfolio average", each legend item draws its dash pattern (an element per pattern, not colour only).
   - `markets=de&markets=es` → legend Germany, Spain + portfolio; the table view lists real values (DE growth "−9.7%").
   - 5 selected → "Showing 4 of 5 selected".
   - `range=3m` → share notice; `product=veltrix` → "Compares markets, not products" notice.
   - fewer than 3 axes → the table shows without the chart toggle.
-- [ ] **Step 2:** run → FAIL.
-- [ ] **Step 3:** implement with the shadcn `ChartContainer` + Recharts `RadarChart` via `next/dynamic` (as `TrendChart`); `PolarAngleAxis` labels translated; tooltip shows raw values formatted by `useKpiFormat`; reference drawn first, dashed, `--muted-foreground`.
-- [ ] **Step 4:** green; commit `feat(radar): comparison radar with table alternative`.
+- [x] **Step 2:** run → FAIL.
+- [x] **Step 3:** implement with the shadcn `ChartContainer` + Recharts `RadarChart` via `next/dynamic` (as `TrendChart`); `PolarAngleAxis` labels translated; tooltip shows raw values formatted by `useKpiFormat`; reference drawn first, dashed, `--muted-foreground`.
+- [x] **Step 4:** green; commit `feat(radar): comparison radar with table alternative`.
 
 ### Task 6: layout, skeletons, docs, release
 
 **Files:**
 - Modify: `src/pages/dashboard/ui/Overview.tsx` (+ `Overview.test.tsx`), spec §6 (`kpi` row) and §8 (Heat map, Comparison radar rows, Coordinated views), ADR 0004, DESIGN.md (inventory, chart rules), README (if it lists widgets), CHANGELOG `0.8.0`, `package.json` `0.8.0`, `docs/plans/backlog.md` (close the M4 items; move the radar decision into the spec), this plan's status.
 
-- [ ] **Step 1: failing tests** in `Overview.test.tsx`: Analyst → radar after Top risks in the same column and the heat map after the markets table; Executive → neither; the static skeleton holds both behind `mode-analyst:`.
-- [ ] **Step 2:** implement the right column as a stack (`TopRisks` + `AnalystOnly(ComparisonRadar)`, each in its own `Slot`); heat map `Slot` after the table.
-- [ ] **Step 3:** docs synced with what is built; `pnpm build` static for the four locales.
-- [ ] **Step 4:** commit `feat(dashboard): heat map and radar in Analyst` and `docs: 0.8.0`.
+- [x] **Step 1: failing tests** in `Overview.test.tsx`: Analyst → radar after Top risks in the same column and the heat map after the markets table; Executive → neither; the static skeleton holds both behind `mode-analyst:`.
+- [x] **Step 2:** implement the right column as a stack (`TopRisks` + `AnalystOnly(ComparisonRadar)`, each in its own `Slot`); heat map `Slot` after the table.
+- [x] **Step 3:** docs synced with what is built; `pnpm build` static for the four locales.
+- [x] **Step 4:** commit `feat(dashboard): heat map and radar in Analyst` and `docs: 0.8.0`.
 
 ### Task 7: review and owner check
 
 - [ ] Independent branch review by an agent (correctness, a11y, FSD, tests); fix or record each finding in the backlog.
 - [ ] Owner check on his dev server; fixes; plan status → built.
+
+## Built differently from the tasks
+
+- The grid's focus logic stayed in `HeatGrid.tsx` (no `use-grid-focus.ts`); its behaviour is covered by `HeatMap.test.tsx`.
+- `toneFill` moved to `entities/performance/ui/scale-tone.ts` with a new `toneText`, shared by the map and the heat map.
+- The line under the grid shows the last cell hovered, focused or tapped (it kept vanishing when the mouse moved to its buttons) and is not a live region: each cell's name already says the value.
+- The heat-map card has its own `MetricPicker` (the same `kpi`), so the metric can be changed where the grid is.
 
 ## Not in this plan
 
