@@ -26,6 +26,8 @@ test('map → Germany → ask why it dipped → a source opens that month', asyn
   await expect(log).toContainText('Why did Germany dip in March?');
   await expect(log).toContainText('Confidence: High');
   await expect(log).toContainText('AI answer · may be incomplete');
+  // Next to the AI answer, the authoritative block built from the data alone.
+  await expect(log.getByRole('button', { name: 'What the data shows' })).toBeVisible();
   const updates = await page.evaluate(() =>
     'streamCounter' in window && typeof window.streamCounter === 'object' && window.streamCounter
       ? Number(Reflect.get(window.streamCounter, 'updates'))

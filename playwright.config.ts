@@ -41,8 +41,9 @@ export default defineConfig({
         reuseExistingServer: !ci,
         timeout: 180_000,
         env: {
-          // An answer still streams token by token, in a fraction of a second.
-          MOCK_TOKEN_DELAY_MS: '5',
+          // An answer streams word by word: ~1 s for a short one, ~3.5 s for
+          // the long one, so Stop can be pressed mid-answer.
+          MOCK_TOKEN_DELAY_MS: '20',
           MOCK_ALERTS_DELAY_MS: '400',
         },
       },

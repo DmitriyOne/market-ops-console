@@ -37,3 +37,19 @@ test('a question past the data says it cannot answer, with no sources', async ({
   await expect(log.getByRole('button', { name: /, \w{3} 20\d\d/ })).toHaveCount(0);
   await expect(log.getByRole('button', { name: 'What the data shows' })).toHaveCount(0);
 });
+
+test('Stop mid-answer keeps the words so far, without sources or confidence', async ({ page }) => {
+  await page.goto('/dashboard');
+  const assistant = await ask(page, 'Give me a full summary of the portfolio');
+  const log = assistant.getByRole('log');
+  await expect(log).toContainText("Here's the portfolio at a glance.");
+
+  await assistant.getByRole('button', { name: 'Stop answer' }).click();
+  await expect(log).toContainText('Stopped — answer incomplete.');
+  await expect(log).toContainText('No sources or confidence for a partial answer.');
+  // The words that came stay; the rest never arrives.
+  await expect(log).toContainText("Here's the portfolio at a glance.");
+  await expect(log).not.toContainText('for the detail behind these numbers');
+  await expect(log).not.toContainText('Confidence:');
+  await expect(assistant.getByRole('button', { name: 'Ask again' })).toBeVisible();
+});
