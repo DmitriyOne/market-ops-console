@@ -558,7 +558,8 @@
         "thresholdMin": "Enter {min} or more.",
         "regionRequired": "Choose a region.",
         "marketsRequired": "Choose at least one market."
-      }
+      },
+      "back": "Back"
     },
     "preview": {
       "label": "Preview",
@@ -579,10 +580,16 @@
     "triggered": {
       "title": "{count, plural, =0 {Firing now ({period})} one {Firing now: # market ({period})} other {Firing now: # markets ({period})}}",
       "none": "No rule flags a market now.",
-      "reason": "{metric} {value} · {rule}",
+      "reason": "{metric} {value} · {operator, select, below {below {threshold}} other {above {threshold}}}",
       "open": "Open {name}",
-      "show": "Show"
+      "show": "Show",
+      "openShort": "Open"
     },
-    "saved": "{enabled, select, false {Saved “{name}” (off).} other {{count, plural, =0 {Saved “{name}”: it flags no markets now.} one {Saved “{name}”: it flags # market now.} other {Saved “{name}”: it flags # markets now.}}}}"
+    "saved": "{enabled, select, false {Saved “{name}” (off).} other {{count, plural, =0 {Saved “{name}”: it flags no markets now.} one {Saved “{name}”: it flags # market now.} other {Saved “{name}”: it flags # markets now.}}}}",
+    "tabs": {
+      "label": "Alerts view",
+      "firing": "Firing",
+      "rules": "Rules"
+    }
   }
 }

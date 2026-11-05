@@ -1,20 +1,25 @@
 import { screen, waitFor, within } from '@testing-library/react';
-import { Suspense } from 'react';
+import { Suspense, useState } from 'react';
 import { Toaster } from 'sonner';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { enMessages } from '@/shared/config';
 import { alertsApi, datasetHandler, renderWithProviders, server } from '@/shared/lib/test';
 
-import { AlertsPanel } from './AlertsPanel';
+import { AlertsPanel, type AlertTab } from './AlertsPanel';
 
 const t = enMessages.alerts;
 
-function setup(searchParams = '', api = alertsApi()) {
+function Panel({ initial = 'rules' }: { initial?: AlertTab }) {
+  const [tab, setTab] = useState<AlertTab>(initial);
+  return <AlertsPanel tab={tab} onTabChange={setTab} firing={<p>Firing content</p>} />;
+}
+
+function setup(searchParams = '', api = alertsApi(), initial: AlertTab = 'rules') {
   server.use(datasetHandler(), ...api.handlers);
   const view = renderWithProviders(
     <Suspense>
-      <AlertsPanel />
+      <Panel initial={initial} />
       <Toaster />
     </Suspense>,
     { searchParams },
@@ -32,6 +37,31 @@ async function choose(user: ReturnType<typeof setup>['user'], label: string, opt
 describe('AlertsPanel', () => {
   beforeEach(() => {
     localStorage.clear();
+  });
+
+  it('two tabs with counts; New rule is there on both; the form has Back', async () => {
+    const { user } = setup('', alertsApi(), 'firing');
+    const tabs = await screen.findByRole('radiogroup', { name: t.tabs.label });
+    expect(await within(tabs).findByRole('radio', { name: 'Firing · 5' })).toBeChecked();
+    expect(within(tabs).getByRole('radio', { name: 'Rules · 2' })).not.toBeChecked();
+    expect(screen.getByText('Firing content')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: t.list.new })).toBeEnabled();
+    await user.click(within(tabs).getByRole('radio', { name: 'Rules · 2' }));
+    expect(await rulesList()).toBeInTheDocument();
+    expect(screen.queryByText('Firing content')).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: t.list.new }));
+    expect(screen.queryByRole('radiogroup', { name: t.tabs.label })).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: t.form.back }));
+    expect(screen.getByRole('button', { name: t.list.new })).toHaveFocus();
+  });
+
+  it('a save from the Firing tab lands on Rules, where the new rule shows', async () => {
+    const { user } = setup('', alertsApi(), 'firing');
+    await user.click(await screen.findByRole('button', { name: t.list.new }));
+    await user.type(screen.getByRole('textbox', { name: t.form.name }), 'Low attainment EU');
+    await user.click(screen.getByRole('button', { name: t.form.save }));
+    expect(screen.getByRole('radio', { name: /^Rules/ })).toBeChecked();
+    expect(within(await rulesList()).getAllByRole('listitem')).toHaveLength(3);
   });
 
   it('lists the rules in plain words, with how many markets each flags now', async () => {

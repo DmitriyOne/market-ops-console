@@ -1,26 +1,39 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { ruleMarkets } from '@/entities/alert-rule';
 import { useDashboard } from '@/entities/performance';
-import { AlertsPanel } from '@/features/configure-alerts';
+import { AlertsPanel,type AlertTab } from '@/features/configure-alerts';
 import { toast } from '@/shared/ui';
 
 import { TriggeredAlerts } from './TriggeredAlerts';
 
 /**
- * The alerts sheet / tab: what fires now, then the rules. A save confirmed
- * by the server says how many markets the rule flags, with a way to see them.
+ * The alerts sheet / tab: "Firing" first (the bell's answer), "Rules" one
+ * tap away. A save the server confirms says how many markets the rule
+ * flags, with Show, which opens "Firing" at its heading.
  */
 export function AlertsView() {
   const t = useTranslations('alerts');
   const { ds } = useDashboard();
-  const triggered = useRef<HTMLHeadingElement>(null);
+  const [tab, setTab] = useState<AlertTab>('firing');
+  const heading = useRef<HTMLHeadingElement>(null);
+
+  // The heading exists only once "Firing" is shown: focus it after that render.
+  const [showFiring, setShowFiring] = useState(0);
+  useEffect(() => {
+    if (showFiring === 0) return;
+    heading.current?.focus();
+    heading.current?.scrollIntoView({ block: 'start' });
+  }, [showFiring]);
+
   return (
     <AlertsPanel
-      summary={<TriggeredAlerts headingRef={triggered} />}
+      tab={tab}
+      onTabChange={setTab}
+      firing={<TriggeredAlerts headingRef={heading} />}
       onSaved={(rule) => {
         toast.success(
           t('saved', {
@@ -35,8 +48,8 @@ export function AlertsView() {
               // leaves the toasts; let it do that first, then move on.
               const active = document.activeElement;
               if (active instanceof HTMLElement) active.blur();
-              triggered.current?.focus();
-              triggered.current?.scrollIntoView({ block: 'start' });
+              setTab('firing');
+              setShowFiring((n) => n + 1);
             },
           },
         );

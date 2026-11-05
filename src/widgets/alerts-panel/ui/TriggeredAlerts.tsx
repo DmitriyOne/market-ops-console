@@ -10,6 +10,7 @@ import {
   useAlertFlags,
   useAlertRules,
   useMetricValueFormat,
+  useThresholdFormat,
 } from '@/entities/alert-rule';
 import { useDashboard, useKpiFormat } from '@/entities/performance';
 import { useDrillDown } from '@/features/drill-down';
@@ -28,6 +29,7 @@ export function TriggeredAlerts({ headingRef }: { headingRef?: Ref<HTMLHeadingEl
   const { ds } = useDashboard();
   const { period } = useKpiFormat();
   const value = useMetricValueFormat();
+  const threshold = useThresholdFormat();
   const rules = useAlertRules();
   const flags = useAlertFlags(ds);
   const { toMarket } = useDrillDown();
@@ -70,7 +72,8 @@ export function TriggeredAlerts({ headingRef }: { headingRef?: Ref<HTMLHeadingEl
                       {t('triggered.reason', {
                         metric: t(`metric.${rule.metric}`),
                         value: value(rule.metric, metricValue(market, rule.metric)),
-                        rule: rule.name,
+                        operator: rule.operator,
+                        threshold: threshold(rule.metric, rule.threshold),
                       })}
                     </p>
                   ))}
@@ -79,6 +82,8 @@ export function TriggeredAlerts({ headingRef }: { headingRef?: Ref<HTMLHeadingEl
                   type="button"
                   variant="outline"
                   className="h-11"
+                  // The name is in the label, the short word on the button (label in name).
+                  aria-label={t('triggered.open', { name: market.name })}
                   onClick={() => {
                     toMarket(id);
                     // Leave the panel: the desktop sheet closes, the phone shows Overview.
@@ -86,7 +91,7 @@ export function TriggeredAlerts({ headingRef }: { headingRef?: Ref<HTMLHeadingEl
                     scrollMainToTop();
                   }}
                 >
-                  {t('triggered.open', { name: market.name })}
+                  {t('triggered.openShort')}
                 </Button>
               </li>
             );

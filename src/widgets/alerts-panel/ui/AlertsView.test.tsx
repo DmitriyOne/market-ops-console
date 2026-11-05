@@ -41,8 +41,8 @@ describe('AlertsView', () => {
       'United States, Warning',
       'Australia, Warning',
     ]);
-    expect(rows[0]).toHaveTextContent('Attainment 92.0% · Attainment below 95%');
-    expect(rows[0]).toHaveTextContent('Share 8.9% · Share below 10%');
+    expect(rows[0]).toHaveTextContent('Attainment 92.0% · below 95%');
+    expect(rows[0]).toHaveTextContent('Share 8.9% · below 10%');
   });
 
   it('Open leaves the panel and opens the market (one history step)', async () => {
@@ -72,9 +72,11 @@ describe('AlertsView', () => {
     expect(
       await screen.findByText('Saved “Weak growth”: it flags 2 markets now.'),
     ).toBeInTheDocument();
+    // The form saved from "Firing" lands on "Rules"; Show goes back to what fires.
+    expect(screen.getByRole('radio', { name: /^Rules/ })).toBeChecked();
+    await user.click(screen.getByRole('button', { name: t.triggered.show }));
     // Spain joins the list (growth −4.6 %).
     expect(await firing()).toHaveAccessibleName('Firing now: 6 markets (May 2026)');
-    await user.click(screen.getByRole('button', { name: t.triggered.show }));
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: /^Firing now/ })).toHaveFocus();
     });

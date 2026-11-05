@@ -47,7 +47,7 @@ describe('TopRisks', () => {
     const { user } = renderWithProviders(
       <Suspense>
         <TopRisks />
-        <AlertsPanel />
+        <AlertsPanel tab="rules" onTabChange={() => undefined} firing={null} />
       </Suspense>,
     );
     const section = await screen.findByRole('region', { name: t.title });

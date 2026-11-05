@@ -558,7 +558,8 @@
         "thresholdMin": "Geben Sie {min} oder mehr ein.",
         "regionRequired": "Wählen Sie eine Region.",
         "marketsRequired": "Wählen Sie mindestens einen Markt."
-      }
+      },
+      "back": "Zurück"
     },
     "preview": {
       "label": "Vorschau",
@@ -579,10 +580,16 @@
     "triggered": {
       "title": "{count, plural, =0 {Aktuell ausgelöst ({period})} one {Aktuell ausgelöst: # Markt ({period})} other {Aktuell ausgelöst: # Märkte ({period})}}",
       "none": "Derzeit markiert keine Regel einen Markt.",
-      "reason": "{metric} {value} · {rule}",
+      "reason": "{metric} {value} · {operator, select, below {unter {threshold}} other {über {threshold}}}",
       "open": "{name} öffnen",
-      "show": "Anzeigen"
+      "show": "Anzeigen",
+      "openShort": "Öffnen"
     },
-    "saved": "{enabled, select, false {„{name}“ gespeichert (aus).} other {{count, plural, =0 {„{name}“ gespeichert: markiert derzeit keine Märkte.} one {„{name}“ gespeichert: markiert derzeit # Markt.} other {„{name}“ gespeichert: markiert derzeit # Märkte.}}}}"
+    "saved": "{enabled, select, false {„{name}“ gespeichert (aus).} other {{count, plural, =0 {„{name}“ gespeichert: markiert derzeit keine Märkte.} one {„{name}“ gespeichert: markiert derzeit # Markt.} other {„{name}“ gespeichert: markiert derzeit # Märkte.}}}}",
+    "tabs": {
+      "label": "Alarm-Ansicht",
+      "firing": "Ausgelöst",
+      "rules": "Regeln"
+    }
   }
 }
