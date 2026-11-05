@@ -32,6 +32,13 @@ export const formats = {
     /** Heat-map cells: whole percent, the decimal shows on focus. */
     wholePercent: { style: 'percent', maximumFractionDigits: 0 },
     signedWholePercent: { style: 'percent', maximumFractionDigits: 0, signDisplay: 'exceptZero' },
+    /** An alert threshold as typed: "95%", "95.5%", "+2%". */
+    thresholdPercent: { style: 'percent', maximumFractionDigits: 2 },
+    signedThresholdPercent: {
+      style: 'percent',
+      maximumFractionDigits: 2,
+      signDisplay: 'exceptZero',
+    },
     signedPercent: {
       style: 'percent',
       minimumFractionDigits: 1,

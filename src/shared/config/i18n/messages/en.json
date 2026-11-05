@@ -492,6 +492,84 @@
       "duplicate_name": "A rule with this name already exists.",
       "too_many": "You can keep up to 10 rules.",
       "simulated": "Simulated failure (demo switch)."
+    },
+    "title": "Alerts",
+    "description": "Rules check each market’s figures for {period}, the latest month.",
+    "button": "{count, plural, =0 {Alerts} one {Alerts, # market flagged} other {Alerts, # markets flagged}}",
+    "severity": {
+      "warning": "Warning",
+      "critical": "Critical"
+    },
+    "operator": {
+      "below": "Below",
+      "above": "Above"
+    },
+    "list": {
+      "label": "Your rules",
+      "empty": "No rules yet. A rule flags markets whose figure crosses a threshold.",
+      "new": "New rule",
+      "full": "You can keep up to 10 rules. Delete one to add another.",
+      "saving": "Saving…",
+      "enabled": "Rule on: {name}",
+      "edit": "Edit",
+      "editRule": "Edit {name}",
+      "delete": "Delete",
+      "deleteRule": "Delete {name}",
+      "flagsNow": "{count, plural, =0 {Flags no markets now} one {Flags # market now} other {Flags # markets now}}",
+      "off": "Off",
+      "loading": "Loading your rules…",
+      "loadFailed": "Couldn't load your rules.",
+      "retry": "Try again"
+    },
+    "form": {
+      "newTitle": "New rule",
+      "editTitle": "Edit rule",
+      "name": "Name",
+      "metric": "Metric",
+      "operator": "Condition",
+      "threshold": "Threshold",
+      "unitPercent": "%",
+      "unitRevenue": "M$",
+      "revenueHint": "In millions of US dollars, e.g. 1.5",
+      "scope": "Applies to",
+      "scopeKind": {
+        "portfolio": "All markets",
+        "region": "One region",
+        "markets": "Chosen markets"
+      },
+      "region": "Region",
+      "regionPlaceholder": "Choose a region",
+      "markets": "Markets",
+      "severity": "Severity",
+      "enabled": "Rule on",
+      "save": "Save rule",
+      "cancel": "Cancel",
+      "errors": {
+        "nameRequired": "Give the rule a name.",
+        "nameTooLong": "Keep the name under 60 characters.",
+        "duplicateName": "Another rule already has this name.",
+        "thresholdRequired": "Enter a number.",
+        "thresholdRange": "Enter a number from {min} to {max}.",
+        "thresholdMin": "Enter {min} or more.",
+        "regionRequired": "Choose a region.",
+        "marketsRequired": "Choose at least one market."
+      }
+    },
+    "preview": {
+      "label": "Preview",
+      "flags": "{count, plural, one {Would flag # market now ({period}): {markets}} other {Would flag # markets now ({period}): {markets}}}",
+      "none": "Would flag no markets now ({period}).",
+      "incomplete": "Enter a threshold to see which markets it flags."
+    },
+    "delete": {
+      "title": "Delete “{name}”?",
+      "description": "The rule and its flags go away. This can’t be undone.",
+      "confirm": "Delete rule",
+      "cancel": "Keep it"
+    },
+    "simulate": {
+      "label": "Fail the next save (demo)",
+      "hint": "The next change fails on purpose, so you can see it rolled back."
     }
   }
 }

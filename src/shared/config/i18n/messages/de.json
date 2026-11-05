@@ -492,6 +492,84 @@
       "duplicate_name": "Eine Regel mit diesem Namen gibt es bereits.",
       "too_many": "Sie können höchstens 10 Regeln anlegen.",
       "simulated": "Simulierter Fehler (Demo-Schalter)."
+    },
+    "title": "Alarme",
+    "description": "Regeln prüfen die Werte jedes Markts für {period}, den letzten Monat.",
+    "button": "{count, plural, =0 {Alarme} one {Alarme, # Markt markiert} other {Alarme, # Märkte markiert}}",
+    "severity": {
+      "warning": "Warnung",
+      "critical": "Kritisch"
+    },
+    "operator": {
+      "below": "Unter",
+      "above": "Über"
+    },
+    "list": {
+      "label": "Ihre Regeln",
+      "empty": "Noch keine Regeln. Eine Regel markiert Märkte, deren Wert eine Schwelle überschreitet.",
+      "new": "Neue Regel",
+      "full": "Sie können höchstens 10 Regeln anlegen. Löschen Sie eine, um eine neue hinzuzufügen.",
+      "saving": "Wird gespeichert…",
+      "enabled": "Regel aktiv: {name}",
+      "edit": "Bearbeiten",
+      "editRule": "{name} bearbeiten",
+      "delete": "Löschen",
+      "deleteRule": "{name} löschen",
+      "flagsNow": "{count, plural, =0 {Markiert derzeit keine Märkte} one {Markiert derzeit # Markt} other {Markiert derzeit # Märkte}}",
+      "off": "Aus",
+      "loading": "Ihre Regeln werden geladen…",
+      "loadFailed": "Ihre Regeln konnten nicht geladen werden.",
+      "retry": "Erneut versuchen"
+    },
+    "form": {
+      "newTitle": "Neue Regel",
+      "editTitle": "Regel bearbeiten",
+      "name": "Name",
+      "metric": "Kennzahl",
+      "operator": "Bedingung",
+      "threshold": "Schwelle",
+      "unitPercent": "%",
+      "unitRevenue": "Mio. $",
+      "revenueHint": "In Millionen US-Dollar, z. B. 1,5",
+      "scope": "Gilt für",
+      "scopeKind": {
+        "portfolio": "Alle Märkte",
+        "region": "Eine Region",
+        "markets": "Ausgewählte Märkte"
+      },
+      "region": "Region",
+      "regionPlaceholder": "Region wählen",
+      "markets": "Märkte",
+      "severity": "Schweregrad",
+      "enabled": "Regel aktiv",
+      "save": "Regel speichern",
+      "cancel": "Abbrechen",
+      "errors": {
+        "nameRequired": "Geben Sie der Regel einen Namen.",
+        "nameTooLong": "Der Name darf höchstens 60 Zeichen haben.",
+        "duplicateName": "Eine andere Regel hat bereits diesen Namen.",
+        "thresholdRequired": "Geben Sie eine Zahl ein.",
+        "thresholdRange": "Geben Sie eine Zahl von {min} bis {max} ein.",
+        "thresholdMin": "Geben Sie {min} oder mehr ein.",
+        "regionRequired": "Wählen Sie eine Region.",
+        "marketsRequired": "Wählen Sie mindestens einen Markt."
+      }
+    },
+    "preview": {
+      "label": "Vorschau",
+      "flags": "{count, plural, one {Würde derzeit # Markt markieren ({period}): {markets}} other {Würde derzeit # Märkte markieren ({period}): {markets}}}",
+      "none": "Würde derzeit keine Märkte markieren ({period}).",
+      "incomplete": "Geben Sie eine Schwelle ein, um die markierten Märkte zu sehen."
+    },
+    "delete": {
+      "title": "„{name}“ löschen?",
+      "description": "Die Regel und ihre Markierungen verschwinden. Das lässt sich nicht rückgängig machen.",
+      "confirm": "Regel löschen",
+      "cancel": "Behalten"
+    },
+    "simulate": {
+      "label": "Nächstes Speichern scheitern lassen (Demo)",
+      "hint": "Die nächste Änderung schlägt absichtlich fehl, damit Sie das Zurücksetzen sehen."
     }
   }
 }

@@ -8,14 +8,17 @@ import type { AlertMetric, AlertRuleInput, Dataset } from '@/shared/api';
 /** How many market names a scope spells out before it counts them. */
 const NAMES_SHOWN = 3;
 
-/** A threshold as the user reads it: "95%", "−5%", "$1.5M". */
+/** A threshold as the user typed it: "95%", "−5%", "$1.5M". */
 export function useThresholdFormat(): (metric: AlertMetric, value: number) => string {
   const format = useFormatter();
   return useCallback(
     (metric, value) =>
       metric === 'revenue'
         ? format.number(value, 'compactCurrency')
-        : format.number(value / 100, metric === 'growth' ? 'signedPercent' : 'percent'),
+        : format.number(
+            value / 100,
+            metric === 'growth' ? 'signedThresholdPercent' : 'thresholdPercent',
+          ),
     [format],
   );
 }
