@@ -14,7 +14,7 @@ export function useThresholdFormat(): (metric: AlertMetric, value: number) => st
   return useCallback(
     (metric, value) =>
       metric === 'revenue'
-        ? format.number(value, 'compactCurrency')
+        ? format.number(value, 'thresholdCurrency')
         : format.number(
             value / 100,
             metric === 'growth' ? 'signedThresholdPercent' : 'thresholdPercent',

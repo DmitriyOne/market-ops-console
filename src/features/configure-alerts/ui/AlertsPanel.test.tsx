@@ -154,6 +154,20 @@ describe('AlertsPanel', () => {
     });
   });
 
+  it('a revenue threshold reads as typed: 1.25 M$ is "US$1.25m", not "US$1.3m"', async () => {
+    const { user } = setup();
+    await rulesList();
+    await user.click(screen.getByRole('button', { name: t.list.new }));
+    await user.type(screen.getByRole('textbox', { name: t.form.name }), 'Mid revenue');
+    await choose(user, t.form.metric, 'Revenue');
+    const threshold = screen.getByRole('textbox', { name: 'Threshold, M$' });
+    await user.clear(threshold);
+    await user.type(threshold, '1.25');
+    await user.click(screen.getByRole('button', { name: t.form.save }));
+    const items = within(await rulesList()).getAllByRole('listitem');
+    expect(items[2]).toHaveTextContent('Revenue below US$1.25m · All markets');
+  });
+
   it('edit fills the form and saves the change', async () => {
     const { user, api } = setup();
     await rulesList();

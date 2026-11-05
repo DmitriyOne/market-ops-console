@@ -19,6 +19,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 - Alerts: the "Saved … it flags N markets" message did not come when another rule was switched before the save was confirmed, or when the panel was closed meanwhile; then its "Show" opens the panel again.
 - Alerts: closing the sheet opened from the bell left a second copy of the page in the history, so Back seemed to do nothing once; now it goes back. A link that opens on the sheet still closes it in place.
 - Alerts: a save with "chosen markets" and none ticked now focuses the first market, which reads the error; after a delete, focus goes to New rule instead of the page.
+- Alerts: a revenue threshold shows as typed, "$1.25M" (it was rounded to "$1.3M").
 - Alerts: bigger touch targets (44 px): each market row in the form, a rule's on/off switch, and the bell and ⚠ in the markets table; the bell opens on a tap and lists its rules.
 - Closing a side sheet (alerts, phone settings) flashed twice: the dimmed, blurred backdrop faded in 100 ms and the panel in 200 ms; both now take 200 ms and leave in the same frame (measured in the browser).
 - The browser console no longer warns "Encountered a script tag while rendering React component": the scripts that mark the page before it is painted (collapsed assistant, phone tab, Analyst mode) go into the server HTML only.
