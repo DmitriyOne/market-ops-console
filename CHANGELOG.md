@@ -2,6 +2,16 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/). The top version must match `package.json` and the `release/X.Y.Z` branch.
 
+## [0.11.1] - Unreleased
+
+### Changed
+- CI: each check is its own job, so it gets its own line and log in the pull request and they run side by side. Into a release branch: Format, Lint, Types. Into `develop`: Branch & version first, then Format, Lint, Types, Unit tests and E2E. Shorter to wait for (~4 min instead of ~6 into `develop`), more runner minutes (~11 instead of ~6), well within the free plan.
+- The shadcn components use tokens and scale steps instead of arbitrary values (`rounded-compact`, `text-compact`, `secondary-hover`, `min-w-24`, `ring-3`, `rounded-xs`); three layout values with no scale step stay, listed in DESIGN.md with the reason. `ToggleGroup` takes `spacing` 0–4.
+
+### Fixed
+- Markets table: the "Total" cell was a shade darker than the rest of its row (and the row tinted on hover). They are one tone now.
+- Excel export: the total row has the share too, revenue-weighted like the table's, and it follows the Excel filter like the other totals. Blank where the table shows none (not the latest month, or a product).
+
 ## [0.11.0] - Unreleased
 
 ### Fixed

@@ -7,7 +7,6 @@ Format: **Item**: what is wrong (file). Why it can wait. Where it goes.
 ## From the Plan 1 review (foundation, 2026-11-03)
 
 - **SSE errors lose detail**: `streamSse` drops the API error `code` from a non-2xx JSON body and does not check that `Content-Type` is `text/event-stream` (`src/shared/api/http/stream-sse.ts`). No UI reads it yet; not done in Plan 2. **Hardening plan**, hardening.
-- **Arbitrary Tailwind values in shadcn components** (`src/shared/ui/*`), against `.claude/rules/ui.md`. Generated code. **Design pass**, with the semantic tokens.
 
 ## From the design pass (2026-11-03)
 
@@ -59,12 +58,10 @@ Points the owner wants explained in the README, in his own words:
 ## From the 0.7.0 markets table (2026-11-04)
 
 - **Table skeleton is portfolio-shaped** (header, 13 rows, total): a region or a selection has fewer rows, so the page below the table moves up once on load. The row count is not known before the data. **Accepted**.
-- **Total row's sticky cell** is plain `bg-muted` while the footer row is `bg-muted/50` over the card, so the first cell is a shade darker. An opaque mixed token would fix it. **Design pass**.
 - **Shift+Enter on a tile** relies on the browser putting `shiftKey` on the click a key press makes (Chrome and Firefox do); the map handles Shift+Enter itself. **Hardening plan**, with the a11y pass.
 
 ## From the 0.7.0 branch review (2026-11-04)
 
-- **Excel has no share total** while the UI footer has one (a revenue-weighted share is not a column formula). Add as a value, or leave. **Design pass**.
 - **Back undoes one checkbox at a time** in the multi-pick menu (each pick is its own history entry, spec §6). Confirm or batch the menu's picks into one entry on close.
 - **Popups in the assistant's scroll area** (message list) have no scroll boundary yet (`PopperBoundary` covers `<main>` only): a source card's popup could follow its trigger over the panel header. Same fix if it shows. **Hardening plan**.
 - **Map Shift+click** builds the map's still-view key from the rendered selection (`toggleOnMap`), while the toggle itself now reads the URL as it is; two Shift+clicks inside one render could make the map fit once. Cosmetic.
