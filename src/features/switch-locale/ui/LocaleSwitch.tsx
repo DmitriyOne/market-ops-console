@@ -16,8 +16,8 @@ import {
 
 import { useSwitchLocale } from '../model/use-switch-locale';
 
-/** The language menu; `children` is its trigger. */
-function LocaleMenu({ children }: { children: ReactNode }) {
+/** The language menu; `children` is its trigger, `onPick` runs after a choice (the sheet closes). */
+function LocaleMenu({ children, onPick }: { children: ReactNode; onPick?: () => void }) {
   const t = useTranslations('locale');
   const current = useLocale();
   const switchLocale = useSwitchLocale();
@@ -31,6 +31,7 @@ function LocaleMenu({ children }: { children: ReactNode }) {
           onValueChange={(value) => {
             const locale = routing.locales.find((l): l is AppLocale => l === value);
             if (locale) switchLocale(locale);
+            onPick?.();
           }}
         >
           {routing.locales.map((locale) => (
@@ -56,13 +57,19 @@ export function LocaleSwitch() {
   );
 }
 
-/** Settings sheet: the whole row opens the menu and shows the current language. */
-export function LocaleSwitchRow({ className }: { className?: string }) {
+/** Settings sheet: the whole row opens the menu and shows the current language; `onPick` closes the sheet. */
+export function LocaleSwitchRow({
+  className,
+  onPick,
+}: {
+  className?: string;
+  onPick?: () => void;
+}) {
   const t = useTranslations('locale');
   const current = useLocale();
   const name = routing.locales.find((l) => l === current);
   return (
-    <LocaleMenu>
+    <LocaleMenu onPick={onPick}>
       <button type="button" className={className}>
         <span>{t('label')}</span>{' '}
         <span className="flex items-center gap-1 text-muted-foreground">

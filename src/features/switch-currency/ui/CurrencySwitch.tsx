@@ -17,8 +17,11 @@ import {
   DropdownMenuTrigger,
 } from '@/shared/ui';
 
-/** The currency menu: the choices, then the rates' date and source. `children` is its trigger. */
-function CurrencyMenu({ children }: { children: ReactNode }) {
+/**
+ * The currency menu: the choices, then the rates' date and source.
+ * `children` is its trigger; `onPick` runs after a choice (the sheet closes).
+ */
+function CurrencyMenu({ children, onPick }: { children: ReactNode; onPick?: () => void }) {
   const t = useTranslations('currency');
   const format = useFormatter();
   const [currency, setCurrency] = useCurrencyChoice();
@@ -27,12 +30,13 @@ function CurrencyMenu({ children }: { children: ReactNode }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-72" aria-describedby={noteId}>
+      <DropdownMenuContent align="end" className="min-w-72" aria-describedby={noteId}>
         <DropdownMenuRadioGroup
           value={currency ?? undefined}
           onValueChange={(value) => {
             const choice = CURRENCIES.find((c) => c === value);
             if (choice) setCurrency(choice);
+            onPick?.();
           }}
         >
           {CURRENCIES.map((code) => (
@@ -77,12 +81,18 @@ export function CurrencySwitch() {
   );
 }
 
-/** Settings sheet: the whole row opens the menu and shows the current currency. */
-export function CurrencySwitchRow({ className }: { className?: string }) {
+/** Settings sheet: the whole row opens the menu and shows the current currency; `onPick` closes the sheet. */
+export function CurrencySwitchRow({
+  className,
+  onPick,
+}: {
+  className?: string;
+  onPick?: () => void;
+}) {
   const t = useTranslations('currency');
   const [currency] = useCurrencyChoice();
   return (
-    <CurrencyMenu>
+    <CurrencyMenu onPick={onPick}>
       <button type="button" className={className} disabled={currency === null}>
         <span>{t('label')}</span>{' '}
         <span className="flex items-center gap-1 text-muted-foreground">

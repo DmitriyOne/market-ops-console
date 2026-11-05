@@ -151,7 +151,7 @@ Rules:
 | `HoverCard` | evidence card on fine pointers (hover and keyboard focus); a click or Enter on the source closes it until the pointer or focus leaves the button (0.11.1, it blinked) |
 | `Popover` | the same card on coarse pointers (tap); the map tooltip (virtual anchor at the pointer or the country) |
 | `Collapsible` | "What the data shows" (closed by default) |
-| `DropdownMenu` | theme, locale and currency switches (the currency menu: symbol, code, name, then the rates' date and the demo note, `w-72`), breadcrumb steps, the map metric picker (`modal={false}`, one trigger width), the markets filter and `Export ▾` |
+| `DropdownMenu` | theme, locale and currency switches (the currency menu: symbol, code, name, then the rates' date and the demo note, at least `min-w-72`, as wide as its row in the phone sheet; a pick in the sheet closes the sheet), breadcrumb steps, the map metric picker (`modal={false}`, one trigger width), the markets filter and `Export ▾`. After a mouse or touch pick focus goes back to the trigger without the ring (`focusVisible: false`); Enter or Escape keep the ring (ours, 0.12.0) |
 | `Tooltip` | the name of an icon-only control on hover and focus (New chat); hover only, so a note a touch user needs goes in a `Popover` (the table's ⚠ and bell, 0.11.0) |
 | `PopperBoundary` (ours) | the scroll area popups inside it belong to; `AppShell` provides `<main>`. `DropdownMenuContent`, `PopoverContent`, `TooltipContent` and `HoverCardContent` read it themselves (§5) |
 | `Logo` (ours) | the app mark next to the app name: an M in a rounded square (`size-8 rounded-sm`), `bg-foreground text-background` so dark mode inverts it; `aria-hidden` (0.12.0) |

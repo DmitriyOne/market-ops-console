@@ -27,9 +27,18 @@ function DropdownMenuContent({
   className,
   align = 'start',
   sideOffset = 4,
+  onPointerDown,
+  onKeyDown,
+  onCloseAutoFocus,
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Content>) {
   const boundary = usePopperBoundary();
+  // Ours (0.12.0): Radix puts focus back on the trigger when the menu
+  // closes, and Chrome then draws the focus ring after a mouse or touch
+  // pick. After a pointer pick focus still goes back (Tab goes on from the
+  // trigger) but without the ring; Enter or Escape keep Radix's own return,
+  // ring included. A browser without `focusVisible` shows the ring as before.
+  const byPointer = React.useRef(false);
   return (
     <DropdownMenuPrimitive.Portal>
       <DropdownMenuPrimitive.Content
@@ -37,6 +46,25 @@ function DropdownMenuContent({
         data-slot="dropdown-menu-content"
         sideOffset={sideOffset}
         align={align}
+        onPointerDown={(event) => {
+          byPointer.current = true;
+          onPointerDown?.(event);
+        }}
+        onKeyDown={(event) => {
+          byPointer.current = false;
+          onKeyDown?.(event);
+        }}
+        onCloseAutoFocus={(event) => {
+          onCloseAutoFocus?.(event);
+          if (byPointer.current && !event.defaultPrevented) {
+            event.preventDefault();
+            const content = event.currentTarget;
+            const id = content instanceof Element ? content.getAttribute('aria-labelledby') : null;
+            const trigger = id ? document.getElementById(id) : null;
+            trigger?.focus({ preventScroll: true, focusVisible: false });
+          }
+          byPointer.current = false;
+        }}
         className={cn(
           'z-50 max-h-(--radix-dropdown-menu-content-available-height) w-(--radix-dropdown-menu-trigger-width) min-w-32 origin-(--radix-dropdown-menu-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-lg bg-popover p-1 text-popover-foreground shadow-md ring-1 ring-foreground/10 duration-100 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:overflow-hidden data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95',
           className,

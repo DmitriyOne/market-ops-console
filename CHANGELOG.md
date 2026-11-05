@@ -11,6 +11,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 ### Changed
 - Money shows a bare symbol everywhere: `$22.9m`, not `US$22.9m` in British English.
 - The settings button's name lists the currency.
+- Phone settings: a choice in the language, currency or theme menu closes the sheet.
+
+### Fixed
+- Every dropdown (theme, language, currency, path, map metric, filter, Export) kept a focus ring on its button after a choice made with the mouse or a tap. Focus still goes back to the button, without the ring; with the keyboard the ring stays, so you see where you are.
 
 ## [0.11.1] - Unreleased
 

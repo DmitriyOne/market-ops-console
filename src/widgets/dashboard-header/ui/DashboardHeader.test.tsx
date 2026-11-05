@@ -138,6 +138,21 @@ describe('DashboardHeader', () => {
     expect(settings).toHaveFocus();
   });
 
+  it('phone settings: a pick in a menu (currency) is the whole errand, the sheet closes', async () => {
+    const { user } = setup();
+    const settings = await screen.findByRole('button', { name: en.header.settings });
+    await user.click(settings);
+    const sheet = screen.getByRole('dialog', { name: en.header.settingsTitle });
+    await user.click(within(sheet).getByRole('button', { name: /^Currency USD · US dollar/ }));
+    await user.click(screen.getByRole('menuitemradio', { name: /EUR/ }));
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+    expect(localStorage.getItem('mo:currency')).toBe('EUR');
+    expect(settings).toHaveFocus();
+    localStorage.clear();
+  });
+
   it('the app name leads to the clean dashboard and resets the view', async () => {
     const { user, lastUpdate } = setup('?region=eu&market=de&period=2026-03&mode=analyst');
     const home = screen.getByRole('link', { name: `${en.common.appName}, ${en.header.resetView}` });
