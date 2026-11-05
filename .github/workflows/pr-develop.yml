@@ -1,4 +1,5 @@
 # PR into develop: only a release branch may merge here (ADR 0007).
+# Checks: version, format, lint, types, unit tests, then the E2E suite (ADR 0008).
 # One job to stay within GitHub Free minutes (.claude/rules/ci.md).
 name: PR → develop
 
@@ -22,7 +23,8 @@ jobs:
   check:
     if: github.event.action != 'edited' || github.event.changes.base != null
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    # Unit tests ~5 min on the 2-core runner, E2E ~2 more (ADR 0008).
+    timeout-minutes: 14
     steps:
       - name: Require a release/X.Y.Z head branch
         env:
@@ -55,3 +57,34 @@ jobs:
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm test
+
+      # E2E (ADR 0008): Chromium only, the browser cached by Playwright's version.
+      - name: Playwright version
+        id: playwright
+        run: echo "version=$(pnpm exec playwright --version | cut -d' ' -f2)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+
+      - name: Install Chromium
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Install Chromium's system libraries
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: pnpm exec playwright install-deps chromium
+
+      # Builds the app and starts it on :3100 (playwright.config.ts).
+      - run: pnpm e2e
+
+      - name: Upload the Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
