@@ -46,6 +46,8 @@ values** (`bg-[#fff]`, `w-[37px]`).
 | Map | `map-sea` (= `muted`), `map-land` (= `card`), `map-hatch` |
 | shadcn component tokens | `secondary` (chips, `Button` `secondary`), `accent` (menu item hover and focus), `chart-1` … `chart-5` (chart series, §6); `sidebar-*` come with shadcn and are unused |
 | Map and heat-map scales (0.6.0; heat map in M4) | diverging `scale-div-1` … `scale-div-6` (orange · grey · blue), sequential `scale-seq-1` … `scale-seq-5` (blue); SVG fills read these source tokens, not `--color-*` aliases |
+| Heat-map cell text (0.8.0) | `scale-div-N-foreground`, `scale-seq-N-foreground`: black or white (`scale-ink-dark` / `scale-ink-light`), whichever reads on the step at ≥ 4.5:1 |
+| Radar series (0.8.0) | `series-1` … `series-4`: blue · teal · violet · wine, apart from the status hues; checked with the dataviz validator (CVD ΔE ≥ 9, ≥ 3:1 on the card) and paired with a dash pattern and a marker shape each |
 
 Rules:
 

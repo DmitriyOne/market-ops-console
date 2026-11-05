@@ -174,6 +174,27 @@
   --scale-seq-3: oklch(0.5485 0.16 257.02);
   --scale-seq-4: oklch(0.4387 0.1552 257.04);
   --scale-seq-5: oklch(0.3314 0.115 257.05);
+
+  /* Heat-map cell text: black or white, whichever reads on the step (≥ 4.5:1). */
+  --scale-ink-dark: oklch(0 0 0);
+  --scale-ink-light: oklch(1 0 0);
+  --scale-div-1-foreground: var(--scale-ink-light);
+  --scale-div-2-foreground: var(--scale-ink-dark);
+  --scale-div-3-foreground: var(--scale-ink-dark);
+  --scale-div-4-foreground: var(--scale-ink-dark);
+  --scale-div-5-foreground: var(--scale-ink-light);
+  --scale-div-6-foreground: var(--scale-ink-light);
+  --scale-seq-1-foreground: var(--scale-ink-dark);
+  --scale-seq-2-foreground: var(--scale-ink-dark);
+  --scale-seq-3-foreground: var(--scale-ink-light);
+  --scale-seq-4-foreground: var(--scale-ink-light);
+  --scale-seq-5-foreground: var(--scale-ink-light);
+
+  /* Radar series: categorical, checked with the dataviz validator (CVD, ≥ 3:1 on the card). */
+  --series-1: oklch(0.4496 0.1204 255.2);
+  --series-2: oklch(0.5992 0.1198 165.1);
+  --series-3: oklch(0.6002 0.1493 300.13);
+  --series-4: oklch(0.45 0.1194 5.21);
 }
 
 .dark {
@@ -241,6 +262,27 @@
   --scale-seq-3: oklch(0.691 0.13 256.89);
   --scale-seq-4: oklch(0.8094 0.0854 257.35);
   --scale-seq-5: oklch(0.9197 0.0346 256.34);
+
+  /* Heat-map cell text per step. */
+  --scale-ink-dark: oklch(0 0 0);
+  --scale-ink-light: oklch(1 0 0);
+  --scale-div-1-foreground: var(--scale-ink-dark);
+  --scale-div-2-foreground: var(--scale-ink-light);
+  --scale-div-3-foreground: var(--scale-ink-light);
+  --scale-div-4-foreground: var(--scale-ink-light);
+  --scale-div-5-foreground: var(--scale-ink-dark);
+  --scale-div-6-foreground: var(--scale-ink-dark);
+  --scale-seq-1-foreground: var(--scale-ink-light);
+  --scale-seq-2-foreground: var(--scale-ink-dark);
+  --scale-seq-3-foreground: var(--scale-ink-dark);
+  --scale-seq-4-foreground: var(--scale-ink-dark);
+  --scale-seq-5-foreground: var(--scale-ink-dark);
+
+  /* Radar series: categorical, checked with the dataviz validator (CVD, ≥ 3:1 on the card). */
+  --series-1: oklch(0.649 0.1503 255.09);
+  --series-2: oklch(0.6504 0.1199 165.11);
+  --series-3: oklch(0.5504 0.1499 299.87);
+  --series-4: oklch(0.5512 0.1501 5.01);
 }
 
 @layer base {
