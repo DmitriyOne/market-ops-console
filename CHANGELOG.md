@@ -2,13 +2,13 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/). The top version must match `package.json` and the `release/X.Y.Z` branch.
 
-## [1.0.0] - Unreleased
+## [1.0.0] - 2026-11-08
 
 ### Changed
 - README rewritten for reviewers, one block per section the brief asks for: try it in three minutes, quick start, architecture (layers, data flow diagram, server vs client state), decisions with what was considered, trust in AI output, productionising (performance, observability, resilience, CI/CD), accessibility, testing, key decisions, standards, AI workflow, what I'd do next. Screenshots in `docs/screenshots`.
 - The full feature list moved from the README to `docs/features.md`.
 
-## [0.16.0] - Unreleased
+## [0.16.0] - 2026-11-06
 
 ### Added
 - `POST /api/chat`, the path the starter pack's contract names, answers like `/api/v1/chat` (a rewrite; ADR 0012).
@@ -41,7 +41,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 - Assistant: Try again after a failed answer asks again in its place; the failed turn no longer stays above the new one. A stopped answer stays (it holds what had arrived).
 - Assistant: on a window as narrow as a phone, a source picked with the mouse no longer leaves its card over the header.
 
-## [0.15.0] - Unreleased
+## [0.15.0] - 2026-11-06
 
 ### Added
 - **Share link** at the end of the title row, on every level and in both modes: copies the address of the view (drill path, period, mode, selection, currency, open tab, language), says "Link copied", and points to the address bar if the browser blocks the clipboard. A share icon on phones.
@@ -50,7 +50,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 ### Changed
 - Node.js is pinned to 24.x (`engines`): Vercel no longer moves the build to a new major version on its own, the same Node as `.nvmrc` and CI.
 
-## [0.14.0] - Unreleased
+## [0.14.0] - 2026-11-06
 
 ### Added
 - Error monitoring with Sentry (ADR 0019): errors from the browser and the server, 10 % of traces in production, with the screen's language, mode, currency and tab on every event. Off without `NEXT_PUBLIC_SENTRY_DSN`. E2E runs it on with a DSN that points nowhere and checks what the browser would send.
@@ -66,13 +66,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 - Sentry's experimental Next.js flag (`clientTraceMetadata`) is removed: nothing experimental in production (ADR 0018).
 - No layout shift when the alert rules arrive: the status table's Alerts column keeps its width and shows a placeholder instead of "None" while they load, Top risks waits for them, and the mock API answers reads at once (writes still wait, to show "Saving…").
 
-## [0.13.1] - Unreleased
+## [0.13.1] - 2026-11-06
 
 ### Changed
 - Lint: the dataset is read only through `useDataset()` / `useDashboard()`, which convert to the chosen currency; the bare query (dollars) is allowed only where dollars or no amounts are needed (ADR 0017).
 - CI: the check on a pull request into `master` is named "Branch & version", like its `develop` counterpart (ADR 0007).
 
-## [0.13.0] - Unreleased
+## [0.13.0] - 2026-11-06
 
 ### Added
 - A title per page in its language ("Dashboard · Market Ops Console", "Page not found · …"), the description and a link preview (Open Graph, Twitter) in the page language (ADR 0018).
@@ -86,7 +86,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 - Lint checks plain `.ts` files and more announced attributes for text outside the dictionaries (ADR 0011).
 - Rule: no experimental Next.js features in production; so a path outside the app's routing (`/x.txt`) keeps Next's own 404.
 
-## [0.12.0] - Unreleased
+## [0.12.0] - 2026-11-06
 
 ### Added
 - Currency: amounts in US dollars, euros or British pounds, chosen in the header (desktop) or the ⚙︎ settings sheet (phone) and remembered in this browser. ECB rates of 5 November 2026 (1 USD = 0.89095 EUR = 0.74299 GBP), fixed in the code for this demo; a live app would get them from the backend API, and the menu says so. One rate for every month, so growth, attainment and share stay as they are. Everything that shows an amount converts: KPIs, charts, the markets table, heat map, radar, map and its revenue steps (round in the chosen currency), Top risks, the assistant's evidence cards, alerts (revenue thresholds typed in the chosen currency, stored in USD) and the Excel export (the About sheet names the rate and its date). CSV stays raw USD. The assistant's answer text is shown as received; when it quotes dollars in another currency, a line says so (ADR 0017).
@@ -100,7 +100,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 ### Fixed
 - Every dropdown (theme, language, currency, path, map metric, filter, Export) kept a focus ring on its button after a choice made with the mouse or a tap. Focus still goes back to the button, without the ring; with the keyboard the ring stays, so you see where you are.
 
-## [0.11.1] - Unreleased
+## [0.11.1] - 2026-11-05
 
 ### Changed
 - CI: each check is its own job, so it gets its own line and log in the pull request and they run side by side. Into a release branch: Format, Lint, Types. Into `develop`: Branch & version first, then Format, Lint, Types, Unit tests and E2E. Shorter to wait for (~4.5 min instead of ~7.5 into `develop`), more runner minutes (~13 instead of ~8; ~4 instead of ~2 into a release branch), well within the free plan.
@@ -112,7 +112,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 - Excel export: the total row has the share too, revenue-weighted like the table's, and it follows the Excel filter like the other totals. Blank where the table shows none (not the latest month, or a product).
 - CI: the Branch & version check (into `develop`) and the check into `master` failed at Node's setup, which since v5 caches pnpm's store on its own because `package.json` names pnpm, and these jobs install no pnpm. That cache is off for them now.
 
-## [0.11.0] - Unreleased
+## [0.11.0] - 2026-11-05
 
 ### Fixed
 - Alerts: with the panel open on desktop, a keyboard can't reach the toast (the panel keeps focus inside), so its Retry was mouse/touch only. A failed save now also shows in the rule's row ("Not saved. …", "Not deleted. …"; a new rule's above the list) with Retry and Dismiss, next after the switch for Tab; focus stays on the rule or the list afterwards. The row's Retry and the toast's are one action (pressing both sends it once) and the row's buttons close the toast; Dismiss forgets the rule's earlier failures too.
@@ -122,7 +122,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 - Screen readers: a heat-map cell no longer repeats its market and month ("Canada, Dec 2024: +12% (+11.7%)" → "+12% (+11.7%)"); the row and column headers say them, the month in full ("Dec 24" on screen). The table's ⚠ and bell popovers are named.
 - Map with a keyboard: the focus ring is drawn on top, not partly under neighbouring countries and the status patterns; Tab to a market outside a zoomed-in view moves the map to it, with its tooltip. A tap or a click shows neither the ring nor the move.
 
-## [0.10.0] - Unreleased
+## [0.10.0] - 2026-11-05
 
 ### Added
 - End-to-end tests (Playwright, `pnpm e2e`, `e2e/`), on a desktop and a phone (Pixel 7 emulation): the brief's happy path (Germany on the map, the suggested question streams token by token, a source opens Germany in March 2026) and German number formats; Back and Forward in a real browser (drill-down one level at a time, another market keeping the product, selected markets with the table, the alerts sheet leaving no step behind, heat-map focus kept in the grid); the phone tab bar; alerts on the real API (a new rule saving, kept after a reload; a failed save rolled back with its reason, then Retry); the assistant's error with Try again, its "can't answer" without sources, and Stop mid-answer keeping the words so far; a shared link opening the same view in a fresh browser, and the Executive/Analyst switch undone by Back; Excel and CSV export as real downloads of the rows shown; going offline and back; a failing alerts API with Try again; accessibility scans with axe (WCAG 2.1 A/AA) of Executive, Analyst, the alerts panel and the assistant with an answer. The suite builds the app and starts it on port 3100, so a dev server on 3000 keeps running; with `BASE_URL` it tests that address instead (a deployed preview).
@@ -135,7 +135,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 - The buttons in a toast (Retry after a failed alert save, Show after a saved one) could not be clicked while the alerts panel was open on desktop: the panel is modal and blocked clicks outside it. They work now, and pressing one keeps the panel open.
 - Screen readers and voice control: a heat-map cell's name now includes the figure it shows ("Canada, Dec 2024: +12% (+11.7%)"), and a market tile's name starts with its code and figure together ("US 100.5% attainment, United States, On track"). Found by the axe scans (WCAG 2.5.3, label in name).
 
-## [0.9.0] - Unreleased
+## [0.9.0] - 2026-11-05
 
 ### Added
 - Alerts: rules that flag markets whose figure crosses a threshold (growth, attainment, share or revenue; below or above; all markets, one region or chosen markets; warning or critical; on or off). Judged on each market's stored figures for the latest month (May 2026), whatever month the dashboard shows. A first visit starts with two example rules ("Attainment below 95%", critical: Germany, United Kingdom, Italy; "Share below 10%": United States, Germany, Australia), named in the page's language.
@@ -157,7 +157,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 - Closing a side sheet (alerts, phone settings) flashed twice: the dimmed, blurred backdrop faded in 100 ms and the panel in 200 ms; both now take 200 ms and leave in the same frame (measured in the browser).
 - The browser console no longer warns "Encountered a script tag while rendering React component": the scripts that mark the page before it is painted (collapsed assistant, phone tab, Analyst mode) go into the server HTML only.
 
-## [0.8.0] - Unreleased
+## [0.8.0] - 2026-11-05
 
 ### Added
 - Heat map in Analyst, full width under the markets table: the scope's markets × 24 months, coloured by the map's metric with the map's steps (one picker for both, also on the card); status and share have no months, so it shows growth YoY with a notice, which is where Germany's March 2026 dip shows (−31 %; as attainment it stays at 92 %, the forecast fell too). Whole numbers in the cells, one decimal and the anomaly note in the line under the grid, a ⚠ mark on anomaly cells, the selected window marked on the month headers and around its cells, selected markets marked in their row. One Tab stop and arrow keys; Enter or a click opens the market at that month (the window stays), Shift+click or Shift+Enter selects it; on a touch screen a tap shows the cell and the line under the grid has Open and Select (the line previews the hovered cell and otherwise keeps the one picked, so its buttons act on it). Scrolls sideways inside its card on a phone with the market column fixed, opened at the selected month. In a product view the anomaly note is called the whole market's (the data has no per-product notes). Table alternative with the anomaly marks and notes, remembered per browser.
@@ -168,7 +168,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 ### Changed
 - Analyst skeletons hold the radar and the heat map too, so an Analyst link does not grow on load.
 
-## [0.7.0] - Unreleased
+## [0.7.0] - 2026-11-05
 
 ### Added
 - Markets table in Analyst, full width under the map: every KPI per market of the scope (revenue, forecast, gap to forecast, attainment, prior year, growth, share, units, status), all calculated from monthly data so a row adds up and the total is the sum of the rows (share and status as stored; the tiles keep the stored KPIs), the country code, a ⚠ with the data's note when an anomaly falls in the window, a total of the rows shown, headers that sort (in the URL as `sort`, no history entry), a sticky market column on small screens, a market name that opens the market.
@@ -187,7 +187,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 - Checkbox items in menus show a dash, not a tick, when only part of a group is picked.
 - `markets` is one selection list for the assistant, the map, the tiles and the filter; "highlighted from the assistant" now reads "selected", and the open market reads "open now".
 
-## [0.6.0] - Unreleased
+## [0.6.0] - 2026-11-04
 
 ### Added
 - CI on PRs into `release/*`: format check, lint (ESLint + Steiger) and typecheck, no tests (ADR 0007).
@@ -202,7 +202,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 - Phone header: the app name is back on the first row next to ⚙︎; the path moves to its own row.
 - Moving to another market keeps the chosen product (map, tiles, top risks, top movers, breadcrumbs); picking the current market again in the breadcrumbs goes back up from the product.
 
-## [0.5.0] - Unreleased
+## [0.5.0] - 2026-11-04
 
 ### Added
 - Dashboard header: drill-down path `Portfolio › Region › Market › Product` (each step opens the list of its siblings; picking the current one goes back up to it), period, mode, language and theme; on phones the path and a ⚙︎ button that opens language, theme and "Reset view" in a bottom sheet (whole rows are the targets), period and mode below. Skeleton of the same shape in the static HTML.
@@ -269,7 +269,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 - The evidence popover closes when it sends a phone to the dashboard; the unread badge clears on Back.
 - The collapsed state stays in sync across tabs and with full storage.
 
-## [0.3.0] - Unreleased
+## [0.3.0] - 2026-11-03
 
 ### Added
 - Design direction (ADR 0014, owner decision): dashboard variant D (map console), assistant variant A; dashboard A is the fallback if time runs out.
@@ -277,7 +277,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 - `tokens.test.ts`: WCAG contrast check of every text pair (4.5:1) and control/chart pair (3:1) in both themes.
 - Fonts via `next/font`: Space Grotesk for text, JetBrains Mono for numbers (both SIL OFL 1.1); Cyrillic text uses the system font.
 
-## [0.2.0] - Unreleased
+## [0.2.0] - 2026-11-03
 
 ### Added
 - Next.js 16 app scaffold with TypeScript 6 (strict), Tailwind v4 + shadcn/ui (Radix), ESLint 10, Prettier, Steiger and Vitest.
@@ -292,7 +292,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 - Error handling (ADR 0013): domain errors (`ValidationError`, `NotFoundError`, `DataIntegrityError`), `withErrorHandling` for route handlers, SSE `error` event on stream failures, validated lazy loading of source data, central `logError` (routes, error boundaries, query/mutation caches), `WidgetBoundary` and `useErrorMessage`.
 - CI: PR guards for `develop` (release branches only; format, lint, typecheck, tests) and `master` (develop only; version check), `scripts/check-version.ts`.
 
-## [0.1.0] - Unreleased
+## [0.1.0] - 2026-11-03
 
 ### Added
 - Starter pack: dataset, assistant fixtures, streaming contract, reference SSE route.
