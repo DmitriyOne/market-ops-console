@@ -89,4 +89,5 @@ Run `format`, `lint`, `typecheck` and `test` before every commit (and `e2e` when
 
 - Write the README sections that ask for the owner's own reasoning (approach, decisions, AI usage, "what I'd do differently"). Draft structure only; the owner writes them.
 - Add Storybook, Redux/Zustand, Vercel AI SDK, husky, or a real backend.
+- Turn on an experimental Next.js feature (`experimental.*` in `next.config.ts`, or a file convention that needs one, such as `global-not-found`): nothing experimental goes to production (owner, 2026-11-06; ADR 0018).
 - Switch off or relax a lint rule (ESLint, Steiger, TypeScript) on your own. Fix the code, or ask the owner; approved exceptions are listed in the ADR.
