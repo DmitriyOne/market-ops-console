@@ -629,6 +629,8 @@
       "remove": "Nicht gelöscht. {reason}",
       "retry": "Erneut versuchen",
       "retryRule": "Erneut versuchen: {name}",
+      "fix": "Bearbeiten",
+      "fixRule": "Bearbeiten: {name}",
       "dismiss": "Ausblenden",
       "dismissRule": "Ausblenden: {name}"
     }

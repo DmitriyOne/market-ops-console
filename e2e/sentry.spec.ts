@@ -28,7 +28,7 @@ async function ask(page: Page, question: string) {
 // A 502 from a gateway: the server never saw it, so the browser reports it.
 // (A 500 with our own code is the server's to report: a breadcrumb here.)
 async function openAlertsWithTheApiDown(page: Page) {
-  await page.route('**/api/v1/alerts?*', (route) =>
+  await page.route('**/api/v1/alerts', (route) =>
     route.fulfill({ status: 502, body: 'Bad gateway' }),
   );
   await page.goto('/dashboard?tab=alerts');

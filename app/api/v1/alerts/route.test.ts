@@ -46,13 +46,16 @@ function client() {
 }
 
 describe('/api/v1/alerts', () => {
-  it('a first visit gets the two examples in the asked language, nothing stored', async () => {
+  it('a first visit gets the two examples as presets, nothing stored', async () => {
     const { send } = client();
-    const response = await send(GET, { query: '?locale=ru-RU' });
+    const response = await send(GET);
     expect(response.headers.get('set-cookie')).toBeNull();
     expect(response.headers.get('cache-control')).toBe('no-store');
     const { rules } = alertsResponseSchema.parse(await response.json());
-    expect(rules.map((r) => r.name)).toEqual(['Выполнение плана ниже 95%', 'Доля ниже 10%']);
+    expect(rules.map((r) => [r.preset, r.name])).toEqual([
+      ['attainment', 'Attainment below 95%'],
+      ['share', 'Share below 10%'],
+    ]);
   });
 
   it('an unreadable cookie is warned about once and cleared, not on every load', async () => {
@@ -65,14 +68,27 @@ describe('/api/v1/alerts', () => {
     warn.mockRestore();
   });
 
-  it('the first write keeps the examples in the language it names', async () => {
+  it('an example keeps its preset through a toggle; an edit from the form drops it', async () => {
     const c = client();
-    expect((await c.send(POST, { query: '?locale=ru-RU', body: input })).status).toBe(201);
-    expect((await c.list()).map((r) => r.name)).toEqual([
-      'Выполнение плана ниже 95%',
-      'Доля ниже 10%',
-      'Low growth',
-    ]);
+    const [example] = await c.list();
+    if (!example) throw new Error('no example');
+    const { id, ...stored } = example;
+    await c.send(PATCH, { query: `?id=${id}`, body: { ...stored, enabled: false } });
+    expect((await c.list())[0]).toMatchObject({ preset: 'attainment', enabled: false });
+
+    const edited: Partial<typeof stored> = { ...stored, name: 'Мой план' };
+    delete edited.preset;
+    await c.send(PATCH, { query: `?id=${id}`, body: edited });
+    expect((await c.list())[0]).toMatchObject({ name: 'Мой план' });
+    expect((await c.list())[0]?.preset).toBeUndefined();
+  });
+
+  it("an example's name is taken in every language, not only the stored English one", async () => {
+    const c = client();
+    for (const name of ['Выполнение плана ниже 95%', 'attainment BELOW 95%']) {
+      const response = await c.send(POST, { body: { ...input, name } });
+      expect(response.status).toBe(409);
+    }
   });
 
   it('creates, replaces and deletes, keeping the list in an httpOnly cookie', async () => {

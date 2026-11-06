@@ -7,7 +7,7 @@ import {
   useMutationState,
   useQueryClient,
 } from '@tanstack/react-query';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { useCallback, useMemo } from 'react';
 
 import {
@@ -17,6 +17,7 @@ import {
   ruleInCurrency,
   ruleInUsd,
   updateRule,
+  useRuleName,
 } from '@/entities/alert-rule';
 import {
   ALERT_ERROR_CODES,
@@ -46,6 +47,20 @@ type WriteVars = CreateVars | UpdateVars | RemoveVars;
 
 const isCode = (code: string | undefined): code is AlertErrorCode =>
   ALERT_ERROR_CODES.some((c) => c === code);
+
+/**
+ * The API refused the write itself (a taken name, ten rules, a rule deleted
+ * elsewhere): sending it again gets the same answer. Only the demo's
+ * simulated failure, a server fault or the network can pass on a Retry.
+ */
+const isRefused = (error: unknown): error is HttpError =>
+  error instanceof HttpError && isCode(error.code) && error.code !== 'simulated';
+
+function withoutPreset(rule: AlertRule): AlertRule {
+  const own = { ...rule };
+  delete own.preset;
+  return own;
+}
 
 /** The list as the API has it: revenue thresholds in USD. */
 function rules(client: QueryClient): AlertRule[] {
@@ -85,8 +100,8 @@ function revert(client: QueryClient, vars: WriteVars): void {
   }
 }
 
-async function send(vars: WriteVars, locale: string): Promise<AlertRule | null> {
-  const options = { locale, simulateFailure: takeSimulatedFailure() };
+async function send(vars: WriteVars): Promise<AlertRule | null> {
+  const options = { simulateFailure: takeSimulatedFailure() };
   if (vars.kind === 'create') return createRule(vars.input, options);
   if (vars.kind === 'update') {
     const { id, ...input } = vars.rule;
@@ -152,7 +167,6 @@ function retryWrite(
 export function useRuleMutations() {
   const client = useQueryClient();
   const t = useTranslations('alerts');
-  const locale = useLocale();
   const reason = useReason();
   const currency = useCurrency();
 
@@ -162,7 +176,7 @@ export function useRuleMutations() {
     // two in flight would each start from the old list and one would be
     // lost. The optimistic change (onMutate) still shows at once.
     scope: { id: 'alert-rules' },
-    mutationFn: (vars: WriteVars) => send(vars, locale),
+    mutationFn: send,
     onMutate: async (vars) => {
       // A list arriving now would overwrite the optimistic change.
       await client.cancelQueries({ queryKey: ALERTS_QUERY_KEY });
@@ -176,17 +190,24 @@ export function useRuleMutations() {
     },
     onError: (error, vars) => {
       revert(client, vars);
-      toast.error(
-        t('rollback', { reason: reason(error) }),
-        {
-          label: t('retry'),
-          onClick: () => {
-            // The write's own variables: the cache holds this very object.
-            retryWrite(client, mutation.mutate, targetOf(vars), (m) => m.state.variables === vars);
-          },
-        },
-        { id: toastId(targetOf(vars)) },
-      );
+      // A refused write gets no Retry: the panel offers Edit instead.
+      const retry = isRefused(error)
+        ? undefined
+        : {
+            label: t('retry'),
+            onClick: () => {
+              // The write's own variables: the cache holds this very object.
+              retryWrite(
+                client,
+                mutation.mutate,
+                targetOf(vars),
+                (m) => m.state.variables === vars,
+              );
+            },
+          };
+      toast.error(t('rollback', { reason: reason(error) }), retry, {
+        id: toastId(targetOf(vars)),
+      });
     },
     onSettled: () => {
       // This write still counts as running here.
@@ -213,10 +234,11 @@ export function useRuleMutations() {
           onSaved: shown(onSaved),
         });
       },
+      /** An edit from the form: the rule is the user's from now on, an example's preset goes. */
       update: (rule: AlertRule, onSaved?: OnSaved) => {
         const previous = rules(client).find((r) => r.id === rule.id);
         if (previous) {
-          const next = ruleInUsd(rule, currency, previous);
+          const next = withoutPreset(ruleInUsd(rule, currency, previous));
           mutate({ kind: 'update', rule: next, previous, onSaved: shown(onSaved) });
         }
       },
@@ -265,11 +287,20 @@ export type FailedWrite = {
   target: string;
   name: string;
   reason: string;
+  /** False when the API refused the write: Retry would get the same answer. */
+  retryable: boolean;
+  /**
+   * A refused new or edited rule: what it asked for, in the chosen currency,
+   * for the panel's Edit. Null otherwise.
+   */
+  fix: { input: AlertRuleInput; nameTaken: boolean } | null;
 };
 
 /** The writes to offer Retry for: per rule, the latest write, if it failed. */
 export function useFailedWrites(): readonly FailedWrite[] {
   const reason = useReason();
+  const nameOf = useRuleName();
+  const currency = useCurrency();
   const writes = useMutationState({
     filters: { mutationKey: WRITE_KEY },
     select: (m) => ({
@@ -293,13 +324,28 @@ export function useFailedWrites(): readonly FailedWrite[] {
       const name =
         vars.kind === 'create'
           ? vars.input.name
-          : vars.kind === 'update'
-            ? vars.previous.name
-            : vars.rule.name;
-      failed.push({ id: w.id, kind: vars.kind, target, name, reason: reason(w.error) });
+          : nameOf(vars.kind === 'update' ? vars.previous : vars.rule);
+      const refused = isRefused(w.error);
+      const asked = vars.kind === 'create' ? vars.input : vars.kind === 'update' ? vars.rule : null;
+      const fix =
+        asked && refused
+          ? {
+              input: ruleInCurrency(asked, currency),
+              nameTaken: w.error instanceof HttpError && w.error.code === 'duplicate_name',
+            }
+          : null;
+      failed.push({
+        id: w.id,
+        kind: vars.kind,
+        target,
+        name,
+        reason: reason(w.error),
+        retryable: !refused,
+        fix,
+      });
     }
     return failed;
-  }, [writes, reason]);
+  }, [writes, reason, nameOf, currency]);
 }
 
 /** Ids of rules with a write in flight, shown as "Saving…". */

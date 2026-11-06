@@ -4,7 +4,7 @@ import { BellIcon } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
 
 import { useFlaggedCount } from '@/features/configure-alerts';
-import { useSection } from '@/features/switch-section';
+import { ALERTS_TRIGGER_ATTR, useSection } from '@/features/switch-section';
 import { cn } from '@/shared/lib';
 import { Button } from '@/shared/ui';
 
@@ -20,6 +20,7 @@ export function AlertsButton({ className }: { className?: string }) {
       variant="ghost"
       className={cn('relative size-11', className)}
       aria-label={t('button', { count: count ?? 0 })}
+      {...{ [ALERTS_TRIGGER_ATTR]: '' }}
       onClick={() => {
         setSection('alerts');
       }}

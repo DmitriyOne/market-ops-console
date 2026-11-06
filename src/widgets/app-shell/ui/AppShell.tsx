@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { type ReactNode, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 
 import { useFlaggedCount } from '@/features/configure-alerts';
-import { SectionTabBar, useSection } from '@/features/switch-section';
+import { ALERTS_TRIGGER_ATTR, SectionTabBar, useSection } from '@/features/switch-section';
 import { cn, scrollMainToTop, useJoinParts, useMediaQuery } from '@/shared/lib';
 import {
   Button,
@@ -71,6 +71,9 @@ export function AppShell({ header, main, assistant, alerts }: AppShellProps) {
   // Focus moves to whichever of the two buttons is shown next.
   const collapseRef = useRef<HTMLButtonElement>(null);
   const expandRef = useRef<HTMLButtonElement>(null);
+  // What had focus when the alerts sheet opened: the sheet has no trigger of
+  // its own (the URL opens it), so it returns focus here by hand.
+  const alertsOpener = useRef<HTMLElement | null>(null);
 
   // The before-paint section mark is for the static page only; the URL rules from here.
   useEffect(() => {
@@ -211,7 +214,27 @@ export function AppShell({ header, main, assistant, alerts }: AppShellProps) {
           else setSection('overview', { history: 'replace' });
         }}
       >
-        <SheetContent aria-describedby={undefined} className="w-full overflow-y-auto sm:max-w-md">
+        <SheetContent
+          aria-describedby={undefined}
+          className="w-full overflow-y-auto sm:max-w-md"
+          onOpenAutoFocus={() => {
+            const active = document.activeElement;
+            alertsOpener.current = active instanceof HTMLElement ? active : null;
+          }}
+          onCloseAutoFocus={(event) => {
+            // Back to the button that opened it; after a link, or when that
+            // button is gone, to the bell.
+            const opener = alertsOpener.current;
+            alertsOpener.current = null;
+            const target =
+              opener?.isConnected && opener !== document.body
+                ? opener
+                : document.querySelector<HTMLElement>(`[${ALERTS_TRIGGER_ATTR}]`);
+            if (!target) return;
+            event.preventDefault();
+            target.focus();
+          }}
+        >
           <SheetHeader className="pr-14">
             <SheetTitle className="text-lg font-semibold">{t('alerts')}</SheetTitle>
           </SheetHeader>

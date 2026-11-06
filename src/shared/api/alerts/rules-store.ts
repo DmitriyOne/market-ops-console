@@ -1,10 +1,11 @@
 import { ConflictError, NotFoundError } from '@/shared/lib';
 
+import { ruleNameKeys } from './examples';
 import { type AlertRule, type AlertRuleInput, ALERTS_MAX, nameKey } from './schema';
 
 function assertUniqueName(rules: readonly AlertRule[], name: string, exceptId?: string): void {
   const key = nameKey(name);
-  if (rules.some((r) => r.id !== exceptId && nameKey(r.name) === key)) {
+  if (rules.some((r) => r.id !== exceptId && ruleNameKeys(r).has(key))) {
     throw new ConflictError('duplicate_name', 'A rule with this name already exists.');
   }
 }

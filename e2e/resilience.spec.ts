@@ -27,7 +27,7 @@ test('offline: one notice over the page, gone when the network is back', async (
 });
 
 test('the alerts API failing: the panel says so, Try again loads the rules', async ({ page }) => {
-  await page.route('**/api/v1/alerts?*', (route) =>
+  await page.route('**/api/v1/alerts', (route) =>
     route.fulfill({ status: 500, json: { error: { code: 'internal', message: 'Down.' } } }),
   );
   await page.goto('/dashboard?tab=alerts');
@@ -35,7 +35,7 @@ test('the alerts API failing: the panel says so, Try again loads the rules', asy
   const failed = sheet.getByRole('alert');
   await expect(failed).toContainText("Couldn't load your rules.");
 
-  await page.unroute('**/api/v1/alerts?*');
+  await page.unroute('**/api/v1/alerts');
   await failed.getByRole('button', { name: 'Try again' }).click();
   await expect(sheet.getByRole('region', { name: /^Firing now/ })).toBeVisible();
   await expect(sheet.getByRole('alert')).toHaveCount(0);

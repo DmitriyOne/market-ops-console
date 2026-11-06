@@ -85,3 +85,22 @@ test('a failed save offers Retry in the row, reachable by keyboard inside the mo
   await sheet.getByRole('radio', { name: /^Rules/ }).click();
   await expect(sheet.getByRole('switch', { name: 'Rule on: Share below 10%' })).not.toBeChecked();
 });
+
+test('Escape closes the sheet and gives focus back to the bell', async ({ page }) => {
+  await page.goto('/dashboard');
+  const bell = page.getByRole('banner').getByRole('button', { name: /^Alerts/ });
+  await bell.focus();
+  await page.keyboard.press('Enter');
+  const sheet = page.getByRole('dialog', { name: 'Alerts' });
+  await expect(sheet).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(sheet).toBeHidden();
+  await expect(bell).toBeFocused();
+
+  // Opened by a link there is no opener: focus still lands on the bell.
+  await page.goto('/dashboard?tab=alerts');
+  await expect(sheet).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(sheet).toBeHidden();
+  await expect(bell).toBeFocused();
+});

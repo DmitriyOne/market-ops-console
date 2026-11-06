@@ -18,6 +18,14 @@ export const THRESHOLD_LIMITS: Record<AlertMetric, { min: number; max: number }>
   revenue: { min: 0, max: Number.MAX_SAFE_INTEGER },
 };
 
+/**
+ * The first visit's example rules. A rule with a preset is shown under the
+ * preset's name in the page's language; editing it in the form drops the
+ * preset, and the name the user saved is theirs from then on.
+ */
+export const ALERT_PRESETS = ['attainment', 'share'] as const;
+export type AlertPreset = (typeof ALERT_PRESETS)[number];
+
 export const ALERTS_MAX = 10;
 export const ALERT_NAME_MAX = 60;
 
@@ -46,6 +54,7 @@ const ruleFields = z.object({
   scope: alertScopeSchema,
   severity: z.enum(ALERT_SEVERITIES),
   enabled: z.boolean(),
+  preset: z.enum(ALERT_PRESETS).optional(),
 });
 
 /** The threshold must fit its metric; the message is a translation key. */

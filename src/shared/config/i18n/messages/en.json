@@ -629,6 +629,8 @@
       "remove": "Not deleted. {reason}",
       "retry": "Retry",
       "retryRule": "Retry: {name}",
+      "fix": "Edit",
+      "fixRule": "Edit: {name}",
       "dismiss": "Dismiss",
       "dismissRule": "Dismiss: {name}"
     }
