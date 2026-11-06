@@ -132,3 +132,11 @@ Points the owner wants explained in the README, in his own words:
 - **Every console line goes to Sentry Logs** (owner's choice, ADR 0019): a library's message or a stray debug `console.log` with personal data would reach Sentry, and lint cannot see it. Guarded by the rule in CLAUDE.md and the E2E question check. A `beforeSendLog` filter (by level or by a known-safe prefix) would narrow it. **Owner, revisit before production**.
 - **`HeatMap` test "the default Analyst view shows growth by month…" failed once** in a full run with `MarketsTable`'s known flaky test, and passes alone and in two full reruns: flaky under load. **Watch**.
 
+
+## From 0.16.0 (production check, 2026-11-06)
+- **Escape within ~50 ms of the bell opening the sheet** goes Back before nuqs has written `?tab=alerts`, so it leaves the dashboard. No person presses that fast; the E2E waits for the address and focus first (seen only under 6 parallel workers). Fix if it ever shows: close with `replace` when the address does not have `tab=alerts` yet.
+- **Phone, Russian, 320 px wide** (iPhone SE): the period button shows "май 20…" (the mode switch, "Руководитель", takes the rest); the full period is its name and in the picker. 360 px and up fit in every language.
+- **Small countries on the phone map** (Germany 8×9 px, UK, Italy): below 24 px, allowed by WCAG 2.5.8's "equivalent" exception (Tiles and Table do the same with full-size targets). Next: a tap in a dense area zooms in first; or a note under the map pointing to Tiles.
+- **Unknown query keys** (`?lang=xx`, `utm_*`) stay in the URL on purpose: campaign tags must survive; only the dashboard's own keys are repaired.
+- **German compact amounts**: `74.374,7 €` next to `-341.028 €` while Russian shows `74,4 тыс. €`: CLDR has no compact form for thousands in German ("Mio." starts at a million). Correct as is.
+- **Mobile LCP 5.5 s in Lighthouse (Performance 68; desktop 99)**: the LCP element is the line under the title, rendered only after hydration because it depends on the URL (static HTML shows a skeleton). Next: render the URL-independent part of the title row in the static HTML (the default view's text, replaced only when the URL differs), and split the dashboard's client JS further (main chunk boots in ~1.2 s on 4× CPU). Measured numbers: `docs/requirements-map.md`.
