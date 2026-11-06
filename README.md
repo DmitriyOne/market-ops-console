@@ -11,6 +11,12 @@ Take-home assignment for the Frontend Engineer role at NewPage Solutions.
 
 **Live:** https://df-market-ops-console.vercel.app · **Every brief requirement, where it is and how to check it:** [`docs/requirements-map.md`](docs/requirements-map.md) · **Full feature list:** [`docs/features.md`](docs/features.md)
 
+## A few words from me
+
+> **About the language.** English is not my first language, and I am not fluent yet. The parts of this README marked *In my own words* I said in Ukrainian, and they were translated into English with an AI tool, as close to word for word as possible. The AI only translated what I said; it did not write it for me. These are my thoughts and my feelings.
+>
+> It was a very interesting product. Of course, quite a big one. But I really enjoyed building it, and I got carried away by it. It was very nice to have this opportunity. I hope we get to meet and talk more. If you have any feedback at all, I will be glad to hear it, because I really put a lot of effort and time into this.
+
 | | |
 |---|---|
 | ![Executive view with an answer from the assistant: sources and confidence](docs/screenshots/executive-assistant.jpg) | ![Analyst view in dark mode: three markets selected on the map, growth metric](docs/screenshots/analyst-dark.jpg) |
@@ -24,12 +30,6 @@ Take-home assignment for the Frontend Engineer role at NewPage Solutions.
 </p>
 
 Phone, in German: the Europe overview, and the assistant refusing a question the data cannot answer.
-
-## A few words from me
-
-> **About the language.** English is not my first language, and I am not fluent yet. The parts of this README marked *In my own words* I said in Ukrainian, and they were translated into English with an AI tool, as close to word for word as possible. The AI only translated what I said; it did not write it for me. These are my thoughts and my feelings.
->
-> It was a very interesting product. Of course, quite a big one. But I really enjoyed building it, and I got carried away by it. It was very nice to have this opportunity. I hope we get to meet and talk more. If you have any feedback at all, I will be glad to hear it, because I really put a lot of effort and time into this.
 
 ## Contents
 
