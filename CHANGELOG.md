@@ -27,7 +27,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 ### Added
 - A title per page in its language ("Dashboard · Market Ops Console", "Page not found · …"), the description and a link preview (Open Graph, Twitter) in the page language (ADR 0018).
 - Favicon: the M logo, light or dark with the browser's scheme; an iPhone icon and `favicon.ico`.
-- A link preview image, one per language (logo, name, description). It resolves once the site is deployed (0.14.0).
+- A link preview image, one per language (logo, name, description). It resolves once the site is deployed (0.15.0).
 - `robots.txt`: the console stays closed to search engines (no crawling, `noindex` on every page), so there is no sitemap.
 
 ### Changed

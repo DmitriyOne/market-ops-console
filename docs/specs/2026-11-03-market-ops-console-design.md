@@ -33,7 +33,7 @@ The brief (`.docx`) is kept outside the repo on purpose. Its "What your build mu
 | Component/integration tests + one E2E happy path | §12 |
 | Deployed link, README sections a–k, screenshots | outside this spec |
 
-Owner additions beyond the brief: four locales with translated UI, dark mode, phone tab bar, cookie-backed alert API.
+Owner additions beyond the brief: four locales with translated UI, dark mode, phone tab bar, cookie-backed alert API, currency picker (0.12.0), error monitoring with Sentry (0.14.0, ADR 0019).
 
 ## 1. Intent
 
@@ -108,6 +108,7 @@ Verified by script on 2026-11-03.
 | `/api/v1/data` | serves validated `data.json` [call] |
 | `/api/v1/alerts` | mock alert rules API (cookie-backed) |
 | `not-found`, `error`, `global-error` | localised 404 and error pages (see §11a) |
+| `/[locale]/sentry-test`, `/api/v1/sentry-test` | Sentry test page and its API, a 404 unless `ENABLE_SENTRY_TEST_PAGE` is set (local only; ADR 0019) **[owner, 2026-11-06]** |
 
 Locale prefix `as-needed`: `/dashboard` is `en-GB`; `/de-DE/dashboard`, `/en-US/dashboard`, `/ru-RU/dashboard` (ADR 0010).
 
@@ -247,6 +248,8 @@ Four suggested questions (buttons) taken from the brief: risks this quarter, Ger
 - `/api/v1/chat` (stream): 10 s to the first event, then 15 s maximum gap between events (idle timeout); no total limit, so long answers are not cut. A timed-out stream ends in the error state with Retry; partial text is kept and labelled incomplete.
 - TanStack Query: queries retry once on network/timeout errors, never on 4xx or parse errors; mutations never retry (rollback instead).
 
+**Error monitoring** (0.14.0, owner, ADR 0019). Every error the app logs goes to Sentry through `logError` / `logWarning` / `logEvent`; expected failures stay breadcrumbs; no IP, cookies, headers, bodies or question text; events go through our own `/monitoring` path.
+
 **Offline guard.** `features/network-status`: `navigator.onLine` + `online`/`offline` events via `useSyncExternalStore`. When offline, a full-screen guard ("You're offline — we'll reconnect automatically", Retry button) covers the app; the app stays mounted underneath so chat history, form drafts and URL state survive [call: overlay, not unmount]. It disappears on the `online` event. Caveat noted in README: `navigator.onLine` only reports the network interface, so a request can still fail while "online"; that case is handled by the timeouts/errors above.
 
 **Error and status pages** (all localised, same visual system):
@@ -265,6 +268,7 @@ Unit: SSE parsing, schemas, selectors, formatters, chat reducer, discrepancy rul
 - `world-atlas` (`countries-110m.json`, served locally, no CDN) for map shapes; `topojson-client` comes with `react-simple-maps`.
 - `exceljs` (0.7.0) for the Excel export of the markets table, loaded only when a file is made (its own ~256 KB gzip chunk, not in the first load) **[owner, 2026-11-04]**.
 - `sonner` (shadcn toast) for the rollback message, answer-feedback thanks and a failed copy **[2026-11-04]**.
+- `@sentry/nextjs` (0.14.0) for error monitoring and traces, off without a DSN, no personal data (ADR 0019) **[owner, 2026-11-06]**.
 
 ## 14. Cut line if time runs short **[owner]**
 

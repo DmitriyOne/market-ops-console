@@ -29,6 +29,9 @@ second copy of the same rules would drift from it on the first edit.
   raw colours, no arbitrary Tailwind values. See `DESIGN.md`.
 - **Network in tests goes through MSW** (`@/shared/lib/test`); an
   unmocked request fails the test.
+- **Errors and events only through `logError` / `logWarning` / `logEvent`**
+  (`@/shared/lib`); they feed Sentry, never with personal data or the
+  question text; lint blocks a direct Sentry import (ADR 0019).
 - **Deferred review findings** go to `docs/plans/backlog.md`, not only
   into a report.
 
