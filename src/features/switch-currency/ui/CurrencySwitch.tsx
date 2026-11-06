@@ -4,7 +4,7 @@ import { ChevronRightIcon } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
 import { type ReactNode, useId } from 'react';
 
-import { CURRENCIES, CURRENCY_SYMBOLS, RATES_DATE, USD_RATES } from '@/shared/config';
+import { CURRENCIES, CURRENCY_SYMBOLS, isCurrency, RATES_DATE, USD_RATES } from '@/shared/config';
 import { useCurrencyChoice, useJoinParts } from '@/shared/lib';
 import {
   Button,
@@ -34,8 +34,7 @@ function CurrencyMenu({ children, onPick }: { children: ReactNode; onPick?: () =
         <DropdownMenuRadioGroup
           value={currency}
           onValueChange={(value) => {
-            const choice = CURRENCIES.find((c) => c === value);
-            if (choice) setCurrency(choice);
+            if (isCurrency(value)) setCurrency(value);
             onPick?.();
           }}
         >

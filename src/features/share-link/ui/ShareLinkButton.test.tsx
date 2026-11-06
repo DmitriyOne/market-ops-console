@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { enMessages as en, formats } from '@/shared/config';
 import { Toaster } from '@/shared/ui';
 
-import { ShareLinkButton } from './ShareLinkButton';
+import { ShareLinkButton, ShareLinkButtonSkeleton } from './ShareLinkButton';
 
 vi.mock('@wrksz/themes/client', () => ({
   useTheme: () => ({ theme: 'light', resolvedTheme: 'light', setTheme: vi.fn() }),
@@ -13,6 +13,11 @@ vi.mock('@wrksz/themes/client', () => ({
 
 const t = en.shareLink;
 const writeText = vi.fn<(text: string) => Promise<void>>();
+
+/** jsdom has no clipboard: put one on `navigator` for a test, and take it off after. */
+function setClipboard(clipboard: { writeText: typeof writeText } | undefined) {
+  Object.defineProperty(navigator, 'clipboard', { value: clipboard, configurable: true });
+}
 
 function setup() {
   render(
@@ -34,15 +39,16 @@ async function click(button: HTMLElement) {
 describe('ShareLinkButton', () => {
   beforeEach(() => {
     writeText.mockReset().mockResolvedValue(undefined);
-    Object.assign(navigator, { clipboard: { writeText } });
-    window.history.replaceState(null, '', '/dashboard?region=eu&market=de&mode=analyst');
+    setClipboard({ writeText });
+    window.history.replaceState(null, '', '/dashboard?region=eu&market=de&mode=analyst#main');
   });
   afterEach(() => {
     vi.useRealTimers();
+    Reflect.deleteProperty(navigator, 'clipboard');
     window.history.replaceState(null, '', '/');
   });
 
-  it('copies the whole address, view state included, and says so', async () => {
+  it('copies the whole address, view state included and the in-page anchor dropped, and says so', async () => {
     const button = setup();
     await click(button);
     expect(writeText).toHaveBeenCalledWith(
@@ -76,5 +82,31 @@ describe('ShareLinkButton', () => {
     await click(setup());
     expect(await screen.findByText(t.failed)).toBeInTheDocument();
     expect(screen.queryByText(t.copied)).not.toBeInTheDocument();
+  });
+
+  it('reads "Link copied" out again on a repeat click', async () => {
+    const button = setup();
+    await click(button);
+    const first = screen.getByText(t.copied);
+    await click(button);
+    // A new node in the live region: screen readers announce it again.
+    expect(screen.getByText(t.copied)).not.toBe(first);
+  });
+
+  it('a browser without the clipboard API (plain http) gets the same hint', async () => {
+    setClipboard(undefined);
+    await click(setup());
+    // sonner keeps the previous test's toast in its store; one more is enough.
+    expect((await screen.findAllByText(t.failed)).length).toBeGreaterThan(0);
+    expect(screen.queryByText(t.copied)).not.toBeInTheDocument();
+  });
+
+  it('the skeleton holds the label (hidden) so it is as wide as the button', () => {
+    render(
+      <NextIntlClientProvider locale="en-GB" messages={en} formats={formats} timeZone="UTC">
+        <ShareLinkButtonSkeleton />
+      </NextIntlClientProvider>,
+    );
+    expect(screen.getByText(t.button, { ignore: '' })).toHaveClass('invisible');
   });
 });
