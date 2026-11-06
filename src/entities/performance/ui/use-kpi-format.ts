@@ -4,6 +4,7 @@ import { useFormatter, useTranslations } from 'next-intl';
 import { useCallback } from 'react';
 
 import type { Period } from '@/shared/api';
+import { useJoinParts } from '@/shared/lib';
 
 import type { ResolvedCitation } from '../model/citation';
 import type { KpiValue } from '../model/kpis';
@@ -13,6 +14,7 @@ import { periodToDate } from '../model/period';
 export function useKpiFormat() {
   const format = useFormatter();
   const t = useTranslations('dataCheck');
+  const join = useJoinParts();
   const dash = t('noStatus');
 
   const value = (
@@ -31,9 +33,8 @@ export function useKpiFormat() {
 
   /** "Veltrix · Germany · Mar 2026"; the period only when it is not `omitPeriod`. */
   const scopeName = (r: ResolvedCitation, omitPeriod?: Period) => {
-    const parts = [r.names.product, r.names.market ?? r.names.region].filter(Boolean);
-    const name = parts.length > 0 ? parts.join(' · ') : t('portfolio');
-    return r.period === omitPeriod ? name : `${name} · ${period(r.period)}`;
+    const name = join([r.names.product, r.names.market ?? r.names.region]) || t('portfolio');
+    return r.period === omitPeriod ? name : join([name, period(r.period)]);
   };
 
   return { value, percent, signedPercent, period, scopeName };

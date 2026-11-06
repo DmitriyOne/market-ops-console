@@ -32,6 +32,7 @@ type MapTooltipProps = {
 export function MapTooltip({ item, metric, tip, onOpen, onToggle, onClose }: MapTooltipProps) {
   const t = useTranslations('marketStatus');
   const tKpi = useTranslations('kpi');
+  const tCommon = useTranslations('common');
   const m = useMapFormat();
   const { ds } = useDashboard();
   const flag = useAlertFlags(ds).byMarket.get(item.id);
@@ -78,7 +79,9 @@ export function MapTooltip({ item, metric, tip, onOpen, onToggle, onClose }: Map
           <span className="text-muted-foreground">{m.metricLabel(m.valueMetric(metric))}</span>
           <span className="font-mono tabular-nums">{m.value(metric, item.value)}</span>
           {item.value.source === 'calculated' ? (
-            <span className="text-muted-foreground">· {tKpi('calculated')}</span>
+            <span className="text-muted-foreground">
+              {tCommon('after', { text: tKpi('calculated') })}
+            </span>
           ) : null}
         </p>
         {item.status ? (

@@ -3,7 +3,7 @@
 import { LayoutDashboardIcon, MicroscopeIcon } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
 
-import { marketsInScope, periodToDate, scopeLabel, useDashboard } from '@/entities/performance';
+import { marketsInScope, periodToDate, useDashboard, useScopeLabel } from '@/entities/performance';
 import { cn } from '@/shared/lib';
 import { Skeleton } from '@/shared/ui';
 
@@ -17,6 +17,7 @@ export function ScopeTitle() {
   const tDrill = useTranslations('drill');
   const format = useFormatter();
   const { ds, state } = useDashboard();
+  const scopeLabel = useScopeLabel();
   const title = scopeLabel(ds, state.scope) ?? tDrill('portfolio');
   const analyst = state.mode === 'analyst';
   const ModeIcon = analyst ? MicroscopeIcon : LayoutDashboardIcon;

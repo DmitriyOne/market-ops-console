@@ -3,7 +3,16 @@
     "appName": "Market Ops Console",
     "skipToContent": "Перейти к содержимому",
     "description": "Продажи по рынкам, продуктам и периодам и ИИ-ассистент, который показывает источники.",
-    "close": "Закрыть"
+    "close": "Закрыть",
+    "titleTemplate": "{page} · {appName}",
+    "separator": " · ",
+    "after": "· {text}",
+    "srAfter": ", {text}",
+    "separatorMark": "·"
+  },
+  "meta": {
+    "dashboard": "Панель",
+    "ogAlt": "{appName}. {description}"
   },
   "errors": {
     "timeout": "Запрос выполнялся слишком долго. Попробуйте ещё раз.",
@@ -24,12 +33,14 @@
   "notFound": {
     "title": "Страница не найдена",
     "body": "Такой страницы нет, или она была перемещена.",
-    "home": "Вернуться к панели"
+    "home": "Вернуться к панели",
+    "address": "<label>Адрес не найден:</label> {path}"
   },
   "errorPage": {
     "title": "Что-то пошло не так",
     "body": "Не удалось показать страницу. Попробуйте ещё раз или вернитесь к панели.",
-    "home": "Вернуться к панели"
+    "home": "Вернуться к панели",
+    "errorId": "Код ошибки: {id}"
   },
   "theme": {
     "label": "Тема",
@@ -406,7 +417,10 @@
     "revenueUnit": "Выручка в {currency, select, EUR {евро} GBP {фунтах стерлингов} other {долларах США}}.",
     "anomalyMarket": "аномалия по рынку в целом: {note}",
     "anomalies": "Аномалии",
-    "anomalyMark": "аномалия"
+    "anomalyMark": "аномалия",
+    "readout": "{metric} {value}",
+    "anomalyItem": "{month}: {note}",
+    "cellWithNote": "{value}, {note}"
   },
   "radar": {
     "title": "Сравнение",
@@ -463,7 +477,8 @@
       "code": "Код",
       "anomaly": "Аномалия",
       "month": "Месяц",
-      "actual": "Факт"
+      "actual": "Факт",
+      "anomalyItem": "{period}: {note}"
     },
     "about": {
       "source": "Источник",
@@ -574,7 +589,8 @@
         "regionRequired": "Выберите регион.",
         "marketsRequired": "Выберите хотя бы один рынок."
       },
-      "back": "Назад"
+      "back": "Назад",
+      "thresholdWithUnit": "Порог, {unit}"
     },
     "preview": {
       "label": "Предпросмотр",

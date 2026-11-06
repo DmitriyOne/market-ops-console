@@ -30,7 +30,7 @@ Format: **Item**: what is wrong (file). Why it can wait. Where it goes.
 
 ## From the owner check of 0.5.0 (2026-11-04)
 
-- **No favicon**: every page requests `/favicon.ico` and gets a 404 (console error in the browser). Add an `app/icon.svg` (or `favicon.ico`) in the app's style. **0.13.0, with the deploy** (owner, 2026-11-05: together with the title, description and preview image; the 0.12.0 `Logo` is the mark to reuse).
+- **No favicon**: every page requests `/favicon.ico` and gets a 404 (console error in the browser). **Done in 0.13.0** (ADR 0018), with titles, descriptions and the preview image; the deploy moved to 0.14.0.
 
 ## README notes (owner, 2026-11-04)
 
@@ -84,7 +84,7 @@ Points the owner wants explained in the README, in his own words:
 
 ## From the 0.10.0 E2E build (2026-11-05)
 
-- **The E2E run on Vercel previews** (`deployment_status`, `BASE_URL` = the preview URL, filtered to `release/*` previews to spare minutes; protection bypass or Trusted Sources) comes with the deploy. **0.13.0** (0.12.0 became the currency picker, owner 2026-11-05).
+- **The E2E run on Vercel previews** (`deployment_status`, `BASE_URL` = the preview URL, filtered to `release/*` previews to spare minutes; protection bypass or Trusted Sources) comes with the deploy. **0.14.0** (0.12.0 became the currency picker, 0.13.0 metadata and error pages; owner 2026-11-06).
 - **The phone tab's name reads "Alerts , 5 markets flagged"** in Chromium (a space before the comma from the inline count). Screen readers ignore it. Cosmetic.
 
 ## From the 0.11.0 review (2026-11-05)
@@ -108,3 +108,13 @@ Points the owner wants explained in the README, in his own words:
 - **A market near a revenue break may change colour with the currency** (steps stay round in the chosen currency, owner's choice). **Accepted**.
 - **From the 0.12.0 review — a USD rule edited in EUR or GBP shows six decimals** ("1.113688" M€): exact and round-trips, but reads oddly. Showing two decimals would need the keep-the-stored-dollars check to compare at that precision. **Owner's call**.
 - **From the 0.12.0 review — nothing stops a new raw dataset reader**: `datasetQueryOptions` is still exported, so a future `useQuery(datasetQueryOptions)` would show USD with no failing test. A `no-restricted-imports` rule (allowing `DatasetGate` and the CSV export) or a `useUsdDataset` would close it. **Owner's call** (a new lint rule).
+
+## From 0.13.0 (metadata and error pages, 2026-11-06)
+
+- **The server HTML of a localised 404 is Next's empty error shell** (`<html id="__next_error__">`, no `lang`, an empty `<body>`, the general title): without JavaScript, or if it fails, the page is blank. Not new: the 0.12.0 build is the same (0.13.0 review). Cause not established; to look at: the dynamic `[...rest]` catch-all, no top-level `app/layout.tsx` / `app/not-found.tsx`. Status 404 is correct. **Open**.
+- **The 404 and 500 titles are set on the client** (React `<title>`, two `<title>` elements, the first wins). Next's metadata cannot be localised in `not-found`. **Accepted**.
+- **`MarketsTable` test "a market the alert rules flag has a bell" failed once** in a full run and passes alone (10/10): flaky under load. **Watch**.
+- **The Inter files are full fonts** (~325 KB each, only the preview image uses them). Subsetting to Latin + Cyrillic is optional. **Accepted**.
+- **A path outside the app's routing** (`/x.txt`, `/api/unknown`) gets Next's own English 404: the localised one needs `global-not-found`, an experimental flag (owner: none in production). **Accepted**.
+- **The preview image's URL is `localhost`** until 0.14.0 sets `NEXT_PUBLIC_SITE_URL` or Vercel provides its domain. **0.14.0**.
+

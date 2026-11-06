@@ -183,7 +183,7 @@ export function RuleForm({ ds, initial, others, editing, onSubmit, onCancel }: R
 
       <FormField
         id={id('threshold')}
-        label={`${t('form.threshold')}, ${unit}`}
+        label={t('form.thresholdWithUnit', { unit })}
         hint={metric === 'revenue' ? t('form.revenueHint', { currency }) : undefined}
         error={thresholdError}
       >

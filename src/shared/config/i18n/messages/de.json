@@ -3,7 +3,16 @@
     "appName": "Market Ops Console",
     "skipToContent": "Zum Inhalt springen",
     "description": "Vertriebsleistung nach Markt, Produkt und Zeitraum, mit einem KI-Assistenten, der seine Quellen zeigt.",
-    "close": "Schließen"
+    "close": "Schließen",
+    "titleTemplate": "{page} · {appName}",
+    "separator": " · ",
+    "after": "· {text}",
+    "srAfter": ", {text}",
+    "separatorMark": "·"
+  },
+  "meta": {
+    "dashboard": "Dashboard",
+    "ogAlt": "{appName}. {description}"
   },
   "errors": {
     "timeout": "Die Anfrage hat zu lange gedauert. Bitte versuchen Sie es erneut.",
@@ -24,12 +33,14 @@
   "notFound": {
     "title": "Seite nicht gefunden",
     "body": "Die gesuchte Seite existiert nicht oder wurde verschoben.",
-    "home": "Zurück zum Dashboard"
+    "home": "Zurück zum Dashboard",
+    "address": "<label>Nicht gefundene Adresse:</label> {path}"
   },
   "errorPage": {
     "title": "Etwas ist schiefgelaufen",
     "body": "Diese Seite konnte nicht angezeigt werden. Versuchen Sie es erneut oder kehren Sie zum Dashboard zurück.",
-    "home": "Zurück zum Dashboard"
+    "home": "Zurück zum Dashboard",
+    "errorId": "Fehler-ID: {id}"
   },
   "theme": {
     "label": "Design",
@@ -406,7 +417,10 @@
     "revenueUnit": "Umsatz in {currency, select, EUR {Euro} GBP {Britischen Pfund} other {US-Dollar}}.",
     "anomalyMarket": "Auffälligkeit im ganzen Markt: {note}",
     "anomalies": "Auffälligkeiten",
-    "anomalyMark": "Auffälligkeit"
+    "anomalyMark": "Auffälligkeit",
+    "readout": "{metric} {value}",
+    "anomalyItem": "{month}: {note}",
+    "cellWithNote": "{value}, {note}"
   },
   "radar": {
     "title": "Vergleich",
@@ -463,7 +477,8 @@
       "code": "Code",
       "anomaly": "Anomalie",
       "month": "Monat",
-      "actual": "Ist"
+      "actual": "Ist",
+      "anomalyItem": "{period}: {note}"
     },
     "about": {
       "source": "Quelle",
@@ -574,7 +589,8 @@
         "regionRequired": "Wählen Sie eine Region.",
         "marketsRequired": "Wählen Sie mindestens einen Markt."
       },
-      "back": "Zurück"
+      "back": "Zurück",
+      "thresholdWithUnit": "Schwelle, {unit}"
     },
     "preview": {
       "label": "Vorschau",

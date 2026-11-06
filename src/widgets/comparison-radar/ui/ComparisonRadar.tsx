@@ -2,7 +2,7 @@
 
 import { ChartPieIcon, TableIcon } from 'lucide-react';
 import dynamic from 'next/dynamic';
-import { useTranslations } from 'next-intl';
+import { useFormatter, useTranslations } from 'next-intl';
 import { useId, useMemo } from 'react';
 
 import {
@@ -55,6 +55,7 @@ const MIN_AXES = 3;
 export function ComparisonRadar() {
   const t = useTranslations('radar');
   const tPeriod = useTranslations('period');
+  const format = useFormatter();
   const titleId = useId();
   const k = useKpiFormat();
   const f = useRadarFormat();
@@ -70,7 +71,10 @@ export function ComparisonRadar() {
 
   const chartable = view.axes.length >= MIN_AXES;
   const asTable = asTableStored || !chartable;
-  const names = view.series.map((s) => s.name).join(', ');
+  const names = format.list(
+    view.series.map((s) => s.name),
+    { type: 'conjunction' },
+  );
   const window =
     range === '1m'
       ? k.period(period)

@@ -9,3 +9,4 @@ export {
 } from './currency';
 export { env } from './env';
 export * from './i18n';
+export { siteUrl } from './site-url';

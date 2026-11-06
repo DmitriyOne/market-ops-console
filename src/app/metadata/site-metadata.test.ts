@@ -4,13 +4,31 @@ import { siteMetadata } from './site-metadata';
 
 describe('siteMetadata', () => {
   it.each([
-    ['en-GB', 'Market Ops Console', 'Sales performance'],
-    ['de-DE', 'Market Ops Console', 'Vertriebsleistung'],
-    ['ru-RU', 'Market Ops Console', 'Продажи'],
-  ] as const)('%s has a translated title and description', (locale, title, description) => {
+    ['en-GB', 'Sales performance'],
+    ['de-DE', 'Vertriebsleistung'],
+    ['ru-RU', 'Продажи'],
+  ] as const)('%s has a translated title template and description', (locale, description) => {
     const meta = siteMetadata(locale);
-    expect(meta.title).toEqual({ default: title, template: `%s · ${title}` });
+    expect(meta.title).toEqual({
+      default: 'Market Ops Console',
+      template: '%s · Market Ops Console',
+    });
     expect(String(meta.description)).toContain(description);
+  });
+
+  it('describes the link preview in the page language', () => {
+    const meta = siteMetadata('de-DE');
+    expect(meta.openGraph).toMatchObject({
+      type: 'website',
+      siteName: 'Market Ops Console',
+      locale: 'de_DE',
+    });
+    expect(String(meta.openGraph?.description)).toContain('Vertriebsleistung');
+    expect(meta.twitter).toMatchObject({ card: 'summary_large_image' });
+  });
+
+  it('gives relative image URLs an absolute base', () => {
+    expect(String(siteMetadata('en-GB').metadataBase)).toBe('http://localhost:3000/');
   });
 
   it('keeps the internal console out of search engines', () => {

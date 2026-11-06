@@ -12,16 +12,20 @@ export function getProduct(ds: Dataset, id: string): Product | undefined {
   return ds.products.find((p) => p.id === id);
 }
 
-/** "Veltrix · Germany", "Europe", or null for the whole portfolio. Names stay English like the data. */
-export function scopeLabel(
+/**
+ * The names a scope is made of: `["Veltrix", "Germany"]`, `["Europe"]`, or
+ * none for the whole portfolio. Names stay English like the data; the UI
+ * joins them (`useScopeLabel`).
+ */
+export function scopeParts(
   ds: Dataset,
   scope: { regionId?: string; marketId?: string; productId?: string },
-): string | null {
+): string[] {
   const product = scope.productId ? getProduct(ds, scope.productId)?.name : undefined;
   const place = scope.marketId
     ? getMarket(ds, scope.marketId)?.name
     : scope.regionId
       ? getRegion(ds, scope.regionId)?.name
       : undefined;
-  return [product, place].filter(Boolean).join(' · ') || null;
+  return [product, place].filter((n): n is string => Boolean(n));
 }

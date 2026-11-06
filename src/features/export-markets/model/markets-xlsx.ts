@@ -1,10 +1,10 @@
 import type { Worksheet } from 'exceljs';
 
 import type { MarketsTableView, MonthlyRow, Range, TableColumn } from '@/entities/performance';
-import type { MarketStatus, Period } from '@/shared/api';
+import type { Anomaly, MarketStatus, Period } from '@/shared/api';
 import { type Currency, CURRENCY_SYMBOLS, DEFAULT_CURRENCY } from '@/shared/config';
 
-import { anomalyText, marketsCsvName } from './markets-csv';
+import { marketsCsvName } from './markets-csv';
 
 /** Words for the workbook in the UI language; numbers carry their own formats. */
 export type MarketsSheetLabels = {
@@ -15,6 +15,8 @@ export type MarketsSheetLabels = {
   status: (status: MarketStatus) => string;
   code: string;
   anomaly: string;
+  /** The anomaly cell: each one with its month, in the UI language (the notes are the data's). */
+  anomalies: (list: readonly Anomaly[]) => string | null;
   total: string;
   month: string;
   actual: string;
@@ -220,7 +222,7 @@ export async function marketsXlsx(
       fraction(r.sharePct.value),
       r.units.value,
       r.status ? labels.status(r.status) : null,
-      anomalyText(r.anomalies),
+      labels.anomalies(r.anomalies),
     ]),
   );
   for (let row = FIRST; row <= last; row += 1) {

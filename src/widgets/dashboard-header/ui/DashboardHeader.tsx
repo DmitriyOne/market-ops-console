@@ -47,7 +47,7 @@ function AppName({ live = false }: { live?: boolean }) {
     >
       <Logo />
       {t('appName')}
-      <span className="sr-only">{`, ${tHeader('resetView')}`}</span>
+      <span className="sr-only">{t('srAfter', { text: tHeader('resetView') })}</span>
     </ResetViewLink>
   );
 }
