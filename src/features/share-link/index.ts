@@ -1,1 +1,1 @@
-export { CopyLinkButton, CopyLinkButtonSkeleton } from './ui/CopyLinkButton';
+export { ShareLinkButton, ShareLinkButtonSkeleton } from './ui/ShareLinkButton';

@@ -26,10 +26,10 @@ describe('ScopeTitle', () => {
     expect(screen.getByText('13 markets · 5 products · latest data May 2026')).toBeInTheDocument();
   });
 
-  it('has Copy link next to the title', async () => {
+  it('has Share link next to the title', async () => {
     setup('?region=eu');
     await screen.findByRole('heading', { level: 1, name: 'Europe' });
-    expect(screen.getByRole('button', { name: 'Copy link' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Share link' })).toBeInTheDocument();
   });
 
   it('region', async () => {

@@ -4,14 +4,14 @@ import { LayoutDashboardIcon, MicroscopeIcon } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
 
 import { marketsInScope, periodToDate, useDashboard, useScopeLabel } from '@/entities/performance';
-import { CopyLinkButton, CopyLinkButtonSkeleton } from '@/features/share-link';
+import { ShareLinkButton, ShareLinkButtonSkeleton } from '@/features/share-link';
 import { cn } from '@/shared/lib';
 import { Skeleton } from '@/shared/ui';
 
 /**
  * "Veltrix · Germany" and what the scope holds; names stay English like the
  * data. The view's name sits next to it with what it adds, so a switch of
- * mode shows at the top, not only far below (owner, 2026-11-05). Copy link
+ * mode shows at the top, not only far below (owner, 2026-11-05). Share link
  * sits at the row's end, on every level and in both modes (owner, 2026-11-06).
  */
 export function ScopeTitle() {
@@ -51,7 +51,7 @@ export function ScopeTitle() {
           })}
         </p>
       </div>
-      <CopyLinkButton />
+      <ShareLinkButton />
     </div>
   );
 }
@@ -67,7 +67,7 @@ export function ScopeTitleSkeleton() {
         <Skeleton className="h-4 w-96 max-w-full" />
         <Skeleton className="h-4 w-72 max-w-full" />
       </div>
-      <CopyLinkButtonSkeleton />
+      <ShareLinkButtonSkeleton />
     </div>
   );
 }

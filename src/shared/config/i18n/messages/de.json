@@ -685,7 +685,7 @@
     }
   },
   "shareLink": {
-    "button": "Link kopieren",
+    "button": "Link teilen",
     "copied": "Link kopiert",
     "failed": "Link konnte nicht kopiert werden. Bitte aus der Adresszeile kopieren."
   }

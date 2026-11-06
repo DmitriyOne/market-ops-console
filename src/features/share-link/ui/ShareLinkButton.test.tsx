@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { enMessages as en, formats } from '@/shared/config';
 import { Toaster } from '@/shared/ui';
 
-import { CopyLinkButton } from './CopyLinkButton';
+import { ShareLinkButton } from './ShareLinkButton';
 
 vi.mock('@wrksz/themes/client', () => ({
   useTheme: () => ({ theme: 'light', resolvedTheme: 'light', setTheme: vi.fn() }),
@@ -17,7 +17,7 @@ const writeText = vi.fn<(text: string) => Promise<void>>();
 function setup() {
   render(
     <NextIntlClientProvider locale="en-GB" messages={en} formats={formats} timeZone="UTC">
-      <CopyLinkButton />
+      <ShareLinkButton />
       <Toaster />
     </NextIntlClientProvider>,
   );
@@ -31,7 +31,7 @@ async function click(button: HTMLElement) {
   });
 }
 
-describe('CopyLinkButton', () => {
+describe('ShareLinkButton', () => {
   beforeEach(() => {
     writeText.mockReset().mockResolvedValue(undefined);
     Object.assign(navigator, { clipboard: { writeText } });
@@ -49,7 +49,7 @@ describe('CopyLinkButton', () => {
       `${window.location.origin}/dashboard?region=eu&market=de&mode=analyst`,
     );
     expect(screen.getByText(t.copied)).toBeInTheDocument();
-    // The name stays "Copy link": it is still the same action.
+    // The name stays "Share link": it is still the same action.
     expect(button).toHaveAccessibleName(t.button);
   });
 

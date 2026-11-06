@@ -1,6 +1,6 @@
 'use client';
 
-import { CheckIcon, LinkIcon } from 'lucide-react';
+import { CheckIcon, Share2Icon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState } from 'react';
 
@@ -10,12 +10,12 @@ import { Button, Skeleton, toast } from '@/shared/ui';
 const COPIED_MS = 2000;
 
 /**
- * Copies the page's address: the URL holds the whole view (drill path,
- * period, mode, selection, open tab), so a colleague opening it sees the
- * same screen. The currency and the language are each viewer's own and are
- * not in it. An icon on phones, an icon with its name from `sm` up.
+ * Share link: copies the page's address. The URL holds the whole view (drill
+ * path, period, mode, selection, open tab) and the language prefix, so a
+ * colleague opening it sees the same screen. An icon on phones, an icon with
+ * its name from `sm` up.
  */
-export function CopyLinkButton({ className }: { className?: string }) {
+export function ShareLinkButton({ className }: { className?: string }) {
   const t = useTranslations('shareLink');
   const [copied, setCopied] = useState(false);
   // One timer: a second click restarts the 2 s instead of being cut short by the first.
@@ -54,7 +54,7 @@ export function CopyLinkButton({ className }: { className?: string }) {
           void onCopy();
         }}
       >
-        {copied ? <CheckIcon aria-hidden /> : <LinkIcon aria-hidden />}
+        {copied ? <CheckIcon aria-hidden /> : <Share2Icon aria-hidden />}
         <span className="sr-only sm:not-sr-only">{t('button')}</span>
       </Button>
       <span aria-live="polite" className="sr-only">
@@ -64,6 +64,6 @@ export function CopyLinkButton({ className }: { className?: string }) {
   );
 }
 
-export function CopyLinkButtonSkeleton() {
+export function ShareLinkButtonSkeleton() {
   return <Skeleton aria-hidden className="size-11 shrink-0 sm:w-32" />;
 }

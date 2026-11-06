@@ -43,11 +43,11 @@ test('settings sheet: the currency row switches amounts to pounds and closes the
   );
 });
 
-test('Copy link is an icon next to the title, a 44 px target', async ({ page }) => {
+test('Share link is an icon next to the title, a 44 px target', async ({ page }) => {
   await page.goto('/dashboard?region=eu&market=de');
-  const button = page.getByRole('button', { name: 'Copy link' });
+  const button = page.getByRole('button', { name: 'Share link' });
   await expect(button).toBeVisible();
-  await expect(button.getByText('Copy link')).not.toBeInViewport();
+  await expect(button.getByText('Share link')).not.toBeInViewport();
   const box = await button.boundingBox();
   expect(box?.width).toBe(44);
   expect(box?.height).toBe(44);

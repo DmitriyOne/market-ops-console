@@ -685,7 +685,7 @@
     }
   },
   "shareLink": {
-    "button": "Copy link",
+    "button": "Share link",
     "copied": "Link copied",
     "failed": "Couldn't copy the link. Copy it from the address bar."
   }
