@@ -73,6 +73,35 @@ describe('AppShell', () => {
     vi.restoreAllMocks();
   });
 
+  it('phone: scrolling down hides the period row; back on Overview it shows again', async () => {
+    viewport(false);
+    const { user, container } = setup();
+    const header = container.querySelector('header');
+    const main = screen.getByRole('main');
+    const scrollMain = (top: number) => {
+      act(() => {
+        main.scrollTop = top;
+        main.dispatchEvent(new Event('scroll'));
+      });
+    };
+    scrollMain(400);
+    expect(header).toHaveAttribute('data-controls-hidden');
+    scrollMain(300);
+    expect(header).not.toHaveAttribute('data-controls-hidden');
+    scrollMain(600);
+    expect(header).toHaveAttribute('data-controls-hidden');
+
+    await user.click(screen.getByRole('button', { name: /^Assistant/ }));
+    await user.click(screen.getByRole('button', { name: 'Overview' }));
+    expect(header).not.toHaveAttribute('data-controls-hidden');
+  });
+
+  it('phone: the dashboard scrolls a focused control to below the period row', () => {
+    viewport(false);
+    setup();
+    expect(screen.getByRole('main')).toHaveClass('max-lg:scroll-pt-controls');
+  });
+
   it('has a skip link to the main content', () => {
     viewport(true);
     setup();

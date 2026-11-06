@@ -14,6 +14,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 - Analyst on wide screens: the map stays in view while Top risks and the radar next to it scroll, so a pick on the map and the radar it changes are seen together.
 
 ### Fixed
+- Phone: a control focused by keyboard is scrolled to below the period row, not under it (WCAG 2.4.11); back on Overview, or turned from desktop to phone, the row shows again instead of staying hidden by an earlier scroll.
+- Heat map with a mouse: the line under the grid only reads the cell out; its Open and Select buttons, which changed under the mouse on the way down to them, are for touch screens, where a tap shows the cell. A tap where a mouse is the main pointer opens, as a click does.
 - A hand-typed currency in another case (`?currency=eur`) is written as `EUR`, not dropped to USD; the repair is logged once per link, not once per widget.
 - The radar's axis names (Momentum, Attainment, Выполнение плана) are no longer cut off in a narrow card.
 - Alerts: the example rules are named in the page's language in every language, also after a switch (they carry a preset; an edit from the form makes the name the user's). Before, they kept the language of the first visit, and the first save after a switch could clash with an example's name in another language.

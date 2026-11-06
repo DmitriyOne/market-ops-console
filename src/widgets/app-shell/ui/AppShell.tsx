@@ -40,9 +40,11 @@ const FRAME = 'flex h-dvh flex-col bg-background';
 // `relative`: screen-reader-only text inside is placed against the scroll
 // area, not the page, so it cannot stretch the page below the tab bar.
 // Phone: positioned above the dashboard, so its period and mode row can lie
-// over the dashboard's top; the dashboard starts that row lower (`pt-controls`).
+// over the dashboard's top; the dashboard starts that row lower (`pt-controls`),
+// and a control focused by keyboard is scrolled to below it (`scroll-pt-controls`,
+// WCAG 2.4.11: focus not hidden by the row).
 const HEADER = 'border-b border-border max-lg:relative max-lg:z-10';
-const MAIN = 'relative min-w-0 flex-1 overflow-y-auto max-lg:pt-controls';
+const MAIN = 'relative min-w-0 flex-1 overflow-y-auto max-lg:scroll-pt-controls max-lg:pt-controls';
 /** Scrolled less than this, the period and mode row stays put (a jittery thumb). */
 const SCROLL_STEP = 8;
 /** Near the top the row always shows: it covers the dashboard's first lines otherwise. */
@@ -107,6 +109,13 @@ export function AppShell({ header, main, assistant, alerts }: AppShellProps) {
   // Phone: scrolling the dashboard down slides the period and mode row away,
   // scrolling up brings it back (owner, 2026-11-06).
   const [scrolledDown, setScrolledDown] = useState(false);
+  // Back on Overview, or turned from desktop to phone: the row shows until the
+  // next scroll down, not hidden by a scroll from before.
+  const [scrollFor, setScrollFor] = useState({ desktop, section });
+  if (scrollFor.desktop !== desktop || scrollFor.section !== section) {
+    setScrollFor({ desktop, section });
+    setScrolledDown(false);
+  }
   useEffect(() => {
     if (desktop || !mainArea) return;
     let last = mainArea.scrollTop;

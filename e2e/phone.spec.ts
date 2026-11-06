@@ -92,7 +92,11 @@ test('the period shows in full when it fits, as the month over "12 мес." when
 }) => {
   const shown = page.getByRole('banner').getByRole('button', { name: /^(Period|Период): / });
   await page.goto('/dashboard?range=12m');
-  await expect(shown).toContainText('May 2026 · 12 months');
+  // `filter({ visible })`: the invisible copy it is measured with holds the full label too.
+  await expect(
+    shown.getByText('May 2026 · 12 months', { exact: true }).filter({ visible: true }),
+  ).toBeVisible();
+  await expect(shown.getByText('12 mo', { exact: true }).filter({ visible: true })).toHaveCount(0);
 
   await page.setViewportSize({ width: 320, height: 700 });
   await page.goto('/ru-RU/dashboard?range=12m');
@@ -101,4 +105,42 @@ test('the period shows in full when it fits, as the month over "12 мес." when
   await expect(
     shown.getByText('май 2026 г. · 12 месяцев', { exact: true }).filter({ visible: true }),
   ).toHaveCount(0);
+});
+
+test('a control focused by keyboard is not hidden under the period row (WCAG 2.4.11)', async ({
+  page,
+}) => {
+  await page.goto('/dashboard?region=eu&market=de');
+  const share = page.getByRole('button', { name: 'Share link' });
+  const row = page.getByRole('button', { name: /^Period: / }).locator('xpath=..');
+  await expect(share).toBeVisible();
+  // Half of it above the top edge: the browser then scrolls only as far as it
+  // must (a control far off screen Chrome would centre, hiding the problem).
+  await share.evaluate((el) => {
+    const area = document.getElementById('main');
+    if (!area) return;
+    const offset = el.getBoundingClientRect().top - area.getBoundingClientRect().top;
+    area.scrollTop += offset + el.getBoundingClientRect().height / 2;
+  });
+  // Focus scrolls the dashboard back up; the row comes back with it.
+  await share.focus();
+  await expect(row).toHaveCSS('opacity', '1');
+  const [s, r] = [await share.boundingBox(), await row.boundingBox()];
+  expect(s?.y ?? 0, 'below the row').toBeGreaterThanOrEqual((r?.y ?? 0) + (r?.height ?? 0) - 1);
+});
+
+test('heat map on a phone: a tap shows the cell, Open under the grid opens it', async ({
+  page,
+}) => {
+  await page.goto('/dashboard?mode=analyst&region=eu');
+  const grid = page.getByRole('grid', { name: /by market and month/ });
+  const germany = grid
+    .getByRole('row')
+    .filter({ has: page.getByRole('rowheader', { name: /^Germany/ }) });
+  await germany.getByRole('button').last().tap();
+  const open = page.getByRole('button', { name: /^Open Germany, May 2026/ });
+  await expect(open).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'Europe' })).toBeVisible();
+  await open.tap();
+  await expect(page.getByRole('heading', { level: 1, name: 'Germany' })).toBeVisible();
 });
