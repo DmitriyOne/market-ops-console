@@ -12,7 +12,8 @@
   },
   "meta": {
     "dashboard": "Панель",
-    "ogAlt": "{appName}. {description}"
+    "ogAlt": "{appName}. {description}",
+    "sentryTest": "Тест Sentry"
   },
   "errors": {
     "timeout": "Запрос выполнялся слишком долго. Попробуйте ещё раз.",
@@ -631,6 +632,55 @@
       "retryRule": "Повторить: {name}",
       "dismiss": "Скрыть",
       "dismissRule": "Скрыть: {name}"
+    }
+  },
+  "sentryTest": {
+    "title": "Тестовая страница Sentry",
+    "intro": "Каждая кнопка отправляет в Sentry один вид ошибки или сигнала. Страница есть только там, где задана ENABLE_SENTRY_TEST_PAGE; в остальных местах это 404.",
+    "off": "Sentry здесь выключен: NEXT_PUBLIC_SENTRY_DSN не задан. Кнопки всё равно падают, но ничего не отправляется.",
+    "sent": "Готово: {label}. Смотрите в Sentry, раздел {place}.",
+    "apiResult": "Тестовый API ответил {status}. Смотрите в Sentry, раздел Issues.",
+    "items": {
+      "clientError": {
+        "label": "Ошибка на клиенте",
+        "hint": "Падает в обработчике клика; её ловит SDK.",
+        "place": "Issues"
+      },
+      "renderError": {
+        "label": "Ошибка рендера",
+        "hint": "Компонент падает при отрисовке; её записывает экран ошибки.",
+        "place": "Issues"
+      },
+      "handled": {
+        "label": "Обработанная ошибка",
+        "hint": "Записана через logError; страница остаётся как есть.",
+        "place": "Issues"
+      },
+      "rejection": {
+        "label": "Необработанный promise",
+        "hint": "Promise отклоняется, и его никто не ловит.",
+        "place": "Issues"
+      },
+      "warning": {
+        "label": "Предупреждение",
+        "hint": "logWarning: сообщение уровня warning.",
+        "place": "Issues"
+      },
+      "apiError": {
+        "label": "Ошибка API",
+        "hint": "Тестовый API падает на сервере и отвечает 500.",
+        "place": "Issues"
+      },
+      "serverError": {
+        "label": "Ошибка серверного рендера",
+        "hint": "Открывает страницу, Server Component которой падает.",
+        "place": "Issues"
+      },
+      "trace": {
+        "label": "Трейс",
+        "hint": "Span на 300 мс через traceSpan.",
+        "place": "Traces"
+      }
     }
   }
 }

@@ -12,7 +12,8 @@
   },
   "meta": {
     "dashboard": "Dashboard",
-    "ogAlt": "{appName}. {description}"
+    "ogAlt": "{appName}. {description}",
+    "sentryTest": "Sentry-Test"
   },
   "errors": {
     "timeout": "Die Anfrage hat zu lange gedauert. Bitte versuchen Sie es erneut.",
@@ -631,6 +632,55 @@
       "retryRule": "Erneut versuchen: {name}",
       "dismiss": "Ausblenden",
       "dismissRule": "Ausblenden: {name}"
+    }
+  },
+  "sentryTest": {
+    "title": "Sentry-Testseite",
+    "intro": "Jede Schaltfläche schickt eine Art von Fehler oder Signal an Sentry. Die Seite gibt es nur, wo ENABLE_SENTRY_TEST_PAGE gesetzt ist; überall sonst ist sie ein 404.",
+    "off": "Sentry ist hier aus: NEXT_PUBLIC_SENTRY_DSN ist nicht gesetzt. Die Schaltflächen schlagen trotzdem fehl, gesendet wird nichts.",
+    "sent": "Erledigt: {label}. In Sentry unter {place} nachsehen.",
+    "apiResult": "Die Test-API hat mit {status} geantwortet. In Sentry unter Issues nachsehen.",
+    "items": {
+      "clientError": {
+        "label": "Client-Fehler",
+        "hint": "Wirft in einem Klick-Handler; das SDK fängt ihn ab.",
+        "place": "Issues"
+      },
+      "renderError": {
+        "label": "Render-Fehler",
+        "hint": "Eine Komponente wirft beim Rendern; die Fehlerseite protokolliert ihn.",
+        "place": "Issues"
+      },
+      "handled": {
+        "label": "Behandelter Fehler",
+        "hint": "Über logError protokolliert; die Seite bleibt, wie sie ist.",
+        "place": "Issues"
+      },
+      "rejection": {
+        "label": "Unbehandelte Ablehnung",
+        "hint": "Ein Promise wird abgelehnt, und nichts fängt es ab.",
+        "place": "Issues"
+      },
+      "warning": {
+        "label": "Warnung",
+        "hint": "logWarning: eine Meldung mit Stufe warning.",
+        "place": "Issues"
+      },
+      "apiError": {
+        "label": "API-Fehler",
+        "hint": "Die Test-API wirft auf dem Server und antwortet mit 500.",
+        "place": "Issues"
+      },
+      "serverError": {
+        "label": "Server-Render-Fehler",
+        "hint": "Öffnet eine Seite, deren Server Component wirft.",
+        "place": "Issues"
+      },
+      "trace": {
+        "label": "Trace",
+        "hint": "Ein Span von 300 ms über traceSpan.",
+        "place": "Traces"
+      }
     }
   }
 }
