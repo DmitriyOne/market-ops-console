@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';
 
 import { type AlertRuleInput, alertRuleResponseSchema, alertsResponseSchema } from '@/shared/api';
+import { encodeRules } from '@/shared/api/server';
 
 import { DELETE, GET, PATCH, POST } from './route';
 
@@ -89,6 +90,55 @@ describe('/api/v1/alerts', () => {
       const response = await c.send(POST, { body: { ...input, name } });
       expect(response.status).toBe(409);
     }
+  });
+
+  it('a list stored by 0.15 (examples without a preset, named in Russian) gets the presets back', async () => {
+    const c = client();
+    const base = { operator: 'below', scope: { kind: 'portfolio' }, enabled: true } as const;
+    const old = encodeRules([
+      {
+        ...base,
+        id: 'example-attainment',
+        name: 'Выполнение плана ниже 95%',
+        metric: 'attainment',
+        threshold: 95,
+        severity: 'critical',
+      },
+      // Renamed by the user before 0.16: theirs, not the example's.
+      {
+        ...base,
+        id: 'example-share',
+        name: 'Моя доля',
+        metric: 'share',
+        threshold: 10,
+        severity: 'warning',
+      },
+    ]);
+    const response = await c.send(GET, { headers: { cookie: `mo-alerts=${old}` } });
+    const { rules } = alertsResponseSchema.parse(await response.json());
+    expect(rules.map((r) => [r.id, r.preset])).toEqual([
+      ['example-attainment', 'attainment'],
+      ['example-share', undefined],
+    ]);
+    // Its English name is taken too, as for a list stored by 0.16.
+    const dup = await c.send(POST, {
+      headers: { cookie: `mo-alerts=${old}` },
+      body: { ...input, name: 'Attainment below 95%' },
+    });
+    expect(dup.status).toBe(409);
+  });
+
+  it('a write cannot give a rule a preset that is not its own', async () => {
+    const c = client();
+    const created = await c.send(POST, { body: { ...input, preset: 'attainment' } });
+    const { rule } = alertRuleResponseSchema.parse(await created.json());
+    expect(rule.preset).toBeUndefined();
+    const { id, ...fields } = rule;
+    const changed = await c.send(PATCH, {
+      query: `?id=${id}`,
+      body: { ...fields, preset: 'share' },
+    });
+    expect(alertRuleResponseSchema.parse(await changed.json()).rule.preset).toBeUndefined();
   });
 
   it('creates, replaces and deletes, keeping the list in an httpOnly cookie', async () => {

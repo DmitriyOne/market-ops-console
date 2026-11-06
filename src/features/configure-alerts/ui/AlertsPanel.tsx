@@ -26,9 +26,13 @@ export const ALERT_TABS = ['firing', 'rules'] as const;
 export type AlertTab = (typeof ALERT_TABS)[number];
 const isTab = (value: string): value is AlertTab => ALERT_TABS.some((t) => t === value);
 
-/** `fix`: back from a refused write, the form starts from what it asked for. */
+/**
+ * `fixId`: back from a refused write (its mutation id), the form starts from
+ * what it asked for. The id, not the write: looked up on each render, so a
+ * currency change shows its numbers in the new currency.
+ */
 type Form =
-  { kind: 'new'; fix?: FailedWrite } | { kind: 'edit'; rule: AlertRule; fix?: FailedWrite } | null;
+  { kind: 'new'; fixId?: number } | { kind: 'edit'; rule: AlertRule; fixId?: number } | null;
 
 type AlertsPanelProps = {
   /** What the rules flag now (the "Firing" tab's content). */
@@ -84,7 +88,8 @@ export function AlertsPanel({ firing, tab, onTabChange, onSaved }: AlertsPanelPr
     // The rule as the list has it now: in the current currency.
     const editing =
       form.kind === 'edit' ? (list.find((r) => r.id === form.rule.id) ?? form.rule) : null;
-    const { fix } = form;
+    const fix: FailedWrite | undefined =
+      form.fixId === undefined ? undefined : failed.find((f) => f.id === form.fixId);
     return (
       <div className="flex flex-col gap-3">
         <Button type="button" variant="ghost" className="h-11 self-start" onClick={closeForm}>
@@ -213,8 +218,8 @@ export function AlertsPanel({ firing, tab, onTabChange, onSaved }: AlertsPanelPr
               const rule = list.find((r) => r.id === failed.target);
               setForm(
                 failed.kind === 'update' && rule
-                  ? { kind: 'edit', rule, fix: failed }
-                  : { kind: 'new', fix: failed },
+                  ? { kind: 'edit', rule, fixId: failed.id }
+                  : { kind: 'new', fixId: failed.id },
               );
             }}
           />

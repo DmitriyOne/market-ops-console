@@ -5,8 +5,10 @@ import { type RefObject, useLayoutEffect, useState } from 'react';
 /**
  * Whether `probe` (an invisible copy of the full text) is wider than `box`,
  * the room the text has. Measured before paint and again whenever the room
- * changes, so the choice follows the real width in every language, not a
- * breakpoint. False until measured (and in tests, which have no layout).
+ * or the text's own width changes (the web font arriving after the first
+ * paint makes the same text wider), so the choice follows the real width in
+ * every language, not a breakpoint. False until measured (and in tests,
+ * which have no layout).
  */
 export function useOverflows(
   box: RefObject<HTMLElement | null>,
@@ -24,6 +26,7 @@ export function useOverflows(
     check();
     const observer = new ResizeObserver(check);
     observer.observe(room);
+    observer.observe(full);
     return () => {
       observer.disconnect();
     };

@@ -78,16 +78,22 @@ export function RuleList({
   };
   const dismiss = (f: FailedWrite) => {
     onDismiss(f);
-    focusTo.current = f.kind === 'create' ? LIST : f.target;
+    focusTo.current = above.includes(f) ? LIST : f.target;
   };
   const failedFor = new Map(failed.filter((f) => f.kind !== 'create').map((f) => [f.target, f]));
-  const created = failed.filter((f) => f.kind === 'create');
+  // Above the list: a new rule's failure (it has no row), and one whose rule
+  // is gone (deleted elsewhere: `not_found`), else it would show nowhere.
+  const above = failed.filter((f) => f.kind === 'create' || !rules.some((r) => r.id === f.target));
 
   return (
     <div ref={root} className="flex flex-col gap-3">
-      {created.map((f) => (
+      {above.map((f) => (
         <FailedLine key={f.id} failed={f} onRetry={retry} onDismiss={dismiss} onFix={onFix}>
-          {t('failed.create', { name: f.name, reason: f.reason })}
+          {/* No row to stand by: the line names the rule. */}
+          {t(f.kind === 'remove' ? 'failed.remove' : 'failed.create', {
+            name: f.name,
+            reason: f.reason,
+          })}
         </FailedLine>
       ))}
       {rules.length === 0 ? (

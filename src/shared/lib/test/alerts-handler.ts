@@ -87,6 +87,10 @@ export function alertsApi(initial: readonly AlertRule[] = EXAMPLE_RULES) {
   return {
     handlers,
     rules: () => rules,
+    /** Deletes a rule behind the page's back (another tab). */
+    remove: (id: string) => {
+      rules = rules.filter((r) => r.id !== id);
+    },
     failNext: () => {
       fail = true;
     },

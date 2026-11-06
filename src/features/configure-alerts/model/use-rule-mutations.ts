@@ -41,7 +41,14 @@ const WRITE_KEY = ['alerts', 'write'] as const;
  */
 type OnSaved = (rule: AlertRule) => void;
 type CreateVars = { kind: 'create'; input: AlertRuleInput; tempId: string; onSaved?: OnSaved };
-type UpdateVars = { kind: 'update'; rule: AlertRule; previous: AlertRule; onSaved?: OnSaved };
+/** `from`: the form (an edit) or the list's switch (a toggle). */
+type UpdateVars = {
+  kind: 'update';
+  from: 'form' | 'toggle';
+  rule: AlertRule;
+  previous: AlertRule;
+  onSaved?: OnSaved;
+};
 type RemoveVars = { kind: 'remove'; rule: AlertRule; index: number };
 type WriteVars = CreateVars | UpdateVars | RemoveVars;
 
@@ -55,6 +62,14 @@ const isCode = (code: string | undefined): code is AlertErrorCode =>
  */
 const isRefused = (error: unknown): error is HttpError =>
   error instanceof HttpError && isCode(error.code) && error.code !== 'simulated';
+
+/**
+ * Refusals the form can fix: a taken name, a value out of range. Ten rules
+ * (`too_many`) or a rule deleted elsewhere (`not_found`) it cannot.
+ */
+const FIXABLE: readonly AlertErrorCode[] = ['duplicate_name', 'invalid_request'];
+const isFixable = (error: unknown) =>
+  error instanceof HttpError && FIXABLE.some((code) => code === error.code);
 
 function withoutPreset(rule: AlertRule): AlertRule {
   const own = { ...rule };
@@ -239,14 +254,19 @@ export function useRuleMutations() {
         const previous = rules(client).find((r) => r.id === rule.id);
         if (previous) {
           const next = withoutPreset(ruleInUsd(rule, currency, previous));
-          mutate({ kind: 'update', rule: next, previous, onSaved: shown(onSaved) });
+          mutate({ kind: 'update', from: 'form', rule: next, previous, onSaved: shown(onSaved) });
         }
       },
       // From the stored rule: only `enabled` changes.
       toggle: (rule: AlertRule) => {
         const previous = rules(client).find((r) => r.id === rule.id);
         if (previous) {
-          mutate({ kind: 'update', rule: { ...previous, enabled: !previous.enabled }, previous });
+          mutate({
+            kind: 'update',
+            from: 'toggle',
+            rule: { ...previous, enabled: !previous.enabled },
+            previous,
+          });
         }
       },
       remove: (rule: AlertRule) => {
@@ -290,8 +310,10 @@ export type FailedWrite = {
   /** False when the API refused the write: Retry would get the same answer. */
   retryable: boolean;
   /**
-   * A refused new or edited rule: what it asked for, in the chosen currency,
-   * for the panel's Edit. Null otherwise.
+   * A new rule or a form edit refused for something the form can fix (a
+   * taken name, a value out of range): what it asked for, in the chosen
+   * currency, for the panel's Edit. Null otherwise (a toggle, ten rules, a
+   * rule deleted elsewhere: Dismiss only).
    */
   fix: { input: AlertRuleInput; nameTaken: boolean } | null;
 };
@@ -326,9 +348,14 @@ export function useFailedWrites(): readonly FailedWrite[] {
           ? vars.input.name
           : nameOf(vars.kind === 'update' ? vars.previous : vars.rule);
       const refused = isRefused(w.error);
-      const asked = vars.kind === 'create' ? vars.input : vars.kind === 'update' ? vars.rule : null;
+      const asked =
+        vars.kind === 'create'
+          ? vars.input
+          : vars.kind === 'update' && vars.from === 'form'
+            ? vars.rule
+            : null;
       const fix =
-        asked && refused
+        asked && isFixable(w.error)
           ? {
               input: ruleInCurrency(asked, currency),
               nameTaken: w.error instanceof HttpError && w.error.code === 'duplicate_name',

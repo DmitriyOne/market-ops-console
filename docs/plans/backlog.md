@@ -134,6 +134,7 @@ Points the owner wants explained in the README, in his own words:
 
 
 ## From 0.16.0 (production check, 2026-11-06)
+- **Review nits (independent review, 2026-11-06), left as they are:** the Russian suggestion chip says «Сравнить APAC и Европу» while the region is «АТР» elsewhere (the chip asks the assistant in English, which knows "APAC"; wording only); `GET /api/chat` answers 405 like `/api/v1/chat` (POST only, as the contract says); the alerts sheet opened on desktop, the window narrowed to a phone and the sheet closed: focus goes to the bell, which is hidden then (the tab bar is the way there).
 - **Escape within ~50 ms of the bell opening the sheet** goes Back before nuqs has written `?tab=alerts`, so it leaves the dashboard. No person presses that fast; the E2E waits for the address and focus first (seen only under 6 parallel workers). Fix if it ever shows: close with `replace` when the address does not have `tab=alerts` yet.
 - **Phone, Russian, 320 px wide** (iPhone SE): the period button shows "май 20…" (the mode switch, "Руководитель", takes the rest); the full period is its name and in the picker. 360 px and up fit in every language.
 - **Small countries on the phone map** (Germany 8×9 px, UK, Italy): below 24 px, allowed by WCAG 2.5.8's "equivalent" exception (Tiles and Table do the same with full-size targets). Next: a tap in a dense area zooms in first; or a note under the map pointing to Tiles.

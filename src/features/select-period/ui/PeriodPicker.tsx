@@ -49,7 +49,10 @@ export function PeriodPicker({ className }: { className?: string }) {
           <span className="sr-only">{t('trigger', { period, range })}</span>
           <CalendarIcon aria-hidden className="max-sm:hidden" />
           <span ref={room} aria-hidden className="relative min-w-0 flex-1 text-left">
-            <span ref={probe} className="invisible absolute font-mono whitespace-nowrap">
+            <span
+              ref={probe}
+              className="invisible absolute font-mono whitespace-nowrap tabular-nums"
+            >
               {label}
             </span>
             <span

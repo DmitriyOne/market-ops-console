@@ -15,6 +15,11 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 - Analyst on wide screens: the map stays in view while Top risks and the radar next to it scroll, so a pick on the map and the radar it changes are seen together.
 
 ### Fixed
+- Alerts: lists stored before 0.16.0 get their examples' presets back (named in the page's language again, their names taken in every language); an example the user renamed stays theirs.
+- Alerts: the server keeps presets to the examples: a new rule cannot claim one, a change keeps only the rule's own.
+- Alerts: Edit after a refused rule shows it in the currency chosen now, also after a switch while the form is open (it kept the old currency's numbers and saved them at the new rate).
+- Alerts: Edit is offered only where the form can fix the refusal (a taken name, an invalid value); a refused toggle, ten rules or a rule deleted elsewhere offer Dismiss; a failure whose rule is gone shows above the list, by name, instead of nowhere.
+- Period label: measured again when the web font arrives, not only when the room changes.
 - No hydration error on the bell: its count is shown from after hydration. The alert rules could arrive before the bell's part of the page hydrated (seen in development), and the static HTML has no count.
 - Phone settings: picking a currency no longer flashes its menu 190 px away: the menus in the bottom sheet open upward, so the sheet sliding down after a pick no longer flips them mid-fade.
 - Sentry no longer receives this machine's errors and console lines: a DSN in `.env.local` alone sends nothing; `NEXT_PUBLIC_SENTRY_LOCAL=true` sends, as environment `local`. Deployments report Vercel's environment (`production`, `preview`) instead of `NODE_ENV`, under which a local build or a preview counted as production (ADR 0019).
