@@ -4,7 +4,7 @@ A console for a commercial operations team: a **streaming AI assistant** that an
 
 Take-home assignment for the Frontend Engineer role at NewPage Solutions.
 
-> Status: `0.12.0` currency picker and logo (amounts in USD, EUR or GBP at fixed ECB rates; the M logo in both themes), built, checked by the owner and an independent review, waiting for the owner's final check. Done: foundation (0.2.0), design direction and tokens (0.3.0), assistant (0.4.0), dashboard shell (0.5.0), market map (0.6.0), Analyst markets table (0.7.0), heat map and radar (0.8.0), alerts (0.9.0), end-to-end tests (0.10.0), accessibility pass (0.11.0), polish (0.11.1). Next: deploy, favicon and preview (0.13.0). Full list: `CHANGELOG.md`.
+> Status: `0.13.0` page metadata, favicon, preview image, `robots.txt` and designed 404 / 500 pages, built, waiting for the owner's check. Done: foundation (0.2.0), design direction and tokens (0.3.0), assistant (0.4.0), dashboard shell (0.5.0), market map (0.6.0), Analyst markets table (0.7.0), heat map and radar (0.8.0), alerts (0.9.0), end-to-end tests (0.10.0), accessibility pass (0.11.0), polish (0.11.1), currency picker and logo (0.12.0). Next: deploy and E2E on previews (0.14.0). Full list: `CHANGELOG.md`.
 
 ## What works now
 
@@ -18,7 +18,9 @@ Take-home assignment for the Frontend Engineer role at NewPage Solutions.
 - **Dashboard, Analyst view**: everything above plus the map metric picker, a markets table with every KPI (gap to forecast included) calculated from monthly data, so each row adds up and the total is their sum, a total row and sortable headers, a markets filter fed by the map (Shift+click) and the tiles, "Export" of the rows as shown (Excel with formats and filters, or CSV), units in the revenue trend, a comparison radar next to the map (the selected markets, else the open market and its neighbours, else the regions, against the portfolio average) and a heat map of markets × 24 months in the map's metric (Germany's March 2026 dip shows as growth), both with table alternatives. Selection and sort are in the URL too. The page title says which view is on ("Executive view" / "Analyst view").
 - **Alerts**: threshold rules ("attainment below 95 %", for all markets, a region or chosen ones; warning or critical) in a form that checks what the server checks (it runs the server's rule schema for the threshold range of each metric; the name length, unique names, ten rules and "at least one market" use the same shared limits), with a live preview of the markets a rule flags now. The panel opens on what fires now (each flagged market with its figure and a way to open it). Saved optimistically and rolled back with a message and Retry when the save fails (a demo switch makes the next save fail). Flagged markets get a bell in the header count, Top risks, the markets table and the map's tooltip and table. A right sheet on desktop, a tab on phones, both `tab=alerts`. `/api/v1/alerts` is a demo store in a cookie, not a backend: it checks each rule's shape but does not cap the request size, the number of market ids or how often it is called. A production API over live data needs those limits and rate limiting (per user or IP, in middleware or the platform firewall, e.g. Vercel WAF).
 - **Currency**: amounts in US dollars, euros or British pounds (header menu; phone: ⚙︎), remembered in this browser. The data is USD; the rates are the ECB's of 5 November 2026 (1 USD = 0.89095 EUR = 0.74299 GBP), **fixed in the code for this demo**: a real app would get them from the backend API. One rate for every month, so percentages never change. Every amount converts (KPIs, charts, tables, map steps, alerts, evidence cards, Excel); CSV stays raw USD, and the assistant's own text is shown as received (ADR 0017).
-- 4 locales (en-GB, en-US, de-DE, ru-RU), light and dark themes (the logo inverts with them), an offline screen, error boundaries per widget.
+- 4 locales (en-GB, en-US, de-DE, ru-RU), light and dark themes (the logo inverts with them), an offline screen, error boundaries per widget. Every visible word comes from the dictionaries, separators and page titles included; lint checks it (ADR 0011).
+- **Page metadata**: a title per page and a description in the page language, a favicon that follows the browser's light or dark scheme, and one link preview image per language. The console is closed to search engines: `robots.txt` disallows everything, pages carry `noindex`, so there is no sitemap. Previews resolve after the deploy (ADR 0018).
+- **404 and 500 pages** in the app's look, in every language and theme: the address not found, the error ID, Try again and Back to dashboard. When the whole app fails, the last-resort page still speaks the address's language.
 
 Try it: run `pnpm dev`, switch the currency to EUR in the header (every amount converts, the percentages stay), open the bell in the header (Alerts): add a rule "Growth below 0%" and watch the preview, then tick "Fail the next save (demo)" and switch a rule off to see the rollback. Switch to Analyst and Shift+click Germany and Spain on the map to narrow the markets table, look at the heat map for Germany's March 2026 dip and press Enter on it, click Europe › Germany in the path or Germany on the map, then open the assistant and pick a suggested question, or ask "Why did Germany dip in March?", "What will sales be next year?" (can't answer) or "force error" (error and Retry).
 
@@ -66,17 +68,18 @@ app/                 Next.js routing only (page.tsx re-exports from src/pages)
 pages/               empty on purpose (see pages/README.md)
 src/
   app/               providers, global styles, design tokens
-  pages/             page composition, no logic (dashboard)
+  pages/             page composition, no logic (dashboard, not-found, route-error, global-error)
   widgets/           screen blocks: app-shell, assistant-panel, dashboard-header, alerts-panel (what fires now + the rules), kpi-strip, market-status (tiles, table and map), markets-table, heat-map, comparison-radar, top-risks, top-movers, revenue-trend
   features/          user actions: ask-question (chat stream, composer, history), drill-down, reset-view, select-period, select-metric, select-markets, export-markets, switch-mode, switch-section, switch-locale, switch-currency, switch-theme, network-status, configure-alerts (rule form, list, optimistic saves)
   entities/          alert-rule (rules query and requests, which markets a rule flags, the bell), performance (dataset, dashboard URL state, KPI and status selectors, map scales and the map selector, the markets table, heat map and radar selectors, citations, status chip)
-  shared/            ui (shadcn, error boundaries, toasts), lib (cn, csv, dom, errors, events, media, storage), api (HTTP client, SSE, contracts, dataset, alert rule schema and mock store), config (env, API routes, i18n)
+  shared/            ui (shadcn, error boundaries, toasts, status screen), lib (cn, csv, dom, errors, events, i18n, media, storage), api (HTTP client, SSE, contracts, dataset, alert rule schema and mock store), config (env, API routes, i18n)
 data/                data.json, fixtures.json (source of truth)
 docs/
   decisions/         architecture decision records
   specs/             what we build
   plans/             how we build it, step by step; backlog.md = deferred review findings
 reference/           reference mock SSE route from the starter pack
+scripts/             version check (CI), icon rendering (render-icons.sh)
 ```
 
 ## Git flow

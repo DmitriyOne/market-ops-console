@@ -1,0 +1,23 @@
+# 0018. Page metadata, icons, preview image, robots and error pages
+
+**Context.** Until 0.12.0 every page had the same title, the browser asked for a favicon that did not exist, a shared link had no preview, the 404 and 500 pages were bare text and the global error page spoke English only. The owner asked (2026-11-06) for correct titles and descriptions, a favicon, one preview image for the whole site, `robots.txt`, designed 404 and 500 pages in every language, and no visible text outside the dictionaries.
+
+**Decision.**
+- **Closed to search engines** (owner, 2026-11-03, kept): `app/robots.ts` disallows everything, every page keeps `noindex, nofollow`. **No sitemap**: it would list pages `robots.txt` forbids. No `hreflang` alternates for the same reason.
+- **Titles and descriptions** from the dictionaries: the layout's template is `common.titleTemplate` (`{page} · {appName}`, so the separator is translatable), each page names itself (`meta.dashboard`, the 404 and 500 titles). `og:*` and `twitter:*` repeat the app name and `common.description` in the page language; `og:locale` is `de_DE` and so on.
+- **Absolute URLs** (`metadataBase`): `NEXT_PUBLIC_SITE_URL`, else Vercel's `VERCEL_PROJECT_PRODUCTION_URL`, else `http://localhost:3000` (`shared/config/site-url.ts`). Link previews work once 0.14.0 deploys.
+- **Icons:** `app/icon.svg` is the `Logo` mark and follows the browser's scheme (`prefers-color-scheme` inside the SVG); `app/apple-icon.png` (180 px, square: iOS rounds it) and `app/favicon.ico` (16 + 32 px) are rendered from it by `scripts/render-icons.sh` and committed, so the build needs no tool.
+- **Preview image:** `app/[locale]/opengraph-image.tsx`, 1200 × 630, one design for the site and one image per language (logo, name, description; the alt text from the dictionaries), built statically. Fonts are committed TTF files with their SIL OFL licences (`src/app/metadata/og-fonts`): Space Grotesk as in the app, Inter for the Cyrillic Space Grotesk lacks. No network at build.
+- **Error pages, design A** (owner): `StatusScreen` (`shared/ui`): logo and name in the corner, the code large, title, text, buttons centred; on a phone the buttons stay under the text. 404 shows the address not found, 500 the error ID when Next gives one (server errors). Three pages in `src/pages`, the `app/` files only point to them:
+  - `not-found` inside `[locale]` (`notFound()` and the `[...rest]` catch-all, as next-intl documents);
+  - `route-error` (`[locale]/error.tsx`), Try again and Back to dashboard;
+  - `global-error` when the root layout fails: no providers exist, so `app/global-error.tsx` takes the locale from the address, imports the dictionaries as modules and brings its own `<html>`, styles, fonts and theme.
+- **No experimental Next.js features in production** (owner, 2026-11-06; CLAUDE.md). So no `global-not-found`: a path the proxy skips (`/x.txt`, `/api/unknown`) gets Next's own 404, in English. Nothing in the UI links there.
+
+**Exceptions.**
+- Hex colours in `icon.svg` and the preview image: neither has the app's stylesheet. They repeat the light (and, in the icon, dark) tokens; change both with the tokens.
+- The page titles of the 404 and 500 are set with React's `<title>` from the client component (Next's metadata cannot be localised there), so the server HTML of a 404 carries the general title until the page hydrates. Search engines are kept out anyway.
+
+**Considered.** A sitemap with `robots.txt` open (owner chose closed). A generated `favicon.ico` route (needs a renderer at request time; a committed file is simpler). One preview image in English for every language (would be the only English text a German link shows). The app header on the error pages (design B: heavier, and on a 500 the providers it needs may be what failed).
+
+**Consequences.** Changing the logo means editing `icon.svg`, running `scripts/render-icons.sh`, and checking the preview image. A new page names itself in `meta.*`. 0.14.0 sets the site's address so previews resolve.
