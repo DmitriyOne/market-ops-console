@@ -6,6 +6,7 @@ import { enMessages as en } from '@/shared/config';
 import { alertsApi, datasetHandler, renderWithProviders, server } from '@/shared/lib/test';
 
 import { DashboardHeader } from './DashboardHeader';
+import { ScopeTitle } from './ScopeTitle';
 
 vi.mock('@wrksz/themes/client', () => ({
   useTheme: () => ({ theme: 'light', resolvedTheme: 'light', setTheme: vi.fn() }),
@@ -21,7 +22,15 @@ const t = en.drill;
 function setup(searchParams = '') {
   return renderWithProviders(
     <Suspense>
-      <DashboardHeader />
+      {/* As on the page: the header, then the title with the drill-down path above it. */}
+      <header>
+        <DashboardHeader />
+      </header>
+      <main>
+        <Suspense>
+          <ScopeTitle />
+        </Suspense>
+      </main>
     </Suspense>,
     { searchParams },
   );
@@ -53,6 +62,17 @@ describe('DashboardHeader', () => {
     expect(within(nav).getByRole('button', { name: t.chooseRegion })).toBeInTheDocument();
     expect(within(nav).queryByRole('button', { name: t.chooseMarket })).not.toBeInTheDocument();
     expect(within(nav).queryByRole('button', { name: t.chooseProduct })).not.toBeInTheDocument();
+  });
+
+  it('the drill-down path is on the page, above the title, not in the header', async () => {
+    setup('?region=eu');
+    const path = await screen.findByRole('navigation', { name: t.label });
+    expect(screen.getByRole('main')).toContainElement(path);
+    expect(within(screen.getByRole('banner')).queryByRole('navigation')).not.toBeInTheDocument();
+    expect(
+      path.compareDocumentPosition(screen.getByRole('heading', { level: 1 })) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
   });
 
   it('choosing a region drills into it', async () => {

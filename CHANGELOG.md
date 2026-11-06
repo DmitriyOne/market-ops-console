@@ -10,7 +10,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 ### Changed
 - Region and market names follow the page's language (`Deutschland`, `Германия`; regions `Europa`, `АТР`): the names are in the messages (`places`), generated once from `Intl.DisplayNames` so server and browser agree. Product names are brands and stay. The CSV export keeps the dataset's names, like its USD columns.
 - German and Russian name the forecast one way: Plan / План everywhere (the table said Prognose / Прогноз, the map Zielerreichung).
-- Phone header: period and mode share one row under the path, half the width each (the full period when it fits, measured; else the month over "12 mo"; no calendar icon): the header is a row shorter. A version that slid the row away while scrolling was tried and dropped: menus picked in it flickered (owner, 2026-11-06).
+- The drill-down path moved from the header to the page, above the title, on every screen: the phone header is two rows (≈120 px, was ≈225), the desktop header keeps name, period, mode and the switches.
+- Phone header: period and mode share one row, half the width each (the full period when it fits, measured; else the month over "12 mo"; no calendar icon): the header is a row shorter. A version that slid the row away while scrolling was tried and dropped: menus picked in it flickered (owner, 2026-11-06).
 - Analyst on wide screens: the map stays in view while Top risks and the radar next to it scroll, so a pick on the map and the radar it changes are seen together.
 
 ### Fixed

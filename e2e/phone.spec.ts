@@ -128,7 +128,7 @@ test('settings sheet: a pick closes the currency menu in place, not with a jump 
   expect(jump, 'largest move between two frames, px').toBeLessThan(40);
 });
 
-test('period and mode share one row in the header, side by side', async ({ page }) => {
+test('period and mode share one row in the header; the path is on the page', async ({ page }) => {
   await page.goto('/dashboard?range=12m');
   const period = page.getByRole('banner').getByRole('button', { name: /^Period: / });
   const mode = page.getByRole('banner').getByRole('radiogroup', { name: 'View' });
@@ -137,8 +137,16 @@ test('period and mode share one row in the header, side by side', async ({ page 
     Math.abs((p?.y ?? 0) + (p?.height ?? 0) / 2 - ((m?.y ?? 100) + (m?.height ?? 0) / 2)),
     'same row',
   ).toBeLessThan(4);
+  // The drill-down path is on the page, above the title; the header is two rows.
+  await expect(
+    page.getByRole('main').getByRole('navigation', { name: 'Drill-down' }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('banner').getByRole('navigation', { name: 'Drill-down' }),
+  ).toHaveCount(0);
   // In the header, not over the dashboard.
   const header = await page.getByRole('banner').boundingBox();
+  expect(header?.height ?? 0, 'header height').toBeLessThan(130);
   expect((m?.y ?? 0) + (m?.height ?? 0)).toBeLessThanOrEqual(
     (header?.y ?? 0) + (header?.height ?? 0),
   );

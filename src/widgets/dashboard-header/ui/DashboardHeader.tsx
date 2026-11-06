@@ -14,16 +14,15 @@ import { cn } from '@/shared/lib';
 import { Logo, Skeleton } from '@/shared/ui';
 
 import { AlertsButton } from './AlertsButton';
-import { DrillBreadcrumbs } from './DrillBreadcrumbs';
 import { SettingsSheet } from './SettingsSheet';
 
 const ROW = 'flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2';
-// Phone: period and mode share one row under the path, half the width each.
-const CONTROLS = 'flex items-center gap-2 max-lg:order-2 max-lg:w-full';
+// Phone: period and mode share the second row, half the width each.
+const CONTROLS = 'flex items-center gap-2 max-lg:order-1 max-lg:w-full';
 
-// Phone: the name fills the first row next to ⚙︎; the path drops to its own row.
-const APP_NAME = 'flex items-center gap-2 font-semibold whitespace-nowrap max-lg:flex-1';
-const PATH = 'min-w-0 flex-1 max-lg:order-1 max-lg:basis-full';
+// The name fills the row up to the controls (phone: up to ⚙︎). The drill-down
+// path is on the page, above the title (owner, 2026-11-06).
+const APP_NAME = 'flex flex-1 items-center gap-2 font-semibold whitespace-nowrap';
 
 /** The logo and the app name; live, they lead back to the clean dashboard. */
 function AppName({ live = false }: { live?: boolean }) {
@@ -52,9 +51,8 @@ function AppName({ live = false }: { live?: boolean }) {
 }
 
 /**
- * Desktop: name · path · period · mode · alerts · currency · language · theme in one row.
- * Phone: name and ⚙︎ on the first row, the path below, then period and
- * mode side by side.
+ * Desktop: name · period · mode · alerts · currency · language · theme in one row.
+ * Phone: name and ⚙︎ on the first row, then period and mode side by side.
  */
 export function DashboardHeader() {
   return (
@@ -63,14 +61,9 @@ export function DashboardHeader() {
       <Suspense fallback={<AppName />}>
         <AppName live />
       </Suspense>
-      {/* The path and period need the dataset: they wait with a skeleton, and
-          if it fails they step aside (the page says so once, ADR 0013). */}
-      <DatasetGate fallback={<div className={PATH} />}>
-        <Suspense fallback={<PathSkeleton />}>
-          <DrillBreadcrumbs className={PATH} />
-        </Suspense>
-      </DatasetGate>
       <SettingsSheet className="lg:hidden" />
+      {/* The period needs the dataset: it waits with a skeleton, and if it
+          fails it steps aside (the page says so once, ADR 0013). */}
       <DatasetGate fallback={null}>
         <div className={CONTROLS}>
           <Suspense fallback={<ControlsSkeleton />}>
@@ -95,14 +88,6 @@ export function DashboardHeader() {
   );
 }
 
-function PathSkeleton() {
-  return (
-    <div aria-hidden className={cn('flex min-h-11 items-center', PATH)}>
-      <Skeleton className="h-5 w-44" />
-    </div>
-  );
-}
-
 function ControlsSkeleton() {
   return (
     <>
@@ -120,7 +105,6 @@ export function DashboardHeaderSkeleton() {
   return (
     <div className={ROW} aria-hidden>
       <AppName />
-      <PathSkeleton />
       <Skeleton className="size-11 lg:hidden" />
       <div className={CONTROLS}>
         <ControlsSkeleton />
