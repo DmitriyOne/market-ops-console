@@ -38,10 +38,42 @@ test('Share link puts the address of the current view on the clipboard', async (
   context,
 }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
-  await page.goto('/dashboard?region=eu&market=de&mode=analyst');
+  // `#main` is where the skip link leaves the address; it is not part of the view.
+  await page.goto('/dashboard?region=eu&market=de&mode=analyst&currency=GBP#main');
   await page.getByRole('button', { name: 'Share link' }).click();
   await expect(page.getByText('Link copied')).toBeAttached();
   const copied = await page.evaluate(() => navigator.clipboard.readText());
-  expect(copied).toBe(page.url());
+  expect(copied).toBe(page.url().replace('#main', ''));
   expect(new URL(copied).searchParams.get('market')).toBe('de');
+  expect(new URL(copied).searchParams.get('currency')).toBe('GBP');
 });
+
+// The static page shows the skeleton until the script runs: it must take the
+// button's place exactly, in the longest label (Russian) too, so nothing moves.
+for (const locale of ['', '/ru-RU']) {
+  test(`the Share link skeleton is the button's size${locale ? ` (${locale})` : ''}`, async ({
+    browser,
+  }) => {
+    const url = `${locale}/dashboard?region=eu&market=gb&product=veltrix`;
+    const noScript = await browser.newContext({ javaScriptEnabled: false });
+    const before = await noScript.newPage();
+    await before.goto(url);
+    const skeleton = await before
+      .locator('[data-slot="skeleton"]')
+      .filter({ has: before.locator('svg') })
+      .boundingBox();
+    await noScript.close();
+
+    const live = await browser.newContext();
+    const after = await live.newPage();
+    await after.goto(url);
+    const button = after.getByRole('button', { name: /^(Share link|Поделиться ссылкой)$/ });
+    await expect(button).toBeVisible();
+    const box = await button.boundingBox();
+    await live.close();
+
+    expect(skeleton).not.toBeNull();
+    expect(Math.round(skeleton?.width ?? 0)).toBe(Math.round(box?.width ?? -1));
+    expect(Math.round(skeleton?.height ?? 0)).toBe(Math.round(box?.height ?? -1));
+  });
+}
