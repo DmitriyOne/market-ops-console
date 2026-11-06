@@ -1,7 +1,7 @@
 'use client';
 
 import { BanIcon, SparklesIcon, SquareIcon, TriangleAlertIcon } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useFormatter, useTranslations } from 'next-intl';
 import { type ReactNode, useMemo } from 'react';
 
 import { resolveCitation, type ResolvedCitation, useKpiFormat } from '@/entities/performance';
@@ -137,6 +137,7 @@ export function AnswerMessage({
   const t = useTranslations('assistant');
   const tRoot = useTranslations();
   const f = useKpiFormat();
+  const format = useFormatter();
   const { status, text, citations, confidence, error } = message;
 
   const check = useMemo(
@@ -235,7 +236,11 @@ export function AnswerMessage({
     const labels = citations.map((c) => c.label ?? (ds ? f.scopeName(resolveCitation(ds, c)) : ''));
     return [
       text,
-      labels.length > 0 ? t('actions.copySources', { list: labels.join('; ') }) : null,
+      labels.length > 0
+        ? t('actions.copySources', {
+            list: format.list(labels, { type: 'unit', style: 'short' }),
+          })
+        : null,
       confidence ? t('answer.confidence', { level: t(`answer.${confidence}`) }) : null,
       confidence === 'low' ? t('answer.directional') : null,
       t('answer.label'),

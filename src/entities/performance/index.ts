@@ -73,7 +73,7 @@ export {
   type RadarValue,
   type RadarView,
 } from './model/radar';
-export { getMarket, getProduct, getRegion, scopeLabel } from './model/reference';
+export { getMarket, getProduct, getRegion, scopeParts } from './model/reference';
 export {
   isLatestSnapshot,
   marketsInOrder,
@@ -94,3 +94,4 @@ export { DatasetGate } from './ui/DatasetGate';
 export { toneFill, toneText } from './ui/scale-tone';
 export { StatusChip, StatusIcon, useStatusLabel } from './ui/StatusChip';
 export { useKpiFormat } from './ui/use-kpi-format';
+export { useScopeLabel } from './ui/use-scope-label';

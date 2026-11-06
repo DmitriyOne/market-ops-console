@@ -8,7 +8,6 @@ import { AlertMark, type MarketFlag, useAlertFlags, useFlagLabel } from '@/entit
 import {
   isLatestSnapshot,
   marketsTable,
-  scopeLabel,
   StatusChip,
   type TableColumn,
   type TableRow as Row,
@@ -16,6 +15,7 @@ import {
   type TableTotals,
   useDashboard,
   useKpiFormat,
+  useScopeLabel,
 } from '@/entities/performance';
 import { useDrillDown } from '@/features/drill-down';
 import { ExportMenu } from '@/features/export-markets';
@@ -107,6 +107,7 @@ function SortHead({
 export function MarketsTable() {
   const t = useTranslations('marketsTable');
   const tDrill = useTranslations('drill');
+  const scopeLabel = useScopeLabel();
   const tPeriod = useTranslations('period');
   const titleId = useId();
   const f = useKpiFormat();

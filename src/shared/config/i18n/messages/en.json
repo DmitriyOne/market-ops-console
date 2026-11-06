@@ -4,7 +4,8 @@
     "skipToContent": "Skip to content",
     "description": "Sales performance by market, product and period, with an AI assistant that shows its sources.",
     "close": "Close",
-    "titleTemplate": "{page} · {appName}"
+    "titleTemplate": "{page} · {appName}",
+    "separator": " · "
   },
   "meta": {
     "dashboard": "Dashboard",
@@ -413,7 +414,8 @@
     "revenueUnit": "Revenue in {currency, select, EUR {euros} GBP {British pounds} other {US dollars}}.",
     "anomalyMarket": "anomaly in the whole market: {note}",
     "anomalies": "Anomalies",
-    "anomalyMark": "anomaly"
+    "anomalyMark": "anomaly",
+    "readout": "{metric} {value}"
   },
   "radar": {
     "title": "Comparison",
@@ -470,7 +472,8 @@
       "code": "Code",
       "anomaly": "Anomaly",
       "month": "Month",
-      "actual": "Actual"
+      "actual": "Actual",
+      "anomalyItem": "{period}: {note}"
     },
     "about": {
       "source": "Source",

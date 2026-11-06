@@ -42,7 +42,7 @@ export function useHeatFormat(metric: HeatMetric, marketNotes = false) {
         : t('cellRounded', { shown: short(cell.value), value: long(cell.value) }),
     ];
     if (cell.anomaly) parts.push(note(cell.anomaly.note));
-    return parts.join(', ');
+    return format.list(parts, { type: 'unit', style: 'short' });
   };
 
   return { short, long, month, monthShort, metricName, note, cellName };

@@ -10,6 +10,7 @@ import {
   useKpiFormat,
   useStatusLabel,
 } from '@/entities/performance';
+import { useJoinParts } from '@/shared/lib';
 
 const KIND = {
   attainment: 'percent',
@@ -21,6 +22,7 @@ const KIND = {
 /** Words and numbers of the map: metric names, values, legend bounds, country names. */
 export function useMapFormat() {
   const t = useTranslations('marketStatus');
+  const join = useJoinParts();
   const f = useKpiFormat();
   const statusLabel = useStatusLabel();
 
@@ -41,7 +43,7 @@ export function useMapFormat() {
     const name = item.status
       ? t('countryStatus', { ...args, status: statusLabel(item.status) })
       : t('country', args);
-    return item.selected ? `${name} · ${t('selected')}` : name;
+    return join([name, item.selected ? t('selected') : null]);
   };
   return { metricLabel, valueMetric, value, bound, countryName };
 }

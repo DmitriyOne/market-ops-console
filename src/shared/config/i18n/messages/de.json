@@ -4,7 +4,8 @@
     "skipToContent": "Zum Inhalt springen",
     "description": "Vertriebsleistung nach Markt, Produkt und Zeitraum, mit einem KI-Assistenten, der seine Quellen zeigt.",
     "close": "Schließen",
-    "titleTemplate": "{page} · {appName}"
+    "titleTemplate": "{page} · {appName}",
+    "separator": " · "
   },
   "meta": {
     "dashboard": "Dashboard",
@@ -413,7 +414,8 @@
     "revenueUnit": "Umsatz in {currency, select, EUR {Euro} GBP {Britischen Pfund} other {US-Dollar}}.",
     "anomalyMarket": "Auffälligkeit im ganzen Markt: {note}",
     "anomalies": "Auffälligkeiten",
-    "anomalyMark": "Auffälligkeit"
+    "anomalyMark": "Auffälligkeit",
+    "readout": "{metric} {value}"
   },
   "radar": {
     "title": "Vergleich",
@@ -470,7 +472,8 @@
       "code": "Code",
       "anomaly": "Anomalie",
       "month": "Monat",
-      "actual": "Ist"
+      "actual": "Ist",
+      "anomalyItem": "{period}: {note}"
     },
     "about": {
       "source": "Quelle",

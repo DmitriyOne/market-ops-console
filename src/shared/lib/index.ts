@@ -5,5 +5,6 @@ export * from './dom';
 export * from './download';
 export * from './errors';
 export * from './events';
+export * from './i18n';
 export * from './media';
 export * from './storage';

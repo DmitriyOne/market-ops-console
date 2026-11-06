@@ -32,6 +32,8 @@ const LABELS: MarketsSheetLabels = {
   status: (status) => STATUS[status],
   code: 'Code',
   anomaly: 'Anomaly',
+  anomalies: (list) =>
+    list.length === 0 ? null : list.map((a) => `${a.period}: ${a.note}`).join(' · '),
   total: 'Total',
   month: 'Month',
   actual: 'Actual',

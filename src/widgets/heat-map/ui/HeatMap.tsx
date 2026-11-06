@@ -10,9 +10,9 @@ import {
   type HeatMapView,
   MAP_SCALES,
   scaleSteps,
-  scopeLabel,
   toneFill,
   useDashboard,
+  useScopeLabel,
 } from '@/entities/performance';
 import { useDrillDown } from '@/features/drill-down';
 import { useMarketSelection } from '@/features/select-markets';
@@ -47,6 +47,7 @@ const CARD = 'gap-3 border border-border ring-0';
 export function HeatMap() {
   const t = useTranslations('heatMap');
   const tDrill = useTranslations('drill');
+  const scopeLabel = useScopeLabel();
   const currency = useCurrency();
   const titleId = useId();
   const { ds, state } = useDashboard();

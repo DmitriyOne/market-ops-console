@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useId } from 'react';
 
-import { periodToDate, scopeLabel, trendView, useDashboard } from '@/entities/performance';
+import { periodToDate, trendView, useDashboard, useScopeLabel } from '@/entities/performance';
 import { useStoredFlag } from '@/shared/lib';
 import {
   Button,
@@ -42,6 +42,7 @@ const CARD = 'gap-3 border border-border ring-0';
 export function RevenueTrend() {
   const t = useTranslations('trend');
   const tDrill = useTranslations('drill');
+  const scopeLabel = useScopeLabel();
   const format = useFormatter();
   const titleId = useId();
   const { ds, state } = useDashboard();

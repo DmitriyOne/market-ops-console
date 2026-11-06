@@ -4,7 +4,8 @@
     "skipToContent": "Перейти к содержимому",
     "description": "Продажи по рынкам, продуктам и периодам и ИИ-ассистент, который показывает источники.",
     "close": "Закрыть",
-    "titleTemplate": "{page} · {appName}"
+    "titleTemplate": "{page} · {appName}",
+    "separator": " · "
   },
   "meta": {
     "dashboard": "Панель",
@@ -413,7 +414,8 @@
     "revenueUnit": "Выручка в {currency, select, EUR {евро} GBP {фунтах стерлингов} other {долларах США}}.",
     "anomalyMarket": "аномалия по рынку в целом: {note}",
     "anomalies": "Аномалии",
-    "anomalyMark": "аномалия"
+    "anomalyMark": "аномалия",
+    "readout": "{metric} {value}"
   },
   "radar": {
     "title": "Сравнение",
@@ -470,7 +472,8 @@
       "code": "Код",
       "anomaly": "Аномалия",
       "month": "Месяц",
-      "actual": "Факт"
+      "actual": "Факт",
+      "anomalyItem": "{period}: {note}"
     },
     "about": {
       "source": "Источник",

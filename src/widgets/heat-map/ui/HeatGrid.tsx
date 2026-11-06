@@ -21,7 +21,7 @@ import {
   toneText,
 } from '@/entities/performance';
 import type { Period } from '@/shared/api';
-import { cn } from '@/shared/lib';
+import { cn, useJoinParts } from '@/shared/lib';
 import { Button } from '@/shared/ui';
 
 import { useHeatFormat } from './use-heat-format';
@@ -375,6 +375,8 @@ function CellDetail({
 }) {
   const t = useTranslations('heatMap');
   const h = useHeatFormat(metric, marketNotes);
+  const join = useJoinParts();
+  const separator = useTranslations('common')('separator');
   if (!row || !cell) {
     return <p className="min-h-11 text-xs text-muted-foreground">{t('pick')}</p>;
   }
@@ -382,10 +384,10 @@ function CellDetail({
   return (
     <div className="flex min-h-11 min-w-0 flex-wrap items-center gap-x-3 gap-y-1 text-sm">
       <p className="min-w-0">
-        {[row.name, month, `${h.metricName} ${h.long(cell.value)}`].join(' · ')}
+        {join([row.name, month, t('readout', { metric: h.metricName, value: h.long(cell.value) })])}
         {cell.anomaly ? (
           <span className="text-muted-foreground">
-            {' · '}
+            {separator}
             <TriangleAlertIcon aria-hidden className="inline size-3.5 align-text-top" />{' '}
             {h.note(cell.anomaly.note)}
           </span>
