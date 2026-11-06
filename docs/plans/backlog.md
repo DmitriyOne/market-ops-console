@@ -62,7 +62,7 @@ Points the owner wants explained in the README, in his own words:
 
 ## From the 0.7.0 branch review (2026-11-04)
 
-- **Back undoes one checkbox at a time** in the multi-pick menu (each pick is its own history entry, spec §6). Confirm or batch the menu's picks into one entry on close.
+- **Back undoes one checkbox at a time** in the multi-pick menu (each pick is its own history entry, spec §6). **Accepted (owner, 2026-11-06)**: stays as it is.
 - **Popups in the assistant's scroll area** (message list) have no scroll boundary yet (`PopperBoundary` covers `<main>` only): a source card's popup could follow its trigger over the panel header. Same fix if it shows. **Hardening plan**.
 - **Map Shift+click** builds the map's still-view key from the rendered selection (`toggleOnMap`), while the toggle itself now reads the URL as it is; two Shift+clicks inside one render could make the map fit once. Cosmetic.
 
@@ -107,7 +107,7 @@ Points the owner wants explained in the README, in his own words:
 - **`next dev` shows USD for a moment** with EUR or GBP stored (the dev server renders amounts on the server); a production build shows skeletons, then the chosen currency (checked 2026-11-05, no `$` at any frame). **Accepted**.
 - **A market near a revenue break may change colour with the currency** (steps stay round in the chosen currency, owner's choice). **Accepted**.
 - **From the 0.12.0 review — a USD rule edited in EUR or GBP shows six decimals** ("1.113688" M€): exact and round-trips, but reads oddly. Showing two decimals would need the keep-the-stored-dollars check to compare at that precision. **Owner's call**.
-- **From the 0.12.0 review — nothing stops a new raw dataset reader**: `datasetQueryOptions` is still exported, so a future `useQuery(datasetQueryOptions)` would show USD with no failing test. A `no-restricted-imports` rule (allowing `DatasetGate` and the CSV export) or a `useUsdDataset` would close it. **Owner's call** (a new lint rule).
+- **From the 0.12.0 review — nothing stops a new raw dataset reader**: `datasetQueryOptions` is still exported, so a future `useQuery(datasetQueryOptions)` would show USD with no failing test. **Done in 0.13.1** (owner, 2026-11-06): a `no-restricted-imports` rule allows it only where it is needed (ADR 0017).
 
 ## From 0.13.0 (metadata and error pages, 2026-11-06)
 

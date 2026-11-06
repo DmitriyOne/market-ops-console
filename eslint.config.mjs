@@ -152,6 +152,36 @@ export default defineConfig([
     },
   },
   {
+    // The bare dataset query gives dollars; useDataset() and useDashboard()
+    // convert to the chosen currency. Only the files listed below may read it
+    // raw, each for its own reason (ADR 0017).
+    files: ['src/**/*.{ts,tsx}', 'app/**/*.{ts,tsx}'],
+    ignores: [
+      'src/entities/performance/api/dataset-query.ts',
+      'src/entities/performance/index.ts',
+      'src/entities/performance/model/use-dataset.ts',
+      'src/entities/performance/model/use-dashboard.ts',
+      'src/entities/performance/ui/DatasetGate.tsx',
+      'src/features/export-markets/ui/ExportMenu.tsx',
+      'app/[[]locale]/dashboard/page.tsx',
+    ],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@/entities/performance', '**/dataset-query'],
+              importNames: ['datasetQueryOptions'],
+              message:
+                'datasetQueryOptions gives dollars: read the dataset with useDataset() or useDashboard() (ADR 0017).',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     // End-to-end tests (ADR 0008): Playwright's own rules on top of the above.
     files: ['e2e/**/*.ts'],
     ...playwright.configs['flat/recommended'],

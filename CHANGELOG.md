@@ -2,6 +2,12 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/). The top version must match `package.json` and the `release/X.Y.Z` branch.
 
+## [0.13.1] - Unreleased
+
+### Changed
+- Lint: the dataset is read only through `useDataset()` / `useDashboard()`, which convert to the chosen currency; the bare query (dollars) is allowed only where dollars or no amounts are needed (ADR 0017).
+- CI: the check on a pull request into `master` is named "Branch & version", like its `develop` counterpart (ADR 0007).
+
 ## [0.13.0] - Unreleased
 
 ### Added
