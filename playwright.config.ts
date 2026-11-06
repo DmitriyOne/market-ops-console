@@ -51,6 +51,10 @@ export default defineConfig({
           // the long one, so Stop can be pressed mid-answer.
           MOCK_TOKEN_DELAY_MS: '20',
           MOCK_ALERTS_DELAY_MS: '400',
+          // Never send events from a test run, and keep the Sentry test page
+          // closed even if .env.local opens it (ADR 0019).
+          NEXT_PUBLIC_SENTRY_DSN: '',
+          ENABLE_SENTRY_TEST_PAGE: 'false',
         },
       },
 });
