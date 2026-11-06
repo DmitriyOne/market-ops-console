@@ -1,5 +1,7 @@
 # CLAUDE.md
 
+> **From the author.** Although this project was made with the help of AI, a person put a lot into it: effort, time, experience and research. *(In my own words, said in Ukrainian and translated into English.)*
+
 Instructions for AI coding agents working in this repo. Humans: see `README.md`. UI work: read `DESIGN.md` first (tokens, inventory, checklist).
 
 ## Project
@@ -63,7 +65,10 @@ Flow: `feature/X.Y.Z/NAME` (or `fix/X.Y.Z/NAME`) → `release/X.Y.Z` → `develo
 | Specs (what we build) | `docs/specs/` |
 | Implementation plans | `docs/plans/` |
 | Deferred review findings | `docs/plans/backlog.md` |
+| Brief requirement → code → how to check | `docs/requirements-map.md` |
+| Full feature list (README keeps the short version) | `docs/features.md` |
 | Scoped rules, loaded by path | `.claude/rules/` |
+| Agent skills used on this project (third-party, kept as published) | `.claude/skills/` |
 | Change history | `CHANGELOG.md` |
 
 Update the relevant doc in the same commit as the change. A new decision gets a new ADR.
@@ -87,7 +92,7 @@ Run `format`, `lint`, `typecheck` and `test` before every commit (and `e2e` when
 
 ## Do not
 
-- Write the README sections that ask for the owner's own reasoning (approach, decisions, AI usage, "what I'd do differently"). Draft structure only; the owner writes them.
+- Write the owner's own reasoning in the README. The parts marked *In my own words* are the owner's, said in Ukrainian or Russian and translated close to word for word (owner, 2026-11-06); translate what the owner says, never add to it or polish it into your own words.
 - Add Storybook, Redux/Zustand, Vercel AI SDK, husky, or a real backend.
 - Turn on an experimental Next.js feature (`experimental.*` in `next.config.ts`, or a file convention that needs one, such as `global-not-found`): nothing experimental goes to production (owner, 2026-11-06; ADR 0018).
 - Switch off or relax a lint rule (ESLint, Steiger, TypeScript) on your own. Fix the code, or ask the owner; approved exceptions are listed in the ADR.
