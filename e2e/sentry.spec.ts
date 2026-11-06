@@ -8,6 +8,8 @@ import { expect, type SentryItem, test } from './fixtures';
 
 const QUESTION = 'Why did Germany dip in March?';
 
+const logs = (items: SentryItem[]) => items.filter((item) => item.type === 'log');
+
 const errors = (items: SentryItem[]) =>
   items.filter((item) => item.type === 'event' && item.payload.level === 'error');
 
@@ -68,6 +70,13 @@ test('a failing API is reported with the screen as tags, and nothing personal', 
   expect(payload.user).toBeUndefined();
   // The page address only: no headers, cookies or body.
   expect(payload.request).toEqual({ url: expect.stringContaining('/dashboard?tab=alerts') });
+  // Console output goes to Sentry Logs too (sent in batches, every ~5 s).
+  await expect.poll(() => logs(sentry.items()).length, { timeout: 15_000 }).toBeGreaterThan(0);
+  expect(
+    logs(sentry.items())
+      .map((item) => item.raw)
+      .join('\n'),
+  ).toContain('[query]');
 });
 
 test('an expected failure (the demo switch) is a breadcrumb, not an issue', async ({
@@ -103,6 +112,8 @@ test('the question asked never reaches Sentry', async ({ page, sentry }) => {
   // An error now carries every breadcrumb of the visit; the answer's span was sent too.
   await ask(page, 'force error');
   await expect.poll(() => errors(sentry.items()).length).toBeGreaterThan(0);
+  // Console logs leave in batches: wait for them before reading everything.
+  await expect.poll(() => logs(sentry.items()).length, { timeout: 15_000 }).toBeGreaterThan(0);
   const everything = sentry.raw().join('\n');
   expect(everything).not.toContain('Germany dip');
   expect(everything).not.toContain(encodeURIComponent(QUESTION));

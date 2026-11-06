@@ -129,4 +129,5 @@ Points the owner wants explained in the README, in his own words:
 - **A real mid-stream chat failure is reported twice** (the server's exception, `phase: 'stream'`, and the browser's `ChatServerError` for the `error` event): the browser cannot tell it from the `error` fixture. Send a code with the server's `error` event if it matters. **Accepted**.
 - **Whether ad-block lists drop `/monitoring`** is not checked. **Watch** after the deploy.
 - **The Excel export span's error status and `MonitoringTags` mounted through `Providers` have no test** (independent review). **Hardening plan**.
+- **Every console line goes to Sentry Logs** (owner's choice, ADR 0019): a library's message or a stray debug `console.log` with personal data would reach Sentry, and lint cannot see it. Guarded by the rule in CLAUDE.md and the E2E question check. A `beforeSendLog` filter (by level or by a known-safe prefix) would narrow it. **Owner, revisit before production**.
 

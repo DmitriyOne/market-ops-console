@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { sentryOptionsFor } from './sentry';
+import { CONSOLE_LOG_LEVELS, sentryOptionsFor } from './sentry';
 
 const DSN = 'https://key@o1.ingest.us.sentry.io/2';
 
@@ -26,5 +26,13 @@ describe('sentryOptionsFor', () => {
       genAI: { inputs: false, outputs: false },
       mcp: { inputs: false, outputs: false },
     });
+  });
+
+  it('sends console.log, console.warn and console.error to Sentry Logs', () => {
+    const { integrations } = sentryOptionsFor({ dsn: DSN, environment: 'production' });
+    expect(Array.isArray(integrations) ? integrations.map((i) => i.name) : []).toEqual([
+      'ConsoleLogs',
+    ]);
+    expect(CONSOLE_LOG_LEVELS).toEqual(['log', 'warn', 'error']);
   });
 });
