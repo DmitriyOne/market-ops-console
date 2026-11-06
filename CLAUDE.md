@@ -41,7 +41,7 @@ Next.js 16 App Router · React 19 · TypeScript 6 strict · Tailwind v4 + shadcn
 
 - No `any`, no `as` casts to silence errors. Validate external data with zod at the boundary; infer types from schemas.
 - Env vars only through `src/shared/config/env.ts` (`@t3-oss/env-nextjs`). Never read `process.env` directly.
-- No string literals in UI: visible text, `aria-label`, `alt`, `title`, `placeholder`, zod messages come from `src/shared/config/i18n/messages`.
+- No string literals in UI: visible text, `aria-*`, `alt`, `title`, `placeholder`, labels, zod messages and separators (`' · '`, `', '`) come from `src/shared/config/i18n/messages`. Join label parts with `useJoinParts()`, lists with `format.list()`, the rest as a message with placeholders (ADR 0010, 0011).
 - Format numbers, currency, percentages and dates only through next-intl global formats (`src/shared/config/i18n/formats.ts`). No ad-hoc `Intl.*` or `toFixed` for display.
 - Render model output as text. Never `dangerouslySetInnerHTML`.
 - Every network call goes through the shared client in `src/shared/api` (timeouts, typed errors). API paths only from `src/shared/config/api-routes.ts` (`/api/v1/*`).
