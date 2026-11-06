@@ -12,12 +12,43 @@ const MAX_BYTES = 1024 * 1024;
 const dsn = env.NEXT_PUBLIC_SENTRY_DSN;
 const tunnel = dsn ? createSentryTunnelRoute({ allowedDsns: [dsn] }) : null;
 
+/**
+ * The body, counted as it arrives: null once it passes the cap, whatever
+ * Content-Length says (a chunked body has none).
+ */
+async function readCapped(
+  body: ReadableStream<Uint8Array>,
+): Promise<Uint8Array<ArrayBuffer> | null> {
+  const reader = body.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    total += value.byteLength;
+    if (total > MAX_BYTES) {
+      await reader.cancel();
+      return null;
+    }
+    chunks.push(value);
+  }
+  const bytes = new Uint8Array(new ArrayBuffer(total));
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return bytes;
+}
+
 export async function POST(request: Request): Promise<Response> {
   if (!tunnel) return new Response(null, { status: 404 });
+  if (!request.body) return new Response(null, { status: 400 });
   if (Number(request.headers.get('content-length')) > MAX_BYTES) {
     return new Response(null, { status: 413 });
   }
-  const body = await request.arrayBuffer();
+  const body = await readCapped(request.body);
+  if (!body) return new Response(null, { status: 413 });
   const bare = new Request(request.url, {
     method: 'POST',
     body,

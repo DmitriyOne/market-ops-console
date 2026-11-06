@@ -72,4 +72,29 @@ describe('POST /sentry-tunnel', () => {
     });
     expect((await POST(request)).status).toBe(413);
   });
+
+  it('counts the bytes that arrive: a chunked body with no length over 1 MiB gets 413', async () => {
+    flags.dsn = DSN;
+    const fetchMock = vi.fn<typeof fetch>(() => Promise.resolve(new Response('{}')));
+    vi.stubGlobal('fetch', fetchMock);
+    vi.resetModules();
+    const { POST } = await import('./route');
+    const chunk = new Uint8Array(256 * 1024);
+    let sent = 0;
+    const body = new ReadableStream<Uint8Array>({
+      pull(controller) {
+        if (sent >= 5) {
+          controller.close();
+          return;
+        }
+        sent += 1;
+        controller.enqueue(chunk);
+      },
+    });
+    // `duplex` is required by Node for a stream body; TypeScript's RequestInit lacks it.
+    const init: RequestInit & { duplex: 'half' } = { method: 'POST', body, duplex: 'half' };
+    const request = new Request('http://localhost/sentry-tunnel', init);
+    expect((await POST(request)).status).toBe(413);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
 });
