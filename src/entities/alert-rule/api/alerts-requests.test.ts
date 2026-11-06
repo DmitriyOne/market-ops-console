@@ -35,7 +35,7 @@ describe('alert rule requests', () => {
     expect(seen).toEqual([null, '1']);
   });
 
-  it('every write names the locale, so first-visit examples keep their language', async () => {
+  it('writes name only the rule: the list is the same in every language', async () => {
     const seen: string[] = [];
     const record = ({ request }: { request: Request }) => {
       const url = new URL(request.url);
@@ -57,14 +57,10 @@ describe('alert rule requests', () => {
         return new HttpResponse(null, { status: 204 });
       }),
     );
-    await createRule(input, { locale: 'ru-RU' });
-    await updateRule('a', input, { locale: 'ru-RU' });
-    await deleteRule('a', { locale: 'ru-RU' });
-    expect(seen).toEqual([
-      'POST locale=ru-RU',
-      'PATCH id=a&locale=ru-RU',
-      'DELETE id=a&locale=ru-RU',
-    ]);
+    await createRule(input);
+    await updateRule('a', input);
+    await deleteRule('a');
+    expect(seen).toEqual(['POST ', 'PATCH id=a', 'DELETE id=a']);
   });
 
   it('a failed delete carries the server code', async () => {

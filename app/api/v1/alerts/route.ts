@@ -36,10 +36,7 @@ function readCookie(request: Request, name: string): string | undefined {
 
 /** The stored list; the examples until the first write. */
 function storedRules(request: Request): AlertRule[] {
-  return (
-    decodeRules(readCookie(request, ALERTS_COOKIE)) ??
-    exampleRules(new URL(request.url).searchParams.get('locale'))
-  );
+  return decodeRules(readCookie(request, ALERTS_COOKIE)) ?? exampleRules();
 }
 
 function cookieHeader(rules: readonly AlertRule[] | null): string {
@@ -110,7 +107,7 @@ async function write(request: Request, handler: () => Promise<Response>): Promis
 export const GET = withErrorHandling(ROUTE, (request: Request) => {
   const cookie = readCookie(request, ALERTS_COOKIE);
   const stored = decodeRules(cookie);
-  const rules = stored ?? exampleRules(new URL(request.url).searchParams.get('locale'));
+  const rules = stored ?? exampleRules();
   // An unreadable cookie is warned about once (decodeRules) and cleared, so
   // every later load does not warn again (ADR 0019).
   const headers = cookie && !stored ? { ...NO_STORE, 'Set-Cookie': cookieHeader(null) } : NO_STORE;

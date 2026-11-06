@@ -58,6 +58,8 @@ export default defineConfig({
           // read by e2e/sentry.spec.ts; nothing can leave the machine. The
           // test page stays closed even if .env.local opens it (ADR 0019).
           NEXT_PUBLIC_SENTRY_DSN: E2E_SENTRY_DSN,
+          // A local build: Sentry sends only when asked (to the fake DSN above).
+          NEXT_PUBLIC_SENTRY_LOCAL: 'true',
           ENABLE_SENTRY_TEST_PAGE: 'false',
         },
       },

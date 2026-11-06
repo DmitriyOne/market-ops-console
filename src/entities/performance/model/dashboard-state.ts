@@ -98,9 +98,12 @@ export function normalizeDashboardState(
   const sort = raw.sort === null ? undefined : parseSort(raw.sort);
   if (raw.sort !== null && !sort) fix.sort = null;
 
-  // An unknown currency, or USD written out, leaves the URL (one spelling).
-  if (raw.currency !== null && (!isCurrency(raw.currency) || raw.currency === DEFAULT_CURRENCY)) {
-    fix.currency = null;
+  // One spelling: a known code in another case is written in capitals
+  // (`eur` → `EUR`, a hand-typed link); USD written out and unknown codes leave.
+  if (raw.currency !== null) {
+    const upper = raw.currency.toUpperCase();
+    const known = isCurrency(upper) && upper !== DEFAULT_CURRENCY ? upper : null;
+    if (known !== raw.currency) fix.currency = known;
   }
 
   const scope: Scope = {

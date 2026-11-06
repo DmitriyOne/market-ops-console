@@ -122,3 +122,18 @@ test('heat map: Back to a scope without the focused row keeps focus in the grid'
   // Focus lands on the clamped row: Europe's last market, same month.
   await expect(await cell('United Kingdom', 'May 26')).toBeFocused();
 });
+
+test('heat map with a mouse: a click opens the market; the line under the grid has no buttons', async ({
+  page,
+}) => {
+  await page.goto('/dashboard?mode=analyst&region=eu');
+  const grid = page.getByRole('grid', { name: /by market and month/ });
+  const germany = grid
+    .getByRole('row')
+    .filter({ has: page.getByRole('rowheader', { name: /^Germany/ }) });
+  await germany.getByRole('button').last().hover();
+  await expect(page.getByText(/^Germany · May 2026 · /)).toBeVisible();
+  await expect(page.getByRole('button', { name: /^Open Germany/ })).toBeHidden();
+  await germany.getByRole('button').last().click();
+  await expect(title(page)).toHaveText('Germany');
+});

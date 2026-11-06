@@ -89,7 +89,7 @@ export { anomaliesInScope, type ScopedAnomaly, type TrendPoint, trendSeries } fr
 export { type TrendAnomaly, type TrendView, trendView } from './model/trend-view';
 export { useDashboard } from './model/use-dashboard';
 export { type DashboardFocus, useDashboardFocus } from './model/use-dashboard-focus';
-export { useCurrencySelect, useDataset } from './model/use-dataset';
+export { useDataset, useDatasetSelect } from './model/use-dataset';
 export { DatasetGate } from './ui/DatasetGate';
 export { toneFill, toneText } from './ui/scale-tone';
 export { StatusChip, StatusIcon, useStatusLabel } from './ui/StatusChip';

@@ -9,8 +9,6 @@ import {
 import { API_ROUTES } from '@/shared/config';
 
 export type WriteOptions = {
-  /** Names the first-visit examples the server stores on the first write. */
-  locale?: string;
   simulateFailure?: boolean;
 };
 
@@ -21,19 +19,17 @@ function headers({ simulateFailure }: WriteOptions): Record<string, string> {
   };
 }
 
-function url(id: string | null, { locale }: WriteOptions): string {
-  const params = new URLSearchParams();
-  if (id !== null) params.set('id', id);
-  if (locale) params.set('locale', locale);
-  const query = params.toString();
-  return query ? `${API_ROUTES.alerts}?${query}` : API_ROUTES.alerts;
+function url(id: string | null): string {
+  return id === null
+    ? API_ROUTES.alerts
+    : `${API_ROUTES.alerts}?${new URLSearchParams({ id }).toString()}`;
 }
 
 export async function createRule(
   input: AlertRuleInput,
   options: WriteOptions = {},
 ): Promise<AlertRule> {
-  const { rule } = await fetchJson(url(null, options), alertRuleResponseSchema, {
+  const { rule } = await fetchJson(url(null), alertRuleResponseSchema, {
     method: 'POST',
     headers: headers(options),
     body: JSON.stringify(input),
@@ -46,7 +42,7 @@ export async function updateRule(
   input: AlertRuleInput,
   options: WriteOptions = {},
 ): Promise<AlertRule> {
-  const { rule } = await fetchJson(url(id, options), alertRuleResponseSchema, {
+  const { rule } = await fetchJson(url(id), alertRuleResponseSchema, {
     method: 'PATCH',
     headers: headers(options),
     body: JSON.stringify(input),
@@ -55,5 +51,5 @@ export async function updateRule(
 }
 
 export function deleteRule(id: string, options: WriteOptions = {}): Promise<void> {
-  return fetchEmpty(url(id, options), { method: 'DELETE', headers: headers(options) });
+  return fetchEmpty(url(id), { method: 'DELETE', headers: headers(options) });
 }

@@ -21,14 +21,27 @@ const THEMES = [
 ] as const;
 
 /** The theme menu; `children` is its trigger, `onPick` runs after a choice (the sheet closes). */
-function ThemeMenu({ children, onPick }: { children: ReactNode; onPick?: () => void }) {
+function ThemeMenu({
+  children,
+  onPick,
+  side = 'bottom',
+}: {
+  children: ReactNode;
+  onPick?: () => void;
+  /**
+   * `top` in the settings sheet: it is pinned to the bottom, so there is room
+   * above. Below, a long menu fits only until the sheet starts closing after a
+   * pick; then it flips above mid-fade, a flash 200 px away (owner, 2026-11-06).
+   */
+  side?: 'top' | 'bottom';
+}) {
   const t = useTranslations('theme');
   const { theme, setTheme } = useTheme();
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent side={side} align="end">
         <DropdownMenuRadioGroup
           value={theme ?? 'system'}
           onValueChange={(value) => {
@@ -77,7 +90,7 @@ export function ThemeSwitchRow({ className, onPick }: { className?: string; onPi
   const { theme } = useTheme();
   const current = THEMES.find((c) => c.value === theme) ?? THEMES[2];
   return (
-    <ThemeMenu onPick={onPick}>
+    <ThemeMenu onPick={onPick} side="top">
       <button type="button" className={className} disabled={!ready}>
         <span>{t('label')}</span>{' '}
         <span className="flex items-center gap-1 text-muted-foreground">

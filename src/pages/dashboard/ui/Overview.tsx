@@ -5,6 +5,7 @@ import { type ReactNode, Suspense } from 'react';
 
 import { DatasetGate, useDashboard } from '@/entities/performance';
 import { useModeAttribute } from '@/features/switch-mode';
+import { cn } from '@/shared/lib';
 import { WidgetBoundary } from '@/shared/ui';
 import { ComparisonRadar, ComparisonRadarSkeleton } from '@/widgets/comparison-radar';
 import { ScopeTitle, ScopeTitleSkeleton } from '@/widgets/dashboard-header';
@@ -21,6 +22,10 @@ const PAGE = 'flex flex-col gap-4 p-4';
 // `min-w-0` on every cell: a wide table scrolls inside its card instead of widening the page.
 const ROW = 'grid gap-4 xl:grid-cols-3 *:min-w-0';
 const WIDE = 'xl:col-span-2';
+// The map stays in view while its column is shorter than the one next to
+// it (Analyst: Top risks and the radar), so a pick on the map and the radar
+// it changes are seen together (owner, 2026-11-06).
+const STICKY = 'xl:sticky xl:top-4 xl:self-start';
 // The companion column: Top risks, and in Analyst the radar under it.
 const STACK = 'flex flex-col gap-4';
 
@@ -85,7 +90,7 @@ export function Overview() {
           <KpiStrip />
         </Slot>
         <div className={ROW}>
-          <div className={WIDE}>
+          <div className={cn(WIDE, STICKY)}>
             <Slot name={t('marketStatus.title')} fallback={<MarketStatusSkeleton />}>
               <MarketStatus />
             </Slot>
