@@ -1,5 +1,7 @@
 # Market Ops Console
 
+> **From the author.** Although this project was made with the help of AI, a person put a lot into it: effort, time, experience and research. *(In my own words, said in Ukrainian and translated into English.)*
+
 A console for a commercial operations team. Two surfaces over one dataset:
 
 - a **streaming AI assistant** that cites its sources, says how sure it is, and says so when the data cannot answer;
@@ -263,6 +265,7 @@ I built this with Claude Code. I made the decisions; the agent wrote most of the
 - `.claude/rules/*.md` are scoped rules (FSD, UI, tests, CI) that load only when the agent touches matching files.
 - Every decision is an ADR, so the next session doesn't argue it again.
 - Library docs are checked through Context7, not taken from memory.
+- The agent skills used are in [`.claude/skills`](.claude/skills/README.md), copied as published, with what each was used for.
 
 **Do's**
 - Make the agent reproduce a bug before fixing it, and prove a new test fails on the old code.

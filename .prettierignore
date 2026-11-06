@@ -2,6 +2,7 @@
 pnpm-lock.yaml
 data/*.json
 reference
+.claude/skills
 .superpowers
 # Docs are hand-written; the starter pack stays byte-for-byte
 *.md

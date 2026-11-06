@@ -21,6 +21,7 @@
 
 **Exceptions (owner-approved, 2026-11-03).** Agents never relax a rule on their own (CLAUDE.md).
 - Prettier skips `*.md`: docs are hand-written, and the starter-pack files must stay byte-for-byte.
+- 1.0.0 (owner asked for the skills in the repo, 2026-11-06): ESLint and Prettier skip `.claude/skills/`, the agent skills copied as published (third-party scripts and pages, as `reference/` is the starter pack's). Nothing there is part of the app.
 - `i18next/no-literal-string` skips `*.test.tsx`: tests render throwaway markup (e.g. a counter) that is not UI copy.
 - 0.13.0, the `.ts` check skips `src/shared/api`, `app/api` (messages for developers in API responses and logs; the UI shows translated texts by error code, never `error.message`) and `src/shared/lib/test` (test helpers). The CSV export keeps its machine format (`snake_case` headers, `; ` between anomalies, the same in every locale, 0.7.0).
 

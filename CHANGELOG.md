@@ -10,6 +10,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 - The author's own words, said in Ukrainian and translated close to word for word, in the README: a few words at the top, how AI tools were used, accessibility, what I like in it, what I'd do differently. `CLAUDE.md` says agents only translate those parts.
 - Release dates in the changelog.
 
+### Added
+- The agent skills used to build the app, in `.claude/skills/` as published, with a list of where each came from and what it was used for; lint and Prettier skip the folder, as they skip `reference/`.
+- A note from the author at the top of the README, `CLAUDE.md` and `AGENTS.md`: the project was made with AI's help, with a person's effort, time, experience and research in it.
+
 ## [0.16.0] - 2026-11-06
 
 ### Added

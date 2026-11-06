@@ -1,5 +1,7 @@
 # CLAUDE.md
 
+> **From the author.** Although this project was made with the help of AI, a person put a lot into it: effort, time, experience and research. *(In my own words, said in Ukrainian and translated into English.)*
+
 Instructions for AI coding agents working in this repo. Humans: see `README.md`. UI work: read `DESIGN.md` first (tokens, inventory, checklist).
 
 ## Project
@@ -66,6 +68,7 @@ Flow: `feature/X.Y.Z/NAME` (or `fix/X.Y.Z/NAME`) → `release/X.Y.Z` → `develo
 | Brief requirement → code → how to check | `docs/requirements-map.md` |
 | Full feature list (README keeps the short version) | `docs/features.md` |
 | Scoped rules, loaded by path | `.claude/rules/` |
+| Agent skills used on this project (third-party, kept as published) | `.claude/skills/` |
 | Change history | `CHANGELOG.md` |
 
 Update the relevant doc in the same commit as the change. A new decision gets a new ADR.
