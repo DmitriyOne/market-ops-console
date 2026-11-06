@@ -1,6 +1,6 @@
 import { screen, waitFor } from '@testing-library/react';
 import { Suspense } from 'react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import raw from '@/data/data.json';
 import { inCurrency, marketsTable } from '@/entities/performance';
@@ -93,13 +93,8 @@ describe('ExportMenu', () => {
   describe('in euros (ADR 0017)', () => {
     const ds = datasetSchema.parse(raw);
     const view = (d: typeof ds) => marketsTable(d, {}, '2026-05', '3m', ['de', 'es'], null);
-    afterEach(() => {
-      localStorage.clear();
-    });
-
     it('Excel: amounts in euros, the currency and its rate on the About sheet', async () => {
-      localStorage.setItem('mo:currency', 'EUR');
-      const { user } = setup();
+      const { user } = setup(`${SEARCH}&currency=EUR`);
       await user.click(await screen.findByRole('button', { name: t.button }));
       expect(
         await screen.findByRole('menuitem', { name: /Excel.*amounts in EUR/ }),
@@ -123,8 +118,7 @@ describe('ExportMenu', () => {
     });
 
     it('CSV stays raw USD', async () => {
-      localStorage.setItem('mo:currency', 'EUR');
-      const { user } = setup();
+      const { user } = setup(`${SEARCH}&currency=EUR`);
       await user.click(await screen.findByRole('button', { name: t.button }));
       await user.click(await screen.findByRole('menuitem', { name: /^CSV/ }));
       const usd = view(ds).rows.find((r) => r.id === 'de');

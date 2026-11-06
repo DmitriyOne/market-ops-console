@@ -139,7 +139,7 @@ describe('DashboardHeader', () => {
   });
 
   it('phone settings: a pick in a menu (currency) is the whole errand, the sheet closes', async () => {
-    const { user } = setup();
+    const { user, lastUpdate } = setup();
     const settings = await screen.findByRole('button', { name: en.header.settings });
     await user.click(settings);
     const sheet = screen.getByRole('dialog', { name: en.header.settingsTitle });
@@ -148,9 +148,8 @@ describe('DashboardHeader', () => {
     await waitFor(() => {
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
-    expect(localStorage.getItem('mo:currency')).toBe('EUR');
+    expect(lastUpdate()?.searchParams.get('currency')).toBe('EUR');
     expect(settings).toHaveFocus();
-    localStorage.clear();
   });
 
   it('the app name leads to the clean dashboard and resets the view', async () => {

@@ -425,8 +425,7 @@ describe('MarketStatus map', () => {
     });
 
     it('Brazil (1,115,100 $ = 993,498 €) drops under €1M', async () => {
-      localStorage.setItem('mo:currency', 'EUR');
-      setup('?mode=analyst&kpi=revenue');
+      setup('?mode=analyst&kpi=revenue&currency=EUR');
       const items = within(await screen.findByRole('list', { name: t.legend }))
         .getAllByRole('listitem')
         .map((li) => li.textContent);

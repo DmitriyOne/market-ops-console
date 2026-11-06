@@ -1,6 +1,6 @@
 import { screen } from '@testing-library/react';
 import { useFormatter } from 'next-intl';
-import { afterEach, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { enMessages as en } from '@/shared/config';
 import { renderWithProviders } from '@/shared/lib/test';
@@ -15,10 +15,6 @@ function Amount() {
 }
 
 describe('CurrencySwitch', () => {
-  afterEach(() => {
-    localStorage.clear();
-  });
-
   it('offers USD, EUR and GBP with their names, and says where the rates come from', async () => {
     const { user } = renderWithProviders(<CurrencySwitch />);
     await user.click(screen.getByRole('button', { name: 'Currency: USD, US dollar' }));
@@ -33,8 +29,8 @@ describe('CurrencySwitch', () => {
     );
   });
 
-  it('switches every amount and remembers the choice in this browser', async () => {
-    const { user } = renderWithProviders(
+  it('switches every amount and writes the choice to the URL (replace)', async () => {
+    const { user, lastUpdate } = renderWithProviders(
       <>
         <CurrencySwitch />
         <Amount />
@@ -49,20 +45,28 @@ describe('CurrencySwitch', () => {
       'GBP',
     );
     expect(screen.getByRole('status')).toHaveTextContent('£1,000.00');
-    expect(localStorage.getItem('mo:currency')).toBe('GBP');
+    expect(lastUpdate()?.searchParams.get('currency')).toBe('GBP');
+    expect(lastUpdate()?.options.history).toBe('replace');
   });
 
-  it('reads a stored choice; an unknown one falls back to USD', () => {
-    localStorage.setItem('mo:currency', 'JPY');
-    renderWithProviders(<CurrencySwitch />);
+  it('back to USD removes it from the URL', async () => {
+    const { user, lastUpdate } = renderWithProviders(<CurrencySwitch />, {
+      searchParams: '?currency=EUR',
+    });
+    await user.click(screen.getByRole('button', { name: 'Currency: EUR, Euro' }));
+    await user.click(screen.getByRole('menuitemradio', { name: /USD/ }));
+    expect(lastUpdate()?.searchParams.has('currency')).toBe(false);
+  });
+
+  it('reads the URL; an unknown currency falls back to USD', () => {
+    renderWithProviders(<CurrencySwitch />, { searchParams: '?currency=JPY' });
     expect(screen.getByRole('button', { name: 'Currency: USD, US dollar' })).toHaveTextContent(
       'USD',
     );
   });
 
   it('settings row: shows the code and the name', () => {
-    localStorage.setItem('mo:currency', 'EUR');
-    renderWithProviders(<CurrencySwitchRow />);
+    renderWithProviders(<CurrencySwitchRow />, { searchParams: '?currency=EUR' });
     expect(screen.getByRole('button')).toHaveTextContent(`${t.label} EUR · Euro`);
   });
 });

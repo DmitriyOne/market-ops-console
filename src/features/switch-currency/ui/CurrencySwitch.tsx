@@ -4,7 +4,7 @@ import { ChevronRightIcon } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
 import { type ReactNode, useId } from 'react';
 
-import { CURRENCIES, CURRENCY_SYMBOLS, RATES_DATE, USD_RATES } from '@/shared/config';
+import { CURRENCIES, CURRENCY_SYMBOLS, isCurrency, RATES_DATE, USD_RATES } from '@/shared/config';
 import { useCurrencyChoice, useJoinParts } from '@/shared/lib';
 import {
   Button,
@@ -32,10 +32,9 @@ function CurrencyMenu({ children, onPick }: { children: ReactNode; onPick?: () =
       <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="min-w-72" aria-describedby={noteId}>
         <DropdownMenuRadioGroup
-          value={currency ?? undefined}
+          value={currency}
           onValueChange={(value) => {
-            const choice = CURRENCIES.find((c) => c === value);
-            if (choice) setCurrency(choice);
+            if (isCurrency(value)) setCurrency(value);
             onPick?.();
           }}
         >
@@ -63,7 +62,7 @@ function CurrencyMenu({ children, onPick }: { children: ReactNode; onPick?: () =
   );
 }
 
-/** Header: the code of the current currency ("USD"); waits until the browser is read. */
+/** Header: the code of the current currency ("USD"). */
 export function CurrencySwitch() {
   const t = useTranslations('currency');
   const [currency] = useCurrencyChoice();
@@ -72,10 +71,9 @@ export function CurrencySwitch() {
       <Button
         variant="ghost"
         className="min-w-16"
-        aria-label={currency ? t('current', { code: currency, name: t(currency) }) : t('label')}
-        disabled={currency === null}
+        aria-label={t('current', { code: currency, name: t(currency) })}
       >
-        {currency ?? CURRENCIES[0]}
+        {currency}
       </Button>
     </CurrencyMenu>
   );
@@ -94,10 +92,10 @@ export function CurrencySwitchRow({
   const [currency] = useCurrencyChoice();
   return (
     <CurrencyMenu onPick={onPick}>
-      <button type="button" className={className} disabled={currency === null}>
+      <button type="button" className={className}>
         <span>{t('label')}</span>{' '}
         <span className="flex items-center gap-1 text-muted-foreground">
-          {currency ? join([currency, t(currency)]) : null}
+          {join([currency, t(currency)])}
           <ChevronRightIcon aria-hidden className="size-4" />
         </span>
       </button>

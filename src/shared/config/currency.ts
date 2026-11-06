@@ -4,6 +4,11 @@ export type Currency = (typeof CURRENCIES)[number];
 
 export const DEFAULT_CURRENCY: Currency = 'USD';
 
+/** The URL parameter that holds the currency (`?currency=GBP`); USD is not written. */
+export const CURRENCY_PARAM = 'currency';
+
+export const isCurrency = (v: string): v is Currency => CURRENCIES.some((c) => c === v);
+
 /** The symbol each prints with (`narrowSymbol`): "$", never "US$". */
 export const CURRENCY_SYMBOLS: Record<Currency, string> = { USD: '$', EUR: '€', GBP: '£' };
 

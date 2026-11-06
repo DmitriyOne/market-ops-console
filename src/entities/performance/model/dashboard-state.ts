@@ -1,4 +1,5 @@
 import type { Dataset, Period } from '@/shared/api';
+import { DEFAULT_CURRENCY, isCurrency } from '@/shared/config';
 
 import { MAP_METRICS, type MapMetric } from './map-scale';
 import { parseSort, type TableSort } from './markets-table';
@@ -20,6 +21,8 @@ export type RawDashboardParams = {
   markets: string[] | null;
   kpi: string | null;
   sort: string | null;
+  /** Read by `useCurrency`; only checked here. */
+  currency: string | null;
 };
 
 /** The view every widget reads: valid ids only, defaults filled in. */
@@ -94,6 +97,11 @@ export function normalizeDashboardState(
 
   const sort = raw.sort === null ? undefined : parseSort(raw.sort);
   if (raw.sort !== null && !sort) fix.sort = null;
+
+  // An unknown currency, or USD written out, leaves the URL (one spelling).
+  if (raw.currency !== null && (!isCurrency(raw.currency) || raw.currency === DEFAULT_CURRENCY)) {
+    fix.currency = null;
+  }
 
   const scope: Scope = {
     ...(regionId ? { regionId } : {}),
