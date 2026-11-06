@@ -39,24 +39,17 @@ type AppShellProps = {
 const FRAME = 'flex h-dvh flex-col bg-background';
 // `relative`: screen-reader-only text inside is placed against the scroll
 // area, not the page, so it cannot stretch the page below the tab bar.
-// Phone: positioned above the dashboard, so its period and mode row can lie
+// Phone: positioned above the dashboard (`z-20`: over its sticky table cells,
+// which are `z-10`), so its period and mode row can lie
 // over the dashboard's top; the dashboard starts that row lower (`pt-controls`),
 // and a control focused by keyboard is scrolled to below it (`scroll-pt-controls`,
 // WCAG 2.4.11: focus not hidden by the row).
-const HEADER = 'border-b border-border max-lg:relative max-lg:z-10';
+const HEADER = 'border-b border-border max-lg:relative max-lg:z-20';
 const MAIN = 'relative min-w-0 flex-1 overflow-y-auto max-lg:scroll-pt-controls max-lg:pt-controls';
-/** Scrolled less than this, the period and mode row stays put (a jittery thumb). */
+/** A finger moved less than this, the period and mode row stays put (a jittery thumb). */
 const SCROLL_STEP = 8;
 /** Near the top the row always shows: it covers the dashboard's first lines otherwise. */
 const SCROLL_TOP = 80;
-/**
- * A scroll this soon after a touch, wheel or key on the dashboard, or after
- * the scroll before it (a fling goes on after the finger lifts), is the
- * user's. Any other scroll is the page's own: the browser keeping the view in
- * place when a pick above it changes the height (scroll anchoring), or code.
- */
-const USER_SCROLL_GAP = 150;
-const GESTURES = ['touchstart', 'touchmove', 'wheel', 'keydown'] as const;
 const ALERTS_SECTION = 'relative min-w-0 flex-1 overflow-y-auto p-4';
 const ALERTS_TITLE = 'mb-3 text-lg font-semibold';
 const ASIDE =
@@ -126,30 +119,39 @@ export function AppShell({ header, main, assistant, alerts }: AppShellProps) {
   }
   useEffect(() => {
     if (desktop || !mainArea) return;
-    let last = mainArea.scrollTop;
-    let gesture = -Infinity;
-    const onGesture = () => {
-      gesture = performance.now();
+    const show = (down: boolean) => {
+      setScrolledDown(down && mainArea.scrollTop > SCROLL_TOP);
     };
+    // The direction comes from the finger or the wheel, never from the scroll
+    // position: the page also moves by itself (a pick in a menu changes its
+    // height and the browser keeps the view in place, in one jump or several),
+    // and the row must not slide away and back with the closing menu on it.
+    let fingerY: number | null = null;
+    const onTouchStart = (e: TouchEvent) => {
+      fingerY = e.touches[0]?.clientY ?? null;
+    };
+    const onTouchMove = (e: TouchEvent) => {
+      const y = e.touches[0]?.clientY;
+      if (y === undefined || fingerY === null || Math.abs(fingerY - y) < SCROLL_STEP) return;
+      show(y < fingerY);
+      fingerY = y;
+    };
+    const onWheel = (e: WheelEvent) => {
+      if (Math.abs(e.deltaY) >= 1) show(e.deltaY > 0);
+    };
+    // Near the top the row shows, however the page got there.
     const onScroll = () => {
-      const top = mainArea.scrollTop;
-      const now = performance.now();
-      const byUser = now - gesture < USER_SCROLL_GAP;
-      if (byUser) gesture = now;
-      // Not the user's (a pick in a menu moved the page): the row stays as it
-      // is, else it slides away and back with the closing menu on it.
-      if (!byUser && top > SCROLL_TOP) {
-        last = top;
-        return;
-      }
-      if (Math.abs(top - last) < SCROLL_STEP) return;
-      setScrolledDown(top > last && top > SCROLL_TOP);
-      last = top;
+      if (mainArea.scrollTop <= SCROLL_TOP) setScrolledDown(false);
     };
-    for (const type of GESTURES) mainArea.addEventListener(type, onGesture, { passive: true });
-    mainArea.addEventListener('scroll', onScroll, { passive: true });
+    const passive = { passive: true };
+    mainArea.addEventListener('touchstart', onTouchStart, passive);
+    mainArea.addEventListener('touchmove', onTouchMove, passive);
+    mainArea.addEventListener('wheel', onWheel, passive);
+    mainArea.addEventListener('scroll', onScroll, passive);
     return () => {
-      for (const type of GESTURES) mainArea.removeEventListener(type, onGesture);
+      mainArea.removeEventListener('touchstart', onTouchStart);
+      mainArea.removeEventListener('touchmove', onTouchMove);
+      mainArea.removeEventListener('wheel', onWheel);
       mainArea.removeEventListener('scroll', onScroll);
     };
   }, [desktop, mainArea]);

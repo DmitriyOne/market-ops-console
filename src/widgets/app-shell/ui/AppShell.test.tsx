@@ -73,35 +73,61 @@ describe('AppShell', () => {
     vi.restoreAllMocks();
   });
 
-  it('phone: scrolling down hides the period row; back on Overview it shows again', async () => {
+  it('phone: the period row follows the finger and the wheel, not the page moving by itself', async () => {
     viewport(false);
     const { user, container } = setup();
     const header = container.querySelector('header');
     const main = screen.getByRole('main');
-    // A frame between the user's scrolls; a second before the page's own one.
-    let clock = 0;
-    vi.spyOn(performance, 'now').mockImplementation(() => clock);
-    const scrollMain = (top: number, byUser = true) => {
-      clock += byUser ? 16 : 1000;
+    const at = (top: number) => {
+      main.scrollTop = top;
+    };
+    const wheel = (deltaY: number) => {
       act(() => {
-        if (byUser) main.dispatchEvent(new Event('touchmove'));
-        main.scrollTop = top;
+        main.dispatchEvent(new WheelEvent('wheel', { deltaY }));
+      });
+    };
+    const touch = (type: 'touchstart' | 'touchmove', clientY: number) => {
+      const event = new Event(type);
+      Object.defineProperty(event, 'touches', { value: [{ clientY }] });
+      act(() => {
+        main.dispatchEvent(event);
+      });
+    };
+    const pageMoves = (top: number) => {
+      act(() => {
+        at(top);
         main.dispatchEvent(new Event('scroll'));
       });
     };
-    scrollMain(400);
+
+    at(400);
+    wheel(120);
     expect(header).toHaveAttribute('data-controls-hidden');
-    scrollMain(300);
+    wheel(-40);
     expect(header).not.toHaveAttribute('data-controls-hidden');
-    scrollMain(600);
-    expect(header).toHaveAttribute('data-controls-hidden');
-    scrollMain(500);
-    // A pick in a menu changes the height; the browser moves the page, not the user.
-    scrollMain(620, false);
+
+    // A pick in a menu changes the height: the browser moves the page, down or up.
+    pageMoves(620);
     expect(header).not.toHaveAttribute('data-controls-hidden');
-    scrollMain(700);
+    wheel(120);
+    pageMoves(500);
     expect(header).toHaveAttribute('data-controls-hidden');
 
+    // The finger: up moves the page down (hides), down brings the row back.
+    touch('touchstart', 500);
+    touch('touchmove', 497);
+    expect(header).toHaveAttribute('data-controls-hidden');
+    touch('touchmove', 560);
+    expect(header).not.toHaveAttribute('data-controls-hidden');
+    touch('touchmove', 300);
+    expect(header).toHaveAttribute('data-controls-hidden');
+
+    // Near the top it always shows.
+    pageMoves(40);
+    expect(header).not.toHaveAttribute('data-controls-hidden');
+
+    at(600);
+    wheel(120);
     await user.click(screen.getByRole('button', { name: /^Assistant/ }));
     await user.click(screen.getByRole('button', { name: 'Overview' }));
     expect(header).not.toHaveAttribute('data-controls-hidden');

@@ -173,3 +173,39 @@ test('a pick in the period menu after scrolling back up does not slide the row a
   await expect(row).toHaveCSS('opacity', '1');
   await expect(page.locator('body'), 'the row stayed').not.toHaveAttribute('data-row-hid', 'yes');
 });
+
+test('the period row stays above the dashboard, its sticky table cells too; a region pick does not slide it', async ({
+  page,
+}) => {
+  await page.goto('/dashboard?region=eu&mode=analyst');
+  const period = page.getByRole('button', { name: /^Period: / });
+  const row = period.locator('xpath=..');
+  // Put a sticky first-column cell of the markets table right under the row
+  // (a scroll from code: the row stays where it is).
+  const onTop = await row.evaluate((el) => {
+    const main = document.getElementById('main');
+    const cell = document.querySelector<HTMLElement>('#main td.sticky');
+    if (!main || !cell) return 'no cell';
+    const r = el.getBoundingClientRect();
+    const c = cell.getBoundingClientRect();
+    main.scrollTop += c.top + c.height / 2 - (r.top + r.height / 2);
+    const now = cell.getBoundingClientRect();
+    const hit = document.elementFromPoint(now.left + now.width / 2, now.top + now.height / 2);
+    return hit !== null && el.contains(hit) ? 'row' : `covered by ${hit?.textContent ?? '?'}`;
+  });
+  expect(onTop, 'the row is on top of the sticky cell').toBe('row');
+  await expect(row).toHaveCSS('opacity', '1');
+
+  await page.evaluate(() => {
+    const header = document.querySelector('header');
+    if (!header) return;
+    new MutationObserver(() => {
+      if (header.hasAttribute('data-controls-hidden')) document.body.dataset.rowHid = 'yes';
+    }).observe(header, { attributes: true });
+  });
+  await page.getByRole('button', { name: /^Region: Europe/ }).click();
+  await page.getByRole('menuitemradio', { name: 'APAC' }).click();
+  await expect(page).toHaveURL(/[?&]region=apac(&|$)/);
+  await expect(row).toHaveCSS('opacity', '1');
+  await expect(page.locator('body'), 'the row stayed').not.toHaveAttribute('data-row-hid', 'yes');
+});
