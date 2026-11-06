@@ -5,7 +5,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 ## [0.15.0] - Unreleased
 
 ### Added
-- **Share link** at the end of the title row, on every level and in both modes: copies the address of the view (drill path, period, mode, selection, open tab, language), says "Link copied", and points to the address bar if the browser blocks the clipboard. A share icon on phones.
+- **Share link** at the end of the title row, on every level and in both modes: copies the address of the view (drill path, period, mode, selection, currency, open tab, language), says "Link copied", and points to the address bar if the browser blocks the clipboard. A share icon on phones.
+- The currency is in the URL (`?currency=EUR`; USD is not written), so a shared link opens in the sender's currency. It is no longer remembered per browser: a clean address and Reset view show USD (ADR 0017).
 
 ### Changed
 - Node.js is pinned to 24.x (`engines`): Vercel no longer moves the build to a new major version on its own, the same Node as `.nvmrc` and CI.

@@ -13,6 +13,7 @@ const EMPTY: RawDashboardParams = {
   markets: null,
   kpi: null,
   sort: null,
+  currency: null,
 };
 
 const normalize = (raw: Partial<RawDashboardParams>) =>
@@ -137,6 +138,14 @@ describe('normalizeDashboardState', () => {
   it('a broken table order is removed from the URL', () => {
     for (const sort of ['foo', '--growth', '']) {
       expect(normalize({ sort })).toMatchObject({ state: { sort: null }, fix: { sort: null } });
+    }
+  });
+
+  it('a known currency stays; USD written out and unknown ones leave the URL', () => {
+    expect(normalize({ currency: 'GBP' }).fix).toBeNull();
+    expect(normalize({ currency: 'EUR' }).fix).toBeNull();
+    for (const currency of ['USD', 'JPY', 'gbp', '']) {
+      expect(normalize({ currency }).fix).toEqual({ currency: null });
     }
   });
 });

@@ -11,7 +11,7 @@ const COPIED_MS = 2000;
 
 /**
  * Share link: copies the page's address. The URL holds the whole view (drill
- * path, period, mode, selection, open tab) and the language prefix, so a
+ * path, period, mode, selection, currency, open tab) and the language prefix, so a
  * colleague opening it sees the same screen. An icon on phones, an icon with
  * its name from `sm` up.
  */

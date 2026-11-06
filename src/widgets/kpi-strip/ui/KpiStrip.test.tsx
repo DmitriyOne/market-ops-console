@@ -1,6 +1,6 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import { Suspense } from 'react';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import { enMessages as en } from '@/shared/config';
 import { datasetHandler, renderWithProviders, server } from '@/shared/lib/test';
@@ -36,13 +36,8 @@ describe('KpiStrip', () => {
   });
 
   describe('in another currency', () => {
-    afterEach(() => {
-      localStorage.clear();
-    });
-
     it('shows revenue in euros at the fixed rate; the percentages stay', async () => {
-      localStorage.setItem('mo:currency', 'EUR');
-      setup();
+      setup('?currency=EUR');
       const section = await screen.findByRole('region', { name: t.title });
       // 22,850,419 $ × 0.89095 = 20,358,581 €
       expect(await within(section).findByText('€20.4m')).toBeInTheDocument();

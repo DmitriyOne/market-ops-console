@@ -37,6 +37,7 @@ test('settings sheet: the currency row switches amounts to pounds and closes the
   await expect(page.getByRole('dialog')).toHaveCount(0);
   // 22,850,419 $ × 0.74299
   await expect(page.getByRole('group', { name: 'Revenue' })).toContainText(/£17m/i);
+  await expect(page).toHaveURL(/[?&]currency=GBP(&|$)/);
   await page.getByRole('button', { name: /^Settings/ }).click();
   await expect(page.getByRole('button', { name: /^Currency/ })).toContainText(
     'GBP · British pound',

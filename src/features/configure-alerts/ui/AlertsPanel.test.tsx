@@ -4,6 +4,7 @@ import { Toaster } from 'sonner';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { enMessages } from '@/shared/config';
+import { useCurrencyChoice } from '@/shared/lib';
 import { alertsApi, datasetHandler, renderWithProviders, server } from '@/shared/lib/test';
 
 import { AlertsPanel, type AlertTab } from './AlertsPanel';
@@ -15,10 +16,26 @@ function Panel({ initial = 'rules' }: { initial?: AlertTab }) {
   return <AlertsPanel tab={tab} onTabChange={setTab} firing={<p>Firing content</p>} />;
 }
 
+/** Stands in for the header's currency menu: switches the URL's currency. */
+function ToPounds() {
+  const [, setCurrency] = useCurrencyChoice();
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        setCurrency('GBP');
+      }}
+    >
+      To pounds
+    </button>
+  );
+}
+
 function setup(searchParams = '', api = alertsApi(), initial: AlertTab = 'rules') {
   server.use(datasetHandler(), ...api.handlers);
   const view = renderWithProviders(
     <Suspense>
+      <ToPounds />
       <Panel initial={initial} />
       <Toaster />
     </Suspense>,
@@ -163,8 +180,7 @@ describe('AlertsPanel', () => {
 
   describe('in another currency (ADR 0017)', () => {
     it('EUR: typed in millions of euros, previewed on euro revenue, stored in USD', async () => {
-      localStorage.setItem('mo:currency', 'EUR');
-      const { user, api } = setup();
+      const { user, api } = setup('?currency=EUR');
       await rulesList();
       await user.click(screen.getByRole('button', { name: t.list.new }));
       await user.type(screen.getByRole('textbox', { name: t.form.name }), 'Under a million');
@@ -188,7 +204,6 @@ describe('AlertsPanel', () => {
     });
 
     it('GBP: editing only the name keeps the stored USD threshold to the dollar', async () => {
-      localStorage.setItem('mo:currency', 'GBP');
       const stored = {
         id: 'r-rev',
         name: 'Revenue watch',
@@ -200,7 +215,7 @@ describe('AlertsPanel', () => {
         severity: 'warning',
         enabled: true,
       } as const;
-      const { user, api } = setup('', alertsApi([stored]));
+      const { user, api } = setup('?currency=GBP', alertsApi([stored]));
       await user.click(await screen.findByRole('button', { name: 'Edit Revenue watch' }));
       expect(screen.getByRole('textbox', { name: 'Threshold, M£' })).toHaveValue('0.742991');
       const name = screen.getByRole('textbox', { name: t.form.name });
@@ -214,8 +229,7 @@ describe('AlertsPanel', () => {
     });
   });
 
-  it('a currency change in another tab restarts an open form in the new currency (ADR 0017)', async () => {
-    localStorage.setItem('mo:currency', 'EUR');
+  it('a currency change while the form is open restarts it in the new currency (ADR 0017)', async () => {
     const stored = {
       id: 'r-rev',
       name: 'Revenue watch',
@@ -226,13 +240,12 @@ describe('AlertsPanel', () => {
       severity: 'warning',
       enabled: true,
     } as const;
-    const { user, api } = setup('', alertsApi([stored]));
+    const { user, api } = setup('?currency=EUR', alertsApi([stored]));
     await user.click(await screen.findByRole('button', { name: 'Edit Revenue watch' }));
     // 1,250,000 $ × 0.89095 = 1,113,687.5 € → 1,113,688
     expect(screen.getByRole('textbox', { name: 'Threshold, M€' })).toHaveValue('1.113688');
 
-    localStorage.setItem('mo:currency', 'GBP');
-    window.dispatchEvent(new StorageEvent('storage', { key: 'mo:currency', newValue: 'GBP' }));
+    await user.click(screen.getByRole('button', { name: 'To pounds' }));
 
     // 1,250,000 $ × 0.74299 = 928,737.5 £ → 928,738
     const threshold = await screen.findByRole('textbox', { name: 'Threshold, M£' });
