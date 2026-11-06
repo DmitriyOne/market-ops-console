@@ -15,6 +15,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 - Analyst on wide screens: the map stays in view while Top risks and the radar next to it scroll, so a pick on the map and the radar it changes are seen together.
 
 ### Fixed
+- No hydration error on the bell: its count is shown from after hydration. The alert rules could arrive before the bell's part of the page hydrated (seen in development), and the static HTML has no count.
 - Phone settings: picking a currency no longer flashes its menu 190 px away: the menus in the bottom sheet open upward, so the sheet sliding down after a pick no longer flips them mid-fade.
 - Sentry no longer receives this machine's errors and console lines: a DSN in `.env.local` alone sends nothing; `NEXT_PUBLIC_SENTRY_LOCAL=true` sends, as environment `local`. Deployments report Vercel's environment (`production`, `preview`) instead of `NODE_ENV`, under which a local build or a preview counted as production (ADR 0019).
 - Heat map with a mouse: the line under the grid only reads the cell out; its Open and Select buttons, which changed under the mouse on the way down to them, are for touch screens, where a tap shows the cell. A tap where a mouse is the main pointer opens, as a click does.

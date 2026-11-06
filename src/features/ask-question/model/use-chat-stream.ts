@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useReducer, useRef, useState, useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 
 import {
   AbortedError,
@@ -11,7 +11,7 @@ import {
   streamSse,
 } from '@/shared/api';
 import { API_ROUTES } from '@/shared/config';
-import { logError, startMonitoredSpan } from '@/shared/lib';
+import { logError, startMonitoredSpan, useHydrated } from '@/shared/lib';
 
 import { type ChatMessage, chatReducer } from './chat-reducer';
 import { loadChat, saveChat } from './chat-storage';
@@ -45,10 +45,6 @@ function parseJson(data: string): unknown {
   }
 }
 
-const subscribeNothing = () => () => undefined;
-const isClient = () => true;
-const isServer = () => false;
-
 // Changes when a message is added, removed or settles; tokens do not change it.
 const storageKey = (messages: ChatMessage[]) => messages.map((m) => `${m.id}:${m.status}`).join();
 
@@ -57,7 +53,7 @@ export function useChatStream(): ChatStream {
   const [messages, dispatch] = useReducer(chatReducer, []);
   // The server (and `next dev` SSR) has no sessionStorage: render "not ready"
   // there and while hydrating, then restore on the first client render after.
-  const hydrated = useSyncExternalStore(subscribeNothing, isClient, isServer);
+  const hydrated = useHydrated();
   const [ready, setReady] = useState(false);
   if (hydrated && !ready) {
     setReady(true);
