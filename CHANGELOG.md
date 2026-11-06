@@ -6,7 +6,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 
 ### Changed
 - README rewritten for reviewers, one block per section the brief asks for: try it in three minutes, quick start, architecture (layers, data flow diagram, server vs client state), decisions with what was considered, trust in AI output, productionising (performance, observability, resilience, CI/CD), accessibility, testing, key decisions, standards, AI workflow, what I'd do next. Screenshots in `docs/screenshots`.
-- The full feature list moved from the README to `docs/features.md`.
+- The full feature list moved from the README to `docs/features.md`, brought up to 0.16.0 (path above the title, names in the page's language, heat map by mouse and by touch, Edit or Dismiss for refused alert writes, "Link copied", the phone header, suggested questions after repeated refusals).
+- The author's own words, said in Ukrainian and translated close to word for word, in the README: a few words at the top, how AI tools were used, accessibility, what I like in it, what I'd do differently. `CLAUDE.md` says agents only translate those parts.
+- Release dates in the changelog.
 
 ## [0.16.0] - 2026-11-06
 

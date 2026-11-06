@@ -36,6 +36,8 @@ Format: **Item**: what is wrong (file). Why it can wait. Where it goes.
 
 Points the owner wants explained in the README, in his own words:
 
+**Status at 1.0.0:** in the README (Key technical decisions, Making the AI output trustworthy, Engineering standards), as facts in the agent's words: chat history in `sessionStorage`, citations per answer, rate limits on the server. Not in the README: status for the latest month only, where answer feedback goes, an answer cut by a reload. The owner may restate any of them in his own words.
+
 - **Chat history in sessionStorage, not localStorage or a server.** Production keeps threads on the server per user, with retention and real deletion; the brief forbids a real backend. sessionStorage survives a reload and ends with the tab. localStorage was rejected: transcript left on shared computers, races between tabs. Risks that remain and how they are handled: XSS can read it (plain-text rendering, no third-party scripts, CSP later), ~5 MB quota (50 messages, try/catch), sync writes (only when a message starts or ends), old formats (versioned key, zod on read). "New chat" clears it.
 - **Citations are per answer, not per claim**: the contract has no positions in the text; guessing them means parsing AI text.
 - **Status is for the latest month only** in the data; the data block says so, while a question may say "this quarter".
