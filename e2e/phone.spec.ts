@@ -56,3 +56,49 @@ test('Share link is an icon next to the title, a 44 px target', async ({ page })
   // Same row as the title, at its end.
   expect(Math.abs((box?.y ?? 0) - (title?.y ?? 0))).toBeLessThan(12);
 });
+
+test('period and mode share one row that slides away while scrolling down, without moving the page', async ({
+  page,
+}) => {
+  await page.goto('/ru-RU/dashboard?range=12m');
+  const period = page.getByRole('button', { name: /^Период: / });
+  const mode = page.getByRole('banner').getByRole('radiogroup', { name: 'Вид' });
+  await expect(period).toBeVisible();
+  // One row: the button and the switch sit side by side.
+  const [p, m] = [await period.boundingBox(), await mode.boundingBox()];
+  expect(Math.abs((p?.y ?? 0) - (m?.y ?? 100)), 'same row').toBeLessThan(12);
+
+  // The row is what slides (the button inside only goes with it).
+  const row = period.locator('xpath=..');
+  const main = page.locator('#main');
+  const mainTop = async () => (await main.boundingBox())?.y;
+  const before = await mainTop();
+  await main.evaluate((el) => {
+    el.scrollBy(0, 600);
+  });
+  await expect(row).toHaveCSS('opacity', '0');
+  expect(await mainTop(), 'the dashboard does not move').toBe(before);
+
+  await main.evaluate((el) => {
+    el.scrollBy(0, -200);
+  });
+  await expect(row).toHaveCSS('opacity', '1');
+  await period.click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+});
+
+test('the period shows in full when it fits, as the month over "12 мес." when it does not', async ({
+  page,
+}) => {
+  const shown = page.getByRole('banner').getByRole('button', { name: /^(Period|Период): / });
+  await page.goto('/dashboard?range=12m');
+  await expect(shown).toContainText('May 2026 · 12 months');
+
+  await page.setViewportSize({ width: 320, height: 700 });
+  await page.goto('/ru-RU/dashboard?range=12m');
+  await expect(shown.getByText('12 мес.', { exact: true })).toBeVisible();
+  // The full label is there only as the invisible copy it is measured with.
+  await expect(
+    shown.getByText('май 2026 г. · 12 месяцев', { exact: true }).filter({ visible: true }),
+  ).toHaveCount(0);
+});

@@ -39,8 +39,14 @@ type AppShellProps = {
 const FRAME = 'flex h-dvh flex-col bg-background';
 // `relative`: screen-reader-only text inside is placed against the scroll
 // area, not the page, so it cannot stretch the page below the tab bar.
-const HEADER = 'border-b border-border';
-const MAIN = 'relative min-w-0 flex-1 overflow-y-auto';
+// Phone: positioned above the dashboard, so its period and mode row can lie
+// over the dashboard's top; the dashboard starts that row lower (`pt-controls`).
+const HEADER = 'border-b border-border max-lg:relative max-lg:z-10';
+const MAIN = 'relative min-w-0 flex-1 overflow-y-auto max-lg:pt-controls';
+/** Scrolled less than this, the period and mode row stays put (a jittery thumb). */
+const SCROLL_STEP = 8;
+/** Near the top the row always shows: it covers the dashboard's first lines otherwise. */
+const SCROLL_TOP = 80;
 const ALERTS_SECTION = 'relative min-w-0 flex-1 overflow-y-auto p-4';
 const ALERTS_TITLE = 'mb-3 text-lg font-semibold';
 const ASIDE =
@@ -98,6 +104,25 @@ export function AppShell({ header, main, assistant, alerts }: AppShellProps) {
     if (!hidden) setUnread(0);
   }
 
+  // Phone: scrolling the dashboard down slides the period and mode row away,
+  // scrolling up brings it back (owner, 2026-11-06).
+  const [scrolledDown, setScrolledDown] = useState(false);
+  useEffect(() => {
+    if (desktop || !mainArea) return;
+    let last = mainArea.scrollTop;
+    const onScroll = () => {
+      const top = mainArea.scrollTop;
+      if (Math.abs(top - last) < SCROLL_STEP) return;
+      setScrolledDown(top > last && top > SCROLL_TOP);
+      last = top;
+    };
+    mainArea.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      mainArea.removeEventListener('scroll', onScroll);
+    };
+  }, [desktop, mainArea]);
+  const controlsHidden = !desktop && scrolledDown;
+
   const notifyAnswer = useCallback(() => {
     if (hidden) setUnread((n) => n + 1);
   }, [hidden]);
@@ -149,7 +174,12 @@ export function AppShell({ header, main, assistant, alerts }: AppShellProps) {
         {tCommon('skipToContent')}
       </a>
       {/* Phone assistant: the whole screen, as a chat app. */}
-      <header className={cn(HEADER, overviewHidden && 'max-lg:hidden')}>{header}</header>
+      <header
+        className={cn(HEADER, overviewHidden && 'max-lg:hidden')}
+        data-controls-hidden={controlsHidden || undefined}
+      >
+        {header}
+      </header>
       <div className="flex min-h-0 flex-1">
         <main ref={setMainArea} id="main" className={cn(MAIN, overviewHidden && 'max-lg:hidden')}>
           {/* Popups here stay below the header (they are portalled to the body). */}

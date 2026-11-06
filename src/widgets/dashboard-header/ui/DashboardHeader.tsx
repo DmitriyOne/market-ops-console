@@ -18,9 +18,17 @@ import { DrillBreadcrumbs } from './DrillBreadcrumbs';
 import { SettingsSheet } from './SettingsSheet';
 
 const ROW = 'flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2';
-// Phone: period and mode each take a full row, so nothing runs off the screen.
-const CONTROLS =
-  'flex items-center gap-2 max-lg:order-2 max-lg:w-full max-lg:flex-col max-lg:items-stretch';
+// Phone: period and mode share one row over the top of the dashboard (it
+// starts `controls` lower), so the header itself stays two rows. Scrolling
+// down slides the row away, without moving anything else (no layout shift);
+// up, or focus inside it, brings it back (owner, 2026-11-06).
+const CONTROLS = cn(
+  'flex items-center gap-2',
+  'max-lg:absolute max-lg:inset-x-0 max-lg:top-full max-lg:h-controls max-lg:border-b max-lg:border-border max-lg:bg-background max-lg:px-4',
+  'max-lg:transition-[translate,opacity] max-lg:duration-200 motion-reduce:transition-none',
+  'max-lg:controls-hidden:pointer-events-none max-lg:controls-hidden:-translate-y-full max-lg:controls-hidden:opacity-0',
+  'max-lg:focus-within:pointer-events-auto max-lg:focus-within:translate-y-0 max-lg:focus-within:opacity-100',
+);
 
 // Phone: the name fills the first row next to ⚙︎; the path drops to its own row.
 const APP_NAME = 'flex items-center gap-2 font-semibold whitespace-nowrap max-lg:flex-1';
@@ -54,8 +62,8 @@ function AppName({ live = false }: { live?: boolean }) {
 
 /**
  * Desktop: name · path · period · mode · alerts · currency · language · theme in one row.
- * Phone: name and ⚙︎ on the first row, the path below, then period and
- * mode full width.
+ * Phone: name and ⚙︎ on the first row, the path below; period and mode
+ * in one row over the dashboard's top, which slides away while scrolling down.
  */
 export function DashboardHeader() {
   return (
@@ -75,8 +83,8 @@ export function DashboardHeader() {
       <DatasetGate fallback={null}>
         <div className={CONTROLS}>
           <Suspense fallback={<ControlsSkeleton />}>
-            <PeriodPicker />
-            <ModeSwitch className="max-lg:w-full" />
+            <PeriodPicker className="max-lg:min-w-0 max-lg:flex-1" />
+            <ModeSwitch className="max-lg:shrink-0" />
           </Suspense>
         </div>
       </DatasetGate>
@@ -107,8 +115,8 @@ function PathSkeleton() {
 function ControlsSkeleton() {
   return (
     <>
-      <Skeleton aria-hidden className="h-11 w-48 max-lg:w-full" />
-      <Skeleton aria-hidden className="h-13 w-52 rounded-xl max-lg:w-full" />
+      <Skeleton aria-hidden className="h-11 w-48 max-lg:min-w-0 max-lg:flex-1" />
+      <Skeleton aria-hidden className="h-13 w-52 shrink-0 rounded-xl max-lg:w-44" />
     </>
   );
 }

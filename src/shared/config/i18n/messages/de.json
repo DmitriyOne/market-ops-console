@@ -201,6 +201,11 @@
       "3m": "3 Monate",
       "12m": "12 Monate"
     },
+    "rangeShort": {
+      "1m": "1 Mon.",
+      "3m": "3 Mon.",
+      "12m": "12 Mon."
+    },
     "rangeLabel": "Monate bis {period}"
   },
   "mode": {
