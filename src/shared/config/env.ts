@@ -24,7 +24,7 @@ export const env = createEnv({
   },
   client: {
     NEXT_PUBLIC_SITE_URL: z.url().optional(),
-    /** Sentry project key (public by design). Unset, Sentry stays off: tests, E2E, CI (ADR 0019). */
+    /** Sentry project key (public by design). Unset, Sentry stays off; E2E sets a fake local one (ADR 0019). */
     NEXT_PUBLIC_SENTRY_DSN: z.url().optional(),
   },
   runtimeEnv: {

@@ -126,4 +126,7 @@ Points the owner wants explained in the README, in his own words:
 - **Click breadcrumbs name the button by its CSS classes** (Sentry's DOM path: a long Tailwind class list) rather than its label. Readable enough with the URL and the tags; a `data-sentry-label` on key buttons would shorten them. Cosmetic.
 - **React's recoverable hydration errors are not reported**: Next gives no hook outside the console. **Accepted**.
 - **A Sentry organisation in the EU region, a privacy notice, Sentry's DPA and a consent banner** before any real launch for UK/EU users (README, ADR 0019). **Production**, not this demo.
+- **A real mid-stream chat failure is reported twice** (the server's exception, `phase: 'stream'`, and the browser's `ChatServerError` for the `error` event): the browser cannot tell it from the `error` fixture. Send a code with the server's `error` event if it matters. **Accepted**.
+- **Whether ad-block lists drop `/monitoring`** is not checked. **Watch** after the deploy.
+- **The Excel export span's error status and `MonitoringTags` mounted through `Providers` have no test** (independent review). **Hardening plan**.
 

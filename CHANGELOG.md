@@ -5,8 +5,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 ## [0.14.0] - Unreleased
 
 ### Added
-- Error monitoring with Sentry (ADR 0019): errors from the browser and the server, 10 % of traces in production, with the screen's language, mode, currency and tab on every event. Off without `NEXT_PUBLIC_SENTRY_DSN`, so tests and CI send nothing.
-- No personal data: no IP address, user id, cookies, headers, request bodies or question text; events go through the app's own `/sentry-tunnel`, which forwards only the event body.
+- Error monitoring with Sentry (ADR 0019): errors from the browser and the server, 10 % of traces in production, with the screen's language, mode, currency and tab on every event. Off without `NEXT_PUBLIC_SENTRY_DSN`. E2E runs it on with a DSN that points nowhere and checks what the browser would send.
+- No personal data: no IP address, user id, cookies, headers, request bodies or question text; events go through the app's own `/monitoring` path, which forwards only the event body. The browser copy of a server fault the server already reported is not sent twice; the demo save failure and expected answers are breadcrumbs.
 - Warnings when data is lost without an exception (an unreadable alerts cookie, a stored chat that no longer fits, a full storage) and when an answer cites what the dataset lacks; breadcrumbs for a repaired link and a 404; the chat answer (time to the first token and to the end) and the Excel export are timed.
 - A Sentry test page (`/sentry-test`, every language) that fires each kind of error. It exists only where `ENABLE_SENTRY_TEST_PAGE` is set (`.env.local`); everywhere else it and its API are a 404.
 - README: what is stored and sent, and what a production launch for UK/EU users needs (a consent banner, a privacy notice, Sentry's DPA, an EU data region).

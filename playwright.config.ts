@@ -1,5 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
+import { E2E_SENTRY_DSN } from './e2e/sentry-dsn';
+
 // One config, two targets (ADR 0008): with BASE_URL (a deployed preview) the
 // suite tests that URL; without it, it builds the app and starts it on 3100,
 // apart from the dev server on 3000 (the Next guide tests a production build).
@@ -51,9 +53,11 @@ export default defineConfig({
           // the long one, so Stop can be pressed mid-answer.
           MOCK_TOKEN_DELAY_MS: '20',
           MOCK_ALERTS_DELAY_MS: '400',
-          // Never send events from a test run, and keep the Sentry test page
-          // closed even if .env.local opens it (ADR 0019).
-          NEXT_PUBLIC_SENTRY_DSN: '',
+          // Sentry on, as in production, with a DSN that points nowhere: the
+          // browser's events are caught at /monitoring (the tunnel) by the fixtures and
+          // read by e2e/sentry.spec.ts; nothing can leave the machine. The
+          // test page stays closed even if .env.local opens it (ADR 0019).
+          NEXT_PUBLIC_SENTRY_DSN: E2E_SENTRY_DSN,
           ENABLE_SENTRY_TEST_PAGE: 'false',
         },
       },

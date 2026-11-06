@@ -2,7 +2,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 const DSN = 'https://key@o1.ingest.us.sentry.io/2';
-const flags = vi.hoisted(() => ({ dsn: undefined as string | undefined }));
+const flags = vi.hoisted((): { dsn: string | undefined } => ({ dsn: undefined }));
 vi.mock('@/shared/config', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/shared/config')>();
   return {
@@ -96,5 +96,13 @@ describe('POST /sentry-tunnel', () => {
     const request = new Request('http://localhost/sentry-tunnel', init);
     expect((await POST(request)).status).toBe(413);
     expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('refuses a request with no body', async () => {
+    flags.dsn = DSN;
+    vi.resetModules();
+    const { POST } = await import('./route');
+    const request = new Request('http://localhost/sentry-tunnel', { method: 'POST' });
+    expect((await POST(request)).status).toBe(400);
   });
 });
