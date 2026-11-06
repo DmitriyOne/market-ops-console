@@ -3,7 +3,12 @@
     "appName": "Market Ops Console",
     "skipToContent": "Skip to content",
     "description": "Sales performance by market, product and period, with an AI assistant that shows its sources.",
-    "close": "Close"
+    "close": "Close",
+    "titleTemplate": "{page} · {appName}"
+  },
+  "meta": {
+    "dashboard": "Dashboard",
+    "ogAlt": "{appName}. {description}"
   },
   "errors": {
     "timeout": "The request took too long. Please try again.",
@@ -24,12 +29,14 @@
   "notFound": {
     "title": "Page not found",
     "body": "The page you're looking for doesn't exist or has moved.",
-    "home": "Back to dashboard"
+    "home": "Back to dashboard",
+    "address": "Address not found: {path}"
   },
   "errorPage": {
     "title": "Something went wrong",
     "body": "This page couldn't be displayed. Try again or go back to the dashboard.",
-    "home": "Back to dashboard"
+    "home": "Back to dashboard",
+    "errorId": "Error ID: {id}"
   },
   "theme": {
     "label": "Theme",

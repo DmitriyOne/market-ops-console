@@ -3,7 +3,12 @@
     "appName": "Market Ops Console",
     "skipToContent": "Zum Inhalt springen",
     "description": "Vertriebsleistung nach Markt, Produkt und Zeitraum, mit einem KI-Assistenten, der seine Quellen zeigt.",
-    "close": "Schließen"
+    "close": "Schließen",
+    "titleTemplate": "{page} · {appName}"
+  },
+  "meta": {
+    "dashboard": "Dashboard",
+    "ogAlt": "{appName}. {description}"
   },
   "errors": {
     "timeout": "Die Anfrage hat zu lange gedauert. Bitte versuchen Sie es erneut.",
@@ -24,12 +29,14 @@
   "notFound": {
     "title": "Seite nicht gefunden",
     "body": "Die gesuchte Seite existiert nicht oder wurde verschoben.",
-    "home": "Zurück zum Dashboard"
+    "home": "Zurück zum Dashboard",
+    "address": "Nicht gefundene Adresse: {path}"
   },
   "errorPage": {
     "title": "Etwas ist schiefgelaufen",
     "body": "Diese Seite konnte nicht angezeigt werden. Versuchen Sie es erneut oder kehren Sie zum Dashboard zurück.",
-    "home": "Zurück zum Dashboard"
+    "home": "Zurück zum Dashboard",
+    "errorId": "Fehler-ID: {id}"
   },
   "theme": {
     "label": "Design",
