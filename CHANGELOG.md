@@ -2,6 +2,11 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/). The top version must match `package.json` and the `release/X.Y.Z` branch.
 
+## [0.15.0] - Unreleased
+
+### Changed
+- Node.js is pinned to 24.x (`engines`): Vercel no longer moves the build to a new major version on its own, the same Node as `.nvmrc` and CI.
+
 ## [0.14.0] - Unreleased
 
 ### Added
