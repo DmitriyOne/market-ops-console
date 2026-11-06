@@ -9,8 +9,8 @@ import { useCurrency } from './use-currency';
 
 /**
  * Re-provides next-intl with the formats of the chosen currency, so every
- * `format.number(v, 'compactCurrency')` prints its symbol (ADR 0017). The
- * server renders USD; the choice is read in the browser.
+ * `format.number(v, 'compactCurrency')` prints its symbol (ADR 0017). It
+ * reads the URL, so it sits inside the dashboard's Suspense, not app-wide.
  */
 export function CurrencyFormats({ children }: { children: ReactNode }) {
   const currency = useCurrency();

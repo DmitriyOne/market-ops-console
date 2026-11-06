@@ -1,5 +1,7 @@
 import { parseAsNativeArrayOf, parseAsString } from 'nuqs/server';
 
+import { CURRENCY_PARAM } from '@/shared/config';
+
 /**
  * Dashboard view state in the URL (spec §6). Values are read as plain
  * strings and checked against the dataset in `normalizeDashboardState`,
@@ -21,4 +23,9 @@ export const dashboardSearchParams = {
   markets: parseAsNativeArrayOf(parseAsString),
   /** Markets table order: `growth` ascending, `-growth` descending. */
   sort: parseAsString,
+  /**
+   * Currency amounts are shown in (`useCurrency` reads it); checked here so a
+   * bad or default value leaves the URL and Reset view clears it.
+   */
+  [CURRENCY_PARAM]: parseAsString,
 };

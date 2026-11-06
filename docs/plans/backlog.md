@@ -84,7 +84,7 @@ Points the owner wants explained in the README, in his own words:
 
 ## From the 0.10.0 E2E build (2026-11-05)
 
-- **The E2E run on Vercel previews** (`deployment_status`, `BASE_URL` = the preview URL, filtered to `release/*` previews to spare minutes; protection bypass or Trusted Sources) comes with the deploy. **0.15.0** (0.12.0 became the currency picker, 0.13.0 metadata and error pages, 0.14.0 Sentry; owner 2026-11-06).
+- **The E2E run on Vercel previews** (`deployment_status`, `BASE_URL` = the preview URL, filtered to `release/*` previews to spare minutes; protection bypass or Trusted Sources) comes after the deploy (done by hand, 2026-11-06). **Later** (0.12.0 became the currency picker, 0.13.0 metadata and error pages, 0.14.0 Sentry, 0.15.0 the Node pin and the share button; owner 2026-11-06).
 - **The phone tab's name reads "Alerts , 5 markets flagged"** in Chromium (a space before the comma from the inline count). Screen readers ignore it. Cosmetic.
 
 ## From the 0.11.0 review (2026-11-05)
@@ -116,12 +116,12 @@ Points the owner wants explained in the README, in his own words:
 - **`MarketsTable` test "a market the alert rules flag has a bell" failed once** in a full run and passes alone (10/10): flaky under load. **Watch**.
 - **The Inter files are full fonts** (~325 KB each, only the preview image uses them). Subsetting to Latin + Cyrillic is optional. **Accepted**.
 - **A path outside the app's routing** (`/x.txt`, `/api/unknown`) gets Next's own English 404: the localised one needs `global-not-found`, an experimental flag (owner: none in production). **Accepted**.
-- **The preview image's URL is `localhost`** until 0.15.0 sets `NEXT_PUBLIC_SITE_URL` or Vercel provides its domain. **0.15.0**.
+- **The preview image's URL is `localhost`** until 0.15.0 sets `NEXT_PUBLIC_SITE_URL` or Vercel provides its domain. **Done with the deploy**: Vercel provides it. It picks the shortest production domain, today `market-ops-console-xi.vercel.app`, not `df-market-ops-console.vercel.app`; remove that domain or set `NEXT_PUBLIC_SITE_URL` on Production to change it (owner).
 
 ## From 0.14.0 (Sentry, 2026-11-06)
 
-- **Source maps are not uploaded yet**: production stack traces in Sentry stay minified until `SENTRY_AUTH_TOKEN`, `SENTRY_ORG` and `SENTRY_PROJECT` are set in Vercel. **0.15.0**.
-- **The environment is `NODE_ENV`**, so a Vercel preview reports as `production`. Use `VERCEL_ENV` (exposed to the browser) with the deploy. **0.15.0**.
+- **Source maps are not uploaded yet**: production stack traces in Sentry stay minified until `SENTRY_AUTH_TOKEN`, `SENTRY_ORG` and `SENTRY_PROJECT` are set in Vercel. **Done with the deploy** (Production only); the owner checks a readable stack in Sentry.
+- **The environment is `NODE_ENV`**, so a Vercel preview reports as `production`. Use `VERCEL_ENV` (exposed to the browser). Until then the DSN is set on Production only, so previews send nothing. **Later**.
 - **Page-load and server traces are two traces**: `clientTraceMetadata` is experimental and removed (ADR 0018, 0019). **Accepted**; revisit if Next makes it stable.
 - **Click breadcrumbs name the button by its CSS classes** (Sentry's DOM path: a long Tailwind class list) rather than its label. Readable enough with the URL and the tags; a `data-sentry-label` on key buttons would shorten them. Cosmetic.
 - **React's recoverable hydration errors are not reported**: Next gives no hook outside the console. **Accepted**.
