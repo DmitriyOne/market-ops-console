@@ -18,6 +18,7 @@ export * from './sheet';
 export { Skeleton } from './skeleton';
 export { toast, Toaster } from './sonner';
 export { Sparkline } from './sparkline';
+export { StatusScreen } from './status-screen';
 export { Switch } from './switch';
 export * from './table';
 export { Textarea } from './textarea';

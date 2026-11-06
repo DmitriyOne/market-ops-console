@@ -30,7 +30,7 @@
     "title": "Seite nicht gefunden",
     "body": "Die gesuchte Seite existiert nicht oder wurde verschoben.",
     "home": "Zurück zum Dashboard",
-    "address": "Nicht gefundene Adresse: {path}"
+    "address": "<label>Nicht gefundene Adresse:</label> {path}"
   },
   "errorPage": {
     "title": "Etwas ist schiefgelaufen",
