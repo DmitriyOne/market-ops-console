@@ -23,21 +23,29 @@ Take-home assignment for the Frontend Engineer role at NewPage Solutions.
 
 Phone, in German: the Europe overview, and the assistant refusing a question the data cannot answer.
 
+## A few words from me
+
+> **About the language.** English is not my first language, and I am not fluent yet. The parts of this README marked *In my own words* I said in Ukrainian, and they were translated into English with an AI tool, as close to word for word as possible. The AI only translated what I said; it did not write it for me. These are my thoughts and my feelings.
+>
+> It was a very interesting product. Of course, quite a big one. But I really enjoyed building it, and I got carried away by it. It was very nice to have this opportunity. I hope we get to meet and talk more. If you have any feedback at all, I will be glad to hear it, because I really put a lot of effort and time into this.
+
 ## Contents
 
-1. [Try it in three minutes](#try-it-in-three-minutes)
-2. [Quick start](#quick-start)
-3. [Architecture](#architecture)
-4. [Front-end approach and decisions](#front-end-approach-and-decisions)
-5. [Making the AI output trustworthy](#making-the-ai-output-trustworthy)
-6. [Productionising it](#productionising-it)
-7. [Accessibility](#accessibility)
-8. [Testing](#testing)
-9. [Key technical decisions](#key-technical-decisions)
-10. [Engineering standards](#engineering-standards)
-11. [How I used AI tools](#how-i-used-ai-tools)
-12. [What I'd do differently with more time](#what-id-do-differently-with-more-time)
-13. [Repository map](#repository-map)
+1. [A few words from me](#a-few-words-from-me)
+2. [Try it in three minutes](#try-it-in-three-minutes)
+3. [Quick start](#quick-start)
+4. [Architecture](#architecture)
+5. [Front-end approach and decisions](#front-end-approach-and-decisions)
+6. [Making the AI output trustworthy](#making-the-ai-output-trustworthy)
+7. [Productionising it](#productionising-it)
+8. [Accessibility](#accessibility)
+9. [Testing](#testing)
+10. [Key technical decisions](#key-technical-decisions)
+11. [Engineering standards](#engineering-standards)
+12. [How I used AI tools](#how-i-used-ai-tools)
+13. [What I like in it](#what-i-like-in-it)
+14. [What I'd do differently with more time](#what-id-do-differently-with-more-time)
+15. [Repository map](#repository-map)
 
 ## Try it in three minutes
 
@@ -177,6 +185,12 @@ Vercel builds previews and deploys `master` to production. Branches go `feature/
 
 ## Accessibility
 
+*In my own words:*
+
+> About people, I thought like this: the most important thing I put in was that it is convenient for them. I applied the best practices, both for those who have different needs and for everyone else, but overall so that it all works, and works conveniently. For the users I added different languages, different currencies, different themes, so that it is convenient for them to work, and also different hints and so on, so that all of this makes the work better and helps them find their way faster in what is there.
+>
+> I checked the whole site: the map, the assistant, the menus, the dashboard. For accessibility, I have not turned on voice reading (a screen reader) yet; I am going to do it now and check that it all works well for people. But overall I checked it, because I would really like it to be well supported, and for everyone to be able to use this product comfortably, at any time, in any place, and whatever a person's abilities are.
+
 Target: WCAG 2.1 AA, checked against 2.2 where it was cheap.
 
 - **Keyboard everywhere.** The map's countries are focusable, with zoom buttons. The heat map is an ARIA grid with arrow keys. Menus and sheets keep focus inside and give it back when they close.
@@ -226,6 +240,14 @@ A new test for a bug has to fail on the code before the fix; it is run against t
 
 ## How I used AI tools
 
+*In my own words:*
+
+> Why through an agent? Well, because it seems to me that this is a new era now. It is the same as before, when people changed how they count. I don't know how it was in Britain, but in Ukraine, in Russia, well, in the countries of the USSR, people counted on an abacus, and then they moved to calculators, and that was a new era. Here it is the same: just something new. The same as, well, there was plain JavaScript, and then we moved to frameworks like React, Angular, Vue. It is just a new step. That is why I did it through an agent: because it is a new step in development, and nothing more.
+>
+> Where does it save time? In writing code. Well, simply in the routine, what you do all the time, regularly, step by step.
+>
+> I stopped it and corrected it because, well, I have experience, I know what happens behind the scenes, and I see the situation with clear eyes: what is needed, what was there, what needs to be fixed, where there is a bug. Sometimes, of course, it suggests things, and that is very good, it is even better than me in some things. But sometimes experience matters, and then the result is good: this way you find a solution better and faster.
+
 I built this with Claude Code. I made the decisions; the agent wrote most of the code, and I reviewed it.
 
 **Workflow**
@@ -252,7 +274,27 @@ I built this with Claude Code. I made the decisions; the agent wrote most of the
 - Don't accept "fixed" without a test or a browser check.
 - Don't let it write the reasoning in this README for me.
 
+## What I like in it
+
+*In my own words:*
+
+> I like the solution with different themes, and the two modes, one for one audience and one for the other. Because sometimes, when you open it at night, it is so bright, if there is only one theme. So this is very convenient.
+>
+> I also like that you can export everything to Excel or CSV. Then you can feed it to this same code, or to ChatGPT, and ask for its solution, its thoughts: what can be changed, what can be improved, what is wrong, and all that.
+>
+> I also like that you can leave a plus or a minus on an answer. Sometimes that is handy: maybe, I hope so, someone will see your comment and fix something on the site.
+>
+> What I really like in the AI assistant: if you asked several times and it said it does not know what to answer, then next time it offers a set of questions, so you can just press one button and it already works. Handy. Of course, sometimes it is annoying, you would want a real person, but we have what we have for now.
+>
+> I also really like the zoom on the map, how it works, on mobile too. On mobile the map is small, of course, but overall, yes, it is very interesting, and I like how it all works.
+
 ## What I'd do differently with more time
+
+*In my own words:*
+
+> Most likely, I would first make the backend itself, with Swagger, just so the contracts are easier to understand. I would also put zod on everything. And honestly, I don't really like that we have no short links: when you copy a link, it is the whole URL. That is not very OK, and I would like to change it.
+
+Also on the list:
 
 - **Mobile load time.** Render the default view on the server and let the client only correct it, instead of drawing everything after load.
 - **Real screen-reader testing** with VoiceOver and NVDA, not only axe.
