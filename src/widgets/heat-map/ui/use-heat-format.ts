@@ -36,13 +36,11 @@ export function useHeatFormat(metric: HeatMetric, marketNotes = false) {
     // the month, and a screen reader in the grid reads them as focus moves.
     // The visible (rounded) figure is part of the name (label in name, WCAG
     // 2.5.3), the exact one follows: "+12% (+11.7%)".
-    const parts = [
+    const value =
       cell.value === null
         ? t('cell', { value: dash })
-        : t('cellRounded', { shown: short(cell.value), value: long(cell.value) }),
-    ];
-    if (cell.anomaly) parts.push(note(cell.anomaly.note));
-    return parts.join(', ');
+        : t('cellRounded', { shown: short(cell.value), value: long(cell.value) });
+    return cell.anomaly ? t('cellWithNote', { value, note: note(cell.anomaly.note) }) : value;
   };
 
   return { short, long, month, monthShort, metricName, note, cellName };

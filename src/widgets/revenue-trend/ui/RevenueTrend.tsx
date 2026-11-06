@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useId } from 'react';
 
-import { periodToDate, scopeLabel, trendView, useDashboard } from '@/entities/performance';
+import { periodToDate, trendView, useDashboard, useScopeLabel } from '@/entities/performance';
 import { useStoredFlag } from '@/shared/lib';
 import {
   Button,
@@ -42,6 +42,8 @@ const CARD = 'gap-3 border border-border ring-0';
 export function RevenueTrend() {
   const t = useTranslations('trend');
   const tDrill = useTranslations('drill');
+  const tCommon = useTranslations('common');
+  const scopeLabel = useScopeLabel();
   const format = useFormatter();
   const titleId = useId();
   const { ds, state } = useDashboard();
@@ -138,10 +140,16 @@ export function RevenueTrend() {
                     <TableCell>
                       {period(p.period)}
                       {windowSet.has(p.period) ? (
-                        <span className="text-muted-foreground"> · {t('window')}</span>
+                        <span className="text-muted-foreground">
+                          {' '}
+                          {tCommon('after', { text: t('window') })}
+                        </span>
                       ) : null}
                       {anomalyAt.has(p.period) ? (
-                        <span className="text-status-off-track"> · {t('anomalyMark')}</span>
+                        <span className="text-status-off-track">
+                          {' '}
+                          {tCommon('after', { text: t('anomalyMark') })}
+                        </span>
                       ) : null}
                     </TableCell>
                     {KEYS.map((key) => (

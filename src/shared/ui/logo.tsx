@@ -1,4 +1,6 @@
-import { cn } from '@/shared/lib';
+// The package, not the @/shared/lib barrel: the global error page draws the
+// logo and must not pull in env or i18n modules that may be what failed.
+import { cn } from 'cn';
 
 /**
  * The app mark: an "M" in a rounded square (the design, 2026-11-04). Drawn

@@ -252,7 +252,7 @@ Four suggested questions (buttons) taken from the brief: risks this quarter, Ger
 **Error and status pages** (all localised, same visual system):
 - `app/[locale]/not-found.tsx` — 404 (unknown route, invalid locale via `hasLocale` → `notFound()`, unknown market/region/product ids in URL fall back to defaults instead of 404 [call]).
 - `app/[locale]/error.tsx` — 500-style page for render errors in a route, with Retry (`reset()`) and a link home.
-- `app/global-error.tsx` — last resort when the root layout fails; imports the `en` dictionary directly because providers are not available there.
+- `app/global-error.tsx` — last resort when the root layout fails; providers are not available there, so it imports the dictionaries directly and speaks the address's language (0.13.0, ADR 0018; until then English only).
 - Per-widget error boundaries (§8 States) so one widget failing does not trigger the page.
 - API routes return JSON errors `{ error: { code, message } }` with proper status (400 invalid body, 404, 500); the mock chat route keeps the SSE `error` event from the contract.
 

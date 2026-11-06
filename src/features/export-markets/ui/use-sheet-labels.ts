@@ -5,14 +5,14 @@ import { useFormatter, useTranslations } from 'next-intl';
 import {
   getMarket,
   getProduct,
-  scopeLabel,
   type TableColumn,
   useDashboard,
   useKpiFormat,
+  useScopeLabel,
   useStatusLabel,
 } from '@/entities/performance';
 import { RATES_DATE, USD_RATES } from '@/shared/config';
-import { useCurrency } from '@/shared/lib';
+import { useCurrency, useJoinParts } from '@/shared/lib';
 
 import type { MarketsSheetLabels } from '../model/markets-xlsx';
 
@@ -27,6 +27,8 @@ export function useSheetLabels(): (link: string) => MarketsSheetLabels {
   const f = useKpiFormat();
   const format = useFormatter();
   const statusLabel = useStatusLabel();
+  const scopeLabel = useScopeLabel();
+  const join = useJoinParts();
   const { ds, state } = useDashboard();
   const { scope, period, range, selected, sort } = state;
 
@@ -41,11 +43,17 @@ export function useSheetLabels(): (link: string) => MarketsSheetLabels {
 
   return (link) => ({
     sheets: { markets: t('sheet.markets'), months: t('sheet.months'), about: t('sheet.about') },
-    title: [tTable('title'), scopeLabel(ds, scope) ?? portfolio, span].join(' · '),
+    title: join([tTable('title'), scopeLabel(ds, scope) ?? portfolio, span]),
     header: column,
     status: statusLabel,
     code: t('sheet.code'),
     anomaly: t('sheet.anomaly'),
+    anomalies: (list) =>
+      list.length === 0
+        ? null
+        : join(
+            list.map((a) => t('sheet.anomalyItem', { period: f.period(a.period), note: a.note })),
+          ),
     total: t('sheet.total'),
     month: t('sheet.month'),
     actual: t('sheet.actual'),
@@ -68,13 +76,16 @@ export function useSheetLabels(): (link: string) => MarketsSheetLabels {
                 date: format.dateTime(new Date(`${RATES_DATE}T00:00:00Z`), 'day'),
               }),
       },
-      { label: t('about.view'), value: [place, span].join(' · ') },
+      { label: t('about.view'), value: join([place, span]) },
       ...(product ? [{ label: t('about.product'), value: product }] : []),
       {
         label: t('about.selection'),
         value:
           selected.length > 0
-            ? selected.map((id) => getMarket(ds, id)?.name ?? id).join(', ')
+            ? format.list(
+                selected.map((id) => getMarket(ds, id)?.name ?? id),
+                { type: 'conjunction' },
+              )
             : t('about.selectionAll'),
       },
       {

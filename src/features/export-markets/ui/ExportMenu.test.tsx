@@ -78,9 +78,16 @@ describe('ExportMenu', () => {
       expect(downloadBlob).toHaveBeenCalledWith('markets-2026-05-3m.xlsx', WORKBOOK);
     });
     // Built from the rows as shown (filter and sort), with the months behind them.
-    const [view, months] = marketsXlsx.mock.calls[0] ?? [];
+    const [view, months, labels] = marketsXlsx.mock.calls[0] ?? [];
     expect(view?.rows.map((r) => r.id)).toEqual(['de', 'es']);
     expect(months).toHaveLength(6);
+    // Words from the dictionaries: the selection as a list, anomalies with a
+    // readable month, parts joined by the dictionary's separator.
+    expect(labels?.about).toContainEqual({ label: t.about.selection, value: 'Germany and Spain' });
+    expect(labels?.anomalies([{ period: '2026-03', type: 'dip', note: 'Fell.' }])).toBe(
+      'Mar 2026: Fell.',
+    );
+    expect(labels?.anomalies([])).toBeNull();
   });
 
   describe('in euros (ADR 0017)', () => {

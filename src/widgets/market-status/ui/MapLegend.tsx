@@ -42,6 +42,7 @@ function Swatch({ fill, pattern }: { fill: string; pattern?: 'dots' | 'hatch' })
 /** Steps or statuses with how many markets in scope fall in each. */
 export function MapLegend({ view }: { view: MarketMapView }) {
   const t = useTranslations('marketStatus');
+  const tCommon = useTranslations('common');
   const statusLabel = useStatusLabel();
   const m = useMapFormat();
   const { legend } = view;
@@ -64,8 +65,8 @@ export function MapLegend({ view }: { view: MarketMapView }) {
               <StatusIcon status={status} />
               {statusLabel(status)}
               <span className="font-mono tabular-nums">{legend.counts[status]}</span>
-              {status === 'at_risk' ? `· ${t('dotted')}` : null}
-              {status === 'off_track' ? `· ${t('hatched')}` : null}
+              {status === 'at_risk' ? tCommon('after', { text: t('dotted') }) : null}
+              {status === 'off_track' ? tCommon('after', { text: t('hatched') }) : null}
             </li>
           ))
         : legend.steps.map((step) => (

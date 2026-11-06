@@ -234,6 +234,7 @@ function MapView({
 
 function StatusLegend({ groups }: { groups: TileGroup[] }) {
   const t = useTranslations('marketStatus');
+  const tCommon = useTranslations('common');
   const statusLabel = useStatusLabel();
   const tiles = groups.flatMap((g) => g.tiles);
   if (!tiles.some((tile) => tile.status !== null)) {
@@ -248,7 +249,7 @@ function StatusLegend({ groups }: { groups: TileGroup[] }) {
           <span className="font-mono tabular-nums">
             {tiles.filter((tile) => tile.status === status).length}
           </span>
-          {status === 'off_track' ? `· ${t('hatched')}` : null}
+          {status === 'off_track' ? tCommon('after', { text: t('hatched') }) : null}
         </li>
       ))}
     </ul>

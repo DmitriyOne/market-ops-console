@@ -21,7 +21,7 @@ import {
   toneText,
 } from '@/entities/performance';
 import type { Period } from '@/shared/api';
-import { cn } from '@/shared/lib';
+import { cn, useJoinParts } from '@/shared/lib';
 import { Button } from '@/shared/ui';
 
 import { useHeatFormat } from './use-heat-format';
@@ -50,6 +50,7 @@ const clamp = (n: number, max: number) => Math.min(Math.max(n, 0), max);
  */
 export function HeatGrid({ view, period, label, onOpen, onToggle }: Props) {
   const t = useTranslations('heatMap');
+  const tCommon = useTranslations('common');
   const h = useHeatFormat(view.metric, view.marketNotes);
   const { rows, periods } = view;
   const lastCol = periods.length - 1;
@@ -215,7 +216,9 @@ export function HeatGrid({ view, period, label, onOpen, onToggle }: Props) {
                         as it is the only place a cell's month is said. */}
                     <span aria-hidden>{h.monthShort(p)}</span>
                     <span className="sr-only">{h.month(p)}</span>
-                    {inWindow ? <span className="sr-only">{`, ${t('inWindow')}`}</span> : null}
+                    {inWindow ? (
+                      <span className="sr-only">{tCommon('srAfter', { text: t('inWindow') })}</span>
+                    ) : null}
                   </th>
                 );
               })}
@@ -278,6 +281,7 @@ export function HeatGrid({ view, period, label, onOpen, onToggle }: Props) {
 
 function RowHeader({ row }: { row: HeatRow }) {
   const t = useTranslations('heatMap');
+  const tCommon = useTranslations('common');
   return (
     <th
       scope="row"
@@ -289,8 +293,12 @@ function RowHeader({ row }: { row: HeatRow }) {
       <span className="flex items-center gap-1">
         {row.selected ? <CircleDotIcon aria-hidden className="size-3.5 shrink-0" /> : null}
         {row.name}
-        {row.selected ? <span className="sr-only">{`, ${t('selected')}`}</span> : null}
-        {row.current ? <span className="text-muted-foreground">{`· ${t('current')}`}</span> : null}
+        {row.selected ? (
+          <span className="sr-only">{tCommon('srAfter', { text: t('selected') })}</span>
+        ) : null}
+        {row.current ? (
+          <span className="text-muted-foreground">{tCommon('after', { text: t('current') })}</span>
+        ) : null}
       </span>
     </th>
   );
@@ -375,6 +383,8 @@ function CellDetail({
 }) {
   const t = useTranslations('heatMap');
   const h = useHeatFormat(metric, marketNotes);
+  const join = useJoinParts();
+  const separator = useTranslations('common')('separator');
   if (!row || !cell) {
     return <p className="min-h-11 text-xs text-muted-foreground">{t('pick')}</p>;
   }
@@ -382,10 +392,10 @@ function CellDetail({
   return (
     <div className="flex min-h-11 min-w-0 flex-wrap items-center gap-x-3 gap-y-1 text-sm">
       <p className="min-w-0">
-        {[row.name, month, `${h.metricName} ${h.long(cell.value)}`].join(' · ')}
+        {join([row.name, month, t('readout', { metric: h.metricName, value: h.long(cell.value) })])}
         {cell.anomaly ? (
           <span className="text-muted-foreground">
-            {' · '}
+            {separator}
             <TriangleAlertIcon aria-hidden className="inline size-3.5 align-text-top" />{' '}
             {h.note(cell.anomaly.note)}
           </span>

@@ -5,7 +5,7 @@ import { useFormatter, useTranslations } from 'next-intl';
 import { type ReactNode, useId } from 'react';
 
 import { CURRENCIES, CURRENCY_SYMBOLS, RATES_DATE, USD_RATES } from '@/shared/config';
-import { useCurrencyChoice } from '@/shared/lib';
+import { useCurrencyChoice, useJoinParts } from '@/shared/lib';
 import {
   Button,
   DropdownMenu,
@@ -90,13 +90,14 @@ export function CurrencySwitchRow({
   onPick?: () => void;
 }) {
   const t = useTranslations('currency');
+  const join = useJoinParts();
   const [currency] = useCurrencyChoice();
   return (
     <CurrencyMenu onPick={onPick}>
       <button type="button" className={className} disabled={currency === null}>
         <span>{t('label')}</span>{' '}
         <span className="flex items-center gap-1 text-muted-foreground">
-          {currency ? `${currency} · ${t(currency)}` : null}
+          {currency ? join([currency, t(currency)]) : null}
           <ChevronRightIcon aria-hidden className="size-4" />
         </span>
       </button>

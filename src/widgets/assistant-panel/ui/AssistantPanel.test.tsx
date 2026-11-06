@@ -340,6 +340,8 @@ describe('AssistantPanel', () => {
     const labels = event?.type === 'done' ? event.citations.map((c) => c.label ?? '') : [];
     expect(copied).toContain(tokensText('germany-dip'));
     for (const label of labels) expect(copied).toContain(label);
+    // A list in the UI language ("A, B and C"), not labels run together.
+    expect(copied).toContain(new Intl.ListFormat('en-GB', { type: 'conjunction' }).format(labels));
     expect(copied).toContain(t.answer.label);
     expect(await screen.findByText(t.actions.copied)).toBeInTheDocument();
     // "Copied" goes away on its own.

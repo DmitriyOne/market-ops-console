@@ -6,7 +6,7 @@ import { type ReactNode, useCallback, useEffect, useId, useMemo, useRef, useStat
 
 import { useFlaggedCount } from '@/features/configure-alerts';
 import { SectionTabBar, useSection } from '@/features/switch-section';
-import { cn, scrollMainToTop, useMediaQuery } from '@/shared/lib';
+import { cn, scrollMainToTop, useJoinParts, useMediaQuery } from '@/shared/lib';
 import {
   Button,
   PopperBoundary,
@@ -57,6 +57,7 @@ const DESKTOP = '(min-width: 64rem)';
 export function AppShell({ header, main, assistant, alerts }: AppShellProps) {
   const t = useTranslations('shell');
   const tCommon = useTranslations('common');
+  const join = useJoinParts();
   const desktop = useMediaQuery(DESKTOP);
   const [section, setSection] = useSection();
   const alertsCount = useFlaggedCount();
@@ -174,7 +175,7 @@ export function AppShell({ header, main, assistant, alerts }: AppShellProps) {
               type="button"
               variant="ghost"
               className="relative size-11"
-              aria-label={badge ? `${t('expand')} · ${badge}` : t('expand')}
+              aria-label={join([t('expand'), badge])}
               onClick={expand}
             >
               <PanelRightOpenIcon aria-hidden />

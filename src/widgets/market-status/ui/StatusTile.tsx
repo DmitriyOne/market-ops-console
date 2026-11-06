@@ -3,7 +3,7 @@
 import { useTranslations } from 'next-intl';
 
 import { type MarketTile, StatusIcon, useKpiFormat, useStatusLabel } from '@/entities/performance';
-import { cn } from '@/shared/lib';
+import { cn, useJoinParts } from '@/shared/lib';
 
 const TONE = {
   on_track: 'bg-status-on-track-muted text-status-on-track',
@@ -28,17 +28,16 @@ export function StatusTile({
   const t = useTranslations('marketStatus');
   const f = useKpiFormat();
   const statusLabel = useStatusLabel();
+  const join = useJoinParts();
   const value = f.value(tile.attainmentPct, 'percent');
 
-  const name = [
+  const name = join([
     tile.status
       ? t('tile', { code: tile.iso2, name: tile.name, status: statusLabel(tile.status), value })
       : t('tileNoStatus', { code: tile.iso2, name: tile.name, value }),
     tile.selected ? t('selected') : null,
     tile.current ? t('current') : null,
-  ]
-    .filter(Boolean)
-    .join(' · ');
+  ]);
 
   return (
     <button

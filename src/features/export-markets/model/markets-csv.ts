@@ -23,9 +23,15 @@ export const MARKETS_CSV_HEADER = [
 const money = (n: number | null) => (n === null ? null : Math.round(n));
 const pct = (n: number | null) => (n === null ? null : Math.round(n * 100) / 100);
 
+/** A machine format like the header: the same in every locale, not UI text. */
+const CSV_LIST_SEPARATOR = '; ';
+const CSV_PERIOD_SEPARATOR = ': ';
+
 /** "2026-03: Revenue fell 27% …" (the data's own words); several are joined. */
 export const anomalyText = (anomalies: readonly Anomaly[]) =>
-  anomalies.length === 0 ? null : anomalies.map((a) => `${a.period}: ${a.note}`).join('; ');
+  anomalies.length === 0
+    ? null
+    : anomalies.map((a) => [a.period, a.note].join(CSV_PERIOD_SEPARATOR)).join(CSV_LIST_SEPARATOR);
 
 /** The rows as shown (filter, sort, window), raw USD; the total is left to the spreadsheet. */
 export function marketsCsv(view: MarketsTableView): string {

@@ -1,7 +1,7 @@
 'use client';
 
 import { BanIcon, SparklesIcon, SquareIcon, TriangleAlertIcon } from 'lucide-react';
-import { useTranslations } from 'next-intl';
+import { useFormatter, useTranslations } from 'next-intl';
 import { type ReactNode, useMemo } from 'react';
 
 import { resolveCitation, type ResolvedCitation, useKpiFormat } from '@/entities/performance';
@@ -57,6 +57,7 @@ function Paragraphs({ text, caret }: { text: string; caret?: boolean }) {
 
 function ConfidenceLine({ confidence }: { confidence: Confidence }) {
   const t = useTranslations('assistant.answer');
+  const tCommon = useTranslations('common');
   // Neutral text, bars in the AI accent; only Low adds a warning colour.
   return (
     <p className="flex flex-wrap items-center gap-2 text-sm">
@@ -65,7 +66,9 @@ function ConfidenceLine({ confidence }: { confidence: Confidence }) {
       </span>
       <span className="font-semibold">{t('confidence', { level: t(confidence) })}</span>
       {confidence === 'low' ? (
-        <span className="font-medium text-status-at-risk">· {t('directional')}</span>
+        <span className="font-medium text-status-at-risk">
+          {tCommon('after', { text: t('directional') })}
+        </span>
       ) : null}
     </p>
   );
@@ -137,6 +140,7 @@ export function AnswerMessage({
   const t = useTranslations('assistant');
   const tRoot = useTranslations();
   const f = useKpiFormat();
+  const format = useFormatter();
   const { status, text, citations, confidence, error } = message;
 
   const check = useMemo(
@@ -235,7 +239,11 @@ export function AnswerMessage({
     const labels = citations.map((c) => c.label ?? (ds ? f.scopeName(resolveCitation(ds, c)) : ''));
     return [
       text,
-      labels.length > 0 ? t('actions.copySources', { list: labels.join('; ') }) : null,
+      labels.length > 0
+        ? t('actions.copySources', {
+            list: format.list(labels, { type: 'conjunction' }),
+          })
+        : null,
       confidence ? t('answer.confidence', { level: t(`answer.${confidence}`) }) : null,
       confidence === 'low' ? t('answer.directional') : null,
       t('answer.label'),

@@ -2,6 +2,20 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/). The top version must match `package.json` and the `release/X.Y.Z` branch.
 
+## [0.13.0] - Unreleased
+
+### Added
+- A title per page in its language ("Dashboard · Market Ops Console", "Page not found · …"), the description and a link preview (Open Graph, Twitter) in the page language (ADR 0018).
+- Favicon: the M logo, light or dark with the browser's scheme; an iPhone icon and `favicon.ico`.
+- A link preview image, one per language (logo, name, description). It resolves once the site is deployed (0.14.0).
+- `robots.txt`: the console stays closed to search engines (no crawling, `noindex` on every page), so there is no sitemap.
+
+### Changed
+- The 404 and 500 pages have the app's look (logo, the code, title, text, buttons; light, dark, phone). 404 shows the address that was not found, 500 the error ID when there is one. When the whole app fails, the last-resort page speaks the address's language instead of English only.
+- Label separators (" · "), lists of names ("Germany and Spain") and the Excel sheet's anomalies (with a readable month) come from the dictionaries, so German and Russian read naturally. The copied sources of an answer are a list in the UI language.
+- Lint checks plain `.ts` files and more announced attributes for text outside the dictionaries (ADR 0011).
+- Rule: no experimental Next.js features in production; so a path outside the app's routing (`/x.txt`) keeps Next's own 404.
+
 ## [0.12.0] - Unreleased
 
 ### Added
