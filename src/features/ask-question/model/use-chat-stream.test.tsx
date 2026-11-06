@@ -419,7 +419,7 @@ describe('useChatStream', () => {
     expect(result.current.messages[1]?.text).toBe(tokensOf('at-risk').join(''));
   });
 
-  it('retry adds a new message with the same question', async () => {
+  it('retry asks a failed question again in its place: the failed answer goes', async () => {
     consoleErrors();
     server.use(chatFromFixture('error'));
     const { result } = setup();
@@ -435,10 +435,33 @@ describe('useChatStream', () => {
       result.current.retry(firstId);
     });
     await waitFor(() => {
+      expect(result.current.messages[0]?.status).toBe('done');
+    });
+    expect(result.current.messages).toHaveLength(1);
+    expect(result.current.messages[0]?.question).toBe('force error');
+    expect(result.current.messages[0]?.id).not.toBe(firstId);
+  });
+
+  it('ask again after Stop keeps the stopped answer: it holds what had arrived', async () => {
+    server.use(chatFromFixture('germany-dip', { delayMs: 5 }));
+    const { result } = setup();
+    act(() => {
+      result.current.ask('Why Germany?');
+    });
+    await waitFor(() => {
+      expect(result.current.messages[0]?.text).not.toBe('');
+    });
+    act(() => {
+      result.current.stop();
+    });
+    const firstId = result.current.messages[0]?.id ?? '';
+    act(() => {
+      result.current.retry(firstId);
+    });
+    await waitFor(() => {
       expect(result.current.messages[1]?.status).toBe('done');
     });
-    expect(result.current.messages[1]?.question).toBe('force error');
-    expect(result.current.messages[1]?.id).not.toBe(firstId);
+    expect(result.current.messages[0]?.status).toBe('stopped');
   });
 
   it.each(['Какие рынки под риском?', 'Märkte mit Risiko'])(

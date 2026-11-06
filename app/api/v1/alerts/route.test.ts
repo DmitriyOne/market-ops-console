@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';
 
 import { type AlertRuleInput, alertRuleResponseSchema, alertsResponseSchema } from '@/shared/api';
+import { encodeRules } from '@/shared/api/server';
 
 import { DELETE, GET, PATCH, POST } from './route';
 
@@ -46,13 +47,16 @@ function client() {
 }
 
 describe('/api/v1/alerts', () => {
-  it('a first visit gets the two examples in the asked language, nothing stored', async () => {
+  it('a first visit gets the two examples as presets, nothing stored', async () => {
     const { send } = client();
-    const response = await send(GET, { query: '?locale=ru-RU' });
+    const response = await send(GET);
     expect(response.headers.get('set-cookie')).toBeNull();
     expect(response.headers.get('cache-control')).toBe('no-store');
     const { rules } = alertsResponseSchema.parse(await response.json());
-    expect(rules.map((r) => r.name)).toEqual(['Выполнение плана ниже 95%', 'Доля ниже 10%']);
+    expect(rules.map((r) => [r.preset, r.name])).toEqual([
+      ['attainment', 'Attainment below 95%'],
+      ['share', 'Share below 10%'],
+    ]);
   });
 
   it('an unreadable cookie is warned about once and cleared, not on every load', async () => {
@@ -65,14 +69,76 @@ describe('/api/v1/alerts', () => {
     warn.mockRestore();
   });
 
-  it('the first write keeps the examples in the language it names', async () => {
+  it('an example keeps its preset through a toggle; an edit from the form drops it', async () => {
     const c = client();
-    expect((await c.send(POST, { query: '?locale=ru-RU', body: input })).status).toBe(201);
-    expect((await c.list()).map((r) => r.name)).toEqual([
-      'Выполнение плана ниже 95%',
-      'Доля ниже 10%',
-      'Low growth',
+    const [example] = await c.list();
+    if (!example) throw new Error('no example');
+    const { id, ...stored } = example;
+    await c.send(PATCH, { query: `?id=${id}`, body: { ...stored, enabled: false } });
+    expect((await c.list())[0]).toMatchObject({ preset: 'attainment', enabled: false });
+
+    const edited: Partial<typeof stored> = { ...stored, name: 'Мой план' };
+    delete edited.preset;
+    await c.send(PATCH, { query: `?id=${id}`, body: edited });
+    expect((await c.list())[0]).toMatchObject({ name: 'Мой план' });
+    expect((await c.list())[0]?.preset).toBeUndefined();
+  });
+
+  it("an example's name is taken in every language, not only the stored English one", async () => {
+    const c = client();
+    for (const name of ['Выполнение плана ниже 95%', 'attainment BELOW 95%']) {
+      const response = await c.send(POST, { body: { ...input, name } });
+      expect(response.status).toBe(409);
+    }
+  });
+
+  it('a list stored by 0.15 (examples without a preset, named in Russian) gets the presets back', async () => {
+    const c = client();
+    const base = { operator: 'below', scope: { kind: 'portfolio' }, enabled: true } as const;
+    const old = encodeRules([
+      {
+        ...base,
+        id: 'example-attainment',
+        name: 'Выполнение плана ниже 95%',
+        metric: 'attainment',
+        threshold: 95,
+        severity: 'critical',
+      },
+      // Renamed by the user before 0.16: theirs, not the example's.
+      {
+        ...base,
+        id: 'example-share',
+        name: 'Моя доля',
+        metric: 'share',
+        threshold: 10,
+        severity: 'warning',
+      },
     ]);
+    const response = await c.send(GET, { headers: { cookie: `mo-alerts=${old}` } });
+    const { rules } = alertsResponseSchema.parse(await response.json());
+    expect(rules.map((r) => [r.id, r.preset])).toEqual([
+      ['example-attainment', 'attainment'],
+      ['example-share', undefined],
+    ]);
+    // Its English name is taken too, as for a list stored by 0.16.
+    const dup = await c.send(POST, {
+      headers: { cookie: `mo-alerts=${old}` },
+      body: { ...input, name: 'Attainment below 95%' },
+    });
+    expect(dup.status).toBe(409);
+  });
+
+  it('a write cannot give a rule a preset that is not its own', async () => {
+    const c = client();
+    const created = await c.send(POST, { body: { ...input, preset: 'attainment' } });
+    const { rule } = alertRuleResponseSchema.parse(await created.json());
+    expect(rule.preset).toBeUndefined();
+    const { id, ...fields } = rule;
+    const changed = await c.send(PATCH, {
+      query: `?id=${id}`,
+      body: { ...fields, preset: 'share' },
+    });
+    expect(alertRuleResponseSchema.parse(await changed.json()).rule.preset).toBeUndefined();
   });
 
   it('creates, replaces and deletes, keeping the list in an httpOnly cookie', async () => {

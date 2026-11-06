@@ -29,6 +29,10 @@ function setup() {
   return screen.getByRole('button', { name: t.button });
 }
 
+/** What a screen reader hears (the live region) and what is seen (the bubble under the button). */
+const said = () => document.querySelector('[aria-live="polite"]');
+const bubble = () => document.querySelector('[data-slot="share-copied"]');
+
 async function click(button: HTMLElement) {
   await act(async () => {
     fireEvent.click(button);
@@ -54,7 +58,10 @@ describe('ShareLinkButton', () => {
     expect(writeText).toHaveBeenCalledWith(
       `${window.location.origin}/dashboard?region=eu&market=de&mode=analyst`,
     );
-    expect(screen.getByText(t.copied)).toBeInTheDocument();
+    expect(said()).toHaveTextContent(t.copied);
+    // Seen too, under the button: a phone shows only its icon.
+    expect(bubble()).toHaveTextContent(t.copied);
+    expect(bubble()).toHaveAttribute('aria-hidden', 'true');
     // The name stays "Share link": it is still the same action.
     expect(button).toHaveAccessibleName(t.button);
   });
@@ -70,11 +77,12 @@ describe('ShareLinkButton', () => {
     act(() => {
       vi.advanceTimersByTime(1000);
     });
-    expect(screen.getByText(t.copied)).toBeInTheDocument();
+    expect(bubble()).toHaveTextContent(t.copied);
     act(() => {
       vi.advanceTimersByTime(1000);
     });
-    expect(screen.queryByText(t.copied)).not.toBeInTheDocument();
+    expect(bubble()).toBeNull();
+    expect(said()).toBeEmptyDOMElement();
   });
 
   it('a blocked clipboard shows where to copy it from instead', async () => {
@@ -87,10 +95,11 @@ describe('ShareLinkButton', () => {
   it('reads "Link copied" out again on a repeat click', async () => {
     const button = setup();
     await click(button);
-    const first = screen.getByText(t.copied);
+    const first = said()?.firstElementChild;
     await click(button);
     // A new node in the live region: screen readers announce it again.
-    expect(screen.getByText(t.copied)).not.toBe(first);
+    expect(said()?.firstElementChild).not.toBe(first);
+    expect(said()).toHaveTextContent(t.copied);
   });
 
   it('a browser without the clipboard API (plain http) gets the same hint', async () => {

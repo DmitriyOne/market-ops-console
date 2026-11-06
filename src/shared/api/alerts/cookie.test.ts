@@ -8,7 +8,7 @@ import { exampleRules } from './examples';
 
 describe('alerts cookie', () => {
   it('round-trips a list', () => {
-    const rules = exampleRules('en-GB');
+    const rules = exampleRules();
     expect(decodeRules(encodeRules(rules))).toEqual(rules);
   });
 
@@ -70,7 +70,7 @@ describe('alerts cookie', () => {
       'br',
       'mx',
     ];
-    const [example] = exampleRules('en-GB');
+    const [example] = exampleRules();
     if (!example) throw new Error('no example rule');
     const rules = Array.from({ length: 10 }, (_, i) => ({
       ...example,

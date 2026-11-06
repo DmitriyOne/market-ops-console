@@ -12,7 +12,7 @@
 - **Joining and titles (0.13.0):** label parts are joined with the dictionary's `common.separator` (`useJoinParts`), lists of names with `format.list` (`conjunction`: CLDR's `unit` list has no separator in Russian), anything else as a message with placeholders (`common.after`, `common.srAfter`, …); page titles follow `common.titleTemplate` (ADR 0018). Lint enforces both (ADR 0011).
 - **No string literals in markup**, enforced by `i18next/no-literal-string` (ADR 0011).
 
-**Out of scope.** Assistant answers and market/product names come from `data/` and stay English; the chat labels them as such.
+**Out of scope.** Assistant answers come from `data/` and stay English; the chat labels them as such. Market and product names were out of scope too until 0.16.0 (see the addendum: places now follow the page's language).
 
 **Alternatives.**
 - Cookie only, no routing: simplest, but `cookies()` makes every page dynamic.
@@ -23,3 +23,4 @@
 - Static HTML is built without search params. URL state (nuqs) is read on the client, so URL-dependent widgets render inside `Suspense` with a skeleton to avoid flashing the default view on shared links.
 - Root `app/` contains `[locale]/` and `api/`; `proxy.ts` sits next to it.
 - Unknown paths: with `as-needed`, the proxy treats an unknown prefix as a path under the default (or negotiated) locale, e.g. `/xx/dashboard` → `/en-GB/xx/dashboard`. The `app/[locale]/[...rest]` catch-all turns it into a 404. Because the root layout sits in a dynamic segment, Next 16 serves that 404 as an error shell whose translated text renders after hydration; the experimental `globalNotFound` flag would change this. Owner decision (2026-11-03): do not enable experimental flags; the status code is 404 and the text appears after hydration.
+- Place names (2026-11-06, found by the production check): region and market names follow the page's language through the dataset's `select` (`useDatasetSelect`, with the currency), from `places` in the messages. Country names were generated once from `Intl.DisplayNames` and are kept as text, not computed at run time: Node's and the browser's ICU can differ, which would break hydration. Products are brands and keep their names; the AI's answers stay English (fixtures), so a citation label may name "Germany" on a German page. One word per idea: the forecast is Plan / План in German and Russian.

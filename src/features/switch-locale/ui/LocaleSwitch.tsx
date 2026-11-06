@@ -17,7 +17,20 @@ import {
 import { useSwitchLocale } from '../model/use-switch-locale';
 
 /** The language menu; `children` is its trigger, `onPick` runs after a choice (the sheet closes). */
-function LocaleMenu({ children, onPick }: { children: ReactNode; onPick?: () => void }) {
+function LocaleMenu({
+  children,
+  onPick,
+  side = 'bottom',
+}: {
+  children: ReactNode;
+  onPick?: () => void;
+  /**
+   * `top` in the settings sheet: it is pinned to the bottom, so there is room
+   * above. Below, a long menu fits only until the sheet starts closing after a
+   * pick; then it flips above mid-fade, a flash 200 px away (owner, 2026-11-06).
+   */
+  side?: 'top' | 'bottom';
+}) {
   const t = useTranslations('locale');
   const current = useLocale();
   const switchLocale = useSwitchLocale();
@@ -25,7 +38,7 @@ function LocaleMenu({ children, onPick }: { children: ReactNode; onPick?: () => 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent side={side} align="end">
         <DropdownMenuRadioGroup
           value={current}
           onValueChange={(value) => {
@@ -69,7 +82,7 @@ export function LocaleSwitchRow({
   const current = useLocale();
   const name = routing.locales.find((l) => l === current);
   return (
-    <LocaleMenu onPick={onPick}>
+    <LocaleMenu onPick={onPick} side="top">
       <button type="button" className={className}>
         <span>{t('label')}</span>{' '}
         <span className="flex items-center gap-1 text-muted-foreground">

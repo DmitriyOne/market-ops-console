@@ -141,10 +141,16 @@ describe('normalizeDashboardState', () => {
     }
   });
 
+  it('a known currency in another case is written in capitals', () => {
+    expect(normalize({ currency: 'eur' }).fix).toEqual({ currency: 'EUR' });
+    expect(normalize({ currency: 'Gbp' }).fix).toEqual({ currency: 'GBP' });
+    expect(normalize({ currency: 'usd' }).fix).toEqual({ currency: null });
+  });
+
   it('a known currency stays; USD written out and unknown ones leave the URL', () => {
     expect(normalize({ currency: 'GBP' }).fix).toBeNull();
     expect(normalize({ currency: 'EUR' }).fix).toBeNull();
-    for (const currency of ['USD', 'JPY', 'gbp', '']) {
+    for (const currency of ['USD', 'JPY', '']) {
       expect(normalize({ currency }).fix).toEqual({ currency: null });
     }
   });

@@ -12,7 +12,12 @@ import { Button, Label, Skeleton, Switch, ToggleGroup, ToggleGroupItem } from '@
 
 import { newRuleValues, toFormValues } from '../model/rule-form';
 import { useSimulateFailure } from '../model/simulate-failure';
-import { useFailedWrites, useRuleMutations, useSavingIds } from '../model/use-rule-mutations';
+import {
+  type FailedWrite,
+  useFailedWrites,
+  useRuleMutations,
+  useSavingIds,
+} from '../model/use-rule-mutations';
 import { DeleteRuleDialog } from './DeleteRuleDialog';
 import { RuleForm } from './RuleForm';
 import { RuleList } from './RuleList';
@@ -21,7 +26,13 @@ export const ALERT_TABS = ['firing', 'rules'] as const;
 export type AlertTab = (typeof ALERT_TABS)[number];
 const isTab = (value: string): value is AlertTab => ALERT_TABS.some((t) => t === value);
 
-type Form = { kind: 'new' } | { kind: 'edit'; rule: AlertRule } | null;
+/**
+ * `fixId`: back from a refused write (its mutation id), the form starts from
+ * what it asked for. The id, not the write: looked up on each render, so a
+ * currency change shows its numbers in the new currency.
+ */
+type Form =
+  { kind: 'new'; fixId?: number } | { kind: 'edit'; rule: AlertRule; fixId?: number } | null;
 
 type AlertsPanelProps = {
   /** What the rules flag now (the "Firing" tab's content). */
@@ -77,6 +88,8 @@ export function AlertsPanel({ firing, tab, onTabChange, onSaved }: AlertsPanelPr
     // The rule as the list has it now: in the current currency.
     const editing =
       form.kind === 'edit' ? (list.find((r) => r.id === form.rule.id) ?? form.rule) : null;
+    const fix: FailedWrite | undefined =
+      form.fixId === undefined ? undefined : failed.find((f) => f.id === form.fixId);
     return (
       <div className="flex flex-col gap-3">
         <Button type="button" variant="ghost" className="h-11 self-start" onClick={closeForm}>
@@ -88,11 +101,20 @@ export function AlertsPanel({ firing, tab, onTabChange, onSaved }: AlertsPanelPr
         <RuleForm
           key={currency}
           ds={ds}
-          initial={editing ? toFormValues(editing) : newRuleValues(state.selected)}
+          initial={
+            fix?.fix
+              ? toFormValues(fix.fix.input)
+              : editing
+                ? toFormValues(editing)
+                : newRuleValues(state.selected)
+          }
           others={list.filter((r) => r.id !== editing?.id)}
           editing={editing !== null}
+          nameTaken={fix?.fix?.nameTaken ?? false}
           onCancel={closeForm}
           onSubmit={(input) => {
+            // The refused write is replaced by this one.
+            if (fix) dismiss(fix);
             if (editing) update({ ...input, id: editing.id }, onSaved);
             else create(input, onSaved);
             // The saved rule shows in the list with "Saving…".
@@ -192,6 +214,14 @@ export function AlertsPanel({ firing, tab, onTabChange, onSaved }: AlertsPanelPr
             failed={failed}
             onRetry={retry}
             onDismiss={dismiss}
+            onFix={(failed) => {
+              const rule = list.find((r) => r.id === failed.target);
+              setForm(
+                failed.kind === 'update' && rule
+                  ? { kind: 'edit', rule, fixId: failed.id }
+                  : { kind: 'new', fixId: failed.id },
+              );
+            }}
           />
         )}
       </div>

@@ -2,7 +2,7 @@ import { http, HttpResponse } from 'msw';
 
 import { type AlertRule, alertRuleInputSchema } from '@/shared/api';
 
-/** The route's first-visit examples, as the browser receives them (en). */
+/** The route's first-visit examples, as the browser receives them. */
 export const EXAMPLE_RULES: readonly AlertRule[] = [
   {
     id: 'example-attainment',
@@ -13,6 +13,7 @@ export const EXAMPLE_RULES: readonly AlertRule[] = [
     scope: { kind: 'portfolio' },
     severity: 'critical',
     enabled: true,
+    preset: 'attainment',
   },
   {
     id: 'example-share',
@@ -23,6 +24,7 @@ export const EXAMPLE_RULES: readonly AlertRule[] = [
     scope: { kind: 'portfolio' },
     severity: 'warning',
     enabled: true,
+    preset: 'share',
   },
 ];
 
@@ -85,6 +87,10 @@ export function alertsApi(initial: readonly AlertRule[] = EXAMPLE_RULES) {
   return {
     handlers,
     rules: () => rules,
+    /** Deletes a rule behind the page's back (another tab). */
+    remove: (id: string) => {
+      rules = rules.filter((r) => r.id !== id);
+    },
     failNext: () => {
       fail = true;
     },

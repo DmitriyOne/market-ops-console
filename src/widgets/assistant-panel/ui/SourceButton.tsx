@@ -29,6 +29,17 @@ type SourceButtonProps = {
 const TRIGGER = 'min-h-11 rounded-lg border-surface-ai-border text-surface-ai-label';
 
 /**
+ * The button is not on screen: a pick on a narrow window hides the panel,
+ * the browser takes focus away (which ends the pick) and Radix's hover
+ * timer, started before the click, would open the card with nothing to
+ * anchor to, over the header. Without `checkVisibility` (older browsers,
+ * tests) it counts as shown.
+ */
+function hidden(el: HTMLElement | null): boolean {
+  return el !== null && 'checkVisibility' in el && !el.checkVisibility();
+}
+
+/**
  * One cited source. Fine pointers: hover or focus shows the evidence card,
  * click focuses the dashboard. Touch: tap opens the card, which has the button.
  */
@@ -48,8 +59,9 @@ export function SourceButton({ citation, ds, dataError = null, onSelect }: Sourc
   // button. Otherwise the press's focus and Radix's hover timer (the pointer
   // is still over it) reopen it while the dashboard changes, and it blinks.
   const picked = useRef(false);
+  const trigger = useRef<HTMLButtonElement>(null);
   const show = (next: boolean) => {
-    if (next && picked.current) return;
+    if (next && (picked.current || hidden(trigger.current))) return;
     setOpen(next);
   };
   const release = () => {
@@ -92,6 +104,7 @@ export function SourceButton({ citation, ds, dataError = null, onSelect }: Sourc
     <HoverCard open={open} onOpenChange={show} openDelay={200}>
       <HoverCardTrigger asChild>
         <Button
+          ref={trigger}
           type="button"
           variant="outline"
           className={TRIGGER}

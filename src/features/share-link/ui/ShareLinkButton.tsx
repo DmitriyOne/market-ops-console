@@ -48,7 +48,8 @@ export function ShareLinkButton({ className }: { className?: string }) {
   };
 
   return (
-    <>
+    // `relative`: the "Link copied" bubble hangs under the button.
+    <span className="relative inline-flex shrink-0">
       <Button
         type="button"
         variant="outline"
@@ -60,10 +61,21 @@ export function ShareLinkButton({ className }: { className?: string }) {
         {copied ? <CheckIcon aria-hidden /> : <Share2Icon aria-hidden />}
         <span className="sr-only sm:not-sr-only">{t('button')}</span>
       </Button>
+      {/* Seen, for a phone where the button is only an icon (owner,
+          2026-11-06); the live region below is what a screen reader hears. */}
+      {copied ? (
+        <span
+          aria-hidden
+          data-slot="share-copied"
+          className="absolute top-full right-0 z-10 mt-2 rounded-md bg-foreground px-2 py-1 text-xs whitespace-nowrap text-background shadow-md motion-safe:animate-in motion-safe:fade-in-0"
+        >
+          {t('copied')}
+        </span>
+      ) : null}
       <span aria-live="polite" className="sr-only">
         {copied ? <span key={copied}>{t('copied')}</span> : null}
       </span>
-    </>
+    </span>
   );
 }
 

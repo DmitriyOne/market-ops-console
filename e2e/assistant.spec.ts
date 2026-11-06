@@ -24,8 +24,10 @@ test('a failed answer says so, and Try again asks again', async ({ page }) => {
   );
   await log.getByRole('button', { name: 'Try again' }).click();
   await retried;
-  // Try again asks once more: a second answer, which fails the same way.
-  await expect(log.getByText('No answer')).toHaveCount(2);
+  // Try again asks once more in the failed answer's place: it fails the
+  // same way, and there is still one question and one error, not two.
+  await expect(log.getByText('No answer')).toHaveCount(1);
+  await expect(log.getByText('force error')).toHaveCount(1);
 });
 
 test('a question past the data says it cannot answer, with no sources', async ({ page }) => {
@@ -58,4 +60,41 @@ test('Stop mid-answer keeps the words so far, without sources or confidence', as
   await expect(log).not.toContainText('for the detail behind these numbers');
   await expect(log).not.toContainText('Confidence:');
   await expect(assistant.getByRole('button', { name: 'Ask again' })).toBeVisible();
+});
+
+test('a narrow window: a source picked with the mouse leaves no card over the dashboard', async ({
+  page,
+}) => {
+  // A mouse, not touch: the hover card, on a window as narrow as a phone.
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/dashboard?tab=assistant');
+  const assistant = await ask(page, 'Compare APAC and Europe on growth');
+  const log = assistant.getByRole('log');
+  await expect(log).toContainText('Confidence:');
+  // Straight to a click: the pointer arrives and presses at once, as a
+  // quick user (or a tap in a narrow browser) does.
+  await log
+    .getByRole('button', { name: /^China/ })
+    .first()
+    .click();
+  await expect(page).toHaveURL(/[?&]market=cn(&|$)/);
+  // Watch the page for longer than the card's open delay (200 ms): a late
+  // reopen, with no button to anchor to, would show up over the header.
+  const reopened = await page.evaluate(
+    () =>
+      new Promise<boolean>((resolve) => {
+        const card = () => document.querySelector('[data-slot="hover-card-content"]') !== null;
+        const observer = new MutationObserver(() => {
+          if (!card()) return;
+          observer.disconnect();
+          resolve(true);
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+        setTimeout(() => {
+          observer.disconnect();
+          resolve(card());
+        }, 600);
+      }),
+  );
+  expect(reopened).toBe(false);
 });

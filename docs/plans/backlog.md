@@ -121,7 +121,7 @@ Points the owner wants explained in the README, in his own words:
 ## From 0.14.0 (Sentry, 2026-11-06)
 
 - **Source maps are not uploaded yet**: production stack traces in Sentry stay minified until `SENTRY_AUTH_TOKEN`, `SENTRY_ORG` and `SENTRY_PROJECT` are set in Vercel. **Done with the deploy** (Production only); the owner checks a readable stack in Sentry.
-- **The environment is `NODE_ENV`**, so a Vercel preview reports as `production`. Use `VERCEL_ENV` (exposed to the browser). Until then the DSN is set on Production only, so previews send nothing. **Later**.
+- ~~**The environment is `NODE_ENV`**, so a Vercel preview reports as `production`.~~ **Done in 0.16.0**: `NEXT_PUBLIC_VERCEL_ENV` (`production`, `preview`), `local` on this machine, which sends only with `NEXT_PUBLIC_SENTRY_LOCAL=true` (ADR 0019).
 - **Page-load and server traces are two traces**: `clientTraceMetadata` is experimental and removed (ADR 0018, 0019). **Accepted**; revisit if Next makes it stable.
 - **Click breadcrumbs name the button by its CSS classes** (Sentry's DOM path: a long Tailwind class list) rather than its label. Readable enough with the URL and the tags; a `data-sentry-label` on key buttons would shorten them. Cosmetic.
 - **React's recoverable hydration errors are not reported**: Next gives no hook outside the console. **Accepted**.
@@ -132,3 +132,12 @@ Points the owner wants explained in the README, in his own words:
 - **Every console line goes to Sentry Logs** (owner's choice, ADR 0019): a library's message or a stray debug `console.log` with personal data would reach Sentry, and lint cannot see it. Guarded by the rule in CLAUDE.md and the E2E question check. A `beforeSendLog` filter (by level or by a known-safe prefix) would narrow it. **Owner, revisit before production**.
 - **`HeatMap` test "the default Analyst view shows growth by month…" failed once** in a full run with `MarketsTable`'s known flaky test, and passes alone and in two full reruns: flaky under load. **Watch**.
 
+
+## From 0.16.0 (production check, 2026-11-06)
+- **Review nits (independent review, 2026-11-06), left as they are:** the Russian suggestion chip says «Сравнить APAC и Европу» while the region is «АТР» elsewhere (the chip asks the assistant in English, which knows "APAC"; wording only); `GET /api/chat` answers 405 like `/api/v1/chat` (POST only, as the contract says); the alerts sheet opened on desktop, the window narrowed to a phone and the sheet closed: focus goes to the bell, which is hidden then (the tab bar is the way there).
+- **Escape within ~50 ms of the bell opening the sheet** goes Back before nuqs has written `?tab=alerts`, so it leaves the dashboard. No person presses that fast; the E2E waits for the address and focus first (seen only under 6 parallel workers). Fix if it ever shows: close with `replace` when the address does not have `tab=alerts` yet.
+- **Phone, Russian, 320 px wide** (iPhone SE): the period button shows "май 20…" (the mode switch, "Руководитель", takes the rest); the full period is its name and in the picker. 360 px and up fit in every language.
+- **Small countries on the phone map** (Germany 8×9 px, UK, Italy): below 24 px, allowed by WCAG 2.5.8's "equivalent" exception (Tiles and Table do the same with full-size targets). Next: a tap in a dense area zooms in first; or a note under the map pointing to Tiles.
+- **Unknown query keys** (`?lang=xx`, `utm_*`) stay in the URL on purpose: campaign tags must survive; only the dashboard's own keys are repaired.
+- **German compact amounts**: `74.374,7 €` next to `-341.028 €` while Russian shows `74,4 тыс. €`: CLDR has no compact form for thousands in German ("Mio." starts at a million). Correct as is.
+- **Mobile LCP 5.5 s in Lighthouse (Performance 68; desktop 99)**: the LCP element is the line under the title, rendered only after hydration because it depends on the URL (static HTML shows a skeleton). Next: render the URL-independent part of the title row in the static HTML (the default view's text, replaced only when the URL differs), and split the dashboard's client JS further (main chunk boots in ~1.2 s on 4× CPU). Measured numbers: `docs/requirements-map.md`.

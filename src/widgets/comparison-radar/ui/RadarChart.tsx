@@ -22,6 +22,13 @@ import { useRadarFormat } from './use-radar-format';
 
 const CHART_HEIGHT = 280;
 const TICK = { fontSize: 12, fill: 'var(--color-muted-foreground)' };
+/**
+ * Room on the sides for the axis names ("Attainment", "Выполнение"): in a
+ * narrow card the radius follows the width, and without it the names on the
+ * left and right are cut off. A wide card is bound by its height, so the
+ * margin changes nothing there.
+ */
+const MARGIN = { top: 8, right: 56, bottom: 8, left: 56 };
 const REF_KEY = 'ref';
 
 type Row = { axis: RadarAxis; label: string } & Record<string, number | string | undefined>;
@@ -86,7 +93,7 @@ export function RadarChart({ view, title }: { view: RadarView; title: string }) 
 
   return (
     <ChartContainer className="h-70 w-full" height={CHART_HEIGHT}>
-      <Chart data={data} title={title} outerRadius="70%">
+      <Chart data={data} title={title} outerRadius="70%" margin={MARGIN}>
         <PolarGrid stroke="var(--color-border)" />
         <PolarAngleAxis dataKey="label" tick={TICK} />
         <PolarRadiusAxis domain={[0, 1]} tick={false} axisLine={false} />

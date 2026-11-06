@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useReducer, useRef, useState, useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 
 import {
   AbortedError,
@@ -11,7 +11,7 @@ import {
   streamSse,
 } from '@/shared/api';
 import { API_ROUTES } from '@/shared/config';
-import { logError, startMonitoredSpan } from '@/shared/lib';
+import { logError, startMonitoredSpan, useHydrated } from '@/shared/lib';
 
 import { type ChatMessage, chatReducer } from './chat-reducer';
 import { loadChat, saveChat } from './chat-storage';
@@ -45,10 +45,6 @@ function parseJson(data: string): unknown {
   }
 }
 
-const subscribeNothing = () => () => undefined;
-const isClient = () => true;
-const isServer = () => false;
-
 // Changes when a message is added, removed or settles; tokens do not change it.
 const storageKey = (messages: ChatMessage[]) => messages.map((m) => `${m.id}:${m.status}`).join();
 
@@ -57,7 +53,7 @@ export function useChatStream(): ChatStream {
   const [messages, dispatch] = useReducer(chatReducer, []);
   // The server (and `next dev` SSR) has no sessionStorage: render "not ready"
   // there and while hydrating, then restore on the first client render after.
-  const hydrated = useSyncExternalStore(subscribeNothing, isClient, isServer);
+  const hydrated = useHydrated();
   const [ready, setReady] = useState(false);
   if (hydrated && !ready) {
     setReady(true);
@@ -148,8 +144,8 @@ export function useChatStream(): ChatStream {
     }
   }, []);
 
-  const ask = useCallback(
-    (raw: string) => {
+  const start = useCallback(
+    (raw: string, replaces?: string) => {
       const question = raw.trim();
       if (active.current || !question || question.length > CHAT_QUESTION_MAX_LENGTH) return;
       const id = crypto.randomUUID();
@@ -160,10 +156,17 @@ export function useChatStream(): ChatStream {
       }
       const controller = new AbortController();
       active.current = { id, controller };
-      dispatch({ type: 'started', id, question });
+      dispatch({ type: 'started', id, question, replaces });
       void run(id, question, controller);
     },
     [run],
+  );
+
+  const ask = useCallback(
+    (raw: string) => {
+      start(raw);
+    },
+    [start],
   );
 
   const stop = useCallback(() => {
@@ -182,12 +185,14 @@ export function useChatStream(): ChatStream {
     dispatch({ type: 'reset' });
   }, []);
 
+  // A failed answer is asked again in its place (it goes, the new one comes
+  // last); a stopped one stays, since it holds what had arrived.
   const retry = useCallback(
     (id: string) => {
       const message = messages.find((m) => m.id === id);
-      if (message) ask(message.question);
+      if (message) start(message.question, message.status === 'error' ? id : undefined);
     },
-    [messages, ask],
+    [messages, start],
   );
 
   useEffect(

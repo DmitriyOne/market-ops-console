@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { useCallback, useMemo } from 'react';
 
 import type { AlertRule, Dataset } from '@/shared/api';
@@ -12,17 +12,29 @@ import { type AlertFlags, evaluateRules, NO_FLAGS } from './evaluate';
 import { ruleInCurrency } from './in-currency';
 
 /**
+ * A rule's name as the page shows it: an example (`preset`) in the page's
+ * language, any other as the user saved it.
+ */
+export function useRuleName(): (rule: Pick<AlertRule, 'name' | 'preset'>) => string {
+  const t = useTranslations('alerts.examples');
+  return useCallback((rule) => (rule.preset ? t(rule.preset) : rule.name), [t]);
+}
+
+/**
  * The user's rules, revenue thresholds in the chosen currency like the
- * dataset (ADR 0017); the cache keeps the API's USD. Never suspends, so a
- * slow or failed list hides only the bells.
+ * dataset (ADR 0017) and examples named in the page's language; the cache
+ * keeps what the API stores. Never suspends, so a slow or failed list hides
+ * only the bells.
  */
 export function useAlertRules() {
   const currency = useCurrency();
+  const nameOf = useRuleName();
   const select = useCallback(
-    (rules: AlertRule[]) => rules.map((r) => ruleInCurrency(r, currency)),
-    [currency],
+    (rules: AlertRule[]) =>
+      rules.map((r) => ruleInCurrency(r.preset ? { ...r, name: nameOf(r) } : r, currency)),
+    [currency, nameOf],
   );
-  return useQuery({ ...alertsQueryOptions(useLocale()), select });
+  return useQuery({ ...alertsQueryOptions(), select });
 }
 
 /**

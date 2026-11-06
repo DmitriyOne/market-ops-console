@@ -20,7 +20,8 @@ export type ChatMessage = {
 export type ChatNotice = 'englishOnly';
 
 export type ChatAction =
-  | { type: 'started'; id: string; question: string }
+  /** `replaces`: a failed message this one asks again; it goes, the new one comes last. */
+  | { type: 'started'; id: string; question: string; replaces?: string }
   | { type: 'declined'; id: string; question: string; notice: ChatNotice }
   | { type: 'token'; id: string; value: string }
   | {
@@ -69,8 +70,12 @@ export function chatReducer(state: ChatMessage[], action: ChatAction): ChatMessa
   // Restored history goes before anything already in this session.
   if (action.type === 'restore') return [...action.messages, ...state];
   if (action.type === 'started' || action.type === 'declined') {
+    const replaced = action.type === 'started' ? action.replaces : undefined;
+    const kept = replaced
+      ? state.filter((m) => !(m.id === replaced && m.status === 'error'))
+      : state;
     return [
-      ...state,
+      ...kept,
       {
         id: action.id,
         question: action.question,
