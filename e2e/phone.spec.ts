@@ -42,3 +42,16 @@ test('settings sheet: the currency row switches amounts to pounds and closes the
     'GBP · British pound',
   );
 });
+
+test('Copy link is an icon next to the title, a 44 px target', async ({ page }) => {
+  await page.goto('/dashboard?region=eu&market=de');
+  const button = page.getByRole('button', { name: 'Copy link' });
+  await expect(button).toBeVisible();
+  await expect(button.getByText('Copy link')).not.toBeInViewport();
+  const box = await button.boundingBox();
+  expect(box?.width).toBe(44);
+  expect(box?.height).toBe(44);
+  const title = await page.getByRole('heading', { level: 1, name: 'Germany' }).boundingBox();
+  // Same row as the title, at its end.
+  expect(Math.abs((box?.y ?? 0) - (title?.y ?? 0))).toBeLessThan(12);
+});

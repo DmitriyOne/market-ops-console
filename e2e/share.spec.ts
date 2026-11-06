@@ -32,3 +32,16 @@ test('Executive ↔ Analyst is in the URL, and Back undoes the switch', async ({
   await expect(page.getByRole('grid')).toHaveCount(0);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Germany');
 });
+
+test('Copy link puts the address of the current view on the clipboard', async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.goto('/dashboard?region=eu&market=de&mode=analyst');
+  await page.getByRole('button', { name: 'Copy link' }).click();
+  await expect(page.getByText('Link copied')).toBeAttached();
+  const copied = await page.evaluate(() => navigator.clipboard.readText());
+  expect(copied).toBe(page.url());
+  expect(new URL(copied).searchParams.get('market')).toBe('de');
+});

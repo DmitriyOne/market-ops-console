@@ -4,6 +4,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 
 ## [0.15.0] - Unreleased
 
+### Added
+- **Copy link** at the end of the title row, on every level and in both modes: copies the address of the view (drill path, period, mode, selection, open tab), says "Link copied", and points to the address bar if the browser blocks the clipboard. An icon on phones. The currency and the language are not in the link: each viewer keeps their own.
+
 ### Changed
 - Node.js is pinned to 24.x (`engines`): Vercel no longer moves the build to a new major version on its own, the same Node as `.nvmrc` and CI.
 
