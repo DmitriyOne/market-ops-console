@@ -39,9 +39,11 @@ export function StatusScreen({ code, appName, skipLabel, title, body, detail, ch
           id="main"
           className="flex flex-1 flex-col items-center justify-center gap-4 py-12 text-center"
         >
+          {/* `text-input`: 3.3:1 in both themes, enough for text this large
+              (axe checks it although it is aria-hidden). */}
           <p
             aria-hidden
-            className="font-mono text-7xl leading-none font-medium tracking-tighter text-border sm:text-8xl"
+            className="font-mono text-7xl leading-none font-medium tracking-tighter text-input sm:text-8xl"
           >
             {code}
           </p>
