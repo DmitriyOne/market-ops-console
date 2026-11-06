@@ -22,3 +22,4 @@ One file per decision: context, decision, alternatives, consequences. Status is 
 | [0016](0016-alert-writes.md) | Alert writes: Route Handler + TanStack mutations, not Server Actions + `useOptimistic` | 2026-11-05 |
 | [0017](0017-currency-display.md) | Currency display: fixed rates over USD data, converted once at the data | 2026-11-05 |
 | [0018](0018-metadata-icons-error-pages.md) | Page metadata, icons, preview image, robots (closed) and the 404 / 500 pages; no experimental Next features | 2026-11-06 |
+| [0019](0019-error-monitoring-sentry.md) | Error monitoring with Sentry: one logging place, no personal data, body-only tunnel, closed test page; what production needs (consent banner, EU region) | 2026-11-06 |

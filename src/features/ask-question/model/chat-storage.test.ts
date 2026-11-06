@@ -50,21 +50,44 @@ describe('chat storage (sessionStorage)', () => {
     ['not JSON', '{oops'],
     ['another version', JSON.stringify({ v: 0, messages: [] })],
     ['a bad message', JSON.stringify({ v: 1, messages: [{ id: 1 }] })],
-  ])('starts empty when the stored value is %s', (_name, raw) => {
+  ])('starts empty and warns when the stored value is %s', (_name, raw) => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
     sessionStorage.setItem(CHAT_STORAGE_KEY, raw);
     expect(loadChat()).toEqual([]);
+    expect(warn).toHaveBeenCalledWith('[chat]', 'chat_dropped', {});
+    // Dropped, so the next load starts clean and says nothing.
+    expect(sessionStorage.getItem(CHAT_STORAGE_KEY)).toBeNull();
+    loadChat();
+    expect(warn).toHaveBeenCalledOnce();
   });
 
-  it('works without storage (blocked or full)', () => {
+  it('works without storage, silently when it is blocked', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
     vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
-      throw new Error('denied');
+      throw new DOMException('denied', 'SecurityError');
     });
     vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
-      throw new Error('QuotaExceededError');
+      throw new DOMException('denied', 'SecurityError');
     });
     expect(() => {
       saveChat([message('a')]);
     }).not.toThrow();
     expect(loadChat()).toEqual([]);
+    expect(warn).not.toHaveBeenCalled();
+  });
+
+  it('warns when the chat cannot be saved because storage is full', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new DOMException('full', 'QuotaExceededError');
+    });
+    saveChat([message('a'), message('b')]);
+    expect(warn).toHaveBeenCalledWith('[chat]', 'chat_not_saved', { messages: 2 });
+  });
+
+  it('does not warn when nothing was stored', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    expect(loadChat()).toEqual([]);
+    expect(warn).not.toHaveBeenCalled();
   });
 });

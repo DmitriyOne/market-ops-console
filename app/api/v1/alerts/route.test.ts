@@ -1,5 +1,5 @@
 // @vitest-environment node
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';
 
 import { type AlertRuleInput, alertRuleResponseSchema, alertsResponseSchema } from '@/shared/api';
@@ -53,6 +53,16 @@ describe('/api/v1/alerts', () => {
     expect(response.headers.get('cache-control')).toBe('no-store');
     const { rules } = alertsResponseSchema.parse(await response.json());
     expect(rules.map((r) => r.name)).toEqual(['Выполнение плана ниже 95%', 'Доля ниже 10%']);
+  });
+
+  it('an unreadable cookie is warned about once and cleared, not on every load', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const c = client();
+    const first = await c.send(GET, { headers: { cookie: 'mo-alerts=%%%' } });
+    expect(first.headers.get('set-cookie')).toMatch(/^mo-alerts=; .*Max-Age=0/);
+    await c.send(GET);
+    expect(warn).toHaveBeenCalledOnce();
+    warn.mockRestore();
   });
 
   it('the first write keeps the examples in the language it names', async () => {

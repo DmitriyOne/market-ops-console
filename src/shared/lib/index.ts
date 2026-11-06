@@ -7,4 +7,5 @@ export * from './errors';
 export * from './events';
 export * from './i18n';
 export * from './media';
+export * from './monitoring';
 export * from './storage';

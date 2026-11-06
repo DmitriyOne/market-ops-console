@@ -34,7 +34,7 @@ Import boundaries are checked by Steiger (`steiger` + `@feature-sliced/steiger-p
 
 ## Next.js App Router
 
-- Root `app/` is routing only: pages live under `app/[locale]/` (ADR 0010); `page.tsx` = `export { DashboardPage as default } from '@/pages/dashboard'`. `proxy.ts` sits at the repo root. One exception: `app/global-error.tsx` draws its screen itself (0.13.0, ADR 0018): it may import only modules, never the `shared` barrels, and Steiger lets `src/pages` use only barrels. Route handlers (`app/api/v1/*`) may call into `src/shared/api` or `src/entities/*/api`.
+- Root `app/` is routing only: pages live under `app/[locale]/` (ADR 0010); `page.tsx` = `export { DashboardPage as default } from '@/pages/dashboard'`. `proxy.ts` sits at the repo root. One exception: `app/global-error.tsx` draws its screen itself (0.13.0, ADR 0018): it may import only modules, never the `shared` barrels, and Steiger lets `src/pages` use only barrels. Route handlers (`app/api/v1/*`) may call into `src/shared/api` or `src/entities/*/api`. Sentry's start-up files (`instrumentation.ts`, `instrumentation-client.ts`, `sentry.*.config.ts`) sit at the root, and its body-only tunnel is `app/sentry-tunnel/route.ts` (ADR 0019).
 - Root `pages/` exists empty (with README) so Next.js does not treat `src/pages` as the Pages Router.
 
 ## Where state and React Context live

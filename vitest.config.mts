@@ -24,7 +24,7 @@ export default defineConfig({
         test: {
           name: 'logic',
           environment: 'node',
-          include: ['src/**/*.test.ts', 'app/**/*.test.ts', 'scripts/**/*.test.ts'],
+          include: ['src/**/*.test.ts', 'app/**/*.test.ts', 'scripts/**/*.test.ts', '*.test.ts'],
         },
       },
       {

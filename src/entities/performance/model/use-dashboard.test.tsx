@@ -33,7 +33,8 @@ describe('useDashboard', () => {
     expect(result.current.ds.markets).toHaveLength(13);
   });
 
-  it('rewrites a bad URL in place, without a history entry', async () => {
+  it('rewrites a bad URL in place, without a history entry, and leaves a breadcrumb', async () => {
+    const info = vi.spyOn(console, 'info').mockImplementation(() => undefined);
     const { onUrlUpdate } = setup('?region=apac&market=de&range=7m');
     await waitFor(() => {
       expect(onUrlUpdate).toHaveBeenCalled();
@@ -41,6 +42,8 @@ describe('useDashboard', () => {
     const event = onUrlUpdate.mock.calls.at(-1)?.[0];
     expect(event?.queryString).toBe('?region=eu&market=de');
     expect(event?.options.history).toBe('replace');
+    expect(info).toHaveBeenCalledWith('[event] url_fixed', { params: ['region', 'range'] });
+    info.mockRestore();
   });
 
   it('reads repeated markets keys, the form a shared link and the locale switch keep', async () => {

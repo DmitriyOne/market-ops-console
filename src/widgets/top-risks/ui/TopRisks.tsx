@@ -20,6 +20,8 @@ export function TopRisks() {
   const flags = useAlertFlags(ds);
   const flagLabel = useFlagLabel();
   const risks = topRisks(ds, state.scope, state.period, state.range, flaggedIds(flags));
+  // The order and the bell lines depend on the alert rules: wait for them.
+  if (flags.pending) return <TopRisksSkeleton />;
 
   return (
     <Card aria-labelledby={titleId} role="region" className="gap-3 border border-border ring-0">
