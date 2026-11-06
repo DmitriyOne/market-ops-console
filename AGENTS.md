@@ -1,5 +1,7 @@
 # AGENTS.md
 
+> **From the author.** Although this project was made with the help of AI, a person put a lot into it: effort, time, experience and research. *(In my own words, said in Ukrainian and translated into English.)*
+
 Entry point for AI coding agents in this repo. It holds no rules of its own
 on purpose: the single source of truth is [`CLAUDE.md`](./CLAUDE.md), and a
 second copy of the same rules would drift from it on the first edit.
