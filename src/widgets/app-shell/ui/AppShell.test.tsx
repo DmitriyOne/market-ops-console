@@ -7,6 +7,7 @@ import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { enMessages as en } from '@/shared/config';
+import { CONTROLS_ROW_ATTR } from '@/shared/lib';
 import { alertsApi, datasetHandler, server } from '@/shared/lib/test';
 
 import { applyPanelCollapsed } from '../model/panel-collapsed-script';
@@ -26,7 +27,7 @@ function viewport(desktop: boolean) {
   );
 }
 
-function setup(searchParams = '') {
+function setup(searchParams = '', header: ReactNode = <span>Header</span>) {
   const onUrlUpdate = vi.fn<(event: UrlUpdateEvent) => void>();
   const api: { current: AssistantApi | null } = { current: null };
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -35,7 +36,7 @@ function setup(searchParams = '') {
       <NextIntlClientProvider locale="en-GB" messages={en}>
         <NuqsTestingAdapter searchParams={search} onUrlUpdate={onUrlUpdate} hasMemory>
           <AppShell
-            header={<span>Header</span>}
+            header={header}
             main={<p>Main content</p>}
             alerts={<p>Alerts content</p>}
             assistant={(a) => {
@@ -130,6 +131,27 @@ describe('AppShell', () => {
     wheel(120);
     await user.click(screen.getByRole('button', { name: /^Assistant/ }));
     await user.click(screen.getByRole('button', { name: 'Overview' }));
+    expect(header).not.toHaveAttribute('data-controls-hidden');
+  });
+
+  it('phone: focus landing in the period row (Tab) brings it back, as one state', () => {
+    viewport(false);
+    const { container } = setup(
+      '',
+      <div {...{ [CONTROLS_ROW_ATTR]: '' }}>
+        <button type="button">Period</button>
+      </div>,
+    );
+    const header = container.querySelector('header');
+    const main = screen.getByRole('main');
+    main.scrollTop = 600;
+    act(() => {
+      main.dispatchEvent(new WheelEvent('wheel', { deltaY: 120 }));
+    });
+    expect(header).toHaveAttribute('data-controls-hidden');
+    act(() => {
+      screen.getByRole('button', { name: 'Period' }).focus();
+    });
     expect(header).not.toHaveAttribute('data-controls-hidden');
   });
 

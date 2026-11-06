@@ -209,3 +209,46 @@ test('the period row stays above the dashboard, its sticky table cells too; a re
   await expect(row).toHaveCSS('opacity', '1');
   await expect(page.locator('body'), 'the row stayed').not.toHaveAttribute('data-row-hid', 'yes');
 });
+
+test('the row shows or hides by one rule: focus left on it does not keep it up, then drop it when a menu opens', async ({
+  page,
+}) => {
+  await page.goto('/dashboard?region=eu&market=de');
+  const period = page.getByRole('button', { name: /^Period: / });
+  const row = period.locator('xpath=..');
+  await period.click();
+  await page.getByRole('dialog').getByRole('button', { name: /^Mar/ }).click();
+  await expect(page).toHaveURL(/[?&]period=2026-03(&|$)/);
+  await expect(period).toBeFocused();
+  const box = await page.locator('#main').boundingBox();
+  await page.mouse.move((box?.x ?? 0) + 100, (box?.y ?? 0) + 300);
+  await page.mouse.wheel(0, 900);
+  // Scrolled down: hidden, focus inside or not (before, focus kept it on
+  // screen while it counted as hidden, until a menu took the focus).
+  await expect(row).toHaveCSS('opacity', '0');
+  await page.evaluate(() => {
+    const el = document.querySelector('[data-controls-row]');
+    if (!el) return;
+    const start = getComputedStyle(el).opacity;
+    let frames = 0;
+    const check = () => {
+      if (getComputedStyle(el).opacity !== start) document.body.dataset.rowMoved = 'yes';
+      frames += 1;
+      document.body.dataset.frames = String(frames);
+      requestAnimationFrame(check);
+    };
+    requestAnimationFrame(check);
+  });
+  await page.getByRole('button', { name: /^Region: Europe/ }).click();
+  await page.getByRole('menuitemradio', { name: 'APAC' }).click();
+  await expect(page).toHaveURL(/[?&]region=apac(&|$)/);
+  // A while after the pick (the page settling, focus back on the trigger).
+  const framesNow = Number(await page.locator('body').getAttribute('data-frames'));
+  await expect
+    .poll(async () => Number(await page.locator('body').getAttribute('data-frames')))
+    .toBeGreaterThan(framesNow + 20);
+  await expect(page.locator('body'), 'the row did not slide').not.toHaveAttribute(
+    'data-row-moved',
+    'yes',
+  );
+});

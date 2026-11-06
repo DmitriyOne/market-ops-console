@@ -6,7 +6,7 @@ import { type ReactNode, useCallback, useEffect, useId, useMemo, useRef, useStat
 
 import { useFlaggedCount } from '@/features/configure-alerts';
 import { ALERTS_TRIGGER_ATTR, SectionTabBar, useSection } from '@/features/switch-section';
-import { cn, scrollMainToTop, useJoinParts, useMediaQuery } from '@/shared/lib';
+import { cn, CONTROLS_ROW_ATTR, scrollMainToTop, useJoinParts, useMediaQuery } from '@/shared/lib';
 import {
   Button,
   PopperBoundary,
@@ -211,6 +211,12 @@ export function AppShell({ header, main, assistant, alerts }: AppShellProps) {
       <header
         className={cn(HEADER, overviewHidden && 'max-lg:hidden')}
         data-controls-hidden={controlsHidden || undefined}
+        // Focus inside the period and mode row (Tab, a screen reader) brings
+        // it back: the one state shows it, so a menu taking focus later cannot
+        // make it slide away (owner, 2026-11-06).
+        onFocus={(e) => {
+          if (e.target.closest(`[${CONTROLS_ROW_ATTR}]`)) setScrolledDown(false);
+        }}
       >
         {header}
       </header>
