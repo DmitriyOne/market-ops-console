@@ -207,7 +207,7 @@ Four suggested questions (buttons) taken from the brief: risks this quarter, Ger
 
 ### States
 
-- Skeletons while loading; widgets that depend on URL state render inside `Suspense` with a skeleton (static HTML has no search params; ADR 0010). An Analyst link marks `<html>` before the first paint (`data-mode`, ADR 0015), so the static skeletons already hold the markets table, the map card's Analyst controls, the radar and the heat map (0.8.0) and the page does not grow on load (0.7.0 **[owner, 2026-11-04]**).
+- Skeletons while loading; widgets that depend on URL state render inside `Suspense` with a skeleton (static HTML has no search params; ADR 0010). An Analyst link marks `<html>` before the first paint (`data-mode`, ADR 0015), so the static skeletons already hold the markets table, the map card's Analyst controls, the radar and the heat map (0.8.0) and the page does not grow on load (0.7.0 **[owner, 2026-11-04]**). What depends on the alert rules (loaded after the page) waits for them without moving: the status table's Alerts column keeps a set width with a placeholder instead of "None", Top risks shows its skeleton (its order and bells depend on the rules), the Analyst table keeps the bell's place (0.14.0 **[owner, 2026-11-06]**).
 - Popups (menus, popovers, tooltips) opened in the dashboard stay within its scroll area and hide when their trigger scrolls under the header (0.7.0).
 - Each widget has its own error boundary with Retry naming the widget; one failing widget does not break the page. A failed dataset (every widget would fail together) is one page message with one Retry (0.5.0).
 - Empty states (e.g. no markets match filter) with a reset action.
@@ -228,7 +228,7 @@ Four suggested questions (buttons) taken from the brief: risks this quarter, Ger
 ## 10. Data loading and state [call]
 
 - Dataset: `/api/v1/data` returns `data.json` validated by zod; fetched with TanStack Query; prefetched in the server component at build time and hydrated, so static HTML already contains the data. `staleTime: Infinity` (static data).
-- Alert rules: TanStack Query against `/api/v1/alerts` (`entities/alert-rule`, never suspends: a failed list hides only the bells); writes in `features/configure-alerts`.
+- Alert rules: TanStack Query against `/api/v1/alerts` (`entities/alert-rule`, never suspends: while it loads `useAlertFlags` says `pending` and widgets show placeholders; a failed list hides only the bells); writes in `features/configure-alerts`.
 - Selectors (pure functions in `entities/*/model`) compute every aggregate from the validated dataset; no component computes KPIs inline.
 - Market ↔ map join: `iso3 → numeric ISO` table in `entities/performance` (`ISO3_TO_NUMERIC`).
 
@@ -248,7 +248,7 @@ Four suggested questions (buttons) taken from the brief: risks this quarter, Ger
 - `/api/v1/chat` (stream): 10 s to the first event, then 15 s maximum gap between events (idle timeout); no total limit, so long answers are not cut. A timed-out stream ends in the error state with Retry; partial text is kept and labelled incomplete.
 - TanStack Query: queries retry once on network/timeout errors, never on 4xx or parse errors; mutations never retry (rollback instead).
 
-**Error monitoring** (0.14.0, owner, ADR 0019). Every error the app logs goes to Sentry through `logError` / `logWarning` / `logEvent`; expected failures stay breadcrumbs; no IP, cookies, headers, bodies or question text; events go through our own `/monitoring` path.
+**Error monitoring** (0.14.0, owner, ADR 0019). Every error the app logs goes to Sentry through `logError` / `logWarning` / `logEvent`; expected failures stay breadcrumbs; no IP, cookies, headers, bodies or question text; events go through our own `/monitoring` path. Every `console.log` / `warn` / `error` line goes to Sentry Logs (owner), so nothing personal is printed.
 
 **Offline guard.** `features/network-status`: `navigator.onLine` + `online`/`offline` events via `useSyncExternalStore`. When offline, a full-screen guard ("You're offline — we'll reconnect automatically", Retry button) covers the app; the app stays mounted underneath so chat history, form drafts and URL state survive [call: overlay, not unmount]. It disappears on the `online` event. Caveat noted in README: `navigator.onLine` only reports the network interface, so a request can still fail while "online"; that case is handled by the timeouts/errors above.
 
@@ -268,7 +268,7 @@ Unit: SSE parsing, schemas, selectors, formatters, chat reducer, discrepancy rul
 - `world-atlas` (`countries-110m.json`, served locally, no CDN) for map shapes; `topojson-client` comes with `react-simple-maps`.
 - `exceljs` (0.7.0) for the Excel export of the markets table, loaded only when a file is made (its own ~256 KB gzip chunk, not in the first load) **[owner, 2026-11-04]**.
 - `sonner` (shadcn toast) for the rollback message, answer-feedback thanks and a failed copy **[2026-11-04]**.
-- `@sentry/nextjs` (0.14.0) for error monitoring and traces, off without a DSN, no personal data (ADR 0019) **[owner, 2026-11-06]**.
+- `@sentry/nextjs` (0.14.0) for error monitoring, traces and logs (every console line), off without a DSN, no personal data (ADR 0019) **[owner, 2026-11-06]**.
 
 ## 14. Cut line if time runs short **[owner]**
 

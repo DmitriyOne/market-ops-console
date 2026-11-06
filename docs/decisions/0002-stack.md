@@ -16,7 +16,7 @@
 | Tables | shadcn `Table` + a sort/filter selector in the entity (0.7.0, plan 2026-11-04-05, owner-approved) | 13 rows: sort, filter and totals are a few lines of pure, tested code; the state lives in the URL anyway | TanStack Table (planned first; no gain at 13 rows), AG Grid: heavy |
 | Excel export | ExcelJS 4, `import()` on click (0.7.0, owner) | Real Excel tables (filters, banding, frozen panes, formats, conditional colours); its own ~256 KB gz chunk, not in the first load | CSV only (one column in Excel with Russian regional settings, no filters), SheetJS CE (styles need the paid build) |
 | Tests | Vitest + Testing Library + MSW; Playwright (E2E + axe, local and on PRs into `develop`) | See ADR 0008 | Jest: slower with ESM |
-| Error monitoring | `@sentry/nextjs` 11 (0.14.0, owner) | Errors and traces from browser and server, one logging place, no personal data (ADR 0019) | Console only; another service (none asked for) |
+| Error monitoring | `@sentry/nextjs` 11 (0.14.0, owner) | Errors, traces and logs (every console line) from browser and server, one logging place, no personal data (ADR 0019) | Console only; another service (none asked for) |
 | Hosting | Vercel | Native Next.js, free previews | — |
 
 Package manager: pnpm. Design references: `ui-ux-pro-max` skill, then Claude Design artifact.
