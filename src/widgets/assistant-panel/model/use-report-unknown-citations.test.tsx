@@ -21,6 +21,7 @@ const answer = (id: string, citations: ChatMessage['citations']): ChatMessage =>
 });
 
 const ds = datasetSchema.parse(raw);
+const NONE: ChatMessage[] = [];
 const WARNING = 'unknown_citation';
 
 describe('useReportUnknownCitations', () => {
@@ -34,7 +35,7 @@ describe('useReportUnknownCitations', () => {
       ({ messages }) => {
         useReportUnknownCitations(ds, messages, true);
       },
-      { initialProps: { messages: [] as ChatMessage[] } },
+      { initialProps: { messages: NONE } },
     );
     const bad = answer('a1', [
       { marketId: 'atlantis' },

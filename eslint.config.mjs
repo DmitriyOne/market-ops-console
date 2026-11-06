@@ -33,6 +33,11 @@ const SENTRY = {
     'Report through logError / logWarning / logEvent, or the monitoring helpers in @/shared/lib (ADR 0019).',
 };
 const SENTRY_CALLERS = [
+  'instrumentation.ts',
+  'instrumentation-client.ts',
+  'sentry.server.config.ts',
+  'sentry.edge.config.ts',
+  'next.config.ts',
   'app/sentry-tunnel/route.ts',
   'src/shared/lib/errors/log-error.ts',
   'src/shared/lib/events/log-event.ts',
@@ -133,6 +138,11 @@ export default defineConfig([
       'no-restricted-syntax': [
         'error',
         {
+          // no-restricted-imports does not see a dynamic import.
+          selector: 'ImportExpression[source.value=/^@sentry\\//]',
+          message: SENTRY.message,
+        },
+        {
           selector:
             "CallExpression[callee.property.name='join'] > Literal.arguments[value=/(\\S.*\\s|\\s.*\\S|[^\\x00-\\x7F])/]",
           message:
@@ -187,9 +197,14 @@ export default defineConfig([
   // Restricted imports (one rule, so the blocks below set the whole list
   // each: a later block replaces the rule for its files, it does not add).
   {
-    files: ['src/**/*.{ts,tsx}', 'app/**/*.{ts,tsx}'],
-    ignores: ['**/*.test.{ts,tsx}'],
+    // Root files too (proxy, next.config, the Sentry start-up files).
+    files: ['src/**/*.{ts,tsx}', 'app/**/*.{ts,tsx}', '*.{ts,mts}'],
     rules: { 'no-restricted-imports': ['error', { patterns: [RAW_DATASET, SENTRY] }] },
+  },
+  {
+    // Tests may mock the Sentry SDK; the dataset rule still applies to them.
+    files: ['**/*.test.{ts,tsx}'],
+    rules: { 'no-restricted-imports': ['error', { patterns: [RAW_DATASET] }] },
   },
   {
     // The files that may read the dataset raw, each for its own reason (ADR 0017).

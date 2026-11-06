@@ -12,8 +12,7 @@
   },
   "meta": {
     "dashboard": "Панель",
-    "ogAlt": "{appName}. {description}",
-    "sentryTest": "Тест Sentry"
+    "ogAlt": "{appName}. {description}"
   },
   "errors": {
     "timeout": "Запрос выполнялся слишком долго. Попробуйте ещё раз.",
@@ -635,6 +634,7 @@
     }
   },
   "sentryTest": {
+    "meta": "Тест Sentry",
     "title": "Тестовая страница Sentry",
     "intro": "Каждая кнопка отправляет в Sentry один вид ошибки или сигнала. Страница есть только там, где задана ENABLE_SENTRY_TEST_PAGE; в остальных местах это 404.",
     "off": "Sentry здесь выключен: NEXT_PUBLIC_SENTRY_DSN не задан. Кнопки всё равно падают, но ничего не отправляется.",

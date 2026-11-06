@@ -12,8 +12,7 @@
   },
   "meta": {
     "dashboard": "Dashboard",
-    "ogAlt": "{appName}. {description}",
-    "sentryTest": "Sentry test"
+    "ogAlt": "{appName}. {description}"
   },
   "errors": {
     "timeout": "The request took too long. Please try again.",
@@ -635,6 +634,7 @@
     }
   },
   "sentryTest": {
+    "meta": "Sentry test",
     "title": "Sentry test page",
     "intro": "Each button sends one kind of error or signal to Sentry. The page exists only where ENABLE_SENTRY_TEST_PAGE is set; everywhere else it is a 404.",
     "off": "Sentry is off here: NEXT_PUBLIC_SENTRY_DSN is not set. The buttons still fail, but nothing is sent.",

@@ -12,6 +12,10 @@ vi.mock('next/navigation', async (importOriginal) => ({
     throw new Error('NOT_FOUND');
   },
 }));
+vi.mock('next-intl/server', () => ({
+  getMessages: () => Promise.resolve({ sentryTest: { title: 'Sentry test page' } }),
+  getTranslations: () => Promise.resolve((key: string) => key),
+}));
 vi.mock('@/shared/config', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/shared/config')>();
   return {

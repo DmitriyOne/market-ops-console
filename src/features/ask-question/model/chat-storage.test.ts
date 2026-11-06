@@ -55,6 +55,10 @@ describe('chat storage (sessionStorage)', () => {
     sessionStorage.setItem(CHAT_STORAGE_KEY, raw);
     expect(loadChat()).toEqual([]);
     expect(warn).toHaveBeenCalledWith('[chat]', 'chat_dropped', {});
+    // Dropped, so the next load starts clean and says nothing.
+    expect(sessionStorage.getItem(CHAT_STORAGE_KEY)).toBeNull();
+    loadChat();
+    expect(warn).toHaveBeenCalledOnce();
   });
 
   it('works without storage, silently when it is blocked', () => {

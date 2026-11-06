@@ -12,8 +12,7 @@
   },
   "meta": {
     "dashboard": "Dashboard",
-    "ogAlt": "{appName}. {description}",
-    "sentryTest": "Sentry-Test"
+    "ogAlt": "{appName}. {description}"
   },
   "errors": {
     "timeout": "Die Anfrage hat zu lange gedauert. Bitte versuchen Sie es erneut.",
@@ -635,6 +634,7 @@
     }
   },
   "sentryTest": {
+    "meta": "Sentry-Test",
     "title": "Sentry-Testseite",
     "intro": "Jede Schaltfläche schickt eine Art von Fehler oder Signal an Sentry. Die Seite gibt es nur, wo ENABLE_SENTRY_TEST_PAGE gesetzt ist; überall sonst ist sie ein 404.",
     "off": "Sentry ist hier aus: NEXT_PUBLIC_SENTRY_DSN ist nicht gesetzt. Die Schaltflächen schlagen trotzdem fehl, gesendet wird nichts.",

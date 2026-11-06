@@ -51,7 +51,9 @@ export function loadChat(): ChatMessage[] {
     if (raw === null) return [];
     const parsed = storedSchema.safeParse(parseStored(raw));
     if (!parsed.success) {
-      // A format change after a deploy would wipe every open conversation: say so (ADR 0019).
+      // A format change after a deploy would wipe every open conversation: say
+      // so once, and drop the value so the next load does not say it again (ADR 0019).
+      sessionStorage.removeItem(CHAT_STORAGE_KEY);
       logWarning('chat_dropped', { scope: 'chat' });
       return [];
     }

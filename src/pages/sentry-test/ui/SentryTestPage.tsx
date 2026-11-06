@@ -121,7 +121,9 @@ export function SentryTestPage({ sentryOn }: Props) {
             </div>
             {item === 'serverError' ? (
               <Button asChild variant="outline" className="min-h-11">
-                <Link href="/sentry-test/server">{t(`items.${item}.label`)}</Link>
+                <Link href="/sentry-test/server" prefetch={false}>
+                  {t(`items.${item}.label`)}
+                </Link>
               </Button>
             ) : (
               <Button

@@ -31,9 +31,11 @@ const config = withSentryConfig(withNextIntl(nextConfig), {
   release: { name: `${name}@${version}`, create: uploads, finalize: uploads },
   sourcemaps: { disable: !uploads },
   widenClientFileUpload: true,
-  // Handled by app/sentry-tunnel/route.ts (body only); proxy.ts's matcher
-  // leaves the path alone.
-  tunnelRoute: '/sentry-tunnel',
+  // The closed test page is not listed in the route map shipped to browsers.
+  routeManifestInjection: { exclude: [/sentry-test/] },
+  // A neutral path (filter lists block "sentry"); Sentry rewrites it to
+  // app/sentry-tunnel/route.ts (body only). proxy.ts's matcher skips both.
+  tunnelRoute: '/monitoring',
   silent: !uploads,
   telemetry: false,
 });

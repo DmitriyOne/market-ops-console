@@ -22,16 +22,24 @@ describe('reportLevel', () => {
     expect(reportLevel(named('HttpError', { status: 409, code: 'duplicate_name' }))).toBe('skip');
     expect(reportLevel(named('HttpError', { status: 422, code: 'too_many' }))).toBe('skip');
     expect(reportLevel(named('HttpError', { status: 404, code: 'not_found' }))).toBe('skip');
+    expect(reportLevel(named('HttpError', { status: 503, code: 'simulated' }))).toBe('skip');
   });
 
-  it('reports offline and timeouts as warnings', () => {
+  it('skips the browser copy of a server fault our API already reported', () => {
+    expect(reportLevel(named('HttpError', { status: 500, code: 'internal' }))).toBe('skip');
+    expect(reportLevel(named('HttpError', { status: 500, code: 'data_integrity' }))).toBe('skip');
+  });
+
+  it('reports offline, timeouts and a chunk a deploy removed as warnings', () => {
     expect(reportLevel(named('NetworkError'))).toBe('warning');
     expect(reportLevel(named('TimeoutError'))).toBe('warning');
+    expect(reportLevel(named('ChunkLoadError'))).toBe('warning');
   });
 
-  it('reports a 400 our own form caused, a 5xx and anything unexpected as errors', () => {
+  it('reports a 400 our own form caused, a 5xx the server never saw and anything unexpected as errors', () => {
     expect(reportLevel(named('HttpError', { status: 400, code: 'invalid_request' }))).toBe('error');
-    expect(reportLevel(named('HttpError', { status: 500 }))).toBe('error');
+    // A 5xx the server never saw (a gateway, a crashed function): no code of ours.
+    expect(reportLevel(named('HttpError', { status: 502 }))).toBe('error');
     expect(reportLevel(named('ParseError'))).toBe('error');
     expect(reportLevel(new TypeError('x is undefined'))).toBe('error');
     expect(reportLevel('boom')).toBe('error');
