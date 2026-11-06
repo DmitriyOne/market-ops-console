@@ -41,7 +41,7 @@ test('Share link puts the address of the current view on the clipboard', async (
   // `#main` is where the skip link leaves the address; it is not part of the view.
   await page.goto('/dashboard?region=eu&market=de&mode=analyst&currency=GBP#main');
   await page.getByRole('button', { name: 'Share link' }).click();
-  await expect(page.getByText('Link copied')).toBeAttached();
+  await expect(page.locator('[data-slot="share-copied"]')).toHaveText('Link copied');
   const copied = await page.evaluate(() => navigator.clipboard.readText());
   expect(copied).toBe(page.url().replace('#main', ''));
   expect(new URL(copied).searchParams.get('market')).toBe('de');

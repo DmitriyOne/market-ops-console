@@ -151,3 +151,19 @@ test('period and mode share one row in the header; the path is on the page', asy
     (header?.y ?? 0) + (header?.height ?? 0),
   );
 });
+
+test('Share link on a phone: a tap shows "Link copied" under the icon for a moment', async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.goto('/dashboard?region=eu&market=de');
+  const button = page.getByRole('button', { name: 'Share link' });
+  await button.tap();
+  const bubble = page.locator('[data-slot="share-copied"]');
+  await expect(bubble).toHaveText('Link copied');
+  await expect(bubble).toBeInViewport();
+  const [b, tip] = [await button.boundingBox(), await bubble.boundingBox()];
+  expect(tip?.y ?? 0, 'under the button').toBeGreaterThanOrEqual((b?.y ?? 0) + (b?.height ?? 0));
+  await expect(bubble).toHaveCount(0, { timeout: 4000 });
+});
