@@ -2,6 +2,12 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/). The top version must match `package.json` and the `release/X.Y.Z` branch.
 
+## [1.0.0] - Unreleased
+
+### Changed
+- README rewritten for reviewers, one block per section the brief asks for: try it in three minutes, quick start, architecture (layers, data flow diagram, server vs client state), decisions with what was considered, trust in AI output, productionising (performance, observability, resilience, CI/CD), accessibility, testing, key decisions, standards, AI workflow, what I'd do next. Screenshots in `docs/screenshots`.
+- The full feature list moved from the README to `docs/features.md`.
+
 ## [0.16.0] - Unreleased
 
 ### Added
