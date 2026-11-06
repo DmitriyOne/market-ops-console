@@ -11,7 +11,7 @@ import {
   marketsTable,
   useDashboard,
 } from '@/entities/performance';
-import { downloadBlob, downloadText, logError, useCurrency } from '@/shared/lib';
+import { downloadBlob, downloadText, logError, traceSpan, useCurrency } from '@/shared/lib';
 import {
   Button,
   DropdownMenu,
@@ -61,11 +61,13 @@ export function ExportMenu() {
     }
   };
 
-  const saveExcel = async () => {
-    const months = marketsMonthly(ds, view, scope, period, range);
-    const blob = await marketsXlsx(view, months, sheetLabels(window.location.href), currency);
-    downloadBlob(marketsXlsxName(period, range, scope.productId), blob);
-  };
+  // Timed (ADR 0019): loading ExcelJS and writing the workbook is the slowest click.
+  const saveExcel = () =>
+    traceSpan('export.xlsx', 'ui.export', async () => {
+      const months = marketsMonthly(ds, view, scope, period, range);
+      const blob = await marketsXlsx(view, months, sheetLabels(window.location.href), currency);
+      downloadBlob(marketsXlsxName(period, range, scope.productId), blob);
+    });
 
   const saveCsv = () => {
     downloadText(

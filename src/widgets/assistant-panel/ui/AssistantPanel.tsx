@@ -10,6 +10,7 @@ import { useErrorMessage } from '@/shared/api';
 import { useMediaQuery } from '@/shared/lib';
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from '@/shared/ui';
 
+import { useReportUnknownCitations } from '../model/use-report-unknown-citations';
 import { AnswerMessage, isCantAnswer } from './AnswerMessage';
 import { Conversation } from './Conversation';
 import { ConversationSkeleton } from './ConversationSkeleton';
@@ -39,6 +40,7 @@ export function AssistantPanel({
   // Logged by the query cache; here it only replaces "Loading data…".
   const dataError = useErrorMessage()(dsError);
   const { focus, highlight } = useDashboardFocus();
+  useReportUnknownCitations(ds, chat.messages, chat.ready);
 
   const inputRef = useRef<HTMLTextAreaElement>(null);
   // Answers restored from sessionStorage were seen before the reload: the first

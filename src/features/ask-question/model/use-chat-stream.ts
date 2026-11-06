@@ -11,7 +11,7 @@ import {
   streamSse,
 } from '@/shared/api';
 import { API_ROUTES } from '@/shared/config';
-import { logError } from '@/shared/lib';
+import { logError, startMonitoredSpan } from '@/shared/lib';
 
 import { type ChatMessage, chatReducer } from './chat-reducer';
 import { loadChat, saveChat } from './chat-storage';
@@ -69,6 +69,13 @@ export function useChatStream(): ChatStream {
   const run = useCallback(async (id: string, question: string, controller: AbortController) => {
     // A box, not a `let`: it is set inside onData, which TS flow analysis can't see.
     const stream = { settled: false };
+    // How long a user waits: to the first token and to the end (ADR 0019).
+    // Never the question text.
+    const span = startMonitoredSpan('chat.answer', 'ui.chat');
+    const timing: { firstToken: boolean; outcome: 'ok' | 'error' } = {
+      firstToken: true,
+      outcome: 'ok',
+    };
     // `done` or `error` is the last event: free the composer and close the
     // connection now, even if the server keeps it open.
     const settle = () => {
@@ -87,10 +94,21 @@ export function useChatStream(): ChatStream {
             if (!parsed.success) throw new ParseError(parsed.error.issues);
             const event = parsed.data;
             if (event.type === 'token') {
+              if (timing.firstToken) {
+                timing.firstToken = false;
+                span.set({ 'chat.first_token_ms': span.elapsed() });
+              }
               dispatch({ type: 'token', id, value: event.value });
             } else if (event.type === 'done') {
               const { kind, citations, confidence } = event;
+              span.set({
+                'chat.kind': kind,
+                'chat.confidence': confidence,
+                'chat.citations': citations.length,
+                'chat.total_ms': span.elapsed(),
+              });
               if (kind === 'error') {
+                timing.outcome = 'error';
                 logError(new ChatServerError('Answer ended with kind error'), {
                   scope: 'chat',
                   event: 'done',
@@ -100,6 +118,7 @@ export function useChatStream(): ChatStream {
               settle();
             } else {
               // The server's text is for the log; the user gets a translated message.
+              timing.outcome = 'error';
               logError(new ChatServerError(event.message), { scope: 'chat', event: 'error' });
               dispatch({ type: 'failed', id, error: { key: 'errors.server' } });
               settle();
@@ -109,18 +128,22 @@ export function useChatStream(): ChatStream {
       );
       // The stream closed without `done` or `error`: the connection dropped.
       if (!stream.settled) {
+        timing.outcome = 'error';
         logError(new Error('Chat stream closed without done'), { scope: 'chat' });
         dispatch({ type: 'failed', id, error: { key: 'errors.network' } });
       }
     } catch (error) {
       if (stream.settled) return;
       if (error instanceof AbortedError) {
+        span.set({ 'chat.stopped': true });
         dispatch({ type: 'stopped', id });
       } else {
+        timing.outcome = 'error';
         logError(error, { scope: 'chat' });
         dispatch({ type: 'failed', id, error: { key: errorMessageKey(error) } });
       }
     } finally {
+      span.end(timing.outcome);
       if (active.current?.id === id) active.current = null;
     }
   }, []);
