@@ -1,0 +1,25 @@
+# Architecture Decision Records
+
+One file per decision: context, decision, alternatives, consequences. Status is `Accepted` unless noted. A changed decision gets a new ADR that supersedes the old one.
+
+| # | Decision | Date |
+| --- | --- | --- |
+| [0001](0001-single-repo.md) | One repo, one app for assistant + dashboard | 2026-11-03 |
+| [0002](0002-stack.md) | Stack | 2026-11-03 |
+| [0003](0003-chat-streaming.md) | Chat streaming: `eventsource-parser` + own hook | 2026-11-03 |
+| [0004](0004-data-visualisation.md) | Charts: shadcn charts (Recharts), react-simple-maps, table-grid heat map | 2026-11-03 |
+| [0005](0005-feature-sliced-design.md) | Feature-Sliced Design v2.1 | 2026-11-03 |
+| [0006](0006-state-and-url.md) | State split: Query / URL / local / Context | 2026-11-03 |
+| [0007](0007-git-flow-and-ci.md) | Git flow and CI on GitHub Free | 2026-11-03 |
+| [0008](0008-testing-scope.md) | Testing scope | 2026-11-03 |
+| [0009](0009-theming-dark-mode.md) | Theming and dark mode: @wrksz/themes + shadcn tokens | 2026-11-03 |
+| [0010](0010-i18n-and-locale.md) | i18n: next-intl, `as-needed` locale routing, static pages | 2026-11-03 |
+| [0011](0011-linting-and-formatting.md) | Prettier + ESLint + Steiger | 2026-11-03 |
+| [0012](0012-api-versioning-and-resilience.md) | `/api/v1`, timeouts, offline guard, error pages | 2026-11-03 |
+| [0013](0013-error-handling.md) | Error handling: typed errors, boundaries, one log | 2026-11-03 |
+| [0014](0014-design-direction.md) | Design: dashboard D, assistant A, fallback to dashboard A | 2026-11-03 |
+| [0015](0015-persisted-ui-state-before-paint.md) | Persisted UI state before first paint: inline `<head>` script | 2026-11-03 |
+| [0016](0016-alert-writes.md) | Alert writes: Route Handler + TanStack mutations, not Server Actions + `useOptimistic` | 2026-11-05 |
+| [0017](0017-currency-display.md) | Currency display: fixed rates over USD data, converted once at the data | 2026-11-05 |
+| [0018](0018-metadata-icons-error-pages.md) | Page metadata, icons, preview image, robots (closed) and the 404 / 500 pages; no experimental Next features | 2026-11-06 |
+| [0019](0019-error-monitoring-sentry.md) | Error monitoring with Sentry: one logging place, no personal data, body-only tunnel, closed test page; what production needs (consent banner, EU region) | 2026-11-06 |

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- The Logo mark (src/shared/ui/logo.tsx). Hex, not tokens: a favicon has no
+       stylesheet. Light: the foreground token's square with a background-token M;
+       inverted in dark. -->
+  <style>
+    .tile { fill: #0d1117; }
+    .mark { stroke: #f3f5f7; }
+    @media (prefers-color-scheme: dark) {
+      .tile { fill: #f1f4f8; }
+      .mark { stroke: #07090d; }
+    }
+  </style>
+  <rect class="tile" width="32" height="32" rx="8" />
+  <path class="mark" d="M5.5 18V6.5L12 13l6.5-6.5V18" transform="translate(6 6) scale(0.8333)"
+    fill="none" stroke-width="3" stroke-linejoin="round" />
+</svg>

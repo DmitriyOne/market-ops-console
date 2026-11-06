@@ -14,3 +14,11 @@ coverage/
 # Env
 .env*
 !.env.example
+
+# Next.js and TypeScript
+next-env.d.ts
+*.tsbuildinfo
+
+# Playwright
+/test-results
+/playwright-report

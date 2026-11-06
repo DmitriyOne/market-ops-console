@@ -1,0 +1,687 @@
+{
+  "common": {
+    "appName": "Market Ops Console",
+    "skipToContent": "Zum Inhalt springen",
+    "description": "Vertriebsleistung nach Markt, Produkt und Zeitraum, mit einem KI-Assistenten, der seine Quellen zeigt.",
+    "close": "Schließen",
+    "titleTemplate": "{page} · {appName}",
+    "separator": " · ",
+    "after": "· {text}",
+    "srAfter": ", {text}",
+    "separatorMark": "·"
+  },
+  "meta": {
+    "dashboard": "Dashboard",
+    "ogAlt": "{appName}. {description}"
+  },
+  "errors": {
+    "timeout": "Die Anfrage hat zu lange gedauert. Bitte versuchen Sie es erneut.",
+    "network": "Der Server ist nicht erreichbar. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+    "server": "Der Server konnte die Anfrage nicht abschließen.",
+    "invalidData": "Die empfangenen Daten haben ein unerwartetes Format.",
+    "unknown": "Etwas ist schiefgelaufen.",
+    "sectionTitle": "Dieser Bereich konnte nicht geladen werden.",
+    "retry": "Erneut versuchen",
+    "widgetTitle": "{name} konnte nicht geladen werden",
+    "retryWidget": "Erneut versuchen: {name}",
+    "dataFailed": "Die Dashboard-Daten konnten nicht geladen werden. Jeder Bereich hat eine Schaltfläche „Erneut versuchen“."
+  },
+  "offline": {
+    "title": "Sie sind offline",
+    "body": "Wir verbinden uns automatisch neu. Alles auf dieser Seite bleibt erhalten."
+  },
+  "notFound": {
+    "title": "Seite nicht gefunden",
+    "body": "Die gesuchte Seite existiert nicht oder wurde verschoben.",
+    "home": "Zurück zum Dashboard",
+    "address": "<label>Nicht gefundene Adresse:</label> {path}"
+  },
+  "errorPage": {
+    "title": "Etwas ist schiefgelaufen",
+    "body": "Diese Seite konnte nicht angezeigt werden. Versuchen Sie es erneut oder kehren Sie zum Dashboard zurück.",
+    "home": "Zurück zum Dashboard",
+    "errorId": "Fehler-ID: {id}"
+  },
+  "theme": {
+    "label": "Design",
+    "light": "Hell",
+    "dark": "Dunkel",
+    "system": "System"
+  },
+  "locale": {
+    "label": "Sprache",
+    "en-GB": "English (UK)",
+    "en-US": "English (US)",
+    "de-DE": "Deutsch",
+    "ru-RU": "Русский"
+  },
+  "currency": {
+    "label": "Währung",
+    "USD": "US-Dollar",
+    "EUR": "Euro",
+    "GBP": "Britisches Pfund",
+    "current": "Währung: {code}, {name}",
+    "rates": "EZB-Kurse vom {date}: 1 USD = {eur} EUR = {gbp} GBP.",
+    "demo": "Für diese Demo fest hinterlegt; eine echte App holt die Kurse über die Backend-API."
+  },
+  "assistant": {
+    "composer": {
+      "label": "Frage zu den Daten",
+      "placeholder": "Frage stellen",
+      "send": "Senden",
+      "stop": "Antwort stoppen",
+      "blankReason": "Geben Sie eine Frage ein, um sie zu senden.",
+      "tooLongReason": "Fragen dürfen höchstens {max} Zeichen lang sein.",
+      "counter": "{count} / {max}"
+    },
+    "suggestions": {
+      "title": "Beispielfragen",
+      "risks": "Welche Märkte sind gefährdet?",
+      "germany": "Warum ist Deutschland eingebrochen?",
+      "apacEurope": "APAC und Europa vergleichen",
+      "forecastMiss": "Was treibt die Prognoseabweichung?"
+    },
+    "panel": {
+      "title": "Assistent",
+      "empty": {
+        "title": "Fragen zum Portfolio",
+        "body": "Antworten stammen von der KI und können unvollständig sein. Jede Antwort zeigt ihre Quellen und die passenden Daten, damit Sie sie prüfen können."
+      },
+      "youAsked": "Ihre Frage",
+      "newContent": "Neuer Inhalt",
+      "subtitle": "Antwortet auf Englisch",
+      "newChat": "Neuer Chat",
+      "loading": "Unterhaltung wird geladen…"
+    },
+    "answer": {
+      "label": "KI-Antwort · möglicherweise unvollständig",
+      "writing": "KI-Antwort · wird geschrieben…",
+      "pending": "Quellen und Konfidenz erscheinen, wenn die Antwort fertig ist.",
+      "sources": "Quellen",
+      "confidence": "Konfidenz: {level}",
+      "high": "Hoch",
+      "medium": "Mittel",
+      "low": "Niedrig",
+      "directional": "Nur als Richtwert verstehen",
+      "usdNote": "Beträge in dieser Antwort sind in USD, wie in den Daten; das Dashboard zeigt {currency}."
+    },
+    "stopped": {
+      "title": "Gestoppt — Antwort unvollständig.",
+      "body": "Keine Quellen oder Konfidenz für eine Teilantwort.",
+      "askAgain": "Erneut fragen"
+    },
+    "abstain": {
+      "title": "Das kann ich aus den Daten nicht beantworten",
+      "coverage": "Die Daten reichen von {from} bis {to}."
+    },
+    "error": {
+      "title": "Keine Antwort",
+      "retry": "Erneut versuchen"
+    },
+    "evidence": {
+      "revenue": "Umsatz",
+      "attainment": "Zielerreichung",
+      "growth": "Wachstum ggü. Vorjahr",
+      "units": "Einheiten",
+      "calculated": "Aus Monatsdaten berechnet",
+      "notInDataset": "Nicht im Datensatz",
+      "trend": "Umsatz {name}, letzte 12 Monate",
+      "showOnDashboard": "Im Dashboard zeigen",
+      "clickHint": "Klicken, um im Dashboard zu zeigen",
+      "loading": "Daten werden geladen…",
+      "latestStatus": "Status, {period}"
+    },
+    "declined": {
+      "englishOnly": "Ich verstehe nur Englisch. Bitte stellen Sie Ihre Frage auf Englisch."
+    },
+    "actions": {
+      "copy": "Antwort kopieren",
+      "copied": "Kopiert",
+      "copyFailed": "Kopieren fehlgeschlagen. Bitte Text markieren.",
+      "copySources": "Quellen: {list}",
+      "helpful": "Hilfreich",
+      "notHelpful": "Nicht hilfreich",
+      "reasonsTitle": "Was war falsch?",
+      "reasons": {
+        "wrongNumbers": "Falsche Zahlen",
+        "offTopic": "Frage nicht beantwortet",
+        "missing": "Märkte oder Zeiträume fehlen",
+        "other": "Etwas anderes"
+      },
+      "thanks": "Danke für das Feedback."
+    }
+  },
+  "dataCheck": {
+    "title": "Was die Daten zeigen",
+    "header": "Marktentwicklung · letzter Zeitraum: {period} · aktualisiert am {updated}",
+    "details": "Details",
+    "portfolio": "Portfolio",
+    "name": "Bereich",
+    "attainment": "Ziel",
+    "growth": "Wachstum",
+    "status": "Status",
+    "notMentioned": "In der Antwort nicht erwähnt",
+    "showOnDashboard": "Im Dashboard zeigen",
+    "onTrack": "Im Plan",
+    "atRisk": "Gefährdet",
+    "offTrack": "Unter Plan",
+    "noStatus": "—",
+    "reasonGrowth": "Wachstum {value} ggü. Vorjahr",
+    "latestOnly": "nur aktuell",
+    "attention": "{needAttention, plural, one {# von {markets} Märkten braucht} other {# von {markets} Märkten brauchen}} Aufmerksamkeit; die Antwort nennt {named}.",
+    "attentionRegion": "{needAttention, plural, one {# von {markets} Märkten in {region} braucht} other {# von {markets} Märkten in {region} brauchen}} Aufmerksamkeit; die Antwort nennt {named}.",
+    "gapNote": "{count, plural, one {# Markt nicht erwähnt} other {# Märkte nicht erwähnt}}",
+    "statusNote": "Der Status gilt nur für den letzten Monat."
+  },
+  "shell": {
+    "assistant": "Assistent",
+    "sections": "Bereiche",
+    "tabs": {
+      "overview": "Übersicht",
+      "assistant": "Assistent",
+      "alerts": "Alarme"
+    },
+    "collapse": "Assistent ausblenden",
+    "expand": "Assistent einblenden",
+    "newAnswers": "{count, plural, one {# neue Antwort} other {# neue Antworten}}",
+    "flagged": "{count, plural, one {, # Markt markiert} other {, # Märkte markiert}}",
+    "alerts": "Alarme"
+  },
+  "monthPicker": {
+    "previousYear": "Vorheriges Jahr",
+    "nextYear": "Nächstes Jahr",
+    "months": "Monate {year}"
+  },
+  "period": {
+    "trigger": "Zeitraum: {period}, {range}. Zeitraum ändern",
+    "label": "{period} · {range}",
+    "title": "Zeitraum",
+    "range": {
+      "1m": "1 Monat",
+      "3m": "3 Monate",
+      "12m": "12 Monate"
+    },
+    "rangeLabel": "Monate bis {period}"
+  },
+  "mode": {
+    "label": "Ansicht",
+    "executive": "Management",
+    "analyst": "Analyse"
+  },
+  "drill": {
+    "label": "Drill-down",
+    "portfolio": "Portfolio",
+    "chooseRegion": "Region wählen",
+    "chooseMarket": "Markt wählen",
+    "chooseProduct": "Produkt wählen",
+    "region": "Region",
+    "market": "Markt",
+    "product": "Produkt",
+    "changeRegion": "Region: {name}. Region ändern",
+    "changeMarket": "Markt: {name}. Markt ändern",
+    "changeProduct": "Produkt: {name}. Produkt ändern"
+  },
+  "header": {
+    "settings": "Einstellungen: Sprache, Währung, Design, Ansicht zurücksetzen",
+    "settingsTitle": "Einstellungen",
+    "resetView": "Ansicht zurücksetzen",
+    "resetHint": "Portfolio, letzter Monat, Management"
+  },
+  "overview": {
+    "summary": "{markets, plural, one {# Markt} other {# Märkte}} · {products, plural, one {# Produkt} other {# Produkte}} · neueste Daten {period}",
+    "modeBadge": {
+      "executive": "Ansicht Management",
+      "analyst": "Ansicht Analyse"
+    },
+    "modeNote": {
+      "executive": "Das Wichtigste: KPIs, Marktstatus, Risiken und Umsatztrend.",
+      "analyst": "Zusätzlich unten: Kartenkennzahl, Vergleichsnetz, Markttabelle und Heatmap."
+    }
+  },
+  "kpi": {
+    "title": "Kennzahlen",
+    "revenue": "Umsatz",
+    "attainment": "Planerfüllung",
+    "growth": "Wachstum ggü. Vorjahr",
+    "atRisk": "Märkte mit Risiko",
+    "vsPriorYear": "{value} ggü. Vorjahr",
+    "forecast": "Plan {value}",
+    "priorYear": "Vorjahr {value}",
+    "riskValue": "{count} von {total}",
+    "riskSplit": "{offTrack} verfehlt · {atRisk} gefährdet",
+    "riskNone": "Alle im Plan",
+    "latestOnly": "Der Status gilt nur für den neuesten Monat.",
+    "goLatest": "{period} anzeigen",
+    "perProduct": "Der Status gilt je Markt, nicht je Produkt.",
+    "calculated": "Berechnet",
+    "calculatedLabel": "Berechnet: {formula}",
+    "formula": {
+      "revenue": "Summe der monatlichen Ist-Umsätze im gewählten Zeitraum.",
+      "attainment": "Ist ÷ Plan im gewählten Zeitraum; kann vom gespeicherten Marktwert um etwa 1 Punkt abweichen.",
+      "growth": "Ist ÷ Vorjahres-Ist im gewählten Zeitraum, minus 100 %."
+    },
+    "unavailable": "—"
+  },
+  "marketStatus": {
+    "title": "Marktstatus",
+    "tile": "{code} {value} Planerfüllung, {name}, {status}",
+    "tileNoStatus": "{code} {value} Planerfüllung, {name}",
+    "current": "geöffnet",
+    "selected": "ausgewählt",
+    "hatched": "schraffiert",
+    "latestOnly": "Der Status gilt nur für den neuesten Monat; die Kacheln zeigen die Planerfüllung.",
+    "market": "Markt",
+    "region": "Region",
+    "attainment": "Planerfüllung",
+    "status": "Status",
+    "caption": "Marktstatus nach Region, {window}",
+    "view": "Ansicht",
+    "views": {
+      "map": "Karte",
+      "tiles": "Kacheln",
+      "table": "Tabelle"
+    },
+    "metricTrigger": "Kartenfarbe: {metric}. Ändern",
+    "metricTitle": "Karte einfärben nach",
+    "metric": {
+      "status": "Status",
+      "attainment": "Zielerreichung",
+      "growth": "Wachstum ggü. Vorjahr",
+      "share": "Marktanteil",
+      "revenue": "Umsatz"
+    },
+    "notice": {
+      "statusLatestOnly": "Der Status gilt nur für den letzten Monat; die Karte zeigt die Zielerreichung.",
+      "shareLatestOnly": "Der Marktanteil gilt nur für den letzten Monat; die Karte zeigt die Zielerreichung.",
+      "sharePerProduct": "Einen Marktanteil gibt es nicht je Produkt; die Karte zeigt die Zielerreichung."
+    },
+    "mapLabel": "Weltkarte der Märkte: {metric}",
+    "country": "{name}, {metric} {value}",
+    "countryStatus": "{name}, {metric} {value}, {status}",
+    "noData": "Keine Daten",
+    "openMarket": "{name} öffnen",
+    "zoomIn": "Vergrößern",
+    "zoomOut": "Verkleinern",
+    "wholeWorld": "Ganze Welt",
+    "legend": "Legende",
+    "below": "unter {to}",
+    "between": "{from} – {to}",
+    "above": "ab {from}",
+    "dotted": "gepunktet",
+    "perProduct": "Werte für {product}; der Status gilt je Markt.",
+    "addToFilter": "Zum Filter hinzufügen",
+    "removeFromFilter": "Aus dem Filter entfernen",
+    "hintPointer": "Umschalt+Klick auf einen Markt fügt ihn dem Tabellenfilter hinzu.",
+    "hintTouch": "Tippen Sie auf einen Markt, dann auf „Zum Filter hinzufügen“.",
+    "alerts": "Alarme",
+    "noAlerts": "Keine"
+  },
+  "topRisks": {
+    "title": "Größte Risiken",
+    "order": "Verfehlt zuerst, dann nach Planerfüllung; danach Märkte, die Ihre Alarme markieren",
+    "reason": "{attainment} · {growth} ggü. Vorjahr",
+    "empty": "Hier gibt es keine Märkte mit Risiko."
+  },
+  "trend": {
+    "title": "Umsatz · {from} – {to}",
+    "actual": "Ist",
+    "forecast": "Plan",
+    "priorYear": "Vorjahr",
+    "showTable": "Als Tabelle",
+    "summary": "Umsatz für {scope}, {from} bis {to}. {period}: Ist {actual}, Plan {forecast}, Vorjahr {priorYear}.",
+    "anomaly": "{period} · {market}: {note}",
+    "month": "Monat",
+    "caption": "Umsatz je Monat für {scope}",
+    "anomalyMark": "Auffälligkeit",
+    "window": "ausgewählt",
+    "legend": "Legende",
+    "name": "Umsatzverlauf",
+    "showChart": "Als Diagramm anzeigen",
+    "windowRange": "{from} – {to}",
+    "units": "Stück"
+  },
+  "topMovers": {
+    "title": "Größte Veränderungen",
+    "basis": "Wachstum ggü. Vorjahr, {range} bis {period}",
+    "risers": "Höchstes Wachstum",
+    "fallers": "Niedrigstes Wachstum",
+    "empty": "Zu wenige Märkte für einen Vergleich."
+  },
+  "marketFilter": {
+    "button": "Märkte",
+    "buttonCount": "Märkte ({count})",
+    "title": "Nur diese Märkte zeigen",
+    "clear": "Auswahl aufheben",
+    "remove": "{name} entfernen",
+    "count": "{selected} von {total} ausgewählt",
+    "selected": "Ausgewählt",
+    "region": "Ganz {region}",
+    "atRisk": "Gefährdet oder nicht im Plan",
+    "atRiskLatestOnly": "Nur für den letzten Monat",
+    "clearAll": "Alle entfernen"
+  },
+  "marketsTable": {
+    "title": "Märkte",
+    "caption": "Märkte in {scope}, {window}. Spaltenköpfe sortieren die Tabelle.",
+    "total": "Summe",
+    "totalCalculated": "Summe der gezeigten Zeilen, aus Monatsdaten berechnet",
+    "sortHint": "Sortieren",
+    "column": {
+      "market": "Markt",
+      "region": "Region",
+      "revenue": "Umsatz",
+      "forecast": "Prognose",
+      "gap": "Abstand zur Prognose",
+      "attainment": "Zielerreichung",
+      "priorYear": "Vorjahr",
+      "growth": "Wachstum ggü. Vj.",
+      "share": "Marktanteil",
+      "units": "Stück",
+      "status": "Status"
+    },
+    "empty": "Keiner der ausgewählten Märkte ist in dieser Ansicht. Heben Sie die Auswahl auf, um alle Märkte zu sehen.",
+    "noteLatest": "Status und Marktanteil gibt es nur für den letzten Monat.",
+    "notePerProduct": "Marktanteil gibt es nicht pro Produkt.",
+    "noteCalculated": "Alle Werte sind aus Monatsdaten berechnet, daher geht jede Zeile auf und die Summe ist die Summe der Zeilen. Anteil und Status sind die gespeicherten Werte des letzten Monats; die Kacheln zeigen gespeicherte KPIs, die um etwa 1 Punkt abweichen können.",
+    "anomaly": "Anomalie, {period}: {note}"
+  },
+  "heatMap": {
+    "title": "Heatmap",
+    "subtitle": "{metric} nach Monat",
+    "notice": {
+      "statusPerMonth": "Der Status liegt nur für den letzten Monat vor; die Heatmap zeigt das Wachstum ggü. Vorjahr.",
+      "sharePerMonth": "Der Marktanteil liegt nur für den letzten Monat vor; die Heatmap zeigt das Wachstum ggü. Vorjahr."
+    },
+    "gridLabel": "{metric} nach Markt und Monat",
+    "market": "Markt",
+    "cell": "{value}",
+    "cellRounded": "{shown} ({value})",
+    "stepBelow": "unter {to}",
+    "stepBetween": "{from} – {to}",
+    "stepAbove": "ab {from}",
+    "anomaly": "Auffälligkeit: {note}",
+    "selected": "ausgewählt",
+    "current": "gerade geöffnet",
+    "inWindow": "im gewählten Zeitraum",
+    "open": "{market} öffnen, {month}",
+    "add": "{market} zur Auswahl hinzufügen",
+    "remove": "{market} aus der Auswahl entfernen",
+    "pick": "Wählen Sie eine Zelle, um ihren Wert zu sehen.",
+    "hint": "Pfeiltasten bewegen, Enter öffnet den Markt in diesem Monat, Umschalt+Klick oder Umschalt+Enter wählt ihn aus.",
+    "showTable": "Als Tabelle anzeigen",
+    "showChart": "Als Diagramm anzeigen",
+    "caption": "{metric} nach Monat für {scope}",
+    "legend": "Legende",
+    "noteCalculated": "Aus den Monatsreihen berechnet: Werte können um etwa einen Punkt von den gespeicherten KPIs abweichen.",
+    "perProduct": "Werte für {product}.",
+    "revenueUnit": "Umsatz in {currency, select, EUR {Euro} GBP {Britischen Pfund} other {US-Dollar}}.",
+    "anomalyMarket": "Auffälligkeit im ganzen Markt: {note}",
+    "anomalies": "Auffälligkeiten",
+    "anomalyMark": "Auffälligkeit",
+    "readout": "{metric} {value}",
+    "anomalyItem": "{month}: {note}",
+    "cellWithNote": "{value}, {note}"
+  },
+  "radar": {
+    "title": "Vergleich",
+    "basis": {
+      "selection": "Ausgewählte Märkte im Vergleich zum Portfolio",
+      "market": "{market} und seine Nachbarn in {region} im Vergleich zum Portfolio",
+      "region": "Märkte in {region} im Vergleich zum Portfolio",
+      "regions": "Regionen im Vergleich zum Portfolio"
+    },
+    "portfolio": "Portfolio-Durchschnitt",
+    "compared": "Verglichen",
+    "axis": {
+      "growth": "Wachstum ggü. VJ",
+      "attainment": "Planerfüllung",
+      "share": "Marktanteil",
+      "revenue": "Umsatz",
+      "momentum": "Dynamik"
+    },
+    "scaleMarkets": "Jede Achse reicht vom schwächsten (Mitte) bis zum stärksten (Rand) der 13 Märkte.",
+    "scaleRegions": "Jede Achse reicht von der schwächsten (Mitte) bis zur stärksten (Rand) der 4 Regionen.",
+    "momentumNote": "Dynamik: Wachstum ggü. Vorjahr in den letzten 3 Monaten minus die 3 Monate davor, in Prozentpunkten.",
+    "removed": {
+      "shareLatestOnly": "Der Marktanteil liegt nur für den letzten Monat vor; seine Achse fehlt.",
+      "momentumTooEarly": "Die Dynamik braucht sechs Monate Daten; ihre Achse fehlt."
+    },
+    "hidden": {
+      "selection": "Die ersten {shown} von {total} ausgewählten Märkten.",
+      "neighbours": "{shown} von {total} Märkten in {region}."
+    },
+    "productIgnored": "Vergleicht Märkte, nicht Produkte: {product} gilt hier nicht.",
+    "pickHint": "Um andere Märkte zu vergleichen, klicken Sie sie mit Umschalt auf der Karte an oder wählen Sie sie im Tabellenfilter.",
+    "tooFewAxes": "Zu wenige Achsen mit Daten für ein Diagramm; die Tabelle zeigt die Werte.",
+    "showTable": "Als Tabelle anzeigen",
+    "showChart": "Als Diagramm anzeigen",
+    "caption": "{names} im Vergleich zum Portfolio-Durchschnitt, {window}",
+    "chartLabel": "Netzdiagramm: {names} im Vergleich zum Portfolio-Durchschnitt",
+    "pp": "{value} Pp.",
+    "legend": "Legende"
+  },
+  "exportMarkets": {
+    "button": "Exportieren",
+    "preparing": "Wird erstellt…",
+    "title": "Zeilen wie angezeigt",
+    "excel": "Excel (.xlsx)",
+    "excelHint": "Formatiert, mit Filtern; Beträge in {currency}",
+    "csv": "CSV",
+    "csvHint": "Rohwerte in USD, für andere Programme",
+    "failed": "Datei konnte nicht erstellt werden. Bitte erneut versuchen.",
+    "sheet": {
+      "markets": "Märkte",
+      "months": "Nach Monat",
+      "about": "Info",
+      "total": "Summe",
+      "code": "Code",
+      "anomaly": "Anomalie",
+      "month": "Monat",
+      "actual": "Ist",
+      "anomalyItem": "{period}: {note}"
+    },
+    "about": {
+      "source": "Quelle",
+      "sourceValue": "data.json, erstellt am {date}",
+      "currency": "Währung",
+      "currencyUsd": "{code} ({name}), wie in den Daten",
+      "currencyConverted": "{code} ({name}), aus USD umgerechnet zu 1 USD = {rate} {code}, EZB-Kurs vom {date}. Für diese Demo fest hinterlegt; eine echte App holt die Kurse über die Backend-API.",
+      "view": "Ansicht",
+      "product": "Produkt",
+      "selection": "Ausgewählte Märkte",
+      "selectionAll": "Alle Märkte der Ansicht",
+      "sort": "Reihenfolge",
+      "sortDefault": "Region, dann Markt",
+      "asc": "{column}, aufsteigend",
+      "desc": "{column}, absteigend",
+      "calculated": "Wie Werte entstehen",
+      "calculatedValue": "Aus Monatsdaten berechnet (Umsatz = Σ Ist, Zielerreichung = Σ Ist ÷ Σ Prognose, Wachstum = Σ Ist ÷ Σ Vorjahr − 1); Anteil und Status wie für den letzten Monat gespeichert. Summen folgen dem Excel-Filter.",
+      "status": "Status",
+      "statusValue": "In den Daten nur für den letzten Monat gesetzt.",
+      "link": "Diese Ansicht öffnen"
+    }
+  },
+  "alerts": {
+    "examples": {
+      "attainment": "Planerfüllung unter 95 %",
+      "share": "Marktanteil unter 10 %"
+    },
+    "condition": "{operator, select, below {{metric} unter {threshold}} other {{metric} über {threshold}}}",
+    "full": "{condition} · {scope}",
+    "metric": {
+      "growth": "Wachstum",
+      "attainment": "Planerfüllung",
+      "share": "Marktanteil",
+      "revenue": "Umsatz"
+    },
+    "scope": {
+      "portfolio": "Alle Märkte",
+      "marketsCount": "{count, plural, one {# Markt} other {# Märkte}}"
+    },
+    "flagged": "{severity, select, critical {Kritischer Alarm} other {Alarm}}: {rules}",
+    "rollback": "Speichern fehlgeschlagen – vorheriger Stand wiederhergestellt. {reason}",
+    "retry": "Erneut versuchen",
+    "errors": {
+      "invalid_request": "Die Regel ist ungültig.",
+      "not_found": "Diese Regel gibt es nicht mehr.",
+      "duplicate_name": "Eine Regel mit diesem Namen gibt es bereits.",
+      "too_many": "Sie können höchstens 10 Regeln anlegen.",
+      "simulated": "Simulierter Fehler (Demo-Schalter)."
+    },
+    "title": "Alarme",
+    "description": "Regeln prüfen die Werte jedes Markts für {period}, den letzten Monat.",
+    "button": "{count, plural, =0 {Alarme} one {Alarme, # Markt markiert} other {Alarme, # Märkte markiert}}",
+    "severity": {
+      "warning": "Warnung",
+      "critical": "Kritisch"
+    },
+    "operator": {
+      "below": "Unter",
+      "above": "Über"
+    },
+    "list": {
+      "label": "Ihre Regeln",
+      "empty": "Noch keine Regeln. Eine Regel markiert Märkte, deren Wert eine Schwelle überschreitet.",
+      "new": "Neue Regel",
+      "full": "Sie können höchstens 10 Regeln anlegen. Löschen Sie eine, um eine neue hinzuzufügen.",
+      "saving": "Wird gespeichert…",
+      "enabled": "Regel aktiv: {name}",
+      "edit": "Bearbeiten",
+      "editRule": "{name} bearbeiten",
+      "delete": "Löschen",
+      "deleteRule": "{name} löschen",
+      "flagsNow": "{count, plural, =0 {Markiert derzeit keine Märkte} one {Markiert derzeit # Markt} other {Markiert derzeit # Märkte}}",
+      "off": "Aus",
+      "loading": "Ihre Regeln werden geladen…",
+      "loadFailed": "Ihre Regeln konnten nicht geladen werden.",
+      "retry": "Erneut versuchen"
+    },
+    "form": {
+      "newTitle": "Neue Regel",
+      "editTitle": "Regel bearbeiten",
+      "name": "Name",
+      "metric": "Kennzahl",
+      "operator": "Bedingung",
+      "threshold": "Schwelle",
+      "unitPercent": "%",
+      "unitRevenue": "Mio. {symbol}",
+      "revenueHint": "In Millionen {currency, select, EUR {Euro} GBP {Britische Pfund} other {US-Dollar}}, z. B. 1,5",
+      "scope": "Gilt für",
+      "scopeKind": {
+        "portfolio": "Alle Märkte",
+        "region": "Eine Region",
+        "markets": "Ausgewählte Märkte"
+      },
+      "region": "Region",
+      "regionPlaceholder": "Region wählen",
+      "markets": "Märkte",
+      "severity": "Schweregrad",
+      "enabled": "Regel aktiv",
+      "save": "Regel speichern",
+      "cancel": "Abbrechen",
+      "errors": {
+        "nameRequired": "Geben Sie der Regel einen Namen.",
+        "nameTooLong": "Der Name darf höchstens 60 Zeichen haben.",
+        "duplicateName": "Eine andere Regel hat bereits diesen Namen.",
+        "thresholdRequired": "Geben Sie eine Zahl ein.",
+        "thresholdRange": "Geben Sie eine Zahl von {min} bis {max} ein.",
+        "thresholdMin": "Geben Sie {min} oder mehr ein.",
+        "regionRequired": "Wählen Sie eine Region.",
+        "marketsRequired": "Wählen Sie mindestens einen Markt."
+      },
+      "back": "Zurück",
+      "thresholdWithUnit": "Schwelle, {unit}"
+    },
+    "preview": {
+      "label": "Vorschau",
+      "flags": "{count, plural, one {Würde derzeit # Markt markieren ({period}): {markets}} other {Würde derzeit # Märkte markieren ({period}): {markets}}}",
+      "none": "Würde derzeit keine Märkte markieren ({period}).",
+      "incomplete": "Geben Sie eine Schwelle ein, um die markierten Märkte zu sehen."
+    },
+    "delete": {
+      "title": "„{name}“ löschen?",
+      "description": "Die Regel und ihre Markierungen verschwinden. Das lässt sich nicht rückgängig machen.",
+      "confirm": "Regel löschen",
+      "cancel": "Behalten"
+    },
+    "simulate": {
+      "label": "Nächstes Speichern scheitern lassen (Demo)",
+      "hint": "Die nächste Änderung schlägt absichtlich fehl, damit Sie das Zurücksetzen sehen."
+    },
+    "triggered": {
+      "title": "{count, plural, =0 {Aktuell ausgelöst ({period})} one {Aktuell ausgelöst: # Markt ({period})} other {Aktuell ausgelöst: # Märkte ({period})}}",
+      "none": "Derzeit markiert keine Regel einen Markt.",
+      "reason": "{metric} {value} · {operator, select, below {unter {threshold}} other {über {threshold}}}",
+      "open": "{name} öffnen",
+      "show": "Anzeigen",
+      "openShort": "Öffnen"
+    },
+    "saved": "{enabled, select, false {„{name}“ gespeichert (aus).} other {{count, plural, =0 {„{name}“ gespeichert: markiert derzeit keine Märkte.} one {„{name}“ gespeichert: markiert derzeit # Markt.} other {„{name}“ gespeichert: markiert derzeit # Märkte.}}}}",
+    "tabs": {
+      "label": "Alarm-Ansicht",
+      "firing": "Ausgelöst",
+      "rules": "Regeln",
+      "withCount": "{tab} · {count, number}"
+    },
+    "failed": {
+      "create": "„{name}“ wurde nicht gespeichert. {reason}",
+      "update": "Nicht gespeichert. {reason}",
+      "remove": "Nicht gelöscht. {reason}",
+      "retry": "Erneut versuchen",
+      "retryRule": "Erneut versuchen: {name}",
+      "dismiss": "Ausblenden",
+      "dismissRule": "Ausblenden: {name}"
+    }
+  },
+  "sentryTest": {
+    "meta": "Sentry-Test",
+    "title": "Sentry-Testseite",
+    "intro": "Jede Schaltfläche schickt eine Art von Fehler oder Signal an Sentry. Die Seite gibt es nur, wo ENABLE_SENTRY_TEST_PAGE gesetzt ist; überall sonst ist sie ein 404.",
+    "off": "Sentry ist hier aus: NEXT_PUBLIC_SENTRY_DSN ist nicht gesetzt. Die Schaltflächen schlagen trotzdem fehl, gesendet wird nichts.",
+    "sent": "Erledigt: {label}. In Sentry unter {place} nachsehen.",
+    "apiResult": "Die Test-API hat mit {status} geantwortet. In Sentry unter Issues nachsehen.",
+    "sending": "Wird gesendet…",
+    "items": {
+      "clientError": {
+        "label": "Client-Fehler",
+        "hint": "Wirft in einem Klick-Handler; das SDK fängt ihn ab.",
+        "place": "Issues"
+      },
+      "renderError": {
+        "label": "Render-Fehler",
+        "hint": "Eine Komponente wirft beim Rendern; die Fehlerseite protokolliert ihn.",
+        "place": "Issues"
+      },
+      "handled": {
+        "label": "Behandelter Fehler",
+        "hint": "Über logError protokolliert; die Seite bleibt, wie sie ist.",
+        "place": "Issues"
+      },
+      "rejection": {
+        "label": "Unbehandelte Ablehnung",
+        "hint": "Ein Promise wird abgelehnt, und nichts fängt es ab.",
+        "place": "Issues"
+      },
+      "warning": {
+        "label": "Warnung",
+        "hint": "logWarning: eine Meldung mit Stufe warning.",
+        "place": "Issues"
+      },
+      "apiError": {
+        "label": "API-Fehler",
+        "hint": "Die Test-API wirft auf dem Server und antwortet mit 500.",
+        "place": "Issues"
+      },
+      "serverError": {
+        "label": "Server-Render-Fehler",
+        "hint": "Öffnet eine Seite, deren Server Component wirft.",
+        "place": "Issues"
+      },
+      "trace": {
+        "label": "Trace",
+        "hint": "Ein Span von 300 ms über traceSpan.",
+        "place": "Traces"
+      }
+    }
+  }
+}

@@ -1,0 +1,145 @@
+'use client';
+
+import { ArrowUpIcon, SquareIcon } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import {
+  type KeyboardEvent,
+  type RefObject,
+  type SubmitEvent,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+} from 'react';
+
+import { CHAT_QUESTION_MAX_LENGTH } from '@/shared/api';
+import { cn } from '@/shared/lib';
+import { Button, Textarea } from '@/shared/ui';
+
+const COUNTER_FROM = 450;
+
+type ComposerProps = {
+  isStreaming: boolean;
+  onAsk: (question: string) => void;
+  onStop: () => void;
+  /** Lets the panel return focus to the field (e.g. after New chat). */
+  inputRef?: RefObject<HTMLTextAreaElement | null>;
+};
+
+export function Composer({ isStreaming, onAsk, onStop, inputRef }: ComposerProps) {
+  const t = useTranslations('assistant.composer');
+  const [value, setValue] = useState('');
+  const reasonId = useId();
+  const ownRef = useRef<HTMLTextAreaElement>(null);
+  const fieldRef = inputRef ?? ownRef;
+  const wasStreaming = useRef(isStreaming);
+
+  // Starting or ending a stream can pull the focused control away: the clicked
+  // suggestion unmounts, Stop turns into a disabled Send, Retry is disabled.
+  // Keyboard focus then lands here instead of on <body>. Not on touch, where
+  // focusing the field would open the on-screen keyboard.
+  useEffect(() => {
+    if (wasStreaming.current === isStreaming) return;
+    wasStreaming.current = isStreaming;
+    if (typeof window.matchMedia === 'function' && window.matchMedia('(pointer: coarse)').matches)
+      return;
+    const active = document.activeElement;
+    const lost =
+      active === null ||
+      active === document.body ||
+      (active instanceof HTMLButtonElement && active.disabled);
+    if (lost) fieldRef.current?.focus();
+  }, [isStreaming, fieldRef]);
+
+  const question = value.trim();
+  const tooLong = question.length > CHAT_QUESTION_MAX_LENGTH;
+  const canSend = !isStreaming && question.length > 0 && !tooLong;
+  const reason =
+    question.length === 0
+      ? t('blankReason')
+      : tooLong
+        ? t('tooLongReason', { max: CHAT_QUESTION_MAX_LENGTH })
+        : null;
+
+  const send = () => {
+    if (!canSend) return;
+    onAsk(question);
+    setValue('');
+  };
+
+  const onSubmit = (event: SubmitEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    send();
+  };
+
+  const onKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === 'Escape' && isStreaming) {
+      event.preventDefault();
+      onStop();
+    } else if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) {
+      event.preventDefault();
+      send();
+    }
+  };
+
+  return (
+    <form onSubmit={onSubmit} className="flex flex-col gap-1.5">
+      <label htmlFor={`${reasonId}-field`} className="sr-only">
+        {t('label')}
+      </label>
+      <div className="flex items-end gap-2">
+        <Textarea
+          ref={fieldRef}
+          id={`${reasonId}-field`}
+          value={value}
+          placeholder={t('placeholder')}
+          readOnly={isStreaming}
+          aria-disabled={isStreaming}
+          aria-invalid={tooLong}
+          aria-describedby={tooLong ? reasonId : undefined}
+          rows={1}
+          className="max-h-40 min-h-11 resize-none text-base md:text-base"
+          onChange={(event) => {
+            setValue(event.target.value);
+          }}
+          onKeyDown={onKeyDown}
+        />
+        {isStreaming ? (
+          <Button
+            type="button"
+            size="icon-lg"
+            className="size-11"
+            aria-label={t('stop')}
+            onClick={onStop}
+          >
+            <SquareIcon aria-hidden />
+          </Button>
+        ) : (
+          <Button
+            type="submit"
+            size="icon-lg"
+            className="size-11"
+            aria-label={t('send')}
+            aria-describedby={reason ? reasonId : undefined}
+            disabled={!canSend}
+          >
+            <ArrowUpIcon aria-hidden />
+          </Button>
+        )}
+      </div>
+      {question.length >= COUNTER_FROM ? (
+        <span
+          className={cn(
+            'self-end text-xs',
+            tooLong ? 'font-medium text-destructive' : 'text-muted-foreground',
+          )}
+        >
+          {t('counter', { count: question.length, max: CHAT_QUESTION_MAX_LENGTH })}
+        </span>
+      ) : null}
+      <p id={reasonId} className={tooLong ? 'text-xs text-destructive' : 'sr-only'}>
+        {reason}
+      </p>
+    </form>
+  );
+}

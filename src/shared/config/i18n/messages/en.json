@@ -1,0 +1,687 @@
+{
+  "common": {
+    "appName": "Market Ops Console",
+    "skipToContent": "Skip to content",
+    "description": "Sales performance by market, product and period, with an AI assistant that shows its sources.",
+    "close": "Close",
+    "titleTemplate": "{page} · {appName}",
+    "separator": " · ",
+    "after": "· {text}",
+    "srAfter": ", {text}",
+    "separatorMark": "·"
+  },
+  "meta": {
+    "dashboard": "Dashboard",
+    "ogAlt": "{appName}. {description}"
+  },
+  "errors": {
+    "timeout": "The request took too long. Please try again.",
+    "network": "Can't reach the server. Check your connection and try again.",
+    "server": "The server couldn't complete the request.",
+    "invalidData": "We received data in an unexpected format.",
+    "unknown": "Something went wrong.",
+    "sectionTitle": "This section couldn't load.",
+    "retry": "Try again",
+    "widgetTitle": "Couldn't load {name}",
+    "retryWidget": "Try again: {name}",
+    "dataFailed": "The dashboard data couldn't load. Each section has a Try again button."
+  },
+  "offline": {
+    "title": "You're offline",
+    "body": "We'll reconnect automatically. Everything on this page is kept."
+  },
+  "notFound": {
+    "title": "Page not found",
+    "body": "The page you're looking for doesn't exist or has moved.",
+    "home": "Back to dashboard",
+    "address": "<label>Address not found:</label> {path}"
+  },
+  "errorPage": {
+    "title": "Something went wrong",
+    "body": "This page couldn't be displayed. Try again or go back to the dashboard.",
+    "home": "Back to dashboard",
+    "errorId": "Error ID: {id}"
+  },
+  "theme": {
+    "label": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "locale": {
+    "label": "Language",
+    "en-GB": "English (UK)",
+    "en-US": "English (US)",
+    "de-DE": "Deutsch",
+    "ru-RU": "Русский"
+  },
+  "currency": {
+    "label": "Currency",
+    "USD": "US dollar",
+    "EUR": "Euro",
+    "GBP": "British pound",
+    "current": "Currency: {code}, {name}",
+    "rates": "ECB rates of {date}: 1 USD = {eur} EUR = {gbp} GBP.",
+    "demo": "Fixed for this demo; a live app would get rates from the backend API."
+  },
+  "assistant": {
+    "composer": {
+      "label": "Ask about the data",
+      "placeholder": "Ask a question",
+      "send": "Send",
+      "stop": "Stop answer",
+      "blankReason": "Type a question to send it.",
+      "tooLongReason": "Questions can be up to {max} characters.",
+      "counter": "{count} / {max}"
+    },
+    "suggestions": {
+      "title": "Try asking",
+      "risks": "Which markets are at risk?",
+      "germany": "Why did Germany dip?",
+      "apacEurope": "Compare APAC and Europe",
+      "forecastMiss": "What drives the forecast miss?"
+    },
+    "panel": {
+      "title": "Assistant",
+      "empty": {
+        "title": "Ask about the portfolio",
+        "body": "Answers come from the AI and may be incomplete. Each answer shows its sources and the matching data, so you can check it."
+      },
+      "youAsked": "You asked",
+      "newContent": "New content",
+      "subtitle": "Answers in English",
+      "newChat": "New chat",
+      "loading": "Loading the conversation…"
+    },
+    "answer": {
+      "label": "AI answer · may be incomplete",
+      "writing": "AI answer · writing…",
+      "pending": "Sources and confidence appear when the answer is complete.",
+      "sources": "Sources",
+      "confidence": "Confidence: {level}",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low",
+      "directional": "Treat as directional",
+      "usdNote": "Amounts in this answer are in USD, as the data; the dashboard shows {currency}."
+    },
+    "stopped": {
+      "title": "Stopped — answer incomplete.",
+      "body": "No sources or confidence for a partial answer.",
+      "askAgain": "Ask again"
+    },
+    "abstain": {
+      "title": "I can't answer this from the data",
+      "coverage": "The data covers {from} – {to}."
+    },
+    "error": {
+      "title": "No answer",
+      "retry": "Try again"
+    },
+    "evidence": {
+      "revenue": "Revenue",
+      "attainment": "Attainment",
+      "growth": "Growth YoY",
+      "units": "Units",
+      "calculated": "Calculated from monthly data",
+      "notInDataset": "Not in the dataset",
+      "trend": "{name} revenue, last 12 months",
+      "showOnDashboard": "Show on dashboard",
+      "clickHint": "Click to show on dashboard",
+      "loading": "Loading data…",
+      "latestStatus": "Status, {period}"
+    },
+    "declined": {
+      "englishOnly": "I only understand English. Please ask your question in English."
+    },
+    "actions": {
+      "copy": "Copy answer",
+      "copied": "Copied",
+      "copyFailed": "Couldn't copy. Select the text instead.",
+      "copySources": "Sources: {list}",
+      "helpful": "Helpful",
+      "notHelpful": "Not helpful",
+      "reasonsTitle": "What was wrong?",
+      "reasons": {
+        "wrongNumbers": "Wrong numbers",
+        "offTopic": "Didn't answer the question",
+        "missing": "Missing markets or periods",
+        "other": "Something else"
+      },
+      "thanks": "Thanks for the feedback."
+    }
+  },
+  "dataCheck": {
+    "title": "What the data shows",
+    "header": "Market performance · latest period: {period} · updated {updated}",
+    "details": "Details",
+    "portfolio": "Portfolio",
+    "name": "Scope",
+    "attainment": "Attain.",
+    "growth": "Growth",
+    "status": "Status",
+    "notMentioned": "Not mentioned in the answer",
+    "showOnDashboard": "Show on dashboard",
+    "onTrack": "On track",
+    "atRisk": "At risk",
+    "offTrack": "Off track",
+    "noStatus": "—",
+    "reasonGrowth": "Growth {value} YoY",
+    "latestOnly": "latest only",
+    "attention": "{needAttention, plural, one {# of {markets} markets needs} other {# of {markets} markets need}} attention; the answer names {named}.",
+    "attentionRegion": "{needAttention, plural, one {# of {markets} markets in {region} needs} other {# of {markets} markets in {region} need}} attention; the answer names {named}.",
+    "gapNote": "{count, plural, one {# market not mentioned} other {# markets not mentioned}}",
+    "statusNote": "Status is set for the latest month only."
+  },
+  "shell": {
+    "assistant": "Assistant",
+    "sections": "Sections",
+    "tabs": {
+      "overview": "Overview",
+      "assistant": "Assistant",
+      "alerts": "Alerts"
+    },
+    "collapse": "Hide assistant",
+    "expand": "Show assistant",
+    "newAnswers": "{count, plural, one {# new answer} other {# new answers}}",
+    "flagged": "{count, plural, one {, # market flagged} other {, # markets flagged}}",
+    "alerts": "Alerts"
+  },
+  "monthPicker": {
+    "previousYear": "Previous year",
+    "nextYear": "Next year",
+    "months": "Months of {year}"
+  },
+  "period": {
+    "trigger": "Period: {period}, {range}. Change period",
+    "label": "{period} · {range}",
+    "title": "Period",
+    "range": {
+      "1m": "1 month",
+      "3m": "3 months",
+      "12m": "12 months"
+    },
+    "rangeLabel": "Months ending in {period}"
+  },
+  "mode": {
+    "label": "View",
+    "executive": "Executive",
+    "analyst": "Analyst"
+  },
+  "drill": {
+    "label": "Drill-down",
+    "portfolio": "Portfolio",
+    "chooseRegion": "Choose a region",
+    "chooseMarket": "Choose a market",
+    "chooseProduct": "Choose a product",
+    "region": "Region",
+    "market": "Market",
+    "product": "Product",
+    "changeRegion": "Region: {name}. Change region",
+    "changeMarket": "Market: {name}. Change market",
+    "changeProduct": "Product: {name}. Change product"
+  },
+  "header": {
+    "settings": "Settings: language, currency, theme, reset view",
+    "settingsTitle": "Settings",
+    "resetView": "Reset view",
+    "resetHint": "Portfolio, latest month, Executive"
+  },
+  "overview": {
+    "summary": "{markets, plural, one {# market} other {# markets}} · {products, plural, one {# product} other {# products}} · latest data {period}",
+    "modeBadge": {
+      "executive": "Executive view",
+      "analyst": "Analyst view"
+    },
+    "modeNote": {
+      "executive": "Headlines: KPIs, market status, risks and the revenue trend.",
+      "analyst": "Adds the map metric, the comparison radar, the markets table and the heat map below."
+    }
+  },
+  "kpi": {
+    "title": "Key figures",
+    "revenue": "Revenue",
+    "attainment": "Forecast attainment",
+    "growth": "Growth YoY",
+    "atRisk": "Markets at risk",
+    "vsPriorYear": "{value} vs prior year",
+    "forecast": "Forecast {value}",
+    "priorYear": "Prior year {value}",
+    "riskValue": "{count} of {total}",
+    "riskSplit": "{offTrack} off track · {atRisk} at risk",
+    "riskNone": "All on track",
+    "latestOnly": "Status is set for the latest month only.",
+    "goLatest": "Show {period}",
+    "perProduct": "Status is set per market, not per product.",
+    "calculated": "Calculated",
+    "calculatedLabel": "Calculated: {formula}",
+    "formula": {
+      "revenue": "sum of monthly actual revenue over the selected months.",
+      "attainment": "actual ÷ forecast over the selected months; can differ from a market's stored figure by about 1 point.",
+      "growth": "actual ÷ prior-year actual over the selected months, minus 100%."
+    },
+    "unavailable": "—"
+  },
+  "marketStatus": {
+    "title": "Market status",
+    "tile": "{code} {value} attainment, {name}, {status}",
+    "tileNoStatus": "{code} {value} attainment, {name}",
+    "current": "open now",
+    "selected": "selected",
+    "hatched": "hatched",
+    "latestOnly": "Status is set for the latest month only; tiles show forecast attainment.",
+    "market": "Market",
+    "region": "Region",
+    "attainment": "Attainment",
+    "status": "Status",
+    "caption": "Market status by region, {window}",
+    "view": "View",
+    "views": {
+      "map": "Map",
+      "tiles": "Tiles",
+      "table": "Table"
+    },
+    "metricTrigger": "Map colour: {metric}. Change",
+    "metricTitle": "Colour the map by",
+    "metric": {
+      "status": "Status",
+      "attainment": "Attainment",
+      "growth": "Growth YoY",
+      "share": "Market share",
+      "revenue": "Revenue"
+    },
+    "notice": {
+      "statusLatestOnly": "Status is set for the latest month only; the map shows forecast attainment.",
+      "shareLatestOnly": "Market share is set for the latest month only; the map shows forecast attainment.",
+      "sharePerProduct": "Market share is not set per product; the map shows forecast attainment."
+    },
+    "mapLabel": "World map of markets: {metric}",
+    "country": "{name}, {metric} {value}",
+    "countryStatus": "{name}, {metric} {value}, {status}",
+    "noData": "No data",
+    "openMarket": "Open {name}",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "wholeWorld": "Whole world",
+    "legend": "Legend",
+    "below": "below {to}",
+    "between": "{from} – {to}",
+    "above": "{from} and above",
+    "dotted": "dotted",
+    "perProduct": "Values are for {product}; status is set per market.",
+    "addToFilter": "Add to filter",
+    "removeFromFilter": "Remove from filter",
+    "hintPointer": "Shift+click a market to add it to the table filter.",
+    "hintTouch": "Tap a market, then Add to filter.",
+    "alerts": "Alerts",
+    "noAlerts": "None"
+  },
+  "topRisks": {
+    "title": "Top risks",
+    "order": "Off track first, then by attainment; then markets your alerts flag",
+    "reason": "{attainment} · {growth} YoY",
+    "empty": "No markets at risk here."
+  },
+  "trend": {
+    "title": "Revenue · {from} – {to}",
+    "actual": "Actual",
+    "forecast": "Forecast",
+    "priorYear": "Prior year",
+    "showTable": "Show as table",
+    "summary": "Revenue for {scope}, {from} to {to}. {period}: actual {actual}, forecast {forecast}, prior year {priorYear}.",
+    "anomaly": "{period} · {market}: {note}",
+    "month": "Month",
+    "caption": "Revenue by month for {scope}",
+    "anomalyMark": "anomaly",
+    "window": "selected",
+    "legend": "Legend",
+    "name": "Revenue trend",
+    "showChart": "Show as chart",
+    "windowRange": "{from} – {to}",
+    "units": "Units"
+  },
+  "topMovers": {
+    "title": "Top movers",
+    "basis": "Growth YoY, {range} to {period}",
+    "risers": "Highest growth",
+    "fallers": "Lowest growth",
+    "empty": "Not enough markets to compare."
+  },
+  "marketFilter": {
+    "button": "Markets",
+    "buttonCount": "Markets ({count})",
+    "title": "Show only these markets",
+    "clear": "Clear selection",
+    "remove": "Remove {name}",
+    "count": "{selected} of {total} selected",
+    "selected": "Selected",
+    "region": "All of {region}",
+    "atRisk": "At risk or off track",
+    "atRiskLatestOnly": "Latest month only",
+    "clearAll": "Clear all"
+  },
+  "marketsTable": {
+    "title": "Markets",
+    "caption": "Markets in {scope}, {window}. Column headers sort the table.",
+    "total": "Total",
+    "totalCalculated": "Total of the rows shown, calculated from monthly data",
+    "sortHint": "Sort",
+    "column": {
+      "market": "Market",
+      "region": "Region",
+      "revenue": "Revenue",
+      "forecast": "Forecast",
+      "gap": "Gap to forecast",
+      "attainment": "Attainment",
+      "priorYear": "Prior year",
+      "growth": "Growth YoY",
+      "share": "Share",
+      "units": "Units",
+      "status": "Status"
+    },
+    "empty": "None of the selected markets is in this view. Clear the selection to see every market.",
+    "noteLatest": "Status and share are set for the latest month only.",
+    "notePerProduct": "Share is not available per product.",
+    "noteCalculated": "All figures are calculated from monthly data, so a row adds up and the total is the sum of the rows. Share and status are the stored latest-month figures; the tiles show stored KPIs, which can differ by about 1 point.",
+    "anomaly": "Anomaly, {period}: {note}"
+  },
+  "heatMap": {
+    "title": "Heat map",
+    "subtitle": "{metric} by month",
+    "notice": {
+      "statusPerMonth": "Status is set for the latest month only; the heat map shows growth YoY.",
+      "sharePerMonth": "Market share is set for the latest month only; the heat map shows growth YoY."
+    },
+    "gridLabel": "{metric} by market and month",
+    "market": "Market",
+    "cell": "{value}",
+    "cellRounded": "{shown} ({value})",
+    "stepBelow": "below {to}",
+    "stepBetween": "{from} – {to}",
+    "stepAbove": "{from} and above",
+    "anomaly": "anomaly: {note}",
+    "selected": "selected",
+    "current": "open now",
+    "inWindow": "in the selected window",
+    "open": "Open {market}, {month}",
+    "add": "Add {market} to selection",
+    "remove": "Remove {market} from selection",
+    "pick": "Pick a cell to see its value.",
+    "hint": "Arrow keys move, Enter opens the market at that month, Shift+click or Shift+Enter selects it.",
+    "showTable": "Show as table",
+    "showChart": "Show as chart",
+    "caption": "{metric} by month for {scope}",
+    "legend": "Legend",
+    "noteCalculated": "Calculated from monthly series: values can differ from the stored KPIs by about a point.",
+    "perProduct": "Values are for {product}.",
+    "revenueUnit": "Revenue in {currency, select, EUR {euros} GBP {British pounds} other {US dollars}}.",
+    "anomalyMarket": "anomaly in the whole market: {note}",
+    "anomalies": "Anomalies",
+    "anomalyMark": "anomaly",
+    "readout": "{metric} {value}",
+    "anomalyItem": "{month}: {note}",
+    "cellWithNote": "{value}, {note}"
+  },
+  "radar": {
+    "title": "Comparison",
+    "basis": {
+      "selection": "Selected markets against the portfolio",
+      "market": "{market} and its neighbours in {region}, against the portfolio",
+      "region": "Markets of {region} against the portfolio",
+      "regions": "Regions against the portfolio"
+    },
+    "portfolio": "Portfolio average",
+    "compared": "Compared",
+    "axis": {
+      "growth": "Growth YoY",
+      "attainment": "Attainment",
+      "share": "Market share",
+      "revenue": "Revenue",
+      "momentum": "Momentum"
+    },
+    "scaleMarkets": "Each axis runs from the weakest (centre) to the strongest (edge) of the 13 markets.",
+    "scaleRegions": "Each axis runs from the weakest (centre) to the strongest (edge) of the 4 regions.",
+    "momentumNote": "Momentum: growth YoY over the last 3 months minus the 3 months before, in percentage points.",
+    "removed": {
+      "shareLatestOnly": "Market share is set for the latest month only; its axis is left out.",
+      "momentumTooEarly": "Momentum needs six months of data; its axis is left out."
+    },
+    "hidden": {
+      "selection": "Showing the first {shown} of {total} selected markets.",
+      "neighbours": "Showing {shown} of {total} markets of {region}."
+    },
+    "productIgnored": "Compares markets, not products: {product} is not applied here.",
+    "pickHint": "To compare other markets, Shift+click them on the map or pick them in the table filter.",
+    "tooFewAxes": "Too few axes have data for a chart; the table shows the values.",
+    "showTable": "Show as table",
+    "showChart": "Show as chart",
+    "caption": "{names} against the portfolio average, {window}",
+    "chartLabel": "Radar chart: {names} against the portfolio average",
+    "pp": "{value} pp",
+    "legend": "Legend"
+  },
+  "exportMarkets": {
+    "button": "Export",
+    "preparing": "Preparing…",
+    "title": "Rows as shown",
+    "excel": "Excel (.xlsx)",
+    "excelHint": "Formatted, with filters; amounts in {currency}",
+    "csv": "CSV",
+    "csvHint": "Raw numbers in USD, for other tools",
+    "failed": "Couldn't create the file. Try again.",
+    "sheet": {
+      "markets": "Markets",
+      "months": "By month",
+      "about": "About",
+      "total": "Total",
+      "code": "Code",
+      "anomaly": "Anomaly",
+      "month": "Month",
+      "actual": "Actual",
+      "anomalyItem": "{period}: {note}"
+    },
+    "about": {
+      "source": "Source",
+      "sourceValue": "data.json, generated {date}",
+      "currency": "Currency",
+      "currencyUsd": "{code} ({name}), as in the data",
+      "currencyConverted": "{code} ({name}), converted from USD at 1 USD = {rate} {code}, ECB rate of {date}. Fixed for this demo; a live app would get rates from the backend API.",
+      "view": "View",
+      "product": "Product",
+      "selection": "Selected markets",
+      "selectionAll": "All markets in the view",
+      "sort": "Order",
+      "sortDefault": "Region, then market",
+      "asc": "{column}, ascending",
+      "desc": "{column}, descending",
+      "calculated": "How values are made",
+      "calculatedValue": "Calculated from monthly data (revenue = Σ actual, attainment = Σ actual ÷ Σ forecast, growth = Σ actual ÷ Σ prior year − 1); share and status as stored for the latest month. Totals follow the Excel filter.",
+      "status": "Status",
+      "statusValue": "Set in the data for the latest month only.",
+      "link": "Open this view"
+    }
+  },
+  "alerts": {
+    "examples": {
+      "attainment": "Attainment below 95%",
+      "share": "Share below 10%"
+    },
+    "condition": "{operator, select, below {{metric} below {threshold}} other {{metric} above {threshold}}}",
+    "full": "{condition} · {scope}",
+    "metric": {
+      "growth": "Growth",
+      "attainment": "Attainment",
+      "share": "Share",
+      "revenue": "Revenue"
+    },
+    "scope": {
+      "portfolio": "All markets",
+      "marketsCount": "{count, plural, one {# market} other {# markets}}"
+    },
+    "flagged": "{severity, select, critical {Critical alert} other {Alert}}: {rules}",
+    "rollback": "Couldn't save — restored previous state. {reason}",
+    "retry": "Retry",
+    "errors": {
+      "invalid_request": "The rule is not valid.",
+      "not_found": "This rule no longer exists.",
+      "duplicate_name": "A rule with this name already exists.",
+      "too_many": "You can keep up to 10 rules.",
+      "simulated": "Simulated failure (demo switch)."
+    },
+    "title": "Alerts",
+    "description": "Rules check each market’s figures for {period}, the latest month.",
+    "button": "{count, plural, =0 {Alerts} one {Alerts, # market flagged} other {Alerts, # markets flagged}}",
+    "severity": {
+      "warning": "Warning",
+      "critical": "Critical"
+    },
+    "operator": {
+      "below": "Below",
+      "above": "Above"
+    },
+    "list": {
+      "label": "Your rules",
+      "empty": "No rules yet. A rule flags markets whose figure crosses a threshold.",
+      "new": "New rule",
+      "full": "You can keep up to 10 rules. Delete one to add another.",
+      "saving": "Saving…",
+      "enabled": "Rule on: {name}",
+      "edit": "Edit",
+      "editRule": "Edit {name}",
+      "delete": "Delete",
+      "deleteRule": "Delete {name}",
+      "flagsNow": "{count, plural, =0 {Flags no markets now} one {Flags # market now} other {Flags # markets now}}",
+      "off": "Off",
+      "loading": "Loading your rules…",
+      "loadFailed": "Couldn't load your rules.",
+      "retry": "Try again"
+    },
+    "form": {
+      "newTitle": "New rule",
+      "editTitle": "Edit rule",
+      "name": "Name",
+      "metric": "Metric",
+      "operator": "Condition",
+      "threshold": "Threshold",
+      "unitPercent": "%",
+      "unitRevenue": "M{symbol}",
+      "revenueHint": "In millions of {currency, select, EUR {euros} GBP {British pounds} other {US dollars}}, e.g. 1.5",
+      "scope": "Applies to",
+      "scopeKind": {
+        "portfolio": "All markets",
+        "region": "One region",
+        "markets": "Chosen markets"
+      },
+      "region": "Region",
+      "regionPlaceholder": "Choose a region",
+      "markets": "Markets",
+      "severity": "Severity",
+      "enabled": "Rule on",
+      "save": "Save rule",
+      "cancel": "Cancel",
+      "errors": {
+        "nameRequired": "Give the rule a name.",
+        "nameTooLong": "Keep the name under 60 characters.",
+        "duplicateName": "Another rule already has this name.",
+        "thresholdRequired": "Enter a number.",
+        "thresholdRange": "Enter a number from {min} to {max}.",
+        "thresholdMin": "Enter {min} or more.",
+        "regionRequired": "Choose a region.",
+        "marketsRequired": "Choose at least one market."
+      },
+      "back": "Back",
+      "thresholdWithUnit": "Threshold, {unit}"
+    },
+    "preview": {
+      "label": "Preview",
+      "flags": "{count, plural, one {Would flag # market now ({period}): {markets}} other {Would flag # markets now ({period}): {markets}}}",
+      "none": "Would flag no markets now ({period}).",
+      "incomplete": "Enter a threshold to see which markets it flags."
+    },
+    "delete": {
+      "title": "Delete “{name}”?",
+      "description": "The rule and its flags go away. This can’t be undone.",
+      "confirm": "Delete rule",
+      "cancel": "Keep it"
+    },
+    "simulate": {
+      "label": "Fail the next save (demo)",
+      "hint": "The next change fails on purpose, so you can see it rolled back."
+    },
+    "triggered": {
+      "title": "{count, plural, =0 {Firing now ({period})} one {Firing now: # market ({period})} other {Firing now: # markets ({period})}}",
+      "none": "No rule flags a market now.",
+      "reason": "{metric} {value} · {operator, select, below {below {threshold}} other {above {threshold}}}",
+      "open": "Open {name}",
+      "show": "Show",
+      "openShort": "Open"
+    },
+    "saved": "{enabled, select, false {Saved “{name}” (off).} other {{count, plural, =0 {Saved “{name}”: it flags no markets now.} one {Saved “{name}”: it flags # market now.} other {Saved “{name}”: it flags # markets now.}}}}",
+    "tabs": {
+      "label": "Alerts view",
+      "firing": "Firing",
+      "rules": "Rules",
+      "withCount": "{tab} · {count, number}"
+    },
+    "failed": {
+      "create": "“{name}” wasn't saved. {reason}",
+      "update": "Not saved. {reason}",
+      "remove": "Not deleted. {reason}",
+      "retry": "Retry",
+      "retryRule": "Retry: {name}",
+      "dismiss": "Dismiss",
+      "dismissRule": "Dismiss: {name}"
+    }
+  },
+  "sentryTest": {
+    "meta": "Sentry test",
+    "title": "Sentry test page",
+    "intro": "Each button sends one kind of error or signal to Sentry. The page exists only where ENABLE_SENTRY_TEST_PAGE is set; everywhere else it is a 404.",
+    "off": "Sentry is off here: NEXT_PUBLIC_SENTRY_DSN is not set. The buttons still fail, but nothing is sent.",
+    "sent": "Done: {label}. Look in Sentry under {place}.",
+    "apiResult": "The test API answered {status}. Look in Sentry under Issues.",
+    "sending": "Sending…",
+    "items": {
+      "clientError": {
+        "label": "Client error",
+        "hint": "Throws in a click handler; the SDK catches it.",
+        "place": "Issues"
+      },
+      "renderError": {
+        "label": "Render error",
+        "hint": "A component throws while rendering; the error screen logs it.",
+        "place": "Issues"
+      },
+      "handled": {
+        "label": "Handled error",
+        "hint": "Logged through logError; the page stays as it is.",
+        "place": "Issues"
+      },
+      "rejection": {
+        "label": "Unhandled rejection",
+        "hint": "A promise rejects and nothing catches it.",
+        "place": "Issues"
+      },
+      "warning": {
+        "label": "Warning",
+        "hint": "logWarning: a message at level warning.",
+        "place": "Issues"
+      },
+      "apiError": {
+        "label": "API error",
+        "hint": "The test API throws on the server and answers 500.",
+        "place": "Issues"
+      },
+      "serverError": {
+        "label": "Server render error",
+        "hint": "Opens a page whose Server Component throws.",
+        "place": "Issues"
+      },
+      "trace": {
+        "label": "Trace",
+        "hint": "A 300 ms span through traceSpan.",
+        "place": "Traces"
+      }
+    }
+  }
+}
