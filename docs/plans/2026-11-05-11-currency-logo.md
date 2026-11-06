@@ -29,12 +29,15 @@ preview move to 0.13.0.
    mode (light: dark square, white M; dark: light square, dark M), drawn from
    the `foreground`/`background` tokens. Later reused for the favicon (0.13.0).
 8. **Version 0.12.0**: currency + logo. The deploy moves to 0.13.0.
+9. **Map revenue steps stay round in the chosen currency** (`€1M`, `€1.5M`,
+   …, owner): the legend reads cleanly and a market's step matches the figure
+   the user reads; a market near a break may change colour with the currency.
 
 ## How the conversion works
 
-- `shared/config/currency`: `CURRENCIES = ['USD','EUR','GBP']`, `RATES`
-  (USD per unit = 1, EUR 0.89095, GBP 0.74299), `RATES_DATE = '2026-11-05'`.
-- The choice: `useCurrency()` on `useStoredValue('mo:currency')`; unknown or
+- `shared/config/currency`: `CURRENCIES = ['USD','EUR','GBP']`, `USD_RATES`
+  (USD = 1, EUR 0.89095, GBP 0.74299), `RATES_DATE = '2026-11-05'`.
+- The choice: `useCurrency()` on `useStoredChoice('mo:currency')`; unknown or
   missing value = USD.
 - **Converted once, at the data:** the dataset readers get a copy with every
   money field (`kpis.revenue`, series `actual`, `forecast`, `priorYear`) times
@@ -46,7 +49,8 @@ preview move to 0.13.0.
   chosen `currency` and `narrowSymbol`, so every `{value, number, compactCurrency}`
   and `format.number(v, 'currency')` prints the right symbol.
 - **Alerts:** a revenue threshold is multiplied by the rate when read for
-  display and evaluation, divided by it when saved.
+  display and evaluation (unrounded), divided by it and rounded to whole USD
+  when saved.
 - **Exports:** Excel from the converted view with the currency's number
   format; CSV from the USD view.
 - **Assistant:** evidence card figures convert (they are numbers). The answer
@@ -73,10 +77,6 @@ preview move to 0.13.0.
    keeps it.
 9. Docs: ADR 0017 (currency), DESIGN.md (picker, logo), README, CHANGELOG
    0.12.0, backlog (currency item closed, deploy → 0.13.0), version 0.12.0.
-
-9. **Map revenue steps stay round in the chosen currency** (`€1M`, `€1.5M`,
-   …, owner): the legend reads cleanly and a market's step matches the figure
-   the user reads; a market near a break may change colour with the currency.
 
 ## Risks
 

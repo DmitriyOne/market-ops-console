@@ -98,6 +98,7 @@ Points the owner wants explained in the README, in his own words:
 - **The share-total formula is not run by a spreadsheet in tests**: they check its text and redo its sum in JS. Checked once in Microsoft Excel for Mac (2026-11-05): all markets 0.2187, Germany and Spain filtered 0.1178, the revenue-weighted share of the two. LibreOffice not checked: it may not take `SUBTOTAL` over `OFFSET` inside `SUMPRODUCT`, and `IFERROR` would leave the cell blank. **Accepted** (Excel is the target), or a note in About if LibreOffice matters.
 - **Column letters are written by hand** in the totals (`'D'`, `'J'`, as in the attainment and growth totals): moving a column breaks them silently. Derive them from the column list if columns ever move. **Hardening plan**.
 - **A new lockfile makes the parallel jobs race to save one pnpm cache key** ("Unable to reserve cache" warnings, harmless). **Accepted**.
+- **Chromium download took 9 min 39 s on the 0.11.1 PR into `develop`** (cache miss; the E2E job 12 min 12 s of its 15-min limit, the whole run 12.5 min instead of ~4.5). The install step has no timeout of its own, so a slower download fails the job with no report. Options: a `timeout-minutes` on the install with a retry, or a longer job limit. Cached now, so the next runs should be fast. **Owner's call** (CI change).
 
 ## Currency picker — done in 0.12.0 (ADR 0017)
 

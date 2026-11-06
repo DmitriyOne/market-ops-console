@@ -4,7 +4,7 @@ A console for a commercial operations team: a **streaming AI assistant** that an
 
 Take-home assignment for the Frontend Engineer role at NewPage Solutions.
 
-> Status: `0.12.0` currency picker and logo (amounts in USD, EUR or GBP at fixed ECB rates; the M logo in both themes), built, waiting for the owner's check. Done: foundation (0.2.0), design direction and tokens (0.3.0), assistant (0.4.0), dashboard shell (0.5.0), market map (0.6.0), Analyst markets table (0.7.0), heat map and radar (0.8.0), alerts (0.9.0), end-to-end tests (0.10.0), accessibility pass (0.11.0), polish (0.11.1). Next: deploy, favicon and preview (0.13.0). Full list: `CHANGELOG.md`.
+> Status: `0.12.0` currency picker and logo (amounts in USD, EUR or GBP at fixed ECB rates; the M logo in both themes), built, checked by the owner and an independent review, waiting for the owner's final check. Done: foundation (0.2.0), design direction and tokens (0.3.0), assistant (0.4.0), dashboard shell (0.5.0), market map (0.6.0), Analyst markets table (0.7.0), heat map and radar (0.8.0), alerts (0.9.0), end-to-end tests (0.10.0), accessibility pass (0.11.0), polish (0.11.1). Next: deploy, favicon and preview (0.13.0). Full list: `CHANGELOG.md`.
 
 ## What works now
 

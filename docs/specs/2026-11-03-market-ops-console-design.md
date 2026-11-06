@@ -236,7 +236,7 @@ Four suggested questions (buttons) taken from the brief: risks this quarter, Ger
 - **i18n** (ADR 0010): `en-GB` default, `en-US`, `de-DE`, `ru-RU`; `en.json` shared by both English locales. Assistant answers and market/product names stay English; the AI surface says so.
 - **Theme** (ADR 0009): light/dark/system; every token has both values; heat-map scale contrast-checked in both.
 - **Accessibility**: keyboard reachable everything (inside a modal sheet too: a toast's action is repeated in the panel), visible focus (on the map drawn above every layer), focus returned after an overlay or a removed control, skip link, landmarks, live region announcing "Answer complete"/"Stopped"/errors (not every token) [call], `prefers-reduced-motion` respected, chart table alternatives, no colour-only signals.
-- **Formatting**: currency USD always (no conversion), compact numbers, signed percentages, months per locale.
+- **Formatting**: ~~currency USD always (no conversion)~~ amounts in USD, EUR or GBP at fixed demo rates, bare symbols (ADR 0017) **[owner, 2026-11-05]**, compact numbers, signed percentages, months per locale.
 
 ## 11a. Resilience **[owner]**
 
