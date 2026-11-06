@@ -205,7 +205,7 @@ describe('AssistantPanel', () => {
     expect(content).toHaveTextContent('Off track');
   });
 
-  it('force error shows a translated error, not the server text, and Retry asks again', async () => {
+  it('force error shows a translated error, not the server text, and Retry asks again in its place', async () => {
     vi.spyOn(console, 'error').mockImplementation(() => undefined);
     server.use(chatFromFixture('error'));
     const { user } = setup();
@@ -220,7 +220,9 @@ describe('AssistantPanel', () => {
     server.use(chatFromFixture('germany-dip'));
     await user.click(screen.getByRole('button', { name: t.error.retry }));
     await answerDone();
-    expect(screen.getAllByText('force error')).toHaveLength(2);
+    // The failed turn is replaced, not left above the new one.
+    expect(screen.getAllByText('force error')).toHaveLength(1);
+    expect(screen.queryByText(en.errors.server)).not.toBeInTheDocument();
   });
 
   it('keyboard: after a suggested question, focus stays in the composer', async () => {

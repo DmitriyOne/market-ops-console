@@ -8,6 +8,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 - Alerts: the example rules are named in the page's language in every language, also after a switch (they carry a preset; an edit from the form makes the name the user's). Before, they kept the language of the first visit, and the first save after a switch could clash with an example's name in another language.
 - Alerts: a save the API refuses (a name already taken) no longer offers a Retry that cannot pass: Edit opens the form again with what was typed and the error on the name. A refused delete offers only Dismiss.
 - Alerts: Escape (or Close) gives focus back to the bell, also when a link opened the sheet.
+- Assistant: Try again after a failed answer asks again in its place; the failed turn no longer stays above the new one. A stopped answer stays (it holds what had arrived).
+- Assistant: on a window as narrow as a phone, a source picked with the mouse no longer leaves its card over the header.
 
 ## [0.15.0] - Unreleased
 
