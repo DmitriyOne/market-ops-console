@@ -20,8 +20,8 @@ const THEMES = [
   { value: 'system', Icon: MonitorIcon },
 ] as const;
 
-/** The theme menu; `children` is its trigger. */
-function ThemeMenu({ children }: { children: ReactNode }) {
+/** The theme menu; `children` is its trigger, `onPick` runs after a choice (the sheet closes). */
+function ThemeMenu({ children, onPick }: { children: ReactNode; onPick?: () => void }) {
   const t = useTranslations('theme');
   const { theme, setTheme } = useTheme();
 
@@ -34,6 +34,7 @@ function ThemeMenu({ children }: { children: ReactNode }) {
           onValueChange={(value) => {
             const choice = THEMES.find((t) => t.value === value);
             if (choice) setTheme(choice.value);
+            onPick?.();
           }}
         >
           {THEMES.map(({ value, Icon }) => (
@@ -69,14 +70,14 @@ export function ThemeSwitch() {
   );
 }
 
-/** Settings sheet: the whole row opens the menu and shows the current theme. */
-export function ThemeSwitchRow({ className }: { className?: string }) {
+/** Settings sheet: the whole row opens the menu and shows the current theme; `onPick` closes the sheet. */
+export function ThemeSwitchRow({ className, onPick }: { className?: string; onPick?: () => void }) {
   const t = useTranslations('theme');
   const ready = useThemeReady();
   const { theme } = useTheme();
   const current = THEMES.find((c) => c.value === theme) ?? THEMES[2];
   return (
-    <ThemeMenu>
+    <ThemeMenu onPick={onPick}>
       <button type="button" className={className} disabled={!ready}>
         <span>{t('label')}</span>{' '}
         <span className="flex items-center gap-1 text-muted-foreground">

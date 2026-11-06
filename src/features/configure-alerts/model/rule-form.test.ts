@@ -15,8 +15,12 @@ const values = (over: Partial<RuleFormValues> = {}): RuleFormValues => ({
   ...over,
 });
 
-const errors = (v: RuleFormValues, others: { name: string }[] = []): Record<string, string> => {
-  const parsed = ruleFormSchema(others).safeParse(v);
+const errors = (
+  v: RuleFormValues,
+  others: { name: string }[] = [],
+  currency: 'USD' | 'EUR' | 'GBP' = 'USD',
+): Record<string, string> => {
+  const parsed = ruleFormSchema(others, currency).safeParse(v);
   if (parsed.success) return {};
   return Object.fromEntries(parsed.error.issues.map((i) => [String(i.path[0]), i.message]));
 };
@@ -72,5 +76,13 @@ describe('rule form', () => {
     });
     expect(errors(values({ scopeKind: 'region' }))).toEqual({ regionId: 'regionRequired' });
     expect(errors(values({ scopeKind: 'markets' }))).toEqual({ marketIds: 'marketsRequired' });
+  });
+
+  it('checks the range on the USD the server will get (ADR 0017)', () => {
+    // 9,007,199,254 M is just under MAX_SAFE_INTEGER; in pounds that is over it in dollars.
+    const huge = values({ metric: 'revenue', threshold: '9007199254' });
+    expect(errors(huge, [], 'USD')).toEqual({});
+    expect(errors(huge, [], 'GBP')).toEqual({ threshold: 'thresholdRange' });
+    expect(errors(values({ metric: 'revenue', threshold: '1.2' }), [], 'GBP')).toEqual({});
   });
 });

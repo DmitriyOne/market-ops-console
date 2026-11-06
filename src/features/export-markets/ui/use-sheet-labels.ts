@@ -11,6 +11,8 @@ import {
   useKpiFormat,
   useStatusLabel,
 } from '@/entities/performance';
+import { RATES_DATE, USD_RATES } from '@/shared/config';
+import { useCurrency } from '@/shared/lib';
 
 import type { MarketsSheetLabels } from '../model/markets-xlsx';
 
@@ -20,6 +22,8 @@ export function useSheetLabels(): (link: string) => MarketsSheetLabels {
   const tTable = useTranslations('marketsTable');
   const tDrill = useTranslations('drill');
   const tPeriod = useTranslations('period');
+  const tCurrency = useTranslations('currency');
+  const currency = useCurrency();
   const f = useKpiFormat();
   const format = useFormatter();
   const statusLabel = useStatusLabel();
@@ -51,6 +55,18 @@ export function useSheetLabels(): (link: string) => MarketsSheetLabels {
         value: t('about.sourceValue', {
           date: format.dateTime(new Date(ds.meta.generatedAt), 'day'),
         }),
+      },
+      {
+        label: t('about.currency'),
+        value:
+          currency === 'USD'
+            ? t('about.currencyUsd', { code: currency, name: tCurrency(currency) })
+            : t('about.currencyConverted', {
+                code: currency,
+                name: tCurrency(currency),
+                rate: format.number(USD_RATES[currency], 'rate'),
+                date: format.dateTime(new Date(`${RATES_DATE}T00:00:00Z`), 'day'),
+              }),
       },
       { label: t('about.view'), value: [place, span].join(' · ') },
       ...(product ? [{ label: t('about.product'), value: product }] : []),

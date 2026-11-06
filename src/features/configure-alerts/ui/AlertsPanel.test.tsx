@@ -149,7 +149,7 @@ describe('AlertsPanel', () => {
     await user.type(screen.getByRole('textbox', { name: t.form.name }), 'Small markets');
     await choose(user, t.form.metric, 'Revenue');
     const threshold = screen.getByRole('textbox', { name: 'Threshold, M$' });
-    expect(threshold).toHaveAccessibleDescription(t.form.revenueHint);
+    expect(threshold).toHaveAccessibleDescription('In millions of US dollars, e.g. 1.5');
     await user.clear(threshold);
     await user.type(threshold, '0,95');
     expect(
@@ -161,7 +161,93 @@ describe('AlertsPanel', () => {
     });
   });
 
-  it('a revenue threshold reads as typed: 1.25 M$ is "US$1.25m", not "US$1.3m"', async () => {
+  describe('in another currency (ADR 0017)', () => {
+    it('EUR: typed in millions of euros, previewed on euro revenue, stored in USD', async () => {
+      localStorage.setItem('mo:currency', 'EUR');
+      const { user, api } = setup();
+      await rulesList();
+      await user.click(screen.getByRole('button', { name: t.list.new }));
+      await user.type(screen.getByRole('textbox', { name: t.form.name }), 'Under a million');
+      await choose(user, t.form.metric, 'Revenue');
+      const threshold = screen.getByRole('textbox', { name: 'Threshold, M€' });
+      expect(threshold).toHaveAccessibleDescription('In millions of euros, e.g. 1.5');
+      await user.clear(threshold);
+      await user.type(threshold, '1');
+      // Brazil: 1,115,100 $ = 993,498 € — under €1M, though over $1M.
+      expect(
+        screen.getByText(/^Would flag 5 markets now \(May 2026\): .*Brazil/),
+      ).toBeInTheDocument();
+      await user.click(screen.getByRole('button', { name: t.form.save }));
+      // 1,000,000 € ÷ 0.89095 = 1,122,397 $
+      await waitFor(() => {
+        expect(api.rules().find((r) => r.name === 'Under a million')?.threshold).toBe(1_122_397);
+      });
+      const row = await ruleRow('Under a million');
+      expect(row).toHaveTextContent('Revenue below €1m · All markets');
+      expect(row).toHaveTextContent('Flags 5 markets now');
+    });
+
+    it('GBP: editing only the name keeps the stored USD threshold to the dollar', async () => {
+      localStorage.setItem('mo:currency', 'GBP');
+      const stored = {
+        id: 'r-rev',
+        name: 'Revenue watch',
+        metric: 'revenue',
+        operator: 'below',
+        // £742,991 shown; £742,991 ÷ 0.74299 would round to 1,000,001 $.
+        threshold: 1_000_002,
+        scope: { kind: 'portfolio' },
+        severity: 'warning',
+        enabled: true,
+      } as const;
+      const { user, api } = setup('', alertsApi([stored]));
+      await user.click(await screen.findByRole('button', { name: 'Edit Revenue watch' }));
+      expect(screen.getByRole('textbox', { name: 'Threshold, M£' })).toHaveValue('0.742991');
+      const name = screen.getByRole('textbox', { name: t.form.name });
+      await user.clear(name);
+      await user.type(name, 'Revenue watch UK');
+      await user.click(screen.getByRole('button', { name: t.form.save }));
+      await waitFor(() => {
+        expect(api.rules()[0]?.name).toBe('Revenue watch UK');
+      });
+      expect(api.rules()[0]?.threshold).toBe(1_000_002);
+    });
+  });
+
+  it('a currency change in another tab restarts an open form in the new currency (ADR 0017)', async () => {
+    localStorage.setItem('mo:currency', 'EUR');
+    const stored = {
+      id: 'r-rev',
+      name: 'Revenue watch',
+      metric: 'revenue',
+      operator: 'below',
+      threshold: 1_250_000,
+      scope: { kind: 'portfolio' },
+      severity: 'warning',
+      enabled: true,
+    } as const;
+    const { user, api } = setup('', alertsApi([stored]));
+    await user.click(await screen.findByRole('button', { name: 'Edit Revenue watch' }));
+    // 1,250,000 $ × 0.89095 = 1,113,687.5 € → 1,113,688
+    expect(screen.getByRole('textbox', { name: 'Threshold, M€' })).toHaveValue('1.113688');
+
+    localStorage.setItem('mo:currency', 'GBP');
+    window.dispatchEvent(new StorageEvent('storage', { key: 'mo:currency', newValue: 'GBP' }));
+
+    // 1,250,000 $ × 0.74299 = 928,737.5 £ → 928,738
+    const threshold = await screen.findByRole('textbox', { name: 'Threshold, M£' });
+    expect(threshold).toHaveValue('0.928738');
+    const name = screen.getByRole('textbox', { name: t.form.name });
+    await user.clear(name);
+    await user.type(name, 'Revenue watch 2');
+    await user.click(screen.getByRole('button', { name: t.form.save }));
+    await waitFor(() => {
+      expect(api.rules()[0]?.name).toBe('Revenue watch 2');
+    });
+    expect(api.rules()[0]?.threshold).toBe(1_250_000);
+  });
+
+  it('a revenue threshold reads as typed: 1.25 M$ is "$1.25m", not "$1.3m"', async () => {
     const { user } = setup();
     await rulesList();
     await user.click(screen.getByRole('button', { name: t.list.new }));
@@ -172,7 +258,7 @@ describe('AlertsPanel', () => {
     await user.type(threshold, '1.25');
     await user.click(screen.getByRole('button', { name: t.form.save }));
     const items = within(await rulesList()).getAllByRole('listitem');
-    expect(items[2]).toHaveTextContent('Revenue below US$1.25m · All markets');
+    expect(items[2]).toHaveTextContent('Revenue below $1.25m · All markets');
   });
 
   it('edit fills the form and saves the change', async () => {

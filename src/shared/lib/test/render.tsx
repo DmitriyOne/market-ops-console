@@ -9,7 +9,9 @@ import { vi } from 'vitest';
 import { enMessages, formats } from '@/shared/config';
 import { TooltipProvider } from '@/shared/ui';
 
-/** Providers the app gives every page: query client, intl (en-GB), URL state, tooltips. */
+import { CurrencyFormats } from '../currency';
+
+/** Providers the app gives every page: query client, intl (en-GB) in the stored currency, URL state, tooltips. */
 export function TestProviders({
   children,
   searchParams = '',
@@ -24,9 +26,11 @@ export function TestProviders({
   return (
     <QueryClientProvider client={client}>
       <NextIntlClientProvider locale="en-GB" messages={enMessages} formats={formats} timeZone="UTC">
-        <NuqsTestingAdapter searchParams={searchParams} onUrlUpdate={onUrlUpdate} hasMemory>
-          <TooltipProvider>{children}</TooltipProvider>
-        </NuqsTestingAdapter>
+        <CurrencyFormats>
+          <NuqsTestingAdapter searchParams={searchParams} onUrlUpdate={onUrlUpdate} hasMemory>
+            <TooltipProvider>{children}</TooltipProvider>
+          </NuqsTestingAdapter>
+        </CurrencyFormats>
       </NextIntlClientProvider>
     </QueryClientProvider>
   );

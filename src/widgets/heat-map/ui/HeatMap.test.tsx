@@ -1,6 +1,6 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import { Suspense } from 'react';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { enMessages as en } from '@/shared/config';
 import { datasetHandler, renderWithProviders, server } from '@/shared/lib/test';
@@ -176,5 +176,20 @@ describe('HeatMap', () => {
     expect(cell('Germany', 'Mar 26')).toHaveAccessibleName(
       /anomaly in the whole market: Revenue fell 27%/,
     );
+  });
+
+  describe('in euros (ADR 0017)', () => {
+    afterEach(() => {
+      localStorage.clear();
+    });
+
+    it('revenue cells and the note under the grid are in euros', async () => {
+      localStorage.setItem('mo:currency', 'EUR');
+      setup('?mode=analyst&kpi=revenue');
+      await grid();
+      expect(screen.getByText('Revenue in euros.')).toBeInTheDocument();
+      expect(screen.queryByText(/US dollars/)).toBeNull();
+      expect(screen.getAllByText(/€/).length).toBeGreaterThan(0);
+    });
   });
 });

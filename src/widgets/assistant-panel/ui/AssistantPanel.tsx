@@ -1,15 +1,10 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
 import { SparklesIcon, SquarePenIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { type ReactNode, useEffect, useRef } from 'react';
 
-import {
-  datasetQueryOptions,
-  type ResolvedCitation,
-  useDashboardFocus,
-} from '@/entities/performance';
+import { type ResolvedCitation, useDashboardFocus, useDataset } from '@/entities/performance';
 import { Composer, SuggestedQuestions, useChatStream } from '@/features/ask-question';
 import { useErrorMessage } from '@/shared/api';
 import { useMediaQuery } from '@/shared/lib';
@@ -40,7 +35,7 @@ export function AssistantPanel({
   const chat = useChatStream();
   const coarse = useMediaQuery('(pointer: coarse)');
   // Not suspense: the chat works even if the dataset fails to load.
-  const { data: ds, error: dsError } = useQuery(datasetQueryOptions);
+  const { data: ds, error: dsError } = useDataset();
   // Logged by the query cache; here it only replaces "Loading data…".
   const dataError = useErrorMessage()(dsError);
   const { focus, highlight } = useDashboardFocus();

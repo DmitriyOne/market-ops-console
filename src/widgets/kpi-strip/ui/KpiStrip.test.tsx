@@ -1,6 +1,6 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import { Suspense } from 'react';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { enMessages as en } from '@/shared/config';
 import { datasetHandler, renderWithProviders, server } from '@/shared/lib/test';
@@ -28,11 +28,28 @@ describe('KpiStrip', () => {
   it('portfolio, May 2026: the four figures of the brief', async () => {
     setup();
     const section = await screen.findByRole('region', { name: t.title });
-    expect(within(section).getByText('US$22.9m')).toBeInTheDocument();
+    expect(within(section).getByText('$22.9m')).toBeInTheDocument();
     expect(within(section).getByText('100.4%')).toBeInTheDocument();
     expect(within(section).getAllByText('+7.3%').length).toBeGreaterThan(0);
     expect(within(section).getByText('6 of 13')).toBeInTheDocument();
     expect(within(section).getByText('2 off track · 4 at risk')).toBeInTheDocument();
+  });
+
+  describe('in another currency', () => {
+    afterEach(() => {
+      localStorage.clear();
+    });
+
+    it('shows revenue in euros at the fixed rate; the percentages stay', async () => {
+      localStorage.setItem('mo:currency', 'EUR');
+      setup();
+      const section = await screen.findByRole('region', { name: t.title });
+      // 22,850,419 $ × 0.89095 = 20,358,581 €
+      expect(await within(section).findByText('€20.4m')).toBeInTheDocument();
+      expect(within(section).getByText('100.4%')).toBeInTheDocument();
+      expect(within(section).getAllByText('+7.3%').length).toBeGreaterThan(0);
+      expect(within(section).queryByText(/\$/)).toBeNull();
+    });
   });
 
   it('computed figures carry a "Calculated" badge that names the formula', async () => {

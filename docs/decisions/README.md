@@ -20,3 +20,4 @@ One file per decision: context, decision, alternatives, consequences. Status is 
 | [0014](0014-design-direction.md) | Design: dashboard D, assistant A, fallback to dashboard A | 2026-11-03 |
 | [0015](0015-persisted-ui-state-before-paint.md) | Persisted UI state before first paint: inline `<head>` script | 2026-11-03 |
 | [0016](0016-alert-writes.md) | Alert writes: Route Handler + TanStack mutations, not Server Actions + `useOptimistic` | 2026-11-05 |
+| [0017](0017-currency-display.md) | Currency display: fixed rates over USD data, converted once at the data | 2026-11-05 |

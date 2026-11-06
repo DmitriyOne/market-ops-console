@@ -2,6 +2,7 @@ import type { Worksheet } from 'exceljs';
 
 import type { MarketsTableView, MonthlyRow, Range, TableColumn } from '@/entities/performance';
 import type { MarketStatus, Period } from '@/shared/api';
+import { type Currency, CURRENCY_SYMBOLS, DEFAULT_CURRENCY } from '@/shared/config';
 
 import { anomalyText, marketsCsvName } from './markets-csv';
 
@@ -21,8 +22,14 @@ export type MarketsSheetLabels = {
   about: { label: string; value: string; link?: boolean }[];
 };
 
-const MONEY = '"$"#,##0';
-const SIGNED_MONEY = '+"$"#,##0;-"$"#,##0;"$"0';
+/** Whole amounts with the currency's symbol in front: `"€"#,##0`. */
+const moneyFormats = (currency: Currency) => {
+  const symbol = `"${CURRENCY_SYMBOLS[currency]}"`;
+  return {
+    money: `${symbol}#,##0`,
+    signed: `+${symbol}#,##0;-${symbol}#,##0;${symbol}0`,
+  };
+};
 const PERCENT = '0.0%';
 const SIGNED_PERCENT = '+0.0%;-0.0%;0.0%';
 const INTEGER = '#,##0';
@@ -145,14 +152,17 @@ const NEGATIVE_RULE = {
  *    follow the filter), money and percent formats, the market column
  *    frozen and shaded, status and negative values coloured (words stay).
  * 2. By month: the months behind it, dated, for pivots and charts.
- * 3. About: source, view, filter, how values are made, a link back.
+ * 3. About: source, currency and rate, view, filter, how values are made, a link back.
+ * Amounts are in `currency`, as `view` and `months` already hold them (ADR 0017).
  * ExcelJS loads only when a file is made.
  */
 export async function marketsXlsx(
   view: MarketsTableView,
   months: readonly MonthlyRow[],
   labels: MarketsSheetLabels,
+  currency: Currency = DEFAULT_CURRENCY,
 ): Promise<Blob> {
+  const { money: MONEY, signed: SIGNED_MONEY } = moneyFormats(currency);
   const { default: ExcelJS } = await import('exceljs');
   const book = new ExcelJS.Workbook();
   const h = labels.header;

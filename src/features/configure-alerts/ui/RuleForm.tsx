@@ -13,6 +13,8 @@ import {
   type AlertRuleInput,
   type Dataset,
 } from '@/shared/api';
+import { CURRENCY_SYMBOLS } from '@/shared/config';
+import { useCurrency } from '@/shared/lib';
 import {
   Button,
   Input,
@@ -70,7 +72,8 @@ export function RuleForm({ ds, initial, others, editing, onSubmit, onCancel }: R
   const format = useFormatter();
   const base = useId();
   const id = (name: string) => `${base}-${name}`;
-  const schema = useMemo(() => ruleFormSchema(others), [others]);
+  const currency = useCurrency();
+  const schema = useMemo(() => ruleFormSchema(others, currency), [others, currency]);
   const form = useForm<RuleFormValues, unknown, AlertRuleInput>({
     resolver: zodResolver(schema),
     defaultValues: initial,
@@ -98,7 +101,10 @@ export function RuleForm({ ds, initial, others, editing, onSubmit, onCancel }: R
   const nameError = message('name');
   const thresholdError = message('threshold');
   const regionError = message('regionId');
-  const unit = metric === 'revenue' ? t('form.unitRevenue') : t('form.unitPercent');
+  const unit =
+    metric === 'revenue'
+      ? t('form.unitRevenue', { symbol: CURRENCY_SYMBOLS[currency] })
+      : t('form.unitPercent');
 
   return (
     <form
@@ -178,7 +184,7 @@ export function RuleForm({ ds, initial, others, editing, onSubmit, onCancel }: R
       <FormField
         id={id('threshold')}
         label={`${t('form.threshold')}, ${unit}`}
-        hint={metric === 'revenue' ? t('form.revenueHint') : undefined}
+        hint={metric === 'revenue' ? t('form.revenueHint', { currency }) : undefined}
         error={thresholdError}
       >
         <Input

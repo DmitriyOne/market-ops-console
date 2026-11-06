@@ -44,6 +44,15 @@
     "de-DE": "Deutsch",
     "ru-RU": "Русский"
   },
+  "currency": {
+    "label": "Currency",
+    "USD": "US dollar",
+    "EUR": "Euro",
+    "GBP": "British pound",
+    "current": "Currency: {code}, {name}",
+    "rates": "ECB rates of {date}: 1 USD = {eur} EUR = {gbp} GBP.",
+    "demo": "Fixed for this demo; a live app would get rates from the backend API."
+  },
   "assistant": {
     "composer": {
       "label": "Ask about the data",
@@ -82,7 +91,8 @@
       "high": "High",
       "medium": "Medium",
       "low": "Low",
-      "directional": "Treat as directional"
+      "directional": "Treat as directional",
+      "usdNote": "Amounts in this answer are in USD, as the data; the dashboard shows {currency}."
     },
     "stopped": {
       "title": "Stopped — answer incomplete.",
@@ -201,7 +211,7 @@
     "changeProduct": "Product: {name}. Change product"
   },
   "header": {
-    "settings": "Settings: language, theme, reset view",
+    "settings": "Settings: language, currency, theme, reset view",
     "settingsTitle": "Settings",
     "resetView": "Reset view",
     "resetHint": "Portfolio, latest month, Executive"
@@ -393,7 +403,7 @@
     "legend": "Legend",
     "noteCalculated": "Calculated from monthly series: values can differ from the stored KPIs by about a point.",
     "perProduct": "Values are for {product}.",
-    "revenueUnit": "Revenue in US dollars.",
+    "revenueUnit": "Revenue in {currency, select, EUR {euros} GBP {British pounds} other {US dollars}}.",
     "anomalyMarket": "anomaly in the whole market: {note}",
     "anomalies": "Anomalies",
     "anomalyMark": "anomaly"
@@ -441,7 +451,7 @@
     "preparing": "Preparing…",
     "title": "Rows as shown",
     "excel": "Excel (.xlsx)",
-    "excelHint": "Formatted, with filters",
+    "excelHint": "Formatted, with filters; amounts in {currency}",
     "csv": "CSV",
     "csvHint": "Raw numbers in USD, for other tools",
     "failed": "Couldn't create the file. Try again.",
@@ -457,7 +467,10 @@
     },
     "about": {
       "source": "Source",
-      "sourceValue": "data.json, generated {date}; amounts in USD",
+      "sourceValue": "data.json, generated {date}",
+      "currency": "Currency",
+      "currencyUsd": "{code} ({name}), as in the data",
+      "currencyConverted": "{code} ({name}), converted from USD at 1 USD = {rate} {code}, ECB rate of {date}. Fixed for this demo; a live app would get rates from the backend API.",
       "view": "View",
       "product": "Product",
       "selection": "Selected markets",
@@ -536,8 +549,8 @@
       "operator": "Condition",
       "threshold": "Threshold",
       "unitPercent": "%",
-      "unitRevenue": "M$",
-      "revenueHint": "In millions of US dollars, e.g. 1.5",
+      "unitRevenue": "M{symbol}",
+      "revenueHint": "In millions of {currency, select, EUR {euros} GBP {British pounds} other {US dollars}}, e.g. 1.5",
       "scope": "Applies to",
       "scopeKind": {
         "portfolio": "All markets",
