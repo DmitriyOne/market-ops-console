@@ -24,6 +24,7 @@ const isRange = (v: string): v is (typeof RANGES)[number] => RANGES.some((r) => 
 /** "May 2026 · 1 month": the month and the window that ends in it. */
 export function PeriodPicker({ className }: { className?: string }) {
   const t = useTranslations('period');
+  const tCommon = useTranslations('common');
   const format = useFormatter();
   const { ds, state } = useDashboard();
   const { setPeriod, setRange } = useSelectPeriod();
@@ -46,7 +47,11 @@ export function PeriodPicker({ className }: { className?: string }) {
           {/* The name is the full sentence; what shows may be its short form
               ("12 mo"), which a screen reader would read badly. Text, not
               aria-label: a visible label must be part of an aria-label. */}
-          <span className="sr-only">{t('trigger', { period, range })}</span>
+          {/* The short form, when shown, is in the name too (WCAG 2.5.3: say "12 mo"). */}
+          <span className="sr-only">
+            {t('trigger', { period, range })}
+            {compact ? tCommon('srAfter', { text: rangeShort }) : null}
+          </span>
           <CalendarIcon aria-hidden className="max-sm:hidden" />
           <span ref={room} aria-hidden className="relative min-w-0 flex-1 text-left">
             <span

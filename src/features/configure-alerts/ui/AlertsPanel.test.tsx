@@ -542,6 +542,29 @@ describe('AlertsPanel', () => {
     expect(screen.queryByRole('button', { name: 'Edit: Share below 10%' })).toBeNull();
   });
 
+  it('a delete of a rule already deleted elsewhere: the line above the list names it', async () => {
+    const { user, api } = setup();
+    await rulesList();
+    server.use(
+      http.delete(
+        '*/api/v1/alerts',
+        () => {
+          api.remove('example-share');
+          return HttpResponse.json(
+            { error: { code: 'not_found', message: 'gone' } },
+            { status: 404 },
+          );
+        },
+        { once: true },
+      ),
+    );
+    await user.click(screen.getByRole('button', { name: 'Delete Share below 10%' }));
+    await user.click(await screen.findByRole('button', { name: t.delete.confirm }));
+    expect(
+      await screen.findByText("“Share below 10%” wasn't deleted. This rule no longer exists."),
+    ).toBeVisible();
+  });
+
   it("the examples are named in the page's language; the stored list stays the same", async () => {
     const api = alertsApi();
     server.use(datasetHandler(), ...api.handlers);

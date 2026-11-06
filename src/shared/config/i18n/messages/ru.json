@@ -632,6 +632,7 @@
       "create": "«{name}» не сохранено. {reason}",
       "update": "Не сохранено. {reason}",
       "remove": "Не удалено. {reason}",
+      "removeNamed": "«{name}» не удалено. {reason}",
       "retry": "Повторить",
       "retryRule": "Повторить: {name}",
       "fix": "Изменить",

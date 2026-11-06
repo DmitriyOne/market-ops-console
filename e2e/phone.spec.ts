@@ -71,6 +71,8 @@ test('the period shows in full when it fits, as the month over "12 мес." when
   await page.setViewportSize({ width: 320, height: 700 });
   await page.goto('/ru-RU/dashboard?range=12m');
   await expect(shown.getByText('12 мес.', { exact: true })).toBeVisible();
+  // What shows is in the name too, so "12 мес." can be said to press it (WCAG 2.5.3).
+  await expect(shown).toHaveAccessibleName(/12 мес\.$/);
   // The full label is there only as the invisible copy it is measured with.
   await expect(
     shown.getByText('май 2026 г. · 12 месяцев', { exact: true }).filter({ visible: true }),

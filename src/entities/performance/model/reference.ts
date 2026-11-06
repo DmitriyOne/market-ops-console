@@ -14,8 +14,9 @@ export function getProduct(ds: Dataset, id: string): Product | undefined {
 
 /**
  * The names a scope is made of: `["Veltrix", "Germany"]`, `["Europe"]`, or
- * none for the whole portfolio. Names stay English like the data; the UI
- * joins them (`useScopeLabel`).
+ * none for the whole portfolio. As the dataset has them (English); the
+ * page shows places in its language (`useDatasetSelect`, ADR 0010) and the
+ * UI joins them (`useScopeLabel`).
  */
 export function scopeParts(
   ds: Dataset,

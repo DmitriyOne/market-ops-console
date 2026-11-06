@@ -632,6 +632,7 @@
       "create": "„{name}“ wurde nicht gespeichert. {reason}",
       "update": "Nicht gespeichert. {reason}",
       "remove": "Nicht gelöscht. {reason}",
+      "removeNamed": "„{name}“ wurde nicht gelöscht. {reason}",
       "retry": "Erneut versuchen",
       "retryRule": "Erneut versuchen: {name}",
       "fix": "Bearbeiten",

@@ -90,7 +90,7 @@ export function RuleList({
       {above.map((f) => (
         <FailedLine key={f.id} failed={f} onRetry={retry} onDismiss={dismiss} onFix={onFix}>
           {/* No row to stand by: the line names the rule. */}
-          {t(f.kind === 'remove' ? 'failed.remove' : 'failed.create', {
+          {t(f.kind === 'remove' ? 'failed.removeNamed' : 'failed.create', {
             name: f.name,
             reason: f.reason,
           })}

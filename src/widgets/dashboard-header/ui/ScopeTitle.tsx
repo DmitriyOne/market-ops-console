@@ -11,8 +11,8 @@ import { Skeleton } from '@/shared/ui';
 import { DrillBreadcrumbs } from './DrillBreadcrumbs';
 
 /**
- * "Veltrix · Germany" and what the scope holds; names stay English like the
- * data. The view's name sits next to it with what it adds, so a switch of
+ * "Veltrix · Germany" and what the scope holds; places in the page's language,
+ * products as named (brands). The view's name sits next to it with what it adds, so a switch of
  * mode shows at the top, not only far below (owner, 2026-11-05). Share link
  * sits at the row's end, on every level and in both modes (owner, 2026-11-06).
  * The drill-down path is above it, on the page rather than in the header, so

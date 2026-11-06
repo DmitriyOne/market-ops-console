@@ -632,6 +632,7 @@
       "create": "“{name}” wasn't saved. {reason}",
       "update": "Not saved. {reason}",
       "remove": "Not deleted. {reason}",
+      "removeNamed": "“{name}” wasn't deleted. {reason}",
       "retry": "Retry",
       "retryRule": "Retry: {name}",
       "fix": "Edit",

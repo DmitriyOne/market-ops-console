@@ -12,7 +12,7 @@
 - **Joining and titles (0.13.0):** label parts are joined with the dictionary's `common.separator` (`useJoinParts`), lists of names with `format.list` (`conjunction`: CLDR's `unit` list has no separator in Russian), anything else as a message with placeholders (`common.after`, `common.srAfter`, …); page titles follow `common.titleTemplate` (ADR 0018). Lint enforces both (ADR 0011).
 - **No string literals in markup**, enforced by `i18next/no-literal-string` (ADR 0011).
 
-**Out of scope.** Assistant answers and market/product names come from `data/` and stay English; the chat labels them as such.
+**Out of scope.** Assistant answers come from `data/` and stay English; the chat labels them as such. Market and product names were out of scope too until 0.16.0 (see the addendum: places now follow the page's language).
 
 **Alternatives.**
 - Cookie only, no routing: simplest, but `cookies()` makes every page dynamic.

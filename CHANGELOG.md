@@ -16,6 +16,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 - Analyst on wide screens: the map stays in view while Top risks and the radar next to it scroll, so a pick on the map and the radar it changes are seen together.
 
 ### Fixed
+- Period button: when it shows the short form ("12 мес."), that text is in its name too, so it can be said to press it (WCAG 2.5.3).
+- Alerts: a failed delete of a rule already deleted elsewhere names the rule above the list.
 - Alerts: lists stored before 0.16.0 get their examples' presets back (named in the page's language again, their names taken in every language); an example the user renamed stays theirs.
 - Alerts: the server keeps presets to the examples: a new rule cannot claim one, a change keeps only the rule's own.
 - Alerts: Edit after a refused rule shows it in the currency chosen now, also after a switch while the form is open (it kept the old currency's numbers and saved them at the new rate).
