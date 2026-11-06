@@ -2,7 +2,16 @@ import { type BrowserOptions, consoleLoggingIntegration } from '@sentry/nextjs';
 
 import { env } from './env';
 
-type SentryInput = { dsn: string | undefined; environment: string };
+type SentryInput = {
+  dsn: string | undefined;
+  /** Vercel's environment; undefined on this machine. */
+  deployment: 'production' | 'preview' | 'development' | undefined;
+  /** Send from this machine too (`NEXT_PUBLIC_SENTRY_LOCAL`). */
+  local: boolean;
+};
+
+/** Where an event came from: Vercel's environment, or `local` for this machine (dev or a local build). */
+export const LOCAL_ENVIRONMENT = 'local';
 
 export type SharedSentryOptions = Pick<
   BrowserOptions,
@@ -27,18 +36,23 @@ export const CONSOLE_LOG_LEVELS = ['log', 'warn', 'error'] as const;
  * The options every Sentry runtime starts with (client, server, edge), so the
  * three init files cannot drift apart (ADR 0019).
  *
- * Off without a DSN (tests, E2E, CI). Errors and 10 % of traces in
- * production, every trace in development. Personal data is not collected:
+ * Off without a DSN (tests, CI), and on this machine unless
+ * `NEXT_PUBLIC_SENTRY_LOCAL` is true (the test page, E2E). Errors and 10 % of
+ * traces in production, every trace elsewhere. Personal data is not collected:
  * no IP or user id, no cookies, no headers (`X-Forwarded-For`,
  * `Accept-Language`), no request or response bodies (a chat question is a
  * body), no local variables. Query parameters stay: they hold the dashboard
  * state (market ids, period, mode), which a bug report needs. Console output
  * goes to Sentry Logs (`CONSOLE_LOG_LEVELS`).
  */
-export function sentryOptionsFor({ dsn, environment }: SentryInput): SharedSentryOptions {
+export function sentryOptionsFor({ dsn, deployment, local }: SentryInput): SharedSentryOptions {
+  const environment = deployment ?? LOCAL_ENVIRONMENT;
   return {
     dsn,
-    enabled: Boolean(dsn),
+    // On a Vercel deployment; on this machine only when asked: a DSN in
+    // `.env.local` alone must not send `next dev` noise or a local build's
+    // clicks, and a local build is never reported as production (owner, 2026-11-06).
+    enabled: Boolean(dsn) && (deployment !== undefined || local),
     environment,
     tracesSampleRate: environment === 'production' ? 0.1 : 1,
     dataCollection: {
@@ -58,5 +72,9 @@ export function sentryOptionsFor({ dsn, environment }: SentryInput): SharedSentr
 }
 
 export function sentryOptions(): SharedSentryOptions {
-  return sentryOptionsFor({ dsn: env.NEXT_PUBLIC_SENTRY_DSN, environment: env.NODE_ENV });
+  return sentryOptionsFor({
+    dsn: env.NEXT_PUBLIC_SENTRY_DSN,
+    deployment: env.NEXT_PUBLIC_VERCEL_ENV,
+    local: env.NEXT_PUBLIC_SENTRY_LOCAL,
+  });
 }

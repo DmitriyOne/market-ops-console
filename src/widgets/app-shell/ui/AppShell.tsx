@@ -49,6 +49,14 @@ const MAIN = 'relative min-w-0 flex-1 overflow-y-auto max-lg:scroll-pt-controls 
 const SCROLL_STEP = 8;
 /** Near the top the row always shows: it covers the dashboard's first lines otherwise. */
 const SCROLL_TOP = 80;
+/**
+ * A scroll this soon after a touch, wheel or key on the dashboard, or after
+ * the scroll before it (a fling goes on after the finger lifts), is the
+ * user's. Any other scroll is the page's own: the browser keeping the view in
+ * place when a pick above it changes the height (scroll anchoring), or code.
+ */
+const USER_SCROLL_GAP = 150;
+const GESTURES = ['touchstart', 'touchmove', 'wheel', 'keydown'] as const;
 const ALERTS_SECTION = 'relative min-w-0 flex-1 overflow-y-auto p-4';
 const ALERTS_TITLE = 'mb-3 text-lg font-semibold';
 const ASIDE =
@@ -119,14 +127,29 @@ export function AppShell({ header, main, assistant, alerts }: AppShellProps) {
   useEffect(() => {
     if (desktop || !mainArea) return;
     let last = mainArea.scrollTop;
+    let gesture = -Infinity;
+    const onGesture = () => {
+      gesture = performance.now();
+    };
     const onScroll = () => {
       const top = mainArea.scrollTop;
+      const now = performance.now();
+      const byUser = now - gesture < USER_SCROLL_GAP;
+      if (byUser) gesture = now;
+      // Not the user's (a pick in a menu moved the page): the row stays as it
+      // is, else it slides away and back with the closing menu on it.
+      if (!byUser && top > SCROLL_TOP) {
+        last = top;
+        return;
+      }
       if (Math.abs(top - last) < SCROLL_STEP) return;
       setScrolledDown(top > last && top > SCROLL_TOP);
       last = top;
     };
+    for (const type of GESTURES) mainArea.addEventListener(type, onGesture, { passive: true });
     mainArea.addEventListener('scroll', onScroll, { passive: true });
     return () => {
+      for (const type of GESTURES) mainArea.removeEventListener(type, onGesture);
       mainArea.removeEventListener('scroll', onScroll);
     };
   }, [desktop, mainArea]);

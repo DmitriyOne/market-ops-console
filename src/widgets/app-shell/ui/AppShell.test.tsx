@@ -78,8 +78,13 @@ describe('AppShell', () => {
     const { user, container } = setup();
     const header = container.querySelector('header');
     const main = screen.getByRole('main');
-    const scrollMain = (top: number) => {
+    // A frame between the user's scrolls; a second before the page's own one.
+    let clock = 0;
+    vi.spyOn(performance, 'now').mockImplementation(() => clock);
+    const scrollMain = (top: number, byUser = true) => {
+      clock += byUser ? 16 : 1000;
       act(() => {
+        if (byUser) main.dispatchEvent(new Event('touchmove'));
         main.scrollTop = top;
         main.dispatchEvent(new Event('scroll'));
       });
@@ -89,6 +94,12 @@ describe('AppShell', () => {
     scrollMain(300);
     expect(header).not.toHaveAttribute('data-controls-hidden');
     scrollMain(600);
+    expect(header).toHaveAttribute('data-controls-hidden');
+    scrollMain(500);
+    // A pick in a menu changes the height; the browser moves the page, not the user.
+    scrollMain(620, false);
+    expect(header).not.toHaveAttribute('data-controls-hidden');
+    scrollMain(700);
     expect(header).toHaveAttribute('data-controls-hidden');
 
     await user.click(screen.getByRole('button', { name: /^Assistant/ }));

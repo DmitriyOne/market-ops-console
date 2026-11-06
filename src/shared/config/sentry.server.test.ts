@@ -8,7 +8,11 @@ type Captured = { request?: Record<string, unknown>; user?: unknown };
 const events: Captured[] = [];
 
 Sentry.init({
-  ...sentryOptionsFor({ dsn: 'https://key@o1.ingest.us.sentry.io/2', environment: 'production' }),
+  ...sentryOptionsFor({
+    dsn: 'https://key@o1.ingest.us.sentry.io/2',
+    deployment: 'production',
+    local: false,
+  }),
   tracesSampleRate: 0,
   beforeSend(event) {
     events.push({ request: event.request ? { ...event.request } : undefined, user: event.user });

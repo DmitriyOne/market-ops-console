@@ -14,6 +14,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 - Analyst on wide screens: the map stays in view while Top risks and the radar next to it scroll, so a pick on the map and the radar it changes are seen together.
 
 ### Fixed
+- Sentry no longer receives this machine's errors and console lines: a DSN in `.env.local` alone sends nothing; `NEXT_PUBLIC_SENTRY_LOCAL=true` sends, as environment `local`. Deployments report Vercel's environment (`production`, `preview`) instead of `NODE_ENV`, under which a local build or a preview counted as production (ADR 0019).
+- Phone: picking in a menu after scrolling back up no longer slides the period row away and back with the menu on it. The row follows only the user's own scrolling (touch, wheel, keys), not the browser keeping the view in place when the page's height changes.
+- Phone: the period button gives up width to the Executive / Analyst switch; each takes half the row.
 - Phone: a control focused by keyboard is scrolled to below the period row, not under it (WCAG 2.4.11); back on Overview, or turned from desktop to phone, the row shows again instead of staying hidden by an earlier scroll.
 - Heat map with a mouse: the line under the grid only reads the cell out; its Open and Select buttons, which changed under the mouse on the way down to them, are for touch screens, where a tap shows the cell. A tap where a mouse is the main pointer opens, as a click does.
 - A hand-typed currency in another case (`?currency=eur`) is written as `EUR`, not dropped to USD; the repair is logged once per link, not once per widget.

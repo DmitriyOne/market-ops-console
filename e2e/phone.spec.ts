@@ -73,15 +73,14 @@ test('period and mode share one row that slides away while scrolling down, witho
   const main = page.locator('#main');
   const mainTop = async () => (await main.boundingBox())?.y;
   const before = await mainTop();
-  await main.evaluate((el) => {
-    el.scrollBy(0, 600);
-  });
+  // The wheel, as a user scrolls (a scroll from code leaves the row alone).
+  const box = await main.boundingBox();
+  await page.mouse.move((box?.x ?? 0) + 100, (box?.y ?? 0) + 300);
+  await page.mouse.wheel(0, 600);
   await expect(row).toHaveCSS('opacity', '0');
   expect(await mainTop(), 'the dashboard does not move').toBe(before);
 
-  await main.evaluate((el) => {
-    el.scrollBy(0, -200);
-  });
+  await page.mouse.wheel(0, -200);
   await expect(row).toHaveCSS('opacity', '1');
   await period.click();
   await expect(page.getByRole('dialog')).toBeVisible();
@@ -143,4 +142,34 @@ test('heat map on a phone: a tap shows the cell, Open under the grid opens it', 
   await expect(page.getByRole('heading', { level: 1, name: 'Europe' })).toBeVisible();
   await open.tap();
   await expect(page.getByRole('heading', { level: 1, name: 'Germany' })).toBeVisible();
+});
+
+test('a pick in the period menu after scrolling back up does not slide the row away and back', async ({
+  page,
+}) => {
+  await page.goto('/dashboard?region=eu&market=de');
+  const period = page.getByRole('button', { name: /^Period: / });
+  const row = period.locator('xpath=..');
+  const main = page.locator('#main');
+  const box = await main.boundingBox();
+  await page.mouse.move((box?.x ?? 0) + 100, (box?.y ?? 0) + 300);
+  await page.mouse.wheel(0, 900);
+  await expect(row).toHaveCSS('opacity', '0');
+  await page.mouse.wheel(0, -150);
+  await expect(row).toHaveCSS('opacity', '1');
+  await period.click();
+  // Marks the page if the row hides at any moment while the pick changes the
+  // page's height and the browser moves the page to keep the view in place.
+  await page.evaluate(() => {
+    const header = document.querySelector('header');
+    if (!header) return;
+    new MutationObserver(() => {
+      if (header.hasAttribute('data-controls-hidden')) document.body.dataset.rowHid = 'yes';
+    }).observe(header, { attributes: true });
+  });
+  await page.getByRole('dialog').getByRole('button', { name: /^Mar/ }).click();
+  await expect(page).toHaveURL(/[?&]period=2026-03(&|$)/);
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await expect(row).toHaveCSS('opacity', '1');
+  await expect(page.locator('body'), 'the row stayed').not.toHaveAttribute('data-row-hid', 'yes');
 });

@@ -83,8 +83,8 @@ export function DashboardHeader() {
       <DatasetGate fallback={null}>
         <div className={CONTROLS}>
           <Suspense fallback={<ControlsSkeleton />}>
-            <PeriodPicker className="max-lg:min-w-0 max-lg:flex-1" />
-            <ModeSwitch className="max-lg:shrink-0" />
+            <PeriodPicker className="max-lg:min-w-0 max-lg:flex-1 max-lg:basis-0" />
+            <ModeSwitch className="max-lg:flex-1 max-lg:basis-0" />
           </Suspense>
         </div>
       </DatasetGate>
@@ -115,8 +115,11 @@ function PathSkeleton() {
 function ControlsSkeleton() {
   return (
     <>
-      <Skeleton aria-hidden className="h-11 w-48 max-lg:min-w-0 max-lg:flex-1" />
-      <Skeleton aria-hidden className="h-13 w-52 shrink-0 rounded-xl max-lg:w-44" />
+      <Skeleton aria-hidden className="h-11 w-48 max-lg:min-w-0 max-lg:flex-1 max-lg:basis-0" />
+      <Skeleton
+        aria-hidden
+        className="h-13 w-52 shrink-0 rounded-xl max-lg:w-auto max-lg:flex-1 max-lg:basis-0"
+      />
     </>
   );
 }
