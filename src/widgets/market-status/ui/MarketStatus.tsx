@@ -317,7 +317,7 @@ function MarketTable({ groups, map }: { groups: TileGroup[]; map: MarketMapView 
 
   return (
     <>
-      <Table>
+      <Table aria-busy={flags.pending || undefined}>
         <TableCaption className="sr-only">
           {t('caption', {
             window:
@@ -336,7 +336,8 @@ function MarketTable({ groups, map }: { groups: TileGroup[]; map: MarketMapView 
             <TableHead className="text-right">{t('attainment')}</TableHead>
             {extra ? <TableHead className="text-right">{m.metricLabel(extra)}</TableHead> : null}
             <TableHead>{t('status')}</TableHead>
-            <TableHead>{t('alerts')}</TableHead>
+            {/* A set width: a rule's label arriving later does not move the columns. */}
+            <TableHead className="w-72">{t('alerts')}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -360,7 +361,9 @@ function MarketTable({ groups, map }: { groups: TileGroup[]; map: MarketMapView 
                     {tile.status ? <StatusChip status={tile.status} /> : t('latestOnly')}
                   </TableCell>
                   <TableCell className="text-xs whitespace-normal">
-                    {flag ? (
+                    {flags.pending ? (
+                      <Skeleton aria-hidden className="h-3 w-24" />
+                    ) : flag ? (
                       <span className="flex items-start gap-1">
                         <AlertMark flag={flag} labelled={false} className="mt-px" />
                         {flagLabel(flag)}

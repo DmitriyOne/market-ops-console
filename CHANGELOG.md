@@ -16,6 +16,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 - Expected failures (a name already taken, a user's 4xx) are breadcrumbs, offline and timeouts warnings, everything else an error: one rule, `reportLevel`.
 - Lint: Sentry is imported only by the logging and monitoring helpers.
 - Sentry's experimental Next.js flag (`clientTraceMetadata`) is removed: nothing experimental in production (ADR 0018).
+- No layout shift when the alert rules arrive: the status table's Alerts column keeps its width and shows a placeholder instead of "None" while they load, Top risks waits for them, and the mock API answers reads at once (writes still wait, to show "Saving…").
 
 ## [0.13.1] - Unreleased
 

@@ -176,6 +176,7 @@ export function MarketsTable() {
                   key={row.id}
                   row={row}
                   flag={flags.byMarket.get(row.id)}
+                  flagsPending={flags.pending}
                   onOpen={toMarket}
                 />
               ))}
@@ -211,11 +212,14 @@ export function MarketsTable() {
 function MarketRow({
   row,
   flag,
+  flagsPending,
   onOpen,
 }: {
   row: Row;
   /** What the alert rules say about this market now, if anything. */
   flag: MarketFlag | undefined;
+  /** The rules are still loading: keep the bell's place so the column does not widen later. */
+  flagsPending: boolean;
   onOpen: (id: string) => void;
 }) {
   const t = useTranslations('marketsTable');
@@ -253,6 +257,8 @@ function MarketRow({
                 {flagLabel(flag)}
               </PopoverContent>
             </Popover>
+          ) : flagsPending ? (
+            <span aria-hidden className="size-11 shrink-0" />
           ) : null}
           {row.anomalies.map((a) => {
             const label = t('anomaly', { period: f.period(a.period), note: a.note });

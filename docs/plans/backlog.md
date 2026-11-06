@@ -130,4 +130,5 @@ Points the owner wants explained in the README, in his own words:
 - **Whether ad-block lists drop `/monitoring`** is not checked. **Watch** after the deploy.
 - **The Excel export span's error status and `MonitoringTags` mounted through `Providers` have no test** (independent review). **Hardening plan**.
 - **Every console line goes to Sentry Logs** (owner's choice, ADR 0019): a library's message or a stray debug `console.log` with personal data would reach Sentry, and lint cannot see it. Guarded by the rule in CLAUDE.md and the E2E question check. A `beforeSendLog` filter (by level or by a known-safe prefix) would narrow it. **Owner, revisit before production**.
+- **`HeatMap` test "the default Analyst view shows growth by month…" failed once** in a full run with `MarketsTable`'s known flaky test, and passes alone and in two full reruns: flaky under load. **Watch**.
 

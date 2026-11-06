@@ -93,7 +93,7 @@ function readId(request: Request): string {
   return id;
 }
 
-/** Every answer waits like a real network; a demo switch can fail one write. */
+/** Every write waits like a real network; a demo switch can fail one. */
 async function write(request: Request, handler: () => Promise<Response>): Promise<Response> {
   assertSameOrigin(request);
   await sleep(env.MOCK_ALERTS_DELAY_MS);
@@ -106,15 +106,15 @@ async function write(request: Request, handler: () => Promise<Response>): Promis
   return handler();
 }
 
-export const GET = withErrorHandling(ROUTE, async (request: Request) => {
-  await sleep(env.MOCK_ALERTS_DELAY_MS);
+// Reads answer at once: the delay is for writes, so "Saving…" can be seen (spec §9).
+export const GET = withErrorHandling(ROUTE, (request: Request) => {
   const cookie = readCookie(request, ALERTS_COOKIE);
   const stored = decodeRules(cookie);
   const rules = stored ?? exampleRules(new URL(request.url).searchParams.get('locale'));
   // An unreadable cookie is warned about once (decodeRules) and cleared, so
   // every later load does not warn again (ADR 0019).
   const headers = cookie && !stored ? { ...NO_STORE, 'Set-Cookie': cookieHeader(null) } : NO_STORE;
-  return Response.json({ rules }, { headers });
+  return Promise.resolve(Response.json({ rules }, { headers }));
 });
 
 export const POST = withErrorHandling(ROUTE, (request: Request) =>
