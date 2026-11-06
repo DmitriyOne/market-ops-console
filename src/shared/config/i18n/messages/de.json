@@ -79,7 +79,7 @@
       "risks": "Welche Märkte sind gefährdet?",
       "germany": "Warum ist Deutschland eingebrochen?",
       "apacEurope": "APAC und Europa vergleichen",
-      "forecastMiss": "Was treibt die Prognoseabweichung?"
+      "forecastMiss": "Was treibt die Planabweichung?"
     },
     "panel": {
       "title": "Assistent",
@@ -120,7 +120,7 @@
     },
     "evidence": {
       "revenue": "Umsatz",
-      "attainment": "Zielerreichung",
+      "attainment": "Planerfüllung",
       "growth": "Wachstum ggü. Vorjahr",
       "units": "Einheiten",
       "calculated": "Aus Monatsdaten berechnet",
@@ -285,15 +285,15 @@
     "metricTitle": "Karte einfärben nach",
     "metric": {
       "status": "Status",
-      "attainment": "Zielerreichung",
+      "attainment": "Planerfüllung",
       "growth": "Wachstum ggü. Vorjahr",
       "share": "Marktanteil",
       "revenue": "Umsatz"
     },
     "notice": {
-      "statusLatestOnly": "Der Status gilt nur für den letzten Monat; die Karte zeigt die Zielerreichung.",
-      "shareLatestOnly": "Der Marktanteil gilt nur für den letzten Monat; die Karte zeigt die Zielerreichung.",
-      "sharePerProduct": "Einen Marktanteil gibt es nicht je Produkt; die Karte zeigt die Zielerreichung."
+      "statusLatestOnly": "Der Status gilt nur für den letzten Monat; die Karte zeigt die Planerfüllung.",
+      "shareLatestOnly": "Der Marktanteil gilt nur für den letzten Monat; die Karte zeigt die Planerfüllung.",
+      "sharePerProduct": "Einen Marktanteil gibt es nicht je Produkt; die Karte zeigt die Planerfüllung."
     },
     "mapLabel": "Weltkarte der Märkte: {metric}",
     "country": "{name}, {metric} {value}",
@@ -370,9 +370,9 @@
       "market": "Markt",
       "region": "Region",
       "revenue": "Umsatz",
-      "forecast": "Prognose",
-      "gap": "Abstand zur Prognose",
-      "attainment": "Zielerreichung",
+      "forecast": "Plan",
+      "gap": "Abstand zum Plan",
+      "attainment": "Planerfüllung",
       "priorYear": "Vorjahr",
       "growth": "Wachstum ggü. Vj.",
       "share": "Marktanteil",
@@ -495,7 +495,7 @@
       "asc": "{column}, aufsteigend",
       "desc": "{column}, absteigend",
       "calculated": "Wie Werte entstehen",
-      "calculatedValue": "Aus Monatsdaten berechnet (Umsatz = Σ Ist, Zielerreichung = Σ Ist ÷ Σ Prognose, Wachstum = Σ Ist ÷ Σ Vorjahr − 1); Anteil und Status wie für den letzten Monat gespeichert. Summen folgen dem Excel-Filter.",
+      "calculatedValue": "Aus Monatsdaten berechnet (Umsatz = Σ Ist, Planerfüllung = Σ Ist ÷ Σ Plan, Wachstum = Σ Ist ÷ Σ Vorjahr − 1); Anteil und Status wie für den letzten Monat gespeichert. Summen folgen dem Excel-Filter.",
       "status": "Status",
       "statusValue": "In den Daten nur für den letzten Monat gesetzt.",
       "link": "Diese Ansicht öffnen"
@@ -690,5 +690,28 @@
     "button": "Link teilen",
     "copied": "Link kopiert",
     "failed": "Link konnte nicht kopiert werden. Bitte aus der Adresszeile kopieren."
+  },
+  "places": {
+    "regions": {
+      "na": "Nordamerika",
+      "eu": "Europa",
+      "apac": "APAC",
+      "latam": "Lateinamerika"
+    },
+    "markets": {
+      "us": "USA",
+      "ca": "Kanada",
+      "de": "Deutschland",
+      "gb": "Vereinigtes Königreich",
+      "fr": "Frankreich",
+      "it": "Italien",
+      "es": "Spanien",
+      "jp": "Japan",
+      "cn": "China",
+      "in": "Indien",
+      "au": "Australien",
+      "br": "Brasilien",
+      "mx": "Mexiko"
+    }
   }
 }

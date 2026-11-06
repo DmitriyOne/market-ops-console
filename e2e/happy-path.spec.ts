@@ -47,3 +47,14 @@ test('numbers follow the locale: German KPIs', async ({ page }) => {
   await expect(kpis).toContainText('22,9 Mio. $');
   await expect(kpis).toContainText('100,4 %');
 });
+
+test('places follow the locale: German region and market names, Plan in the table', async ({
+  page,
+}) => {
+  await page.goto('/de-DE/dashboard?mode=analyst&region=eu');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Europa');
+  const table = page.getByRole('table', { name: /Märkte/ });
+  await expect(table.getByRole('row', { name: /Deutschland/ })).toBeVisible();
+  await expect(table.getByRole('columnheader', { name: 'Plan', exact: true })).toBeVisible();
+  await expect(table.getByRole('columnheader', { name: /Prognose/ })).toHaveCount(0);
+});

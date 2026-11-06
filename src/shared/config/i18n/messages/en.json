@@ -690,5 +690,28 @@
     "button": "Share link",
     "copied": "Link copied",
     "failed": "Couldn't copy the link. Copy it from the address bar."
+  },
+  "places": {
+    "regions": {
+      "na": "North America",
+      "eu": "Europe",
+      "apac": "APAC",
+      "latam": "LATAM"
+    },
+    "markets": {
+      "us": "United States",
+      "ca": "Canada",
+      "de": "Germany",
+      "gb": "United Kingdom",
+      "fr": "France",
+      "it": "Italy",
+      "es": "Spain",
+      "jp": "Japan",
+      "cn": "China",
+      "in": "India",
+      "au": "Australia",
+      "br": "Brazil",
+      "mx": "Mexico"
+    }
   }
 }
