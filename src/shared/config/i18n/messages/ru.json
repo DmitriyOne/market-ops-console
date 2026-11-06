@@ -640,6 +640,7 @@
     "off": "Sentry здесь выключен: NEXT_PUBLIC_SENTRY_DSN не задан. Кнопки всё равно падают, но ничего не отправляется.",
     "sent": "Готово: {label}. Смотрите в Sentry, раздел {place}.",
     "apiResult": "Тестовый API ответил {status}. Смотрите в Sentry, раздел Issues.",
+    "sending": "Отправляется…",
     "items": {
       "clientError": {
         "label": "Ошибка на клиенте",

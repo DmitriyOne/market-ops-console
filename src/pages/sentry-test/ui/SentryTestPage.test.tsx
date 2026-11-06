@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { NextIntlClientProvider } from 'next-intl';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -66,5 +66,19 @@ describe('SentryTestPage', () => {
     expect(screen.getByRole('status')).toHaveTextContent(items.handled.label);
     await userEvent.click(screen.getByRole('button', { name: items.warning.label }));
     expect(warn).toHaveBeenCalledWith('[ui]', 'sentry_test_warning', { source: 'sentry-test' });
+  });
+
+  it('shows a busy button while the trace runs and ignores a second click', async () => {
+    renderPage(true);
+    const button = screen.getByRole('button', { name: items.trace.label });
+    await userEvent.click(button);
+    expect(button).toHaveAttribute('aria-busy', 'true');
+    expect(button).toHaveTextContent(en.sentryTest.sending);
+    await userEvent.click(button);
+    await waitFor(() => {
+      expect(button).not.toHaveAttribute('aria-busy');
+    });
+    expect(button).toHaveTextContent(items.trace.label);
+    expect(screen.getByRole('status')).toHaveTextContent(items.trace.label);
   });
 });

@@ -1,5 +1,6 @@
 'use client';
 
+import { LoaderCircleIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
@@ -46,6 +47,9 @@ export function SentryTestPage({ sentryOn }: Props) {
   const t = useTranslations('sentryTest');
   const [result, setResult] = useState('');
   const [bomb, setBomb] = useState(false);
+  // The two actions that wait (the API, the trace): the button says so and
+  // ignores a second click. Not disabled: that would drop focus (as in Export).
+  const [pending, setPending] = useState<Item | null>(null);
 
   const done = (item: Item) => {
     setResult(t('sent', { label: t(`items.${item}.label`), place: t(`items.${item}.place`) }));
@@ -71,21 +75,28 @@ export function SentryTestPage({ sentryOn }: Props) {
       done('warning');
     },
     apiError: () => {
-      fetchEmpty(API_ROUTES.sentryTest).then(
-        () => {
-          setResult(t('apiResult', { status: 200 }));
-        },
-        (error: unknown) => {
-          setResult(t('apiResult', { status: error instanceof HttpError ? error.status : 0 }));
-        },
-      );
+      setPending('apiError');
+      fetchEmpty(API_ROUTES.sentryTest)
+        .then(
+          () => {
+            setResult(t('apiResult', { status: 200 }));
+          },
+          (error: unknown) => {
+            setResult(t('apiResult', { status: error instanceof HttpError ? error.status : 0 }));
+          },
+        )
+        .finally(() => {
+          setPending(null);
+        });
     },
     trace: () => {
+      setPending('trace');
       void traceSpan(
         'sentry-test.trace',
         'ui.test',
         () => new Promise<void>((resolve) => setTimeout(resolve, TRACE_MS)),
       ).then(() => {
+        setPending(null);
         done('trace');
       });
     },
@@ -113,8 +124,23 @@ export function SentryTestPage({ sentryOn }: Props) {
                 <Link href="/sentry-test/server">{t(`items.${item}.label`)}</Link>
               </Button>
             ) : (
-              <Button type="button" variant="outline" className="min-h-11" onClick={actions[item]}>
-                {t(`items.${item}.label`)}
+              <Button
+                type="button"
+                variant="outline"
+                className="min-h-11"
+                aria-busy={pending === item || undefined}
+                onClick={() => {
+                  if (pending === null) actions[item]();
+                }}
+              >
+                {pending === item ? (
+                  <>
+                    <LoaderCircleIcon aria-hidden className="motion-safe:animate-spin" />
+                    {t('sending')}
+                  </>
+                ) : (
+                  t(`items.${item}.label`)
+                )}
               </Button>
             )}
           </li>

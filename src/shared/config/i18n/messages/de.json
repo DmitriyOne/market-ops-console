@@ -640,6 +640,7 @@
     "off": "Sentry ist hier aus: NEXT_PUBLIC_SENTRY_DSN ist nicht gesetzt. Die Schaltflächen schlagen trotzdem fehl, gesendet wird nichts.",
     "sent": "Erledigt: {label}. In Sentry unter {place} nachsehen.",
     "apiResult": "Die Test-API hat mit {status} geantwortet. In Sentry unter Issues nachsehen.",
+    "sending": "Wird gesendet…",
     "items": {
       "clientError": {
         "label": "Client-Fehler",
