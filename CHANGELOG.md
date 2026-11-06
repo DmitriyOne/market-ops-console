@@ -9,6 +9,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 - The full feature list moved from the README to `docs/features.md`, brought up to 0.16.0 (path above the title, names in the page's language, heat map by mouse and by touch, Edit or Dismiss for refused alert writes, "Link copied", the phone header, suggested questions after repeated refusals).
 - The author's own words, said in Ukrainian and translated close to word for word, in the README: a few words at the top, how AI tools were used, accessibility, what I like in it, what I'd do differently. `CLAUDE.md` says agents only translate those parts.
 - Release dates in the changelog.
+- README, after a last check against the brief: streaming without jank, coordinated views and URL state among the decisions, the two modes for two audiences, a performance budget in CI under what is next; the author's note at the top says anything missing can be added and asks for feedback.
+- `.superpowers/` (the brainstorming skill's local preview server, which keeps a session token there) is in `.gitignore`.
 
 ### Added
 - The agent skills used to build the app, in `.claude/skills/` as published, with a list of where each came from and what it was used for; lint and Prettier skip the folder, as they skip `reference/`.

@@ -4,6 +4,8 @@ Skills are instruction packs for the AI agent (Claude Code): they load when a ta
 
 They are third-party files, kept as published: lint and Prettier skip this folder (like `reference/`).
 
+`superpowers-brainstorming` ships a local preview server (`scripts/`) for showing mock-ups; it is not part of the app and was not changed. An automated security review flagged it: a predictable `/tmp` folder, and a session token kept in `.superpowers/` inside the project. `.superpowers/` is in `.gitignore`, so the token cannot be committed; the rest would be fixed upstream.
+
 | Skill | Source | What it was used for |
 |---|---|---|
 | `next-best-practices` | public skills catalogue | Every task: App Router conventions, RSC boundaries, metadata, error files |

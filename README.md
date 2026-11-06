@@ -1,6 +1,6 @@
 # Market Ops Console
 
-> **From the author.** Although this project was made with the help of AI, a person put a lot into it: effort, time, experience and research. *(In my own words, said in Ukrainian and translated into English.)*
+> **From the author.** Although this project was made with the help of AI, a person put a lot into it: effort, time, experience and research. Even if something you wanted was not implemented, it is no problem at all to add it. I would just really like to talk and to hear your feedback personally. *(In my own words, said in Ukrainian and translated into English.)*
 
 A console for a commercial operations team. Two surfaces over one dataset:
 
@@ -132,6 +132,7 @@ No Redux or Zustand: these tools cover every case.
 | Charts | ECharts, Nivo, Highcharts, own d3 | **Recharts** (shadcn charts) for trend and radar, **react-simple-maps** for the map, **an HTML table** for the heat map | Each fits its chart. The heat map is a grid of buttons, so arrow keys and screen readers come almost free ([ADR 0004](docs/decisions/0004-data-visualisation.md)) |
 | Server state | SWR | **TanStack Query** | A better story for optimistic writes and rollback |
 | URL state | hand-written `useSearchParams` | **nuqs** | Typed parameters that behave like `useState` |
+| Coordinated views | React context or a global store for the selection | **The URL as the only source** of path, period, selection and mode | Every view reads it, every click writes it: a selection on the map narrows the table and the radar, and the same view comes back on Back, Forward or a shared link ([ADR 0006](docs/decisions/0006-state-and-url.md)) |
 | Forms | Formik | **react-hook-form + zod** | One zod schema checks both the form and the API route |
 | i18n | `Intl` only, react-i18next | **next-intl** | Typed keys and one formatter for server and browser, so pages stay static ([ADR 0010](docs/decisions/0010-i18n-and-locale.md)) |
 
@@ -148,7 +149,7 @@ Every choice, with what was rejected: [ADR 0002](docs/decisions/0002-stack.md).
 
 ## Productionising it
 
-**Performance.** Pages are pre-rendered per language and served from Vercel's CDN. Heavy parts load only when needed: the map (~71 KB gz), the charts, and ExcelJS (~250 KB gz, only when Export is clicked). Lighthouse on production (0.15.0):
+**Performance.** Pages are pre-rendered per language and served from Vercel's CDN. Heavy parts load only when needed: the map (~71 KB gz), the charts, and ExcelJS (~250 KB gz, only when Export is clicked). **Streaming without jank.** The chat's state lives in the assistant panel, so tokens re-render only the answer being written, never the dashboard. The list follows the answer only while the reader is at the bottom; if they scrolled up, a "New content" button appears instead of the page jumping. "What the data shows" is worked out once, when the answer ends. Lighthouse on production (0.15.0):
 
 | | Performance | Accessibility | Best practices | LCP | TBT | CLS |
 |---|---|---|---|---|---|---|
@@ -217,6 +218,7 @@ A new test for a bug has to fail on the code before the fix; it is run against t
 ## Key technical decisions
 
 - **Static pages, URL read on the client.** Every page is pre-rendered per language, and the view is drawn from the URL after load. A skeleton holds its place, so a shared link never flashes the default view first. The cost is mobile LCP (above).
+- **Two modes for two audiences.** Executive shows the headlines: KPIs, market status, top risks, top movers, the trend. Analyst adds the map metric, the markets table with export, the radar and the heat map. The mode is one URL parameter, so a shared link opens the same audience's view.
 - **The mock API is a cookie, not a server.** The brief says not to build a backend. Alert rules live in a cookie behind real `GET / POST / PATCH / DELETE` routes, so the optimistic save and rollback run over a real network round trip ([ADR 0016](docs/decisions/0016-alert-writes.md)).
 - **Alert writes go one at a time.** The cookie holds the whole list, so two writes in flight would overwrite each other. The screen still updates at once.
 - **Chat history in `sessionStorage`.** It survives a reload and ends with the tab. `localStorage` would leave a transcript on a shared computer. Production would keep threads on the server, per user.
@@ -300,6 +302,7 @@ I built this with Claude Code. I made the decisions; the agent wrote most of the
 Also on the list:
 
 - **Mobile load time.** Render the default view on the server and let the client only correct it, instead of drawing everything after load.
+- **A performance budget in CI** (Lighthouse CI and a bundle-size check). Today the numbers above are measured by hand.
 - **Real screen-reader testing** with VoiceOver and NVDA, not only axe.
 - **WebKit in E2E.** Many phone users would be on Safari.
 - **Real backend contracts.** Server-side rate limits, live currency rates, chat threads stored per user.

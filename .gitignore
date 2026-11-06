@@ -22,3 +22,6 @@ next-env.d.ts
 # Playwright
 /test-results
 /playwright-report
+
+# Local state of the brainstorming skill's preview server (holds a session token)
+.superpowers/
