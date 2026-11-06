@@ -1,117 +1,330 @@
 # Market Ops Console
 
-A console for a commercial operations team: a **streaming AI assistant** that answers questions with citations and honest confidence, and an **analytical dashboard** (map, radar, time series, heat map) with drill-down from portfolio to product. Both read the same dataset.
+> **From the author.** Although this project was made with the help of AI, a person put a lot into it: effort, time, experience and research. Even if something you wanted was not implemented, it is no problem at all to add it. I would just really like to talk and to hear your feedback personally. *(In my own words, said in Ukrainian and translated into English.)*
+
+A console for a commercial operations team. Two surfaces over one dataset:
+
+- a **streaming AI assistant** that cites its sources, says how sure it is, and says so when the data cannot answer;
+- an **analytical dashboard** (map, radar, time series, heat map) with drill-down from portfolio to product.
 
 Take-home assignment for the Frontend Engineer role at NewPage Solutions.
 
-> Status: `0.15.0` in progress: Node pinned to 24.x and a share-link button. Deployed: https://df-market-ops-console.vercel.app. Done: foundation (0.2.0), design direction and tokens (0.3.0), assistant (0.4.0), dashboard shell (0.5.0), market map (0.6.0), Analyst markets table (0.7.0), heat map and radar (0.8.0), alerts (0.9.0), end-to-end tests (0.10.0), accessibility pass (0.11.0), polish (0.11.1), currency picker and logo (0.12.0), page metadata, favicon, preview image, `robots.txt` and designed 404 / 500 pages (0.13.0), a lint rule for dataset reads (0.13.1), error monitoring with Sentry (0.14.0). Next: E2E on Vercel previews. Full list: `CHANGELOG.md`.
+**Live:** https://df-market-ops-console.vercel.app · **Every brief requirement, where it is and how to check it:** [`docs/requirements-map.md`](docs/requirements-map.md) · **Full feature list:** [`docs/features.md`](docs/features.md)
 
-## What works now
+| | |
+|---|---|
+| ![Executive view with an answer from the assistant: sources and confidence](docs/screenshots/executive-assistant.jpg) | ![Analyst view in dark mode: three markets selected on the map, growth metric](docs/screenshots/analyst-dark.jpg) |
+| Executive view. The answer is marked as AI, shows its confidence and one button per source. | Analyst view, dark theme. Markets picked on the map narrow the radar and the table. |
+| ![Heat map: markets by month, growth year on year; Germany's March 2026 dip stands out](docs/screenshots/analyst-heat-map-dark.jpg) | ![Alerts sheet: markets firing now and the demo switch that makes the next save fail](docs/screenshots/alerts.jpg) |
+| Heat map, markets × months. Germany's March 2026 dip (−31 %) is marked with a warning sign. | Alerts: what fires now, the rules, and a switch that fails the next save to show the rollback. |
 
-- **Assistant** in a right panel on desktop (collapsible, remembered without a flash) and an Assistant tab on phones.
-- **Streamed answers** with Stop, Retry, confidence and the label "AI answer · may be incomplete". Answers without matching data say "I can't answer this from the data".
-- **Sources**: one button per citation. Hover, focus or tap shows an evidence card with the real numbers and a 12-month trend; a click focuses the dashboard through the URL.
-- **"What the data shows"** under each answer: the portfolio row, the cited rows and markets the answer did not mention, found by fixed rules (no AI). "Show on dashboard" selects them on the map and in the table.
-- **Answer actions**: Copy, 👍 / 👎 with a reason (once per answer), New chat.
-- **History** survives a reload of the same tab (`sessionStorage`) and ends with the tab.
-- **Dashboard, Executive view**: drill-down path `Portfolio › Region › Market › Product`, a month picker with a 1 / 3 / 12-month window, KPI cards (revenue, forecast attainment, growth, markets at risk), market status as a world map, tiles by region or a table (map coloured by status; in Analyst also by attainment, growth, share or revenue), top risks, top movers and the revenue trend (actual vs forecast vs prior year) with a table alternative. Every view is in the URL: links can be shared (**Share link** next to the title copies it; a share icon on phones; the currency is in the URL and the language in the address prefix), Back and Forward work (mode included), a broken link is corrected in place; the app name returns to the clean view (phone: also ⚙︎ › Reset view). A source click in the assistant moves the whole dashboard and scrolls it to the top. The chosen view (map, tiles, table; chart or table) is remembered per browser.
-- **Dashboard, Analyst view**: everything above plus the map metric picker, a markets table with every KPI (gap to forecast included) calculated from monthly data, so each row adds up and the total is their sum, a total row and sortable headers, a markets filter fed by the map (Shift+click) and the tiles, "Export" of the rows as shown (Excel with formats and filters, or CSV), units in the revenue trend, a comparison radar next to the map (the selected markets, else the open market and its neighbours, else the regions, against the portfolio average) and a heat map of markets × 24 months in the map's metric (Germany's March 2026 dip shows as growth), both with table alternatives. Selection and sort are in the URL too. The page title says which view is on ("Executive view" / "Analyst view").
-- **Alerts**: threshold rules ("attainment below 95 %", for all markets, a region or chosen ones; warning or critical) in a form that checks what the server checks (it runs the server's rule schema for the threshold range of each metric; the name length, unique names, ten rules and "at least one market" use the same shared limits), with a live preview of the markets a rule flags now. The panel opens on what fires now (each flagged market with its figure and a way to open it). Saved optimistically and rolled back with a message and Retry when the save fails (a demo switch makes the next save fail). Flagged markets get a bell in the header count, Top risks, the markets table and the map's tooltip and table. A right sheet on desktop, a tab on phones, both `tab=alerts`. `/api/v1/alerts` is a demo store in a cookie, not a backend: it checks each rule's shape but does not cap the request size, the number of market ids or how often it is called. A production API over live data needs those limits and rate limiting (per user or IP, in middleware or the platform firewall, e.g. Vercel WAF).
-- **Currency**: amounts in US dollars, euros or British pounds (header menu; phone: ⚙︎), in the URL (`?currency=EUR`), so a shared link opens in the same currency. The data is USD; the rates are the ECB's of 5 November 2026 (1 USD = 0.89095 EUR = 0.74299 GBP), **fixed in the code for this demo**: a real app would get them from the backend API. One rate for every month, so percentages never change. Every amount converts (KPIs, charts, tables, map steps, alerts, evidence cards, Excel); CSV stays raw USD, and the assistant's own text is shown as received (ADR 0017).
-- 4 locales (en-GB, en-US, de-DE, ru-RU), light and dark themes (the logo inverts with them), an offline screen, error boundaries per widget. Every visible word comes from the dictionaries, separators and page titles included; lint checks it (ADR 0011).
-- **Page metadata**: a title per page and a description in the page language, a favicon that follows the browser's light or dark scheme, and one link preview image per language. The console is closed to search engines: `robots.txt` disallows everything, pages carry `noindex`, so there is no sitemap. Previews resolve after the deploy (ADR 0018).
-- **Error monitoring** (Sentry, ADR 0019): every error the app logs, the browser's uncaught ones and the server's, with the screen's language, mode, currency and tab; the chat answer and the Excel export are timed. Off without a DSN, and on your machine unless `NEXT_PUBLIC_SENTRY_LOCAL=true`. See [Error monitoring and personal data](#error-monitoring-and-personal-data).
-- **404 and 500 pages** in the app's look, in every language and theme: the address not found, the error ID, Try again and Back to dashboard. When the whole app fails, the last-resort page still speaks the address's language.
+<p>
+  <img src="docs/screenshots/phone-overview-de.jpg" width="260" alt="Phone, German: Europe overview with the tab bar">
+  <img src="docs/screenshots/phone-assistant-abstain.jpg" width="260" alt="Phone, German: the assistant says it cannot answer from the data">
+</p>
 
-Try it: run `pnpm dev`, switch the currency to EUR in the header (every amount converts, the percentages stay), open the bell in the header (Alerts): add a rule "Growth below 0%" and watch the preview, then tick "Fail the next save (demo)" and switch a rule off to see the rollback. Switch to Analyst and Shift+click Germany and Spain on the map to narrow the markets table, look at the heat map for Germany's March 2026 dip and press Enter on it, click Europe › Germany in the path or Germany on the map, then open the assistant and pick a suggested question, or ask "Why did Germany dip in March?", "What will sales be next year?" (can't answer) or "force error" (error and Retry).
+Phone, in German: the Europe overview, and the assistant refusing a question the data cannot answer.
 
-## Start here (5 minutes)
+## A few words from me
 
-1. **What we build:** `docs/STARTER_PACK.md` (starter pack) and `docs/CONTRACT.md` (data + streaming contract).
-2. **Why it is built this way:** `docs/decisions/` (one short file per decision).
-3. **How the code is organised:** [Project structure](#project-structure) below.
-4. **How it looks:** `DESIGN.md` (tokens, type, spacing, components).
-5. **Working with an AI agent:** `AGENTS.md`, `CLAUDE.md` + `.claude/rules/`.
-6. **What changed:** `CHANGELOG.md`.
+> **About the language.** English is not my first language, and I am not fluent yet. The parts of this README marked *In my own words* I said in Ukrainian, and they were translated into English with an AI tool, as close to word for word as possible. The AI only translated what I said; it did not write it for me. These are my thoughts and my feelings.
+>
+> It was a very interesting product. Of course, quite a big one. But I really enjoyed building it, and I got carried away by it. It was very nice to have this opportunity. I hope we get to meet and talk more. If you have any feedback at all, I will be glad to hear it, because I really put a lot of effort and time into this.
+
+## Contents
+
+1. [A few words from me](#a-few-words-from-me)
+2. [Try it in three minutes](#try-it-in-three-minutes)
+3. [Quick start](#quick-start)
+4. [Architecture](#architecture)
+5. [Front-end approach and decisions](#front-end-approach-and-decisions)
+6. [Making the AI output trustworthy](#making-the-ai-output-trustworthy)
+7. [Productionising it](#productionising-it)
+8. [Accessibility](#accessibility)
+9. [Testing](#testing)
+10. [Key technical decisions](#key-technical-decisions)
+11. [Engineering standards](#engineering-standards)
+12. [How I used AI tools](#how-i-used-ai-tools)
+13. [What I like in it](#what-i-like-in-it)
+14. [What I'd do differently with more time](#what-id-do-differently-with-more-time)
+15. [Repository map](#repository-map)
+
+## Try it in three minutes
+
+1. **Ask.** In the assistant, pick "Why did Germany dip?". The answer streams word by word. Ask "Give me a full summary of the portfolio" and press Stop to cut a long one.
+2. **Check it.** Hover a source button: the card shows the real numbers. Click it: the dashboard opens Germany in that month. Open "What the data shows" under the answer: the same facts from the dataset, with no AI involved.
+3. **Hit the edges.** "What will sales be next year?" is refused. "Compare APAC and Europe" comes back with medium confidence. "force error" fails and offers Try again.
+4. **Drill and share.** Click Germany on the map, then pick a product in the path above the title. Press Back and Forward. Press Share link and open the link in another browser: the same view opens.
+5. **Analyst.** Switch to Analyst. Shift+click Spain and France on the map: the radar and the markets table follow. Find Germany's March 2026 cell in the heat map.
+6. **Alerts.** Open the bell. Add a rule "Growth below 0 %" and watch the preview list the markets it would flag. Tick "Fail the next save (demo)", switch a rule off, and watch it come back with the reason and Retry.
+7. **Settings.** Switch the currency to EUR (every amount converts, percentages stay), the language to Deutsch, the theme to dark.
 
 ## Quick start
 
-Requires Node 24 (`.nvmrc`, `engines`: `24.x`) and pnpm 10.
+Node 24 (`.nvmrc`) and pnpm 10.
 
 ```bash
 pnpm install
-cp .env.example .env.local   # optional; defaults work
-pnpm dev                     # http://localhost:3000 → /dashboard
-pnpm build && pnpm start     # production build; pages are static per locale
-pnpm format                  # Prettier (code only)
-pnpm format:check
-pnpm lint                    # ESLint + Steiger (FSD boundaries)
-pnpm typecheck
-pnpm test                    # Vitest
-pnpm exec playwright install chromium   # once, for the E2E tests
-pnpm e2e                     # Playwright: builds, starts on :3100 (dev on :3000 can keep running)
-pnpm e2e:ui                  # the same in Playwright's UI mode
-pnpm e2e --project=phone     # one project (desktop | phone); --headed shows the browser
+cp .env.example .env.local   # optional; the defaults work
+pnpm dev                     # http://localhost:3000
 ```
 
-## Error monitoring and personal data
+| Command | What it does |
+|---|---|
+| `pnpm build && pnpm start` | Production build; pages are static, one per language |
+| `pnpm lint` | ESLint and Steiger (architecture boundaries) |
+| `pnpm typecheck` | TypeScript, strict |
+| `pnpm test` | Unit and component tests (Vitest) |
+| `pnpm exec playwright install chromium` | Once, before the first E2E run |
+| `pnpm e2e` | Builds, starts on :3100 and runs Playwright (desktop and phone); a dev server on :3000 can keep running |
+| `pnpm format` | Prettier |
 
-Sentry gets errors and 10 % of traces (ADR 0019). It is **off unless `NEXT_PUBLIC_SENTRY_DSN` is set**, and on your machine (`pnpm dev`, a local build) also unless `NEXT_PUBLIC_SENTRY_LOCAL=true`, so local errors never mix with production's; deployments report Vercel's environment (`production`, `preview`), local runs `local`. Unit tests run without it; E2E runs it on with a DSN on a local port nothing listens on, catches every event in the browser and checks what would be sent (`e2e/sentry.spec.ts`), so nothing leaves the machine.
+## Architecture
 
-- **One place decides what is sent:** `logError`, `logWarning`, `logEvent` and the monitoring helpers in `src/shared/lib`; lint stops a direct Sentry import. Answers the user caused (a name already taken, a 4xx) stay a breadcrumb; offline and timeouts are warnings; faults are errors. Data lost without an exception (an unreadable alerts cookie, a stored chat that no longer fits its schema, a full storage) and an answer citing what the dataset lacks are warnings.
-- **What Sentry gets:** the error and its stack, the page URL with its query (the dashboard state), the release, the environment, tags for language, mode, currency and tab, the browser's language and time zone, breadcrumbs (clicks, navigations, `fetch` calls without bodies, console lines, product events), a release-health session per page view, and **Sentry Logs: every `console.log`, `console.warn` and `console.error` line**, ours and libraries' (so nothing personal is ever printed to the console); from the server, the request's method, URL and query only. **What it does not get:** the IP address, a user id, cookies, request headers (so no browser or OS breakdown), request or response bodies, the question text. Events go through our own path (`/monitoring`, rewritten to `app/sentry-tunnel/route.ts`), which forwards only the event body (Sentry's own handler would add the visitor's IP and user agent; the route leaves them out, and a test checks it), so Sentry never sees the visitor's IP, and the browser never calls sentry.io (a neutral path, which ad blockers are less likely to drop). For production, also turn on "Prevent Storing of IP Addresses" in the Sentry project.
-- **Stored on the device:** the `NEXT_LOCALE` cookie (language), the `mo-alerts` cookie (the demo alert rules), `localStorage` (theme, map or tiles, chart or table per widget, the collapsed assistant) and `sessionStorage` (the chat, until the tab closes). Sentry sets no cookie (no Session Replay).
-- **Test page:** `/sentry-test` fires each kind of error (client, render, handled, unhandled promise, warning, API 500, server render, a trace). It exists only where `ENABLE_SENTRY_TEST_PAGE=true` is set, which is only `.env.local`; everywhere else it and its API are a 404. To try it: put `NEXT_PUBLIC_SENTRY_DSN`, `NEXT_PUBLIC_SENTRY_LOCAL=true` and `ENABLE_SENTRY_TEST_PAGE=true` in `.env.local`, `pnpm build && pnpm start`, open `/sentry-test`.
+**One Next.js app** (App Router), organised by **Feature-Sliced Design**: each layer imports only from the layers below it, and Steiger fails the lint when one doesn't ([ADR 0005](docs/decisions/0005-feature-sliced-design.md)).
 
-**If this went to production for UK or EU users,** these would be required, not optional (UK GDPR and PECR, EU GDPR and the ePrivacy Directive):
+| Layer | What lives there | Examples |
+|---|---|---|
+| `app/` | Routing only: each page re-exports a page from `src/pages` | `app/[locale]/dashboard`, `app/api/v1/chat` |
+| `src/pages` | Composition, no logic | `dashboard` |
+| `src/widgets` | Screen blocks | `assistant-panel`, `market-status`, `heat-map`, `alerts-panel` |
+| `src/features` | User actions | `ask-question`, `drill-down`, `configure-alerts`, `export-markets` |
+| `src/entities` | Business data and its calculations | `performance` (KPIs, statuses, URL state), `alert-rule` |
+| `src/shared` | No business knowledge | UI kit, HTTP and SSE client, formatters, Sentry helpers |
 
-1. **A cookie / consent banner** that says what is stored on the device and why, with anything not strictly necessary off until the user agrees. Launching without it breaks the law.
-2. **A privacy notice** naming Sentry, the purpose (finding and fixing faults), the lawful basis (legitimate interests, with the balancing test written down) and how long events are kept.
-3. **Sentry's Data Processing Agreement** in place.
-4. **An EU data region.** This demo uses a Sentry organisation in the US (data in Iowa), a transfer to a third country; production would use an organisation in the EU region (Frankfurt) or the transfer safeguards (standard contractual clauses, the UK addendum, the EU-US Data Privacy Framework).
+**How data moves:**
 
-This is a summary, not legal advice; a real launch gets a data protection officer's or lawyer's review.
+```mermaid
+flowchart LR
+  data[(data.json<br/>fixtures.json)] --> build[Static page per language<br/>dataset prefetched in]
+  data --> chat["/api/v1/chat<br/>SSE: token … done"]
+  cookie[(mo-alerts cookie)] <--> alerts["/api/v1/alerts<br/>GET POST PATCH DELETE"]
+  build --> query[TanStack Query cache]
+  alerts --> query
+  url[URL: drill path, period,<br/>mode, selection, currency] --> selectors[Selectors in entities]
+  query --> selectors --> widgets[Map · radar · trend ·<br/>heat map · tables]
+  chat --> stream[useChatStream] --> answer[Answer + sources]
+  answer -- source click writes --> url
+  widgets -- clicks write --> url
+```
+
+The URL is the single source of what is on screen. A click on the map, a source in an answer, the period picker: each writes the URL, and every widget reads from it. That is why Back, Forward and a shared link just work.
+
+**Server state vs client state** ([ADR 0006](docs/decisions/0006-state-and-url.md)):
+
+| State | Where it lives | Why |
+|---|---|---|
+| Dataset, alert rules | TanStack Query | Server data: cached, refetched, written optimistically |
+| Drill path, period, mode, selection, metric, sort, currency, tab | URL (nuqs) | Shareable; Back and Forward work |
+| The chat | `useReducer` in `useChatStream`, copied to `sessionStorage` | Survives a reload, ends with the tab |
+| Theme, map or tiles, chart or table, collapsed assistant | `localStorage` | A per-browser preference, not part of a shared link |
+| Open menus, hover, the alert form's draft | `useState`, react-hook-form | Lives and dies with the component |
+
+No Redux or Zustand: these tools cover every case.
+
+## Front-end approach and decisions
+
+| Area | Considered | Picked | Why |
+|---|---|---|---|
+| Framework | Remix, TanStack Start | **Next.js 16, App Router** | Static pages per language, route handlers for the mock API, Vercel. The others offered nothing here that Next doesn't |
+| Components and tokens | MUI, Chakra | **Tailwind v4 + shadcn/ui (Radix)** | The source is in the repo, so the tokens are ours. Radix gives accessible menus and dialogs. Tokens live in `globals.css`; a test forbids raw colours ([DESIGN.md](DESIGN.md)) |
+| Streaming | Vercel AI SDK, `fetch-event-source`, `EventSource` | **`fetch` + `ReadableStream` + `eventsource-parser`** | `EventSource` cannot POST. The AI SDK expects its own protocol, not the brief's contract. Every event is checked by a zod schema; Stop is an `AbortController` ([ADR 0003](docs/decisions/0003-chat-streaming.md)) |
+| Charts | ECharts, Nivo, Highcharts, own d3 | **Recharts** (shadcn charts) for trend and radar, **react-simple-maps** for the map, **an HTML table** for the heat map | Each fits its chart. The heat map is a grid of buttons, so arrow keys and screen readers come almost free ([ADR 0004](docs/decisions/0004-data-visualisation.md)) |
+| Server state | SWR | **TanStack Query** | A better story for optimistic writes and rollback |
+| URL state | hand-written `useSearchParams` | **nuqs** | Typed parameters that behave like `useState` |
+| Coordinated views | React context or a global store for the selection | **The URL as the only source** of path, period, selection and mode | Every view reads it, every click writes it: a selection on the map narrows the table and the radar, and the same view comes back on Back, Forward or a shared link ([ADR 0006](docs/decisions/0006-state-and-url.md)) |
+| Forms | Formik | **react-hook-form + zod** | One zod schema checks both the form and the API route |
+| i18n | `Intl` only, react-i18next | **next-intl** | Typed keys and one formatter for server and browser, so pages stay static ([ADR 0010](docs/decisions/0010-i18n-and-locale.md)) |
+
+Every choice, with what was rejected: [ADR 0002](docs/decisions/0002-stack.md).
+
+## Making the AI output trustworthy
+
+- **AI looks different.** AI text sits on its own violet surface, labelled "AI answer · may be incomplete". Numbers from the dataset never use that surface.
+- **Every claim can be checked.** One button per source. Hover shows the real figures and a 12-month trend; a click moves the dashboard there. Sources are per answer, not per sentence: the contract has no positions in the text, and guessing them would mean parsing AI text.
+- **"What the data shows"** under each answer is built from the dataset by fixed rules, not by the AI: the cited rows, the portfolio row, and markets the answer didn't mention.
+- **Confidence is honest.** A meter and a word. Low adds "Treat as directional".
+- **Refusal is a state of its own**, with its own frame and a line on what the data does cover.
+- **Safe rendering.** Answers render as plain text, never as HTML.
+
+## Productionising it
+
+**Performance.** Pages are pre-rendered per language and served from Vercel's CDN. Heavy parts load only when needed: the map (~71 KB gz), the charts, and ExcelJS (~250 KB gz, only when Export is clicked). **Streaming without jank.** The chat's state lives in the assistant panel, so tokens re-render only the answer being written, never the dashboard. The list follows the answer only while the reader is at the bottom; if they scrolled up, a "New content" button appears instead of the page jumping. "What the data shows" is worked out once, when the answer ends. Lighthouse on production (0.15.0):
+
+| | Performance | Accessibility | Best practices | LCP | TBT | CLS |
+|---|---|---|---|---|---|---|
+| Desktop | 99 | 100 | 100 | 1.0 s | 0 ms | 0.02 |
+| Mobile (slow 4G, 4× CPU) | 68 | 100 | 100 | 5.5 s | 450 ms | 0 |
+
+Mobile LCP is the weak spot: most of it is JavaScript parsing on a slow CPU. What would fix it is in the [backlog](docs/plans/backlog.md).
+
+### Observability
+
+Sentry ([ADR 0019](docs/decisions/0019-error-monitoring-sentry.md)): errors from the browser and the server, traces (10 % in production), web vitals, and console logs. Two user paths are timed: the chat answer (time to the first token and to the end) and the Excel export. Every event is tagged with language, mode, currency and tab. All reporting goes through one place (`logError`, `logWarning`, `logEvent`); lint blocks a direct Sentry import. Expected failures, such as a name already taken, are breadcrumbs, not issues.
+
+Sentry gets no IP address, no cookies, no headers, no request bodies, and never the question text. Events go through our own `/monitoring` route, which forwards only the event body. It reports from Vercel only (`production`, `preview`); on a developer's machine it is off unless `NEXT_PUBLIC_SENTRY_LOCAL=true`. A test page, `/sentry-test`, fires each kind of error; it exists only where `ENABLE_SENTRY_TEST_PAGE=true` is set in `.env.local`, and is a 404 everywhere else.
+
+**Before a real launch for UK or EU users** (UK GDPR and PECR, EU GDPR and ePrivacy): a cookie and consent banner, a privacy notice that names Sentry, Sentry's data processing agreement, and a Sentry organisation in the EU region (this demo's is in the US). Details are in ADR 0019. This is a summary, not legal advice.
+
+### Resilience
+
+- An error boundary per widget: one broken chart doesn't take the page down.
+- Timeouts and typed errors on every request ([ADR 0012](docs/decisions/0012-api-versioning-and-resilience.md), [ADR 0013](docs/decisions/0013-error-handling.md)).
+- An offline screen that keeps the app mounted underneath, so the chat and a form draft survive.
+- 404 and 500 pages in the app's look, in every language.
+- A broken link (an unknown market, a bad period) is corrected in place, not shown as an error.
+
+### CI/CD
+
+GitHub Actions, on pull requests only, one check per job ([ADR 0007](docs/decisions/0007-git-flow-and-ci.md)):
+
+| Pull request into | Checks |
+|---|---|
+| `release/*` | Format, lint, types |
+| `develop` | Branch and version, then in parallel: format, lint, types, unit tests, E2E |
+| `master` | Branch and version |
+
+Vercel builds previews and deploys `master` to production. Branches go `feature/X.Y.Z/name` → `release/X.Y.Z` → `develop` → `master`.
+
+## Accessibility
+
+*In my own words:*
+
+> About people, I thought like this: the most important thing I put in was that it is convenient for them. I applied the best practices, both for those who have different needs and for everyone else, but overall so that it all works, and works conveniently. For the users I added different languages, different currencies, different themes, so that it is convenient for them to work, and also different hints and so on, so that all of this makes the work better and helps them find their way faster in what is there.
+>
+> I checked the whole site: the map, the assistant, the menus, the dashboard. For accessibility, I have not turned on voice reading (a screen reader) yet; I am going to do it now and check that it all works well for people. But overall I checked it, because I would really like it to be well supported, and for everyone to be able to use this product comfortably, at any time, in any place, and whatever a person's abilities are.
+
+Target: WCAG 2.1 AA, checked against 2.2 where it was cheap.
+
+- **Keyboard everywhere.** The map's countries are focusable, with zoom buttons. The heat map is an ARIA grid with arrow keys. Menus and sheets keep focus inside and give it back when they close.
+- **Every chart has a table.** "Show as table" on each; the choice is remembered.
+- **Not colour alone.** Status has a colour, a shape and a pattern (dotted, hatched). Chart colours were checked with a colour-blindness and contrast validator.
+- **Screen readers.** A streaming answer is marked busy, so it is read when it ends, not word by word. The visible text of a button is part of its name.
+- **Reduced motion** stops the chart animations, the pulsing skeletons and smooth scrolling.
+- **Checked by** axe in E2E (WCAG 2.1 A/AA, desktop and phone, no exclusions), and by hand with the keyboard.
+- **Would add:** a real screen-reader pass (VoiceOver, NVDA) and a 200 % zoom check on every screen.
 
 ## Testing
 
-- **Unit and component** (Vitest + Testing Library + MSW, next to the code): parsing the stream, schemas, selectors, formatters; streaming, stop, abstain / low confidence / error, citations, drill-down into the URL, alert validation and optimistic rollback, the charts' table alternatives.
-- **End-to-end** (Playwright, `e2e/`): the brief's happy path, Back and Forward in a real browser, the phone tab bar, the alert form's optimistic save and rollback on the real API, the assistant's error, "can't answer" and Stop states, a shared link opening the same view and Share link putting it on the clipboard, Excel/CSV downloads, offline and a failing API, the map and the alerts panel with a keyboard, axe accessibility scans (WCAG 2.1 A/AA) on desktop and a phone emulation, and what the real Sentry SDK would send (Sentry runs on with a DSN that points nowhere; the browser's events are caught and checked for tags and for no personal data). They run locally (`pnpm e2e`) and on every PR into `develop`; `BASE_URL=https://… pnpm e2e` tests a deployed copy (an unprotected one; protected Vercel previews come with the deploy). `E2E_REUSE=1` reuses a server already on :3100 instead of building.
-- **Skipped on purpose:** visual regression, a cross-browser matrix, Storybook (ADR 0008).
+| Kind | Tool | What |
+|---|---|---|
+| Unit and component | Vitest, Testing Library, MSW: 147 files, 960 tests | SSE parsing, schemas, selectors, formatters; streaming, Stop, refusal, low confidence and error; sources; drill-down into the URL; alert validation and rollback; the charts' tables |
+| End-to-end | Playwright, 60 tests, desktop and phone | The brief's happy path (map → Germany → ask → a source opens the month), Back and Forward, shared links, alerts on the real API, exports as real downloads, offline, axe scans, and what Sentry would send |
 
-## Project structure
+A new test for a bug has to fail on the code before the fix; it is run against the old code to prove that.
 
-Feature-Sliced Design v2.1. Layers import only downward. Slices that exist today are listed by name; the rest are planned.
+**Skipped on purpose:** visual regression (fonts and OS make screenshots flaky), a cross-browser matrix (CI minutes), Storybook ([ADR 0008](docs/decisions/0008-testing-scope.md)).
+
+## Key technical decisions
+
+- **Static pages, URL read on the client.** Every page is pre-rendered per language, and the view is drawn from the URL after load. A skeleton holds its place, so a shared link never flashes the default view first. The cost is mobile LCP (above).
+- **Two modes for two audiences.** Executive shows the headlines: KPIs, market status, top risks, top movers, the trend. Analyst adds the map metric, the markets table with export, the radar and the heat map. The mode is one URL parameter, so a shared link opens the same audience's view.
+- **The mock API is a cookie, not a server.** The brief says not to build a backend. Alert rules live in a cookie behind real `GET / POST / PATCH / DELETE` routes, so the optimistic save and rollback run over a real network round trip ([ADR 0016](docs/decisions/0016-alert-writes.md)).
+- **Alert writes go one at a time.** The cookie holds the whole list, so two writes in flight would overwrite each other. The screen still updates at once.
+- **Chat history in `sessionStorage`.** It survives a reload and ends with the tab. `localStorage` would leave a transcript on a shared computer. Production would keep threads on the server, per user.
+- **Currency at fixed rates.** The data is in USD; EUR and GBP use the ECB rates of 5 November 2026, fixed in the code. One rate for every month, so percentages never change ([ADR 0017](docs/decisions/0017-currency-display.md)).
+- **No flash before hydration.** Theme, mode and the collapsed panel are set by a small script in `<head>` before the first paint ([ADR 0015](docs/decisions/0015-persisted-ui-state-before-paint.md)).
+
+## Engineering standards
+
+**Followed**
+- Strict TypeScript, no `any`, no type casts except `as const`.
+- Every visible word comes from the dictionaries (English, German, Russian); lint fails on a literal string in the UI.
+- Design tokens only; a test fails on a raw colour.
+- Architecture boundaries enforced by Steiger.
+- Environment variables only through one validated module.
+- No experimental Next.js flags.
+- One record per decision ([`docs/decisions`](docs/decisions)); deferred review findings in [`docs/plans/backlog.md`](docs/plans/backlog.md).
+
+**Skipped**
+- Git hooks (husky): CI does the checking.
+- Branch protection: not available on a free private repo.
+- Storybook and visual regression (above).
+- Rate limiting: it belongs on the server, per user or IP. The mock API caps neither request size nor frequency.
+
+## How I used AI tools
+
+*In my own words:*
+
+> Why through an agent? Well, because it seems to me that this is a new era now. It is the same as before, when people changed how they count. I don't know how it was in Britain, but in Ukraine, in Russia, well, in the countries of the USSR, people counted on an abacus, and then they moved to calculators, and that was a new era. Here it is the same: just something new. The same as, well, there was plain JavaScript, and then we moved to frameworks like React, Angular, Vue. It is just a new step. That is why I did it through an agent: because it is a new step in development, and nothing more.
+>
+> Where does it save time? In writing code. Well, simply in the routine, what you do all the time, regularly, step by step.
+>
+> I stopped it and corrected it because, well, I have experience, I know what happens behind the scenes, and I see the situation with clear eyes: what is needed, what was there, what needs to be fixed, where there is a bug. Sometimes, of course, it suggests things, and that is very good, it is even better than me in some things. But sometimes experience matters, and then the result is good: this way you find a solution better and faster.
+>
+> Where is AI output fine, and where do I need to think myself? Well, I would rather say it like this. It is fine somewhere on routine work, somewhere on the things that used to take days, and weeks, and months, hours, and now take a few minutes, or, well, maybe a few hours to build this feature, this task. But a review is needed where it can affect the business, where it can be critical for the business, some business losses, or where it can affect the user, their problems, their losses, and everything in this spirit. So, of course, it knows a lot and can do a lot, but checking one more time will not hurt. There is a saying in Russian, I don't know how it sounds in English: "лучше перебдеть, чем недобдеть", word for word "better to over-watch than to under-watch" (I think in English it is "better safe than sorry"). So, yes, it is better to check one more time, because these are real, living people and real, living money. And this is exactly why you need Playwright, and exactly why you need experience in development: the experience of understanding what to look at.
+
+I built this with Claude Code. I made the decisions; the agent wrote most of the code, and I reviewed it.
+
+**Workflow**
+1. A written spec ([`docs/specs`](docs/specs)) before any code.
+2. A plan per milestone ([`docs/plans`](docs/plans)), approved before work started.
+3. The agent implements on a feature branch.
+4. A separate reviewer agent reads the whole branch.
+5. I check it in the browser, on desktop and on my phone.
+6. Findings are fixed or written to the backlog.
+
+**What keeps it repeatable**
+- `CLAUDE.md` holds the working agreement: git flow, code rules, what needs my approval.
+- `.claude/rules/*.md` are scoped rules (FSD, UI, tests, CI) that load only when the agent touches matching files.
+- Every decision is an ADR, so the next session doesn't argue it again.
+- Library docs are checked through Context7, not taken from memory.
+- The agent skills used are in [`.claude/skills`](.claude/skills/README.md), copied as published, with what each was used for.
+
+**Do's**
+- Make the agent reproduce a bug before fixing it, and prove a new test fails on the old code.
+- Ask for the cause, not a patch. Two flicker bugs turned out to be focus and menu positioning, not the scroll code.
+- Mark my own decisions as mine in the docs.
+
+**Don'ts**
+- Don't let the agent relax a lint or type rule to get green.
+- Don't accept "fixed" without a test or a browser check.
+- Don't let it write the reasoning in this README for me.
+
+## What I like in it
+
+*In my own words:*
+
+> I like the solution with different themes, and the two modes, one for one audience and one for the other. Because sometimes, when you open it at night, it is so bright, if there is only one theme. So this is very convenient.
+>
+> I also like that you can export everything to Excel or CSV. Then you can feed it to this same code, or to ChatGPT, and ask for its solution, its thoughts: what can be changed, what can be improved, what is wrong, and all that.
+>
+> I also like that you can leave a plus or a minus on an answer. Sometimes that is handy: maybe, I hope so, someone will see your comment and fix something on the site.
+>
+> What I really like in the AI assistant: if you asked several times and it said it does not know what to answer, then next time it offers a set of questions, so you can just press one button and it already works. Handy. Of course, sometimes it is annoying, you would want a real person, but we have what we have for now.
+>
+> I also really like the zoom on the map, how it works, on mobile too. On mobile the map is small, of course, but overall, yes, it is very interesting, and I like how it all works.
+
+## What I'd do differently with more time
+
+*In my own words:*
+
+> Most likely, I would first make the backend itself, with Swagger, just so the contracts are easier to understand. I would also put zod on everything. And honestly, I don't really like that we have no short links: when you copy a link, it is the whole URL. That is not very OK, and I would like to change it.
+
+Also on the list:
+
+- **Mobile load time.** Render the default view on the server and let the client only correct it, instead of drawing everything after load.
+- **A performance budget in CI** (Lighthouse CI and a bundle-size check). Today the numbers above are measured by hand.
+- **Real screen-reader testing** with VoiceOver and NVDA, not only axe.
+- **WebKit in E2E.** Many phone users would be on Safari.
+- **Real backend contracts.** Server-side rate limits, live currency rates, chat threads stored per user.
+- **A consent banner and an EU Sentry region**, before any real user.
+- **Stretch goals from the brief:** a live mode, a context-aware assistant, a command palette.
+
+## Repository map
 
 ```
-app/                 Next.js routing only (page.tsx re-exports from src/pages); sentry-tunnel (Sentry's body-only tunnel, served at /monitoring)
-pages/               empty on purpose (see pages/README.md)
-src/
-  app/               providers, global styles, design tokens
-  pages/             page composition, no logic (dashboard, not-found, route-error, sentry-test)
-  widgets/           screen blocks: app-shell, assistant-panel, dashboard-header, alerts-panel (what fires now + the rules), kpi-strip, market-status (tiles, table and map), markets-table, heat-map, comparison-radar, top-risks, top-movers, revenue-trend
-  features/          user actions: ask-question (chat stream, composer, history), drill-down, reset-view, select-period, select-metric, select-markets, export-markets, switch-mode, switch-section, switch-locale, switch-currency, switch-theme, network-status, configure-alerts (rule form, list, optimistic saves)
-  entities/          alert-rule (rules query and requests, which markets a rule flags, the bell), performance (dataset, dashboard URL state, KPI and status selectors, map scales and the map selector, the markets table, heat map and radar selectors, citations, status chip)
-  shared/            ui (shadcn, error boundaries, toasts, status screen), lib (cn, csv, dom, errors, events, i18n, media, monitoring, storage), api (HTTP client, SSE, contracts, dataset, alert rule schema and mock store), config (env, API routes, i18n, Sentry options)
-instrumentation*.ts, sentry.*.config.ts   Sentry start-up per runtime (ADR 0019)
-data/                data.json, fixtures.json (source of truth)
+app/                   Next.js routes only; app/api/v1 holds the mock chat and alerts APIs
+src/                   the app, by FSD layer (see Architecture)
+data/                  data.json and fixtures.json from the starter pack
+e2e/                   Playwright tests
 docs/
-  decisions/         architecture decision records
-  specs/             what we build
-  plans/             how we build it, step by step; backlog.md = deferred review findings
-reference/           reference mock SSE route from the starter pack
-scripts/             version check (CI), icon rendering (render-icons.sh)
+  requirements-map.md  every brief requirement → code → how to check it
+  features.md          the full feature list
+  decisions/           architecture decision records
+  specs/, plans/       what was built and in what steps; plans/backlog.md for deferred findings
+  CONTRACT.md          the streaming contract from the starter pack
+DESIGN.md              tokens, type, spacing, components
+CHANGELOG.md           every release
+CLAUDE.md, AGENTS.md, .claude/rules/   instructions for AI agents
 ```
-
-## Git flow
-
-`feature/X.Y.Z/NAME` (or `fix/X.Y.Z/NAME`) → `release/X.Y.Z` → `develop` → `master`. Work happens on `feature/X.Y.Z/NAME` branched from `release/X.Y.Z`, so the branch name says which release it belongs to; nobody commits to `release/*`, `develop` or `master` directly. Only `release/*` merges into `develop`, only `develop` into `master`. The version in `package.json`, the top of `CHANGELOG.md` and the release branch must match. CI runs on pull requests only, each check its own job (and its own line in the PR): into `release/*` format, lint and types; into `develop` the branch and version check first, then the same plus unit tests and the E2E suite in parallel; into `master` the version check. Details: `docs/decisions/0007-git-flow-and-ci.md`.
-
-## Working with AI agents
-
-- `CLAUDE.md`: working agreement, architecture, code rules. Loaded every session.
-- `.claude/rules/*.md`: scoped rules (FSD, UI, testing, CI) that load only when the agent touches matching files.
-- `docs/decisions`, `docs/specs`, `docs/plans`: the context an agent (or a new developer) needs, kept in the repo and updated with the code.
-
----
-
-*Sections required by the brief (architecture, productionising, approach and decisions, accessibility, testing, AI workflow, what I'd do differently) will be written by the author as the project progresses.*
