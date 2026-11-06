@@ -4,7 +4,7 @@ A console for a commercial operations team: a **streaming AI assistant** that an
 
 Take-home assignment for the Frontend Engineer role at NewPage Solutions.
 
-> Status: `0.13.0` page metadata, favicon, preview image, `robots.txt` and designed 404 / 500 pages, built, waiting for the owner's check. Done: foundation (0.2.0), design direction and tokens (0.3.0), assistant (0.4.0), dashboard shell (0.5.0), market map (0.6.0), Analyst markets table (0.7.0), heat map and radar (0.8.0), alerts (0.9.0), end-to-end tests (0.10.0), accessibility pass (0.11.0), polish (0.11.1), currency picker and logo (0.12.0). Next: deploy and E2E on previews (0.14.0). Full list: `CHANGELOG.md`.
+> Status: `0.13.1` lint rule that keeps every dataset read in the chosen currency, built, waiting for the owner's check. Done: foundation (0.2.0), design direction and tokens (0.3.0), assistant (0.4.0), dashboard shell (0.5.0), market map (0.6.0), Analyst markets table (0.7.0), heat map and radar (0.8.0), alerts (0.9.0), end-to-end tests (0.10.0), accessibility pass (0.11.0), polish (0.11.1), currency picker and logo (0.12.0), page metadata, favicon, preview image, `robots.txt` and designed 404 / 500 pages (0.13.0). Next: deploy and E2E on previews (0.14.0). Full list: `CHANGELOG.md`.
 
 ## What works now
 

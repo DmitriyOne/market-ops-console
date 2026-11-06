@@ -40,7 +40,7 @@ Import boundaries are checked by Steiger (`steiger` + `@feature-sliced/steiger-p
 ## Where state and React Context live
 
 1. **URL state** (drill path, period, selection, mode): `nuqs`, parsers defined in the owning entity/feature `model/`.
-2. **Server state** (dataset, alert rules): TanStack Query, query keys and hooks in the entity `api/`.
+2. **Server state** (dataset, alert rules): TanStack Query, query keys and hooks in the entity `api/`. Read the dataset with `useDataset()` / `useDashboard()` (chosen currency); the bare `datasetQueryOptions` (dollars) is lint-restricted to a few files (ADR 0017).
 3. **Local stream state** (chat): `useReducer` in `features/ask-question/model`.
 4. **React Context**: only for dependency-style values, not for app state.
    - App-wide client providers (QueryClient, nuqs adapter, offline guard): `src/app/providers`. `NextIntlClientProvider` and the theme provider are server components and sit in the root layout `app/[locale]/layout.tsx` (ADR 0009, 0010). Hooks are exported from `shared` or the owning entity.
