@@ -57,35 +57,6 @@ test('Share link is an icon next to the title, a 44 px target', async ({ page })
   expect(Math.abs((box?.y ?? 0) - (title?.y ?? 0))).toBeLessThan(12);
 });
 
-test('period and mode share one row that slides away while scrolling down, without moving the page', async ({
-  page,
-}) => {
-  await page.goto('/ru-RU/dashboard?range=12m');
-  const period = page.getByRole('button', { name: /^Период: / });
-  const mode = page.getByRole('banner').getByRole('radiogroup', { name: 'Вид' });
-  await expect(period).toBeVisible();
-  // One row: the button and the switch sit side by side.
-  const [p, m] = [await period.boundingBox(), await mode.boundingBox()];
-  expect(Math.abs((p?.y ?? 0) - (m?.y ?? 100)), 'same row').toBeLessThan(12);
-
-  // The row is what slides (the button inside only goes with it).
-  const row = period.locator('xpath=..');
-  const main = page.locator('#main');
-  const mainTop = async () => (await main.boundingBox())?.y;
-  const before = await mainTop();
-  // The wheel, as a user scrolls (a scroll from code leaves the row alone).
-  const box = await main.boundingBox();
-  await page.mouse.move((box?.x ?? 0) + 100, (box?.y ?? 0) + 300);
-  await page.mouse.wheel(0, 600);
-  await expect(row).toHaveCSS('opacity', '0');
-  expect(await mainTop(), 'the dashboard does not move').toBe(before);
-
-  await page.mouse.wheel(0, -200);
-  await expect(row).toHaveCSS('opacity', '1');
-  await period.click();
-  await expect(page.getByRole('dialog')).toBeVisible();
-});
-
 test('the period shows in full when it fits, as the month over "12 мес." when it does not', async ({
   page,
 }) => {
@@ -106,28 +77,6 @@ test('the period shows in full when it fits, as the month over "12 мес." when
   ).toHaveCount(0);
 });
 
-test('a control focused by keyboard is not hidden under the period row (WCAG 2.4.11)', async ({
-  page,
-}) => {
-  await page.goto('/dashboard?region=eu&market=de');
-  const share = page.getByRole('button', { name: 'Share link' });
-  const row = page.getByRole('button', { name: /^Period: / }).locator('xpath=..');
-  await expect(share).toBeVisible();
-  // Half of it above the top edge: the browser then scrolls only as far as it
-  // must (a control far off screen Chrome would centre, hiding the problem).
-  await share.evaluate((el) => {
-    const area = document.getElementById('main');
-    if (!area) return;
-    const offset = el.getBoundingClientRect().top - area.getBoundingClientRect().top;
-    area.scrollTop += offset + el.getBoundingClientRect().height / 2;
-  });
-  // Focus scrolls the dashboard back up; the row comes back with it.
-  await share.focus();
-  await expect(row).toHaveCSS('opacity', '1');
-  const [s, r] = [await share.boundingBox(), await row.boundingBox()];
-  expect(s?.y ?? 0, 'below the row').toBeGreaterThanOrEqual((r?.y ?? 0) + (r?.height ?? 0) - 1);
-});
-
 test('heat map on a phone: a tap shows the cell, Open under the grid opens it', async ({
   page,
 }) => {
@@ -144,111 +93,53 @@ test('heat map on a phone: a tap shows the cell, Open under the grid opens it', 
   await expect(page.getByRole('heading', { level: 1, name: 'Germany' })).toBeVisible();
 });
 
-test('a pick in the period menu after scrolling back up does not slide the row away and back', async ({
+test('settings sheet: a pick closes the currency menu in place, not with a jump to the other side', async ({
   page,
 }) => {
+  // The screen the jump was seen on: the menu fits below the row until the sheet slides down.
+  await page.setViewportSize({ width: 425, height: 791 });
   await page.goto('/dashboard?region=eu&market=de');
-  const period = page.getByRole('button', { name: /^Period: / });
-  const row = period.locator('xpath=..');
-  const main = page.locator('#main');
-  const box = await main.boundingBox();
-  await page.mouse.move((box?.x ?? 0) + 100, (box?.y ?? 0) + 300);
-  await page.mouse.wheel(0, 900);
-  await expect(row).toHaveCSS('opacity', '0');
-  await page.mouse.wheel(0, -150);
-  await expect(row).toHaveCSS('opacity', '1');
-  await period.click();
-  // Marks the page if the row hides at any moment while the pick changes the
-  // page's height and the browser moves the page to keep the view in place.
+  await page.getByRole('button', { name: /^Settings/ }).click();
+  await page.getByRole('button', { name: /^Currency/ }).click();
+  const menu = page.getByRole('menu');
+  await expect(menu).toBeVisible();
+  // The menu's top on every frame until it is gone; the largest step between two frames.
   await page.evaluate(() => {
-    const header = document.querySelector('header');
-    if (!header) return;
-    new MutationObserver(() => {
-      if (header.hasAttribute('data-controls-hidden')) document.body.dataset.rowHid = 'yes';
-    }).observe(header, { attributes: true });
-  });
-  await page.getByRole('dialog').getByRole('button', { name: /^Mar/ }).click();
-  await expect(page).toHaveURL(/[?&]period=2026-03(&|$)/);
-  await expect(page.getByRole('dialog')).toHaveCount(0);
-  await expect(row).toHaveCSS('opacity', '1');
-  await expect(page.locator('body'), 'the row stayed').not.toHaveAttribute('data-row-hid', 'yes');
-});
-
-test('the period row stays above the dashboard, its sticky table cells too; a region pick does not slide it', async ({
-  page,
-}) => {
-  await page.goto('/dashboard?region=eu&mode=analyst');
-  const period = page.getByRole('button', { name: /^Period: / });
-  const row = period.locator('xpath=..');
-  // Put a sticky first-column cell of the markets table right under the row
-  // (a scroll from code: the row stays where it is).
-  const onTop = await row.evaluate((el) => {
-    const main = document.getElementById('main');
-    const cell = document.querySelector<HTMLElement>('#main td.sticky');
-    if (!main || !cell) return 'no cell';
-    const r = el.getBoundingClientRect();
-    const c = cell.getBoundingClientRect();
-    main.scrollTop += c.top + c.height / 2 - (r.top + r.height / 2);
-    const now = cell.getBoundingClientRect();
-    const hit = document.elementFromPoint(now.left + now.width / 2, now.top + now.height / 2);
-    return hit !== null && el.contains(hit) ? 'row' : `covered by ${hit?.textContent ?? '?'}`;
-  });
-  expect(onTop, 'the row is on top of the sticky cell').toBe('row');
-  await expect(row).toHaveCSS('opacity', '1');
-
-  await page.evaluate(() => {
-    const header = document.querySelector('header');
-    if (!header) return;
-    new MutationObserver(() => {
-      if (header.hasAttribute('data-controls-hidden')) document.body.dataset.rowHid = 'yes';
-    }).observe(header, { attributes: true });
-  });
-  await page.getByRole('button', { name: /^Region: Europe/ }).click();
-  await page.getByRole('menuitemradio', { name: 'APAC' }).click();
-  await expect(page).toHaveURL(/[?&]region=apac(&|$)/);
-  await expect(row).toHaveCSS('opacity', '1');
-  await expect(page.locator('body'), 'the row stayed').not.toHaveAttribute('data-row-hid', 'yes');
-});
-
-test('the row shows or hides by one rule: focus left on it does not keep it up, then drop it when a menu opens', async ({
-  page,
-}) => {
-  await page.goto('/dashboard?region=eu&market=de');
-  const period = page.getByRole('button', { name: /^Period: / });
-  const row = period.locator('xpath=..');
-  await period.click();
-  await page.getByRole('dialog').getByRole('button', { name: /^Mar/ }).click();
-  await expect(page).toHaveURL(/[?&]period=2026-03(&|$)/);
-  await expect(period).toBeFocused();
-  const box = await page.locator('#main').boundingBox();
-  await page.mouse.move((box?.x ?? 0) + 100, (box?.y ?? 0) + 300);
-  await page.mouse.wheel(0, 900);
-  // Scrolled down: hidden, focus inside or not (before, focus kept it on
-  // screen while it counted as hidden, until a menu took the focus).
-  await expect(row).toHaveCSS('opacity', '0');
-  await page.evaluate(() => {
-    const el = document.querySelector('[data-controls-row]');
+    const el = document.querySelector('[data-slot="dropdown-menu-content"]');
     if (!el) return;
-    const start = getComputedStyle(el).opacity;
-    let frames = 0;
+    let last = el.getBoundingClientRect().top;
+    let jump = 0;
     const check = () => {
-      if (getComputedStyle(el).opacity !== start) document.body.dataset.rowMoved = 'yes';
-      frames += 1;
-      document.body.dataset.frames = String(frames);
+      if (!el.isConnected) {
+        document.body.dataset.menuJump = String(Math.round(jump));
+        return;
+      }
+      const top = el.getBoundingClientRect().top;
+      jump = Math.max(jump, Math.abs(top - last));
+      last = top;
       requestAnimationFrame(check);
     };
     requestAnimationFrame(check);
   });
-  await page.getByRole('button', { name: /^Region: Europe/ }).click();
-  await page.getByRole('menuitemradio', { name: 'APAC' }).click();
-  await expect(page).toHaveURL(/[?&]region=apac(&|$)/);
-  // A while after the pick (the page settling, focus back on the trigger).
-  const framesNow = Number(await page.locator('body').getAttribute('data-frames'));
-  await expect
-    .poll(async () => Number(await page.locator('body').getAttribute('data-frames')))
-    .toBeGreaterThan(framesNow + 20);
-  await expect(page.locator('body'), 'the row did not slide').not.toHaveAttribute(
-    'data-row-moved',
-    'yes',
+  await menu.getByRole('menuitemradio', { name: /GBP/ }).click();
+  await expect(page).toHaveURL(/[?&]currency=GBP(&|$)/);
+  await expect(page.locator('body')).toHaveAttribute('data-menu-jump', /^\d+$/);
+  const jump = Number(await page.locator('body').getAttribute('data-menu-jump'));
+  expect(jump, 'largest move between two frames, px').toBeLessThan(40);
+});
+
+test('period and mode share one row in the header, side by side', async ({ page }) => {
+  await page.goto('/dashboard?range=12m');
+  const period = page.getByRole('banner').getByRole('button', { name: /^Period: / });
+  const mode = page.getByRole('banner').getByRole('radiogroup', { name: 'View' });
+  const [p, m] = [await period.boundingBox(), await mode.boundingBox()];
+  expect(
+    Math.abs((p?.y ?? 0) + (p?.height ?? 0) / 2 - ((m?.y ?? 100) + (m?.height ?? 0) / 2)),
+    'same row',
+  ).toBeLessThan(4);
+  // In the header, not over the dashboard.
+  const header = await page.getByRole('banner').boundingBox();
+  expect((m?.y ?? 0) + (m?.height ?? 0)).toBeLessThanOrEqual(
+    (header?.y ?? 0) + (header?.height ?? 0),
   );
 });

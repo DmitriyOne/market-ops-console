@@ -21,7 +21,20 @@ import {
  * The currency menu: the choices, then the rates' date and source.
  * `children` is its trigger; `onPick` runs after a choice (the sheet closes).
  */
-function CurrencyMenu({ children, onPick }: { children: ReactNode; onPick?: () => void }) {
+function CurrencyMenu({
+  children,
+  onPick,
+  side = 'bottom',
+}: {
+  children: ReactNode;
+  onPick?: () => void;
+  /**
+   * `top` in the settings sheet: it is pinned to the bottom, so there is room
+   * above. Below, a long menu fits only until the sheet starts closing after a
+   * pick; then it flips above mid-fade, a flash 200 px away (owner, 2026-11-06).
+   */
+  side?: 'top' | 'bottom';
+}) {
   const t = useTranslations('currency');
   const format = useFormatter();
   const [currency, setCurrency] = useCurrencyChoice();
@@ -30,7 +43,7 @@ function CurrencyMenu({ children, onPick }: { children: ReactNode; onPick?: () =
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="min-w-72" aria-describedby={noteId}>
+      <DropdownMenuContent side={side} align="end" className="min-w-72" aria-describedby={noteId}>
         <DropdownMenuRadioGroup
           value={currency}
           onValueChange={(value) => {
@@ -91,7 +104,7 @@ export function CurrencySwitchRow({
   const join = useJoinParts();
   const [currency] = useCurrencyChoice();
   return (
-    <CurrencyMenu onPick={onPick}>
+    <CurrencyMenu onPick={onPick} side="top">
       <button type="button" className={className}>
         <span>{t('label')}</span>{' '}
         <span className="flex items-center gap-1 text-muted-foreground">

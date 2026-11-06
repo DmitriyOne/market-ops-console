@@ -10,7 +10,7 @@ import { CurrencySwitch } from '@/features/switch-currency';
 import { LocaleSwitch } from '@/features/switch-locale';
 import { ModeSwitch } from '@/features/switch-mode';
 import { ThemeSwitch } from '@/features/switch-theme';
-import { cn, CONTROLS_ROW_ATTR } from '@/shared/lib';
+import { cn } from '@/shared/lib';
 import { Logo, Skeleton } from '@/shared/ui';
 
 import { AlertsButton } from './AlertsButton';
@@ -18,18 +18,8 @@ import { DrillBreadcrumbs } from './DrillBreadcrumbs';
 import { SettingsSheet } from './SettingsSheet';
 
 const ROW = 'flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2';
-// Phone: period and mode share one row over the top of the dashboard (it
-// starts `controls` lower), so the header itself stays two rows. Scrolling
-// down slides the row away, without moving anything else (no layout shift);
-// up, or focus inside it, brings it back (owner, 2026-11-06). The shell keeps
-// that one state: no CSS `focus-within` here, which kept a hidden row on
-// screen until focus left for a menu, and then slid it away with the menu.
-const CONTROLS = cn(
-  'flex items-center gap-2',
-  'max-lg:absolute max-lg:inset-x-0 max-lg:top-full max-lg:h-controls max-lg:border-b max-lg:border-border max-lg:bg-background max-lg:px-4',
-  'max-lg:transition-[translate,opacity] max-lg:duration-200 motion-reduce:transition-none',
-  'max-lg:controls-hidden:pointer-events-none max-lg:controls-hidden:-translate-y-full max-lg:controls-hidden:opacity-0',
-);
+// Phone: period and mode share one row under the path, half the width each.
+const CONTROLS = 'flex items-center gap-2 max-lg:order-2 max-lg:w-full';
 
 // Phone: the name fills the first row next to ⚙︎; the path drops to its own row.
 const APP_NAME = 'flex items-center gap-2 font-semibold whitespace-nowrap max-lg:flex-1';
@@ -63,8 +53,8 @@ function AppName({ live = false }: { live?: boolean }) {
 
 /**
  * Desktop: name · path · period · mode · alerts · currency · language · theme in one row.
- * Phone: name and ⚙︎ on the first row, the path below; period and mode
- * in one row over the dashboard's top, which slides away while scrolling down.
+ * Phone: name and ⚙︎ on the first row, the path below, then period and
+ * mode side by side.
  */
 export function DashboardHeader() {
   return (
@@ -82,7 +72,7 @@ export function DashboardHeader() {
       </DatasetGate>
       <SettingsSheet className="lg:hidden" />
       <DatasetGate fallback={null}>
-        <div className={CONTROLS} {...{ [CONTROLS_ROW_ATTR]: '' }}>
+        <div className={CONTROLS}>
           <Suspense fallback={<ControlsSkeleton />}>
             <PeriodPicker className="max-lg:min-w-0 max-lg:flex-1 max-lg:basis-0" />
             <ModeSwitch className="max-lg:flex-1 max-lg:basis-0" />

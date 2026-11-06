@@ -6,7 +6,7 @@ import { type ReactNode, useCallback, useEffect, useId, useMemo, useRef, useStat
 
 import { useFlaggedCount } from '@/features/configure-alerts';
 import { ALERTS_TRIGGER_ATTR, SectionTabBar, useSection } from '@/features/switch-section';
-import { cn, CONTROLS_ROW_ATTR, scrollMainToTop, useJoinParts, useMediaQuery } from '@/shared/lib';
+import { cn, scrollMainToTop, useJoinParts, useMediaQuery } from '@/shared/lib';
 import {
   Button,
   PopperBoundary,
@@ -39,17 +39,8 @@ type AppShellProps = {
 const FRAME = 'flex h-dvh flex-col bg-background';
 // `relative`: screen-reader-only text inside is placed against the scroll
 // area, not the page, so it cannot stretch the page below the tab bar.
-// Phone: positioned above the dashboard (`z-20`: over its sticky table cells,
-// which are `z-10`), so its period and mode row can lie
-// over the dashboard's top; the dashboard starts that row lower (`pt-controls`),
-// and a control focused by keyboard is scrolled to below it (`scroll-pt-controls`,
-// WCAG 2.4.11: focus not hidden by the row).
-const HEADER = 'border-b border-border max-lg:relative max-lg:z-20';
-const MAIN = 'relative min-w-0 flex-1 overflow-y-auto max-lg:scroll-pt-controls max-lg:pt-controls';
-/** A finger moved less than this, the period and mode row stays put (a jittery thumb). */
-const SCROLL_STEP = 8;
-/** Near the top the row always shows: it covers the dashboard's first lines otherwise. */
-const SCROLL_TOP = 80;
+const HEADER = 'border-b border-border';
+const MAIN = 'relative min-w-0 flex-1 overflow-y-auto';
 const ALERTS_SECTION = 'relative min-w-0 flex-1 overflow-y-auto p-4';
 const ALERTS_TITLE = 'mb-3 text-lg font-semibold';
 const ASIDE =
@@ -107,56 +98,6 @@ export function AppShell({ header, main, assistant, alerts }: AppShellProps) {
     if (!hidden) setUnread(0);
   }
 
-  // Phone: scrolling the dashboard down slides the period and mode row away,
-  // scrolling up brings it back (owner, 2026-11-06).
-  const [scrolledDown, setScrolledDown] = useState(false);
-  // Back on Overview, or turned from desktop to phone: the row shows until the
-  // next scroll down, not hidden by a scroll from before.
-  const [scrollFor, setScrollFor] = useState({ desktop, section });
-  if (scrollFor.desktop !== desktop || scrollFor.section !== section) {
-    setScrollFor({ desktop, section });
-    setScrolledDown(false);
-  }
-  useEffect(() => {
-    if (desktop || !mainArea) return;
-    const show = (down: boolean) => {
-      setScrolledDown(down && mainArea.scrollTop > SCROLL_TOP);
-    };
-    // The direction comes from the finger or the wheel, never from the scroll
-    // position: the page also moves by itself (a pick in a menu changes its
-    // height and the browser keeps the view in place, in one jump or several),
-    // and the row must not slide away and back with the closing menu on it.
-    let fingerY: number | null = null;
-    const onTouchStart = (e: TouchEvent) => {
-      fingerY = e.touches[0]?.clientY ?? null;
-    };
-    const onTouchMove = (e: TouchEvent) => {
-      const y = e.touches[0]?.clientY;
-      if (y === undefined || fingerY === null || Math.abs(fingerY - y) < SCROLL_STEP) return;
-      show(y < fingerY);
-      fingerY = y;
-    };
-    const onWheel = (e: WheelEvent) => {
-      if (Math.abs(e.deltaY) >= 1) show(e.deltaY > 0);
-    };
-    // Near the top the row shows, however the page got there.
-    const onScroll = () => {
-      if (mainArea.scrollTop <= SCROLL_TOP) setScrolledDown(false);
-    };
-    const passive = { passive: true };
-    mainArea.addEventListener('touchstart', onTouchStart, passive);
-    mainArea.addEventListener('touchmove', onTouchMove, passive);
-    mainArea.addEventListener('wheel', onWheel, passive);
-    mainArea.addEventListener('scroll', onScroll, passive);
-    return () => {
-      mainArea.removeEventListener('touchstart', onTouchStart);
-      mainArea.removeEventListener('touchmove', onTouchMove);
-      mainArea.removeEventListener('wheel', onWheel);
-      mainArea.removeEventListener('scroll', onScroll);
-    };
-  }, [desktop, mainArea]);
-  const controlsHidden = !desktop && scrolledDown;
-
   const notifyAnswer = useCallback(() => {
     if (hidden) setUnread((n) => n + 1);
   }, [hidden]);
@@ -208,18 +149,7 @@ export function AppShell({ header, main, assistant, alerts }: AppShellProps) {
         {tCommon('skipToContent')}
       </a>
       {/* Phone assistant: the whole screen, as a chat app. */}
-      <header
-        className={cn(HEADER, overviewHidden && 'max-lg:hidden')}
-        data-controls-hidden={controlsHidden || undefined}
-        // Focus inside the period and mode row (Tab, a screen reader) brings
-        // it back: the one state shows it, so a menu taking focus later cannot
-        // make it slide away (owner, 2026-11-06).
-        onFocus={(e) => {
-          if (e.target.closest(`[${CONTROLS_ROW_ATTR}]`)) setScrolledDown(false);
-        }}
-      >
-        {header}
-      </header>
+      <header className={cn(HEADER, overviewHidden && 'max-lg:hidden')}>{header}</header>
       <div className="flex min-h-0 flex-1">
         <main ref={setMainArea} id="main" className={cn(MAIN, overviewHidden && 'max-lg:hidden')}>
           {/* Popups here stay below the header (they are portalled to the body). */}

@@ -7,7 +7,6 @@ import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { enMessages as en } from '@/shared/config';
-import { CONTROLS_ROW_ATTR } from '@/shared/lib';
 import { alertsApi, datasetHandler, server } from '@/shared/lib/test';
 
 import { applyPanelCollapsed } from '../model/panel-collapsed-script';
@@ -27,7 +26,7 @@ function viewport(desktop: boolean) {
   );
 }
 
-function setup(searchParams = '', header: ReactNode = <span>Header</span>) {
+function setup(searchParams = '') {
   const onUrlUpdate = vi.fn<(event: UrlUpdateEvent) => void>();
   const api: { current: AssistantApi | null } = { current: null };
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -36,7 +35,7 @@ function setup(searchParams = '', header: ReactNode = <span>Header</span>) {
       <NextIntlClientProvider locale="en-GB" messages={en}>
         <NuqsTestingAdapter searchParams={search} onUrlUpdate={onUrlUpdate} hasMemory>
           <AppShell
-            header={header}
+            header={<span>Header</span>}
             main={<p>Main content</p>}
             alerts={<p>Alerts content</p>}
             assistant={(a) => {
@@ -72,93 +71,6 @@ describe('AppShell', () => {
   afterEach(() => {
     vi.unstubAllGlobals();
     vi.restoreAllMocks();
-  });
-
-  it('phone: the period row follows the finger and the wheel, not the page moving by itself', async () => {
-    viewport(false);
-    const { user, container } = setup();
-    const header = container.querySelector('header');
-    const main = screen.getByRole('main');
-    const at = (top: number) => {
-      main.scrollTop = top;
-    };
-    const wheel = (deltaY: number) => {
-      act(() => {
-        main.dispatchEvent(new WheelEvent('wheel', { deltaY }));
-      });
-    };
-    const touch = (type: 'touchstart' | 'touchmove', clientY: number) => {
-      const event = new Event(type);
-      Object.defineProperty(event, 'touches', { value: [{ clientY }] });
-      act(() => {
-        main.dispatchEvent(event);
-      });
-    };
-    const pageMoves = (top: number) => {
-      act(() => {
-        at(top);
-        main.dispatchEvent(new Event('scroll'));
-      });
-    };
-
-    at(400);
-    wheel(120);
-    expect(header).toHaveAttribute('data-controls-hidden');
-    wheel(-40);
-    expect(header).not.toHaveAttribute('data-controls-hidden');
-
-    // A pick in a menu changes the height: the browser moves the page, down or up.
-    pageMoves(620);
-    expect(header).not.toHaveAttribute('data-controls-hidden');
-    wheel(120);
-    pageMoves(500);
-    expect(header).toHaveAttribute('data-controls-hidden');
-
-    // The finger: up moves the page down (hides), down brings the row back.
-    touch('touchstart', 500);
-    touch('touchmove', 497);
-    expect(header).toHaveAttribute('data-controls-hidden');
-    touch('touchmove', 560);
-    expect(header).not.toHaveAttribute('data-controls-hidden');
-    touch('touchmove', 300);
-    expect(header).toHaveAttribute('data-controls-hidden');
-
-    // Near the top it always shows.
-    pageMoves(40);
-    expect(header).not.toHaveAttribute('data-controls-hidden');
-
-    at(600);
-    wheel(120);
-    await user.click(screen.getByRole('button', { name: /^Assistant/ }));
-    await user.click(screen.getByRole('button', { name: 'Overview' }));
-    expect(header).not.toHaveAttribute('data-controls-hidden');
-  });
-
-  it('phone: focus landing in the period row (Tab) brings it back, as one state', () => {
-    viewport(false);
-    const { container } = setup(
-      '',
-      <div {...{ [CONTROLS_ROW_ATTR]: '' }}>
-        <button type="button">Period</button>
-      </div>,
-    );
-    const header = container.querySelector('header');
-    const main = screen.getByRole('main');
-    main.scrollTop = 600;
-    act(() => {
-      main.dispatchEvent(new WheelEvent('wheel', { deltaY: 120 }));
-    });
-    expect(header).toHaveAttribute('data-controls-hidden');
-    act(() => {
-      screen.getByRole('button', { name: 'Period' }).focus();
-    });
-    expect(header).not.toHaveAttribute('data-controls-hidden');
-  });
-
-  it('phone: the dashboard scrolls a focused control to below the period row', () => {
-    viewport(false);
-    setup();
-    expect(screen.getByRole('main')).toHaveClass('max-lg:scroll-pt-controls');
   });
 
   it('has a skip link to the main content', () => {

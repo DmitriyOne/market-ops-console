@@ -10,16 +10,12 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 ### Changed
 - Region and market names follow the page's language (`Deutschland`, `Германия`; regions `Europa`, `АТР`): the names are in the messages (`places`), generated once from `Intl.DisplayNames` so server and browser agree. Product names are brands and stay. The CSV export keeps the dataset's names, like its USD columns.
 - German and Russian name the forecast one way: Plan / План everywhere (the table said Prognose / Прогноз, the map Zielerreichung).
-- Phone header: period and mode share one row (the full period when it fits, measured; else the month over "12 mo"; no calendar icon), which slides away while the dashboard scrolls down and comes back on the way up or when focused; it moves by transform over the dashboard's top, so nothing shifts (no layout shift). Header while reading: about 113 px of 844, was 225.
+- Phone header: period and mode share one row under the path, half the width each (the full period when it fits, measured; else the month over "12 mo"; no calendar icon): the header is a row shorter. A version that slid the row away while scrolling was tried and dropped: menus picked in it flickered (owner, 2026-11-06).
 - Analyst on wide screens: the map stays in view while Top risks and the radar next to it scroll, so a pick on the map and the radar it changes are seen together.
 
 ### Fixed
+- Phone settings: picking a currency no longer flashes its menu 190 px away: the menus in the bottom sheet open upward, so the sheet sliding down after a pick no longer flips them mid-fade.
 - Sentry no longer receives this machine's errors and console lines: a DSN in `.env.local` alone sends nothing; `NEXT_PUBLIC_SENTRY_LOCAL=true` sends, as environment `local`. Deployments report Vercel's environment (`production`, `preview`) instead of `NODE_ENV`, under which a local build or a preview counted as production (ADR 0019).
-- Phone: picking in a menu after scrolling back up no longer slides the period row away and back with the menu on it. The row takes its direction from the finger or the wheel, never from the scroll position, which also moves by itself (the browser keeping the view in place when a pick changes the page's height, in one jump or several).
-- Phone: focus left on the period button (after a pick) no longer kept a row that counted as hidden on screen, to slide away when the next menu took the focus and back after: the row shows or hides by one state, and focus landing in it (Tab) brings it back.
-- Phone: the period row is drawn over the dashboard's sticky table cells (market names slid over it while scrolling).
-- Phone: the period button gives up width to the Executive / Analyst switch; each takes half the row.
-- Phone: a control focused by keyboard is scrolled to below the period row, not under it (WCAG 2.4.11); back on Overview, or turned from desktop to phone, the row shows again instead of staying hidden by an earlier scroll.
 - Heat map with a mouse: the line under the grid only reads the cell out; its Open and Select buttons, which changed under the mouse on the way down to them, are for touch screens, where a tap shows the cell. A tap where a mouse is the main pointer opens, as a click does.
 - A hand-typed currency in another case (`?currency=eur`) is written as `EUR`, not dropped to USD; the repair is logged once per link, not once per widget.
 - The radar's axis names (Momentum, Attainment, Выполнение плана) are no longer cut off in a narrow card.
