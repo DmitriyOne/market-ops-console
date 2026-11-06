@@ -121,7 +121,7 @@ Points the owner wants explained in the README, in his own words:
 ## From 0.14.0 (Sentry, 2026-11-06)
 
 - **Source maps are not uploaded yet**: production stack traces in Sentry stay minified until `SENTRY_AUTH_TOKEN`, `SENTRY_ORG` and `SENTRY_PROJECT` are set in Vercel. **Done with the deploy** (Production only); the owner checks a readable stack in Sentry.
-- **The environment is `NODE_ENV`**, so a Vercel preview reports as `production`. Use `VERCEL_ENV` (exposed to the browser). Until then the DSN is set on Production only, so previews send nothing. **Later**.
+- ~~**The environment is `NODE_ENV`**, so a Vercel preview reports as `production`.~~ **Done in 0.16.0**: `NEXT_PUBLIC_VERCEL_ENV` (`production`, `preview`), `local` on this machine, which sends only with `NEXT_PUBLIC_SENTRY_LOCAL=true` (ADR 0019).
 - **Page-load and server traces are two traces**: `clientTraceMetadata` is experimental and removed (ADR 0018, 0019). **Accepted**; revisit if Next makes it stable.
 - **Click breadcrumbs name the button by its CSS classes** (Sentry's DOM path: a long Tailwind class list) rather than its label. Readable enough with the URL and the tags; a `data-sentry-label` on key buttons would shorten them. Cosmetic.
 - **React's recoverable hydration errors are not reported**: Next gives no hook outside the console. **Accepted**.

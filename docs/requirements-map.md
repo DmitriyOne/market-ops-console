@@ -40,9 +40,9 @@ Every requirement of the brief, where the code is, and a link or test that shows
 | React 18+, TypeScript, Next.js App Router; typed contract and events; no `any` | `package.json`; `src/shared/api/chat/contract.ts`; strict TS; `typescript-eslint` strict-type-checked bans `any`; no `as` casts but `as const` (project rule) | `pnpm typecheck && pnpm lint` |
 | Components on design tokens | `src/app/styles/globals.css` (`@theme`), `DESIGN.md`; lint and a test forbid raw colours | `src/app/styles/tokens.test.ts` |
 | Server vs client state, deliberate | TanStack Query (dataset prefetched into the static page, alert rules), nuqs (URL), localStorage (preferences), sessionStorage (chat): ADR 0006 | — |
-| Component / integration tests + one E2E happy path | 140+ Vitest files, 940+ tests; `e2e/happy-path.spec.ts` (map → Germany → ask → source opens the month) | `pnpm test`, `pnpm e2e` |
+| Component / integration tests + one E2E happy path | 147 Vitest files, 960 tests; `e2e/happy-path.spec.ts` (map → Germany → ask → source opens the month) | `pnpm test`, `pnpm e2e` |
 | Resilience: error boundaries, degradation, safe model output | `src/shared/ui/widget-boundary.tsx` per widget; offline guard; 404 / 500 pages; answers rendered as text, never HTML | `e2e/resilience.spec.ts` |
-| Observability | Sentry: errors, traces, web vitals from the browser, logs; body-only tunnel `/monitoring` (ADR 0019) | — |
+| Observability | Sentry: errors, traces, web vitals from the browser, logs; body-only tunnel `/monitoring`; environment from Vercel (`production`, `preview`), off locally unless asked (ADR 0019) | `e2e/sentry.spec.ts` |
 | CI/CD, deployed | `.github/workflows/` (format, lint, types, unit, E2E on pull requests); Vercel | https://df-market-ops-console.vercel.app |
 
 ## Measured (2026-11-06, production 0.15.0)
