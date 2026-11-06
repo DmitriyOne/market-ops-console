@@ -45,7 +45,7 @@ Next.js 16 App Router · React 19 · TypeScript 6 strict · Tailwind v4 + shadcn
 - Format numbers, currency, percentages and dates only through next-intl global formats (`src/shared/config/i18n/formats.ts`). No ad-hoc `Intl.*` or `toFixed` for display.
 - Render model output as text. Never `dangerouslySetInnerHTML`.
 - Every network call goes through the shared client in `src/shared/api` (timeouts, typed errors). API paths only from `src/shared/config/api-routes.ts` (`/api/v1/*`).
-- Errors (ADR 0013): route handlers are wrapped in `withErrorHandling`; throw `AppError` subclasses, not bare `Error`. Wrap each widget in `WidgetBoundary`. Show failures via `useErrorMessage()`. Log only through `logError`. No empty `catch`.
+- Errors (ADR 0013): route handlers are wrapped in `withErrorHandling`; throw `AppError` subclasses, not bare `Error`. Wrap each widget in `WidgetBoundary`. Show failures via `useErrorMessage()`. Log only through `logError` (faults), `logWarning` (data lost without an exception; a snake_case code) and `logEvent` (product steps); they feed Sentry (ADR 0019), and lint allows `@sentry/*` only in those helpers. A new expected failure goes into `reportLevel`, not a skipped log. Never send personal data or the question text. No empty `catch`.
 - Colours, spacing, radii come from design tokens. No raw hex or arbitrary Tailwind values. Every colour token has a light (`:root`) and dark (`.dark`) value.
 - Every chart ships with an accessible alternative (table), keyboard access, and a non-colour signal.
 

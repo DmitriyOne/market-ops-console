@@ -12,7 +12,7 @@
   - `not-found` inside `[locale]` (`notFound()` and the `[...rest]` catch-all, as next-intl documents);
   - `route-error` (`[locale]/error.tsx`), Try again and Back to dashboard;
   - the global error page when the root layout fails: drawn in `app/global-error.tsx` itself, not in `src/pages`, because it must import modules (`shared/ui/status-screen`, `shared/ui/button`, the dictionaries, `localeFromPath`), never the `shared` barrels that pull in env and i18n, and Steiger lets a page use only barrels. It takes the locale from the address and brings its own `<html>`, styles, fonts and theme; `Logo` imports the `cn` package for the same reason.
-- **No experimental Next.js features in production** (owner, 2026-11-06; CLAUDE.md). So no `global-not-found`: a path the proxy skips (`/x.txt`, `/api/unknown`) gets Next's own 404, in English. Nothing in the UI links there.
+- **No experimental Next.js features in production** (owner, 2026-11-06; CLAUDE.md). So no `global-not-found`: a path the proxy skips (`/x.txt`, `/api/unknown`) gets Next's own 404, in English. Nothing in the UI links there. A library that turns one on is overridden too: `withSentryConfig`'s `clientTraceMetadata` is removed in `next.config.ts` (0.14.0, ADR 0019).
 
 **Exceptions.**
 - Hex colours in `icon.svg` and the preview image: neither has the app's stylesheet. They repeat the light (and, in the icon, dark) tokens; change both with the tokens.

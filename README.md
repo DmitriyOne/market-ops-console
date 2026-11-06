@@ -4,7 +4,7 @@ A console for a commercial operations team: a **streaming AI assistant** that an
 
 Take-home assignment for the Frontend Engineer role at NewPage Solutions.
 
-> Status: `0.13.1` lint rule that keeps every dataset read in the chosen currency, built, waiting for the owner's check. Done: foundation (0.2.0), design direction and tokens (0.3.0), assistant (0.4.0), dashboard shell (0.5.0), market map (0.6.0), Analyst markets table (0.7.0), heat map and radar (0.8.0), alerts (0.9.0), end-to-end tests (0.10.0), accessibility pass (0.11.0), polish (0.11.1), currency picker and logo (0.12.0), page metadata, favicon, preview image, `robots.txt` and designed 404 / 500 pages (0.13.0). Next: deploy and E2E on previews (0.14.0). Full list: `CHANGELOG.md`.
+> Status: `0.14.0` error monitoring with Sentry, a closed test page and a written note on personal data, built, waiting for the owner's check. Done: foundation (0.2.0), design direction and tokens (0.3.0), assistant (0.4.0), dashboard shell (0.5.0), market map (0.6.0), Analyst markets table (0.7.0), heat map and radar (0.8.0), alerts (0.9.0), end-to-end tests (0.10.0), accessibility pass (0.11.0), polish (0.11.1), currency picker and logo (0.12.0), page metadata, favicon, preview image, `robots.txt` and designed 404 / 500 pages (0.13.0), a lint rule for dataset reads (0.13.1). Next: deploy and E2E on previews (0.15.0). Full list: `CHANGELOG.md`.
 
 ## What works now
 
@@ -20,6 +20,7 @@ Take-home assignment for the Frontend Engineer role at NewPage Solutions.
 - **Currency**: amounts in US dollars, euros or British pounds (header menu; phone: ⚙︎), remembered in this browser. The data is USD; the rates are the ECB's of 5 November 2026 (1 USD = 0.89095 EUR = 0.74299 GBP), **fixed in the code for this demo**: a real app would get them from the backend API. One rate for every month, so percentages never change. Every amount converts (KPIs, charts, tables, map steps, alerts, evidence cards, Excel); CSV stays raw USD, and the assistant's own text is shown as received (ADR 0017).
 - 4 locales (en-GB, en-US, de-DE, ru-RU), light and dark themes (the logo inverts with them), an offline screen, error boundaries per widget. Every visible word comes from the dictionaries, separators and page titles included; lint checks it (ADR 0011).
 - **Page metadata**: a title per page and a description in the page language, a favicon that follows the browser's light or dark scheme, and one link preview image per language. The console is closed to search engines: `robots.txt` disallows everything, pages carry `noindex`, so there is no sitemap. Previews resolve after the deploy (ADR 0018).
+- **Error monitoring** (Sentry, ADR 0019): every error the app logs, the browser's uncaught ones and the server's, with the screen's language, mode, currency and tab; the chat answer and the Excel export are timed. Off without a DSN. See [Error monitoring and personal data](#error-monitoring-and-personal-data).
 - **404 and 500 pages** in the app's look, in every language and theme: the address not found, the error ID, Try again and Back to dashboard. When the whole app fails, the last-resort page still speaks the address's language.
 
 Try it: run `pnpm dev`, switch the currency to EUR in the header (every amount converts, the percentages stay), open the bell in the header (Alerts): add a rule "Growth below 0%" and watch the preview, then tick "Fail the next save (demo)" and switch a rule off to see the rollback. Switch to Analyst and Shift+click Germany and Spain on the map to narrow the markets table, look at the heat map for Germany's March 2026 dip and press Enter on it, click Europe › Germany in the path or Germany on the map, then open the assistant and pick a suggested question, or ask "Why did Germany dip in March?", "What will sales be next year?" (can't answer) or "force error" (error and Retry).
@@ -53,6 +54,24 @@ pnpm e2e:ui                  # the same in Playwright's UI mode
 pnpm e2e --project=phone     # one project (desktop | phone); --headed shows the browser
 ```
 
+## Error monitoring and personal data
+
+Sentry gets errors and 10 % of traces (ADR 0019). It is **off unless `NEXT_PUBLIC_SENTRY_DSN` is set**, so tests, E2E and CI send nothing.
+
+- **One place decides what is sent:** `logError`, `logWarning`, `logEvent` and the monitoring helpers in `src/shared/lib`; lint stops a direct Sentry import. Answers the user caused (a name already taken, a 4xx) stay a breadcrumb; offline and timeouts are warnings; faults are errors. Data lost without an exception (an unreadable alerts cookie, a stored chat that no longer fits its schema, a full storage) and an answer citing what the dataset lacks are warnings.
+- **What Sentry gets:** the error and its stack, the page URL with its query (the dashboard state), the release, the environment, tags for language, mode, currency and tab, and breadcrumbs (clicks, navigations, product events). **What it does not get:** the IP address, a user id, cookies, request headers, request or response bodies, the question text. Events go through our own route (`/sentry-tunnel`), which forwards only the event body, so Sentry never sees the visitor's IP; ad blockers do not drop them either.
+- **Stored on the device:** the `NEXT_LOCALE` cookie (language), the `mo-alerts` cookie (the demo alert rules), `localStorage` (theme, currency, map or tiles, chart or table per widget, the collapsed assistant) and `sessionStorage` (the chat, until the tab closes). Sentry sets no cookie (no Session Replay).
+- **Test page:** `/sentry-test` fires each kind of error (client, render, handled, unhandled promise, warning, API 500, server render, a trace). It exists only where `ENABLE_SENTRY_TEST_PAGE=true` is set, which is only `.env.local`; everywhere else it and its API are a 404. To try it: put `NEXT_PUBLIC_SENTRY_DSN` and `ENABLE_SENTRY_TEST_PAGE=true` in `.env.local`, `pnpm build && pnpm start`, open `/sentry-test`.
+
+**If this went to production for UK or EU users,** these would be required, not optional (UK GDPR and PECR, EU GDPR and the ePrivacy Directive):
+
+1. **A cookie / consent banner** that says what is stored on the device and why, with anything not strictly necessary off until the user agrees. Launching without it breaks the law.
+2. **A privacy notice** naming Sentry, the purpose (finding and fixing faults), the lawful basis (legitimate interests, with the balancing test written down) and how long events are kept.
+3. **Sentry's Data Processing Agreement** in place.
+4. **An EU data region.** This demo uses a Sentry organisation in the US (data in Iowa), a transfer to a third country; production would use an organisation in the EU region (Frankfurt) or the transfer safeguards (standard contractual clauses, the UK addendum, the EU-US Data Privacy Framework).
+
+This is a summary, not legal advice; a real launch gets a data protection officer's or lawyer's review.
+
 ## Testing
 
 - **Unit and component** (Vitest + Testing Library + MSW, next to the code): parsing the stream, schemas, selectors, formatters; streaming, stop, abstain / low confidence / error, citations, drill-down into the URL, alert validation and optimistic rollback, the charts' table alternatives.
@@ -64,15 +83,16 @@ pnpm e2e --project=phone     # one project (desktop | phone); --headed shows the
 Feature-Sliced Design v2.1. Layers import only downward. Slices that exist today are listed by name; the rest are planned.
 
 ```
-app/                 Next.js routing only (page.tsx re-exports from src/pages)
+app/                 Next.js routing only (page.tsx re-exports from src/pages); sentry-tunnel (Sentry's body-only tunnel)
 pages/               empty on purpose (see pages/README.md)
 src/
   app/               providers, global styles, design tokens
-  pages/             page composition, no logic (dashboard, not-found, route-error)
+  pages/             page composition, no logic (dashboard, not-found, route-error, sentry-test)
   widgets/           screen blocks: app-shell, assistant-panel, dashboard-header, alerts-panel (what fires now + the rules), kpi-strip, market-status (tiles, table and map), markets-table, heat-map, comparison-radar, top-risks, top-movers, revenue-trend
   features/          user actions: ask-question (chat stream, composer, history), drill-down, reset-view, select-period, select-metric, select-markets, export-markets, switch-mode, switch-section, switch-locale, switch-currency, switch-theme, network-status, configure-alerts (rule form, list, optimistic saves)
   entities/          alert-rule (rules query and requests, which markets a rule flags, the bell), performance (dataset, dashboard URL state, KPI and status selectors, map scales and the map selector, the markets table, heat map and radar selectors, citations, status chip)
-  shared/            ui (shadcn, error boundaries, toasts, status screen), lib (cn, csv, dom, errors, events, i18n, media, storage), api (HTTP client, SSE, contracts, dataset, alert rule schema and mock store), config (env, API routes, i18n)
+  shared/            ui (shadcn, error boundaries, toasts, status screen), lib (cn, csv, dom, errors, events, i18n, media, monitoring, storage), api (HTTP client, SSE, contracts, dataset, alert rule schema and mock store), config (env, API routes, i18n, Sentry options)
+instrumentation*.ts, sentry.*.config.ts   Sentry start-up per runtime (ADR 0019)
 data/                data.json, fixtures.json (source of truth)
 docs/
   decisions/         architecture decision records
