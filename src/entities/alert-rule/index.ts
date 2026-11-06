@@ -9,6 +9,7 @@ export {
   NO_FLAGS,
   ruleMarkets,
 } from './model/evaluate';
+export { ruleInCurrency, ruleInUsd } from './model/in-currency';
 export { useAlertFlags, useAlertRules } from './model/use-alert-flags';
 export { AlertMark, useFlagLabel } from './ui/AlertMark';
 export { useMetricValueFormat, useRuleText, useThresholdFormat } from './ui/use-rule-text';

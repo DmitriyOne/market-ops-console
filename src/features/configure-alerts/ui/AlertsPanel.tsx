@@ -7,6 +7,7 @@ import { type ReactNode, useEffect, useId, useRef, useState } from 'react';
 import { useAlertFlags, useAlertRules } from '@/entities/alert-rule';
 import { useDashboard, useKpiFormat } from '@/entities/performance';
 import { type AlertRule, ALERTS_MAX } from '@/shared/api';
+import { useCurrency } from '@/shared/lib';
 import { Button, Label, Skeleton, Switch, ToggleGroup, ToggleGroupItem } from '@/shared/ui';
 
 import { newRuleValues, toFormValues } from '../model/rule-form';
@@ -49,6 +50,7 @@ export function AlertsPanel({ firing, tab, onTabChange, onSaved }: AlertsPanelPr
   const { create, update, toggle, remove, retry, dismiss } = useRuleMutations();
   const [simulate, setSimulate] = useSimulateFailure();
   const [form, setForm] = useState<Form>(null);
+  const currency = useCurrency();
   const [deleting, setDeleting] = useState<AlertRule | null>(null);
   const newButton = useRef<HTMLButtonElement>(null);
   const simulateId = useId();
@@ -72,14 +74,19 @@ export function AlertsPanel({ firing, tab, onTabChange, onSaved }: AlertsPanelPr
   const full = list.length >= ALERTS_MAX;
 
   if (form) {
-    const editing = form.kind === 'edit' ? form.rule : null;
+    // The rule as the list has it now: in the current currency.
+    const editing =
+      form.kind === 'edit' ? (list.find((r) => r.id === form.rule.id) ?? form.rule) : null;
     return (
       <div className="flex flex-col gap-3">
         <Button type="button" variant="ghost" className="h-11 self-start" onClick={closeForm}>
           <ArrowLeftIcon aria-hidden />
           {t('form.back')}
         </Button>
+        {/* A currency change (another tab) starts the form again in the new
+            currency: typed text in the old one would be saved at the wrong rate. */}
         <RuleForm
+          key={currency}
           ds={ds}
           initial={editing ? toFormValues(editing) : newRuleValues(state.selected)}
           others={list.filter((r) => r.id !== editing?.id)}

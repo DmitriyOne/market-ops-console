@@ -6,11 +6,12 @@ import { Suspense } from 'react';
 import { DatasetGate } from '@/entities/performance';
 import { ResetViewLink } from '@/features/reset-view';
 import { PeriodPicker } from '@/features/select-period';
+import { CurrencySwitch } from '@/features/switch-currency';
 import { LocaleSwitch } from '@/features/switch-locale';
 import { ModeSwitch } from '@/features/switch-mode';
 import { ThemeSwitch } from '@/features/switch-theme';
 import { cn } from '@/shared/lib';
-import { Skeleton } from '@/shared/ui';
+import { Logo, Skeleton } from '@/shared/ui';
 
 import { AlertsButton } from './AlertsButton';
 import { DrillBreadcrumbs } from './DrillBreadcrumbs';
@@ -22,21 +23,29 @@ const CONTROLS =
   'flex items-center gap-2 max-lg:order-2 max-lg:w-full max-lg:flex-col max-lg:items-stretch';
 
 // Phone: the name fills the first row next to ⚙︎; the path drops to its own row.
-const APP_NAME = 'font-semibold whitespace-nowrap max-lg:flex-1';
+const APP_NAME = 'flex items-center gap-2 font-semibold whitespace-nowrap max-lg:flex-1';
 const PATH = 'min-w-0 flex-1 max-lg:order-1 max-lg:basis-full';
 
-/** The app name; live, it leads back to the clean dashboard. */
+/** The logo and the app name; live, they lead back to the clean dashboard. */
 function AppName({ live = false }: { live?: boolean }) {
   const t = useTranslations('common');
   const tHeader = useTranslations('header');
-  if (!live) return <span className={APP_NAME}>{t('appName')}</span>;
+  if (!live) {
+    return (
+      <span className={APP_NAME}>
+        <Logo />
+        {t('appName')}
+      </span>
+    );
+  }
   return (
     <ResetViewLink
       className={cn(
         APP_NAME,
-        'inline-flex min-h-11 items-center rounded-sm underline-offset-4 outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/50',
+        'min-h-11 rounded-sm underline-offset-4 outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/50',
       )}
     >
+      <Logo />
       {t('appName')}
       <span className="sr-only">{`, ${tHeader('resetView')}`}</span>
     </ResetViewLink>
@@ -44,7 +53,7 @@ function AppName({ live = false }: { live?: boolean }) {
 }
 
 /**
- * Desktop: name · path · period · mode · alerts · language · theme in one row.
+ * Desktop: name · path · period · mode · alerts · currency · language · theme in one row.
  * Phone: name and ⚙︎ on the first row, the path below, then period and
  * mode full width.
  */
@@ -77,6 +86,7 @@ export function DashboardHeader() {
         <Suspense fallback={<Skeleton aria-hidden className="size-11" />}>
           <AlertsButton />
         </Suspense>
+        <CurrencySwitch />
         <Suspense>
           <LocaleSwitch />
         </Suspense>
@@ -115,6 +125,7 @@ export function DashboardHeaderSkeleton() {
       </div>
       <div className="flex items-center gap-1 max-lg:hidden">
         <Skeleton className="size-11" />
+        <Skeleton className="h-8 min-w-16" />
         <Skeleton className="size-9" />
         <Skeleton className="size-9" />
       </div>

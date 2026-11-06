@@ -41,13 +41,17 @@ const LABELS: MarketsSheetLabels = {
   ],
 };
 
-async function book(selected: string[] = [], range: '1m' | '3m' = '3m') {
+async function book(
+  selected: string[] = [],
+  range: '1m' | '3m' = '3m',
+  currency: 'USD' | 'EUR' | 'GBP' = 'USD',
+) {
   const view = marketsTable(ds, {}, '2026-05', range, selected, {
     column: 'growth',
     dir: 'asc',
   });
   const months = marketsMonthly(ds, view, {}, '2026-05', range);
-  const blob = await marketsXlsx(view, months, LABELS);
+  const blob = await marketsXlsx(view, months, LABELS, currency);
   const wb = new ExcelJS.Workbook();
   await wb.xlsx.load(await blob.arrayBuffer());
   return wb;
@@ -195,6 +199,17 @@ describe('marketsXlsx', () => {
       text: 'https://example.test/dashboard?mode=analyst',
       hyperlink: 'https://example.test/dashboard?mode=analyst',
     });
+  });
+
+  it('amounts carry the chosen currency’s symbol; percentages and units do not', async () => {
+    const wb = await book(['de'], '3m', 'GBP');
+    const markets = sheetOf(wb, 'Markets');
+    expect(markets.getCell('D4').numFmt).toBe('"£"#,##0');
+    expect(markets.getCell('F4').numFmt).toBe('+"£"#,##0;-"£"#,##0;"£"0');
+    expect(markets.getCell('G4').numFmt).toBe('0.0%');
+    expect(markets.getCell('K4').numFmt).toBe('#,##0');
+    expect(sheetOf(wb, 'By month').getCell('E4').numFmt).toBe('"£"#,##0');
+    expect(sheetOf(await book(['de']), 'Markets').getCell('D4').numFmt).toBe('"$"#,##0');
   });
 
   it('is named like the CSV', () => {

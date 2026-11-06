@@ -39,7 +39,7 @@ describe('RevenueTrend', () => {
     setup('?period=2026-03');
     expect(
       await screen.findByText(
-        /^Revenue for Portfolio, Jun 2024 to May 2026\. Mar 2026: actual US\$21\.2m, forecast US\$21\.1m, prior year US\$20\.4m\.$/,
+        /^Revenue for Portfolio, Jun 2024 to May 2026\. Mar 2026: actual \$21\.2m, forecast \$21\.1m, prior year \$20\.4m\.$/,
       ),
     ).toBeInTheDocument();
   });

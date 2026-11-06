@@ -2,7 +2,7 @@ import { QueryClient } from '@tanstack/react-query';
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { Suspense } from 'react';
 import { renderToString } from 'react-dom/server';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import raw from '@/data/data.json';
 import { datasetSchema } from '@/shared/api';
@@ -376,8 +376,33 @@ describe('MarketStatus map', () => {
     const items = within(legend)
       .getAllByRole('listitem')
       .map((li) => li.textContent);
-    expect(items[0]).toMatch(/^below US\$1m\d+$/);
-    expect(items[1]).toMatch(/^US\$1m – US\$1\.5m\d+$/);
+    expect(items[0]).toMatch(/^below \$1m\d+$/);
+    expect(items[1]).toMatch(/^\$1m – \$1\.5m\d+$/);
+  });
+
+  describe('in euros (ADR 0017)', () => {
+    afterEach(() => {
+      localStorage.clear();
+    });
+
+    it('revenue steps stay round in the chosen currency; markets fall by their euro revenue', async () => {
+      setup('?mode=analyst&kpi=revenue');
+      const usd = within(await screen.findByRole('list', { name: t.legend }))
+        .getAllByRole('listitem')
+        .map((li) => li.textContent);
+      // Under $1M in May 2026: Australia, Italy, Mexico, Spain.
+      expect(usd[0]).toBe('below $1m4');
+    });
+
+    it('Brazil (1,115,100 $ = 993,498 €) drops under €1M', async () => {
+      localStorage.setItem('mo:currency', 'EUR');
+      setup('?mode=analyst&kpi=revenue');
+      const items = within(await screen.findByRole('list', { name: t.legend }))
+        .getAllByRole('listitem')
+        .map((li) => li.textContent);
+      expect(items[0]).toBe('below €1m5');
+      expect(items[1]).toMatch(/^€1m – €1\.5m\d+$/);
+    });
   });
 
   it('Open in the tap tooltip brings the page back to its top', async () => {

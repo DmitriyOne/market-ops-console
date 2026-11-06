@@ -20,6 +20,7 @@ export {
   type HeatNotice,
   type HeatRow,
 } from './model/heat-map';
+export { inCurrency } from './model/in-currency';
 export { ISO3_TO_NUMERIC } from './model/iso-numeric';
 export { computeKpis, type KpiName, type Kpis, type KpiSource, type KpiValue } from './model/kpis';
 export {
@@ -88,6 +89,7 @@ export { anomaliesInScope, type ScopedAnomaly, type TrendPoint, trendSeries } fr
 export { type TrendAnomaly, type TrendView, trendView } from './model/trend-view';
 export { useDashboard } from './model/use-dashboard';
 export { type DashboardFocus, useDashboardFocus } from './model/use-dashboard-focus';
+export { useCurrencySelect, useDataset } from './model/use-dataset';
 export { DatasetGate } from './ui/DatasetGate';
 export { toneFill, toneText } from './ui/scale-tone';
 export { StatusChip, StatusIcon, useStatusLabel } from './ui/StatusChip';

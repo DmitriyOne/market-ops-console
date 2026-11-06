@@ -44,6 +44,15 @@
     "de-DE": "Deutsch",
     "ru-RU": "Русский"
   },
+  "currency": {
+    "label": "Währung",
+    "USD": "US-Dollar",
+    "EUR": "Euro",
+    "GBP": "Britisches Pfund",
+    "current": "Währung: {code}, {name}",
+    "rates": "EZB-Kurse vom {date}: 1 USD = {eur} EUR = {gbp} GBP.",
+    "demo": "Für diese Demo fest hinterlegt; eine echte App holt die Kurse über die Backend-API."
+  },
   "assistant": {
     "composer": {
       "label": "Frage zu den Daten",
@@ -82,7 +91,8 @@
       "high": "Hoch",
       "medium": "Mittel",
       "low": "Niedrig",
-      "directional": "Nur als Richtwert verstehen"
+      "directional": "Nur als Richtwert verstehen",
+      "usdNote": "Beträge in dieser Antwort sind in USD, wie in den Daten; das Dashboard zeigt {currency}."
     },
     "stopped": {
       "title": "Gestoppt — Antwort unvollständig.",
@@ -201,7 +211,7 @@
     "changeProduct": "Produkt: {name}. Produkt ändern"
   },
   "header": {
-    "settings": "Einstellungen: Sprache, Design, Ansicht zurücksetzen",
+    "settings": "Einstellungen: Sprache, Währung, Design, Ansicht zurücksetzen",
     "settingsTitle": "Einstellungen",
     "resetView": "Ansicht zurücksetzen",
     "resetHint": "Portfolio, letzter Monat, Management"
@@ -393,7 +403,7 @@
     "legend": "Legende",
     "noteCalculated": "Aus den Monatsreihen berechnet: Werte können um etwa einen Punkt von den gespeicherten KPIs abweichen.",
     "perProduct": "Werte für {product}.",
-    "revenueUnit": "Umsatz in US-Dollar.",
+    "revenueUnit": "Umsatz in {currency, select, EUR {Euro} GBP {Britischen Pfund} other {US-Dollar}}.",
     "anomalyMarket": "Auffälligkeit im ganzen Markt: {note}",
     "anomalies": "Auffälligkeiten",
     "anomalyMark": "Auffälligkeit"
@@ -441,7 +451,7 @@
     "preparing": "Wird erstellt…",
     "title": "Zeilen wie angezeigt",
     "excel": "Excel (.xlsx)",
-    "excelHint": "Formatiert, mit Filtern",
+    "excelHint": "Formatiert, mit Filtern; Beträge in {currency}",
     "csv": "CSV",
     "csvHint": "Rohwerte in USD, für andere Programme",
     "failed": "Datei konnte nicht erstellt werden. Bitte erneut versuchen.",
@@ -457,7 +467,10 @@
     },
     "about": {
       "source": "Quelle",
-      "sourceValue": "data.json, erstellt am {date}; Beträge in USD",
+      "sourceValue": "data.json, erstellt am {date}",
+      "currency": "Währung",
+      "currencyUsd": "{code} ({name}), wie in den Daten",
+      "currencyConverted": "{code} ({name}), aus USD umgerechnet zu 1 USD = {rate} {code}, EZB-Kurs vom {date}. Für diese Demo fest hinterlegt; eine echte App holt die Kurse über die Backend-API.",
       "view": "Ansicht",
       "product": "Produkt",
       "selection": "Ausgewählte Märkte",
@@ -536,8 +549,8 @@
       "operator": "Bedingung",
       "threshold": "Schwelle",
       "unitPercent": "%",
-      "unitRevenue": "Mio. $",
-      "revenueHint": "In Millionen US-Dollar, z. B. 1,5",
+      "unitRevenue": "Mio. {symbol}",
+      "revenueHint": "In Millionen {currency, select, EUR {Euro} GBP {Britische Pfund} other {US-Dollar}}, z. B. 1,5",
       "scope": "Gilt für",
       "scopeKind": {
         "portfolio": "Alle Märkte",

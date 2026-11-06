@@ -44,6 +44,15 @@
     "de-DE": "Deutsch",
     "ru-RU": "Русский"
   },
+  "currency": {
+    "label": "Валюта",
+    "USD": "Доллар США",
+    "EUR": "Евро",
+    "GBP": "Фунт стерлингов",
+    "current": "Валюта: {code}, {name}",
+    "rates": "Курсы ЕЦБ на {date}: 1 USD = {eur} EUR = {gbp} GBP.",
+    "demo": "В демо курсы зафиксированы; в реальном приложении они приходили бы из API бэкенда."
+  },
   "assistant": {
     "composer": {
       "label": "Вопрос по данным",
@@ -82,7 +91,8 @@
       "high": "высокая",
       "medium": "средняя",
       "low": "низкая",
-      "directional": "Считайте ориентиром"
+      "directional": "Считайте ориентиром",
+      "usdNote": "Суммы в этом ответе в USD, как в данных; дашборд показывает {currency}."
     },
     "stopped": {
       "title": "Остановлено — ответ неполный.",
@@ -201,7 +211,7 @@
     "changeProduct": "Продукт: {name}. Сменить продукт"
   },
   "header": {
-    "settings": "Настройки: язык, тема, сброс вида",
+    "settings": "Настройки: язык, валюта, тема, сброс вида",
     "settingsTitle": "Настройки",
     "resetView": "Сбросить вид",
     "resetHint": "Портфель, последний месяц, Руководитель"
@@ -393,7 +403,7 @@
     "legend": "Легенда",
     "noteCalculated": "Рассчитано из помесячных данных: значения могут отличаться от готовых KPI примерно на пункт.",
     "perProduct": "Значения для продукта {product}.",
-    "revenueUnit": "Выручка в долларах США.",
+    "revenueUnit": "Выручка в {currency, select, EUR {евро} GBP {фунтах стерлингов} other {долларах США}}.",
     "anomalyMarket": "аномалия по рынку в целом: {note}",
     "anomalies": "Аномалии",
     "anomalyMark": "аномалия"
@@ -441,7 +451,7 @@
     "preparing": "Готовим…",
     "title": "Строки как на экране",
     "excel": "Excel (.xlsx)",
-    "excelHint": "С форматами и фильтрами",
+    "excelHint": "С форматами и фильтрами; суммы в {currency}",
     "csv": "CSV",
     "csvHint": "Сырые значения в USD, для других программ",
     "failed": "Не удалось создать файл. Попробуйте ещё раз.",
@@ -457,7 +467,10 @@
     },
     "about": {
       "source": "Источник",
-      "sourceValue": "data.json, сформирован {date}; суммы в USD",
+      "sourceValue": "data.json, сформирован {date}",
+      "currency": "Валюта",
+      "currencyUsd": "{code} ({name}), как в данных",
+      "currencyConverted": "{code} ({name}), пересчитано из USD по курсу 1 USD = {rate} {code}, курс ЕЦБ на {date}. В демо курс зафиксирован; в реальном приложении он приходил бы из API бэкенда.",
       "view": "Вид",
       "product": "Продукт",
       "selection": "Выбранные рынки",
@@ -536,8 +549,8 @@
       "operator": "Условие",
       "threshold": "Порог",
       "unitPercent": "%",
-      "unitRevenue": "млн $",
-      "revenueHint": "В миллионах долларов США, например 1,5",
+      "unitRevenue": "млн {symbol}",
+      "revenueHint": "В миллионах {currency, select, EUR {евро} GBP {фунтов стерлингов} other {долларов США}}, например 1,5",
       "scope": "Для каких рынков",
       "scopeKind": {
         "portfolio": "Все рынки",
