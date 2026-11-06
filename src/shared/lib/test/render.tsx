@@ -11,7 +11,7 @@ import { TooltipProvider } from '@/shared/ui';
 
 import { CurrencyFormats } from '../currency';
 
-/** Providers the app gives every page: query client, intl (en-GB) in the stored currency, URL state, tooltips. */
+/** Providers the app gives every page: query client, intl (en-GB) in the URL's currency (`?currency=`), URL state, tooltips. */
 export function TestProviders({
   children,
   searchParams = '',
@@ -26,11 +26,11 @@ export function TestProviders({
   return (
     <QueryClientProvider client={client}>
       <NextIntlClientProvider locale="en-GB" messages={enMessages} formats={formats} timeZone="UTC">
-        <CurrencyFormats>
-          <NuqsTestingAdapter searchParams={searchParams} onUrlUpdate={onUrlUpdate} hasMemory>
+        <NuqsTestingAdapter searchParams={searchParams} onUrlUpdate={onUrlUpdate} hasMemory>
+          <CurrencyFormats>
             <TooltipProvider>{children}</TooltipProvider>
-          </NuqsTestingAdapter>
-        </CurrencyFormats>
+          </CurrencyFormats>
+        </NuqsTestingAdapter>
       </NextIntlClientProvider>
     </QueryClientProvider>
   );

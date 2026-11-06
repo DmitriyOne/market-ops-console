@@ -1,6 +1,6 @@
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import rawData from '@/data/data.json';
 import { inCurrency } from '@/entities/performance';
@@ -27,7 +27,6 @@ const answer = (text: string): ChatMessage => ({
 });
 
 function renderAnswer(text: string, currency?: 'EUR' | 'GBP') {
-  if (currency) localStorage.setItem('mo:currency', currency);
   renderWithProviders(
     <AnswerMessage
       message={answer(text)}
@@ -37,14 +36,11 @@ function renderAnswer(text: string, currency?: 'EUR' | 'GBP') {
       onSource={vi.fn()}
       onHighlight={vi.fn()}
     />,
+    { searchParams: currency ? `?currency=${currency}` : '' },
   );
 }
 
 describe('AnswerMessage in another currency (ADR 0017)', () => {
-  afterEach(() => {
-    localStorage.clear();
-  });
-
   it('says the answer quotes USD when it names dollars and euros are chosen', () => {
     renderAnswer('Germany made $1.7M in May.', 'EUR');
     expect(
@@ -55,7 +51,6 @@ describe('AnswerMessage in another currency (ADR 0017)', () => {
   it('no note in USD, or when the answer quotes no amount', () => {
     renderAnswer('Germany made $1.7M in May.');
     expect(screen.queryByText(/Amounts in this answer/)).toBeNull();
-    localStorage.clear();
     renderAnswer('Germany is off track.', 'GBP');
     expect(screen.queryByText(/Amounts in this answer/)).toBeNull();
   });
