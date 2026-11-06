@@ -40,3 +40,13 @@ test('the alerts API failing: the panel says so, Try again loads the rules', asy
   await expect(sheet.getByRole('region', { name: /^Firing now/ })).toBeVisible();
   await expect(sheet.getByRole('alert')).toHaveCount(0);
 });
+
+test("the contract's path POST /api/chat streams the same answer as /api/v1/chat", async ({
+  request,
+}) => {
+  const contract = await request.post('/api/chat', { data: { question: 'Why did Germany dip?' } });
+  expect(contract.status()).toBe(200);
+  expect(contract.headers()['content-type']).toContain('text/event-stream');
+  const v1 = await request.post('/api/v1/chat', { data: { question: 'Why did Germany dip?' } });
+  expect(await contract.text()).toBe(await v1.text());
+});

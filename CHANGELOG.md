@@ -4,12 +4,16 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 
 ## [0.16.0] - Unreleased
 
+### Added
+- `POST /api/chat`, the path the starter pack's contract names, answers like `/api/v1/chat` (a rewrite; ADR 0012).
+
 ### Changed
 - Region and market names follow the page's language (`Deutschland`, `Германия`; regions `Europa`, `АТР`): the names are in the messages (`places`), generated once from `Intl.DisplayNames` so server and browser agree. Product names are brands and stay. The CSV export keeps the dataset's names, like its USD columns.
 - German and Russian name the forecast one way: Plan / План everywhere (the table said Prognose / Прогноз, the map Zielerreichung).
 - Analyst on wide screens: the map stays in view while Top risks and the radar next to it scroll, so a pick on the map and the radar it changes are seen together.
 
 ### Fixed
+- A hand-typed currency in another case (`?currency=eur`) is written as `EUR`, not dropped to USD; the repair is logged once per link, not once per widget.
 - The radar's axis names (Momentum, Attainment, Выполнение плана) are no longer cut off in a narrow card.
 - Alerts: the example rules are named in the page's language in every language, also after a switch (they carry a preset; an edit from the form makes the name the user's). Before, they kept the language of the first visit, and the first save after a switch could clash with an example's name in another language.
 - Alerts: a save the API refuses (a name already taken) no longer offers a Retry that cannot pass: Edit opens the form again with what was typed and the error on the name. A refused delete offers only Dismiss.

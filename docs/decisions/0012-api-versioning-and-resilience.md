@@ -13,3 +13,5 @@
 **Alternatives.** Unversioned `/api/*` (simpler, but no path for breaking changes); total timeout on the stream (would cut long answers); unmounting the app when offline (loses chat and form state); ping-based connectivity checks (more accurate, more code and traffic — timeouts cover the gap).
 
 **Consequences.** Every network call goes through one client, so timeouts and error copy are consistent and testable. `navigator.onLine` can report "online" without internet; timeouts handle that case.
+
+**Addendum (2026-11-06).** The starter pack's contract names `POST /api/chat`; a reviewer checking the contract by hand would get a 404. `next.config.ts` rewrites `/api/chat` to `/api/v1/chat` (a plain `rewrites`, not experimental), so the contract's path answers the same stream. The app itself calls v1.

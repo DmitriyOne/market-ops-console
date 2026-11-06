@@ -5,6 +5,7 @@ import type { NextConfig } from 'next';
 import createNextIntlPlugin from 'next-intl/plugin';
 import { z } from 'zod';
 
+import { API_ROUTES, CONTRACT_CHAT_ROUTE } from './src/shared/config/api-routes';
 import { env } from './src/shared/config/env';
 
 const withNextIntl = createNextIntlPlugin('./src/shared/config/i18n/request.ts');
@@ -13,7 +14,11 @@ const { name, version } = z
   .object({ name: z.string(), version: z.string() })
   .parse(JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8')));
 
-const nextConfig: NextConfig = {};
+const nextConfig: NextConfig = {
+  // The starter pack's contract names `POST /api/chat` (docs/CONTRACT.md); the
+  // app serves it versioned (ADR 0012). The contract's path answers the same.
+  rewrites: () => Promise.resolve([{ source: CONTRACT_CHAT_ROUTE, destination: API_ROUTES.chat }]),
+};
 
 // Sentry at build time (ADR 0019): every event names the release, browser
 // events go through our own route, and source maps are uploaded (then
