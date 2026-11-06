@@ -31,10 +31,10 @@ export function StatusScreen({ code, appName, skipLabel, title, body, detail, ch
         {skipLabel}
       </a>
       <div className="flex min-h-dvh flex-col bg-background p-4 text-foreground sm:px-8 sm:py-6">
-        <div className="flex items-center gap-2 font-semibold">
+        <header className="flex items-center gap-2 font-semibold">
           <Logo />
           <span>{appName}</span>
-        </div>
+        </header>
         <main
           id="main"
           className="flex flex-1 flex-col items-center justify-center gap-4 py-12 text-center"

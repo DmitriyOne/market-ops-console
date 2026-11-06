@@ -111,7 +111,10 @@ Points the owner wants explained in the README, in his own words:
 
 ## From 0.13.0 (metadata and error pages, 2026-11-06)
 
-- **The 404 and 500 titles are set on the client** (React `<title>`): the server HTML of a 404 has the general title until hydration. Next's metadata cannot be localised in `not-found`. **Accepted** (closed to search engines).
+- **The server HTML of a localised 404 is Next's empty error shell** (`<html id="__next_error__">`, no `lang`, an empty `<body>`, the general title): without JavaScript, or if it fails, the page is blank. Not new: the 0.12.0 build is the same (0.13.0 review). Cause not established; to look at: the dynamic `[...rest]` catch-all, no top-level `app/layout.tsx` / `app/not-found.tsx`. Status 404 is correct. **Open**.
+- **The 404 and 500 titles are set on the client** (React `<title>`, two `<title>` elements, the first wins). Next's metadata cannot be localised in `not-found`. **Accepted**.
+- **`MarketsTable` test "a market the alert rules flag has a bell" failed once** in a full run and passes alone (10/10): flaky under load. **Watch**.
+- **The Inter files are full fonts** (~325 KB each, only the preview image uses them). Subsetting to Latin + Cyrillic is optional. **Accepted**.
 - **A path outside the app's routing** (`/x.txt`, `/api/unknown`) gets Next's own English 404: the localised one needs `global-not-found`, an experimental flag (owner: none in production). **Accepted**.
 - **The preview image's URL is `localhost`** until 0.14.0 sets `NEXT_PUBLIC_SITE_URL` or Vercel provides its domain. **0.14.0**.
 

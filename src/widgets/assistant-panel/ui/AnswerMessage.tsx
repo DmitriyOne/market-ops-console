@@ -57,6 +57,7 @@ function Paragraphs({ text, caret }: { text: string; caret?: boolean }) {
 
 function ConfidenceLine({ confidence }: { confidence: Confidence }) {
   const t = useTranslations('assistant.answer');
+  const tCommon = useTranslations('common');
   // Neutral text, bars in the AI accent; only Low adds a warning colour.
   return (
     <p className="flex flex-wrap items-center gap-2 text-sm">
@@ -65,7 +66,9 @@ function ConfidenceLine({ confidence }: { confidence: Confidence }) {
       </span>
       <span className="font-semibold">{t('confidence', { level: t(confidence) })}</span>
       {confidence === 'low' ? (
-        <span className="font-medium text-status-at-risk">· {t('directional')}</span>
+        <span className="font-medium text-status-at-risk">
+          {tCommon('after', { text: t('directional') })}
+        </span>
       ) : null}
     </p>
   );
@@ -238,7 +241,7 @@ export function AnswerMessage({
       text,
       labels.length > 0
         ? t('actions.copySources', {
-            list: format.list(labels, { type: 'unit', style: 'short' }),
+            list: format.list(labels, { type: 'conjunction' }),
           })
         : null,
       confidence ? t('answer.confidence', { level: t(`answer.${confidence}`) }) : null,

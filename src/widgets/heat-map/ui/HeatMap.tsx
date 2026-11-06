@@ -17,7 +17,7 @@ import {
 import { useDrillDown } from '@/features/drill-down';
 import { useMarketSelection } from '@/features/select-markets';
 import { MetricPicker } from '@/features/select-metric';
-import { cn, useCurrency, useStoredFlag } from '@/shared/lib';
+import { cn, useCurrency, useJoinParts, useStoredFlag } from '@/shared/lib';
 import {
   Button,
   Card,
@@ -150,6 +150,8 @@ function Legend({ view }: { view: HeatMapView }) {
 
 function HeatTable({ view, caption }: { view: HeatMapView; caption: string }) {
   const t = useTranslations('heatMap');
+  const tCommon = useTranslations('common');
+  const join = useJoinParts();
   const h = useHeatFormat(view.metric, view.marketNotes);
   const anomalies = view.rows.flatMap((row) =>
     row.cells.flatMap((c) => (c.anomaly ? [{ row, cell: c, note: c.anomaly.note }] : [])),
@@ -181,9 +183,13 @@ function HeatTable({ view, caption }: { view: HeatMapView; caption: string }) {
                 <span className="flex items-center gap-1">
                   {row.selected ? <CircleDotIcon aria-hidden className="size-3.5" /> : null}
                   {row.name}
-                  {row.selected ? <span className="sr-only">{`, ${t('selected')}`}</span> : null}
+                  {row.selected ? (
+                    <span className="sr-only">{tCommon('srAfter', { text: t('selected') })}</span>
+                  ) : null}
                   {row.current ? (
-                    <span className="text-muted-foreground">{`· ${t('current')}`}</span>
+                    <span className="text-muted-foreground">
+                      {tCommon('after', { text: t('current') })}
+                    </span>
                   ) : null}
                 </span>
               </TableHead>
@@ -193,7 +199,9 @@ function HeatTable({ view, caption }: { view: HeatMapView; caption: string }) {
                   {c.anomaly ? (
                     <>
                       <TriangleAlertIcon aria-hidden className="ml-1 inline size-3.5" />
-                      <span className="sr-only">{`, ${t('anomalyMark')}`}</span>
+                      <span className="sr-only">
+                        {tCommon('srAfter', { text: t('anomalyMark') })}
+                      </span>
                     </>
                   ) : null}
                 </TableCell>
@@ -208,7 +216,10 @@ function HeatTable({ view, caption }: { view: HeatMapView; caption: string }) {
           <ul>
             {anomalies.map((a) => (
               <li key={`${a.row.id}:${a.cell.period}`}>
-                {`${a.row.name} · ${h.month(a.cell.period)}: ${h.note(a.note)}`}
+                {join([
+                  a.row.name,
+                  t('anomalyItem', { month: h.month(a.cell.period), note: h.note(a.note) }),
+                ])}
               </li>
             ))}
           </ul>

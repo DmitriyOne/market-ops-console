@@ -21,6 +21,7 @@ function MoverList({
   onSelect: (id: string) => void;
 }) {
   const t = useTranslations('marketStatus');
+  const tCommon = useTranslations('common');
   const f = useKpiFormat();
   const labelId = useId();
   return (
@@ -61,7 +62,9 @@ function MoverList({
                     {f.value(m.growthPct, 'signedPercent')}
                   </span>
                 </span>
-                {m.selected ? <span className="sr-only">{` · ${t('selected')}`}</span> : null}
+                {m.selected ? (
+                  <span className="sr-only">{tCommon('srAfter', { text: t('selected') })}</span>
+                ) : null}
               </button>
             </li>
           );

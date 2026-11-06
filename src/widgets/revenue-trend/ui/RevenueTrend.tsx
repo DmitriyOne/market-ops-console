@@ -42,6 +42,7 @@ const CARD = 'gap-3 border border-border ring-0';
 export function RevenueTrend() {
   const t = useTranslations('trend');
   const tDrill = useTranslations('drill');
+  const tCommon = useTranslations('common');
   const scopeLabel = useScopeLabel();
   const format = useFormatter();
   const titleId = useId();
@@ -139,10 +140,16 @@ export function RevenueTrend() {
                     <TableCell>
                       {period(p.period)}
                       {windowSet.has(p.period) ? (
-                        <span className="text-muted-foreground"> · {t('window')}</span>
+                        <span className="text-muted-foreground">
+                          {' '}
+                          {tCommon('after', { text: t('window') })}
+                        </span>
                       ) : null}
                       {anomalyAt.has(p.period) ? (
-                        <span className="text-status-off-track"> · {t('anomalyMark')}</span>
+                        <span className="text-status-off-track">
+                          {' '}
+                          {tCommon('after', { text: t('anomalyMark') })}
+                        </span>
                       ) : null}
                     </TableCell>
                     {KEYS.map((key) => (

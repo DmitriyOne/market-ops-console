@@ -68,7 +68,7 @@ app/                 Next.js routing only (page.tsx re-exports from src/pages)
 pages/               empty on purpose (see pages/README.md)
 src/
   app/               providers, global styles, design tokens
-  pages/             page composition, no logic (dashboard, not-found, route-error, global-error)
+  pages/             page composition, no logic (dashboard, not-found, route-error)
   widgets/           screen blocks: app-shell, assistant-panel, dashboard-header, alerts-panel (what fires now + the rules), kpi-strip, market-status (tiles, table and map), markets-table, heat-map, comparison-radar, top-risks, top-movers, revenue-trend
   features/          user actions: ask-question (chat stream, composer, history), drill-down, reset-view, select-period, select-metric, select-markets, export-markets, switch-mode, switch-section, switch-locale, switch-currency, switch-theme, network-status, configure-alerts (rule form, list, optimistic saves)
   entities/          alert-rule (rules query and requests, which markets a rule flags, the bell), performance (dataset, dashboard URL state, KPI and status selectors, map scales and the map selector, the markets table, heat map and radar selectors, citations, status chip)

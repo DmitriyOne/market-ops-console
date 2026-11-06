@@ -17,8 +17,10 @@ test('the icons and the preview image are served', async ({ request }) => {
     ['/icon.svg', 'image/svg+xml'],
     ['/apple-icon.png', 'image/png'],
     ['/de-DE/opengraph-image/preview', 'image/png'],
+    // The default locale too, with no redirect to a prefix-less address.
+    ['/en-GB/opengraph-image/preview', 'image/png'],
   ] as const) {
-    const res = await request.get(path);
+    const res = await request.get(path, { maxRedirects: 0 });
     expect(res.ok(), path).toBe(true);
     expect(res.headers()['content-type'], path).toContain(type);
   }
@@ -39,6 +41,27 @@ test('the dashboard has its title, description and preview in the page language'
     'content',
     /\/de-DE\/opengraph-image\/preview/,
   );
+});
+
+test.describe('in the default locale', () => {
+  // The browser asks for en-GB, so `/dashboard` stays the prefix-less default.
+  test.use({ locale: 'en-GB' });
+
+  test('the page points to its own preview image, served without a redirect', async ({
+    page,
+    request,
+  }) => {
+    await page.goto('/dashboard');
+    const image = page.locator('meta[property="og:image"]');
+    await expect(image).toHaveAttribute('content', /\/en-GB\/opengraph-image\/preview/);
+    await expect(page.locator('meta[property="og:image:alt"]')).toHaveAttribute(
+      'content',
+      /^Market Ops Console\. Sales performance/,
+    );
+    const url = new URL((await image.getAttribute('content')) ?? '');
+    const res = await request.get(url.pathname + url.search, { maxRedirects: 0 });
+    expect(res.status()).toBe(200);
+  });
 });
 
 test('an unknown address shows the 404 in the page language', async ({

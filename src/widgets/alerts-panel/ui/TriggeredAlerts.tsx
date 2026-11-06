@@ -25,6 +25,7 @@ import { Button } from '@/shared/ui';
  */
 export function TriggeredAlerts({ headingRef }: { headingRef?: Ref<HTMLHeadingElement> }) {
   const t = useTranslations('alerts');
+  const tCommon = useTranslations('common');
   const titleId = useId();
   const { ds } = useDashboard();
   const { period } = useKpiFormat();
@@ -65,7 +66,9 @@ export function TriggeredAlerts({ headingRef }: { headingRef?: Ref<HTMLHeadingEl
                   <p className="flex items-center gap-1.5 font-semibold">
                     <AlertMark flag={flag} labelled={false} />
                     {market.name}
-                    <span className="sr-only">{`, ${t(`severity.${flag.severity}`)}`}</span>
+                    <span className="sr-only">
+                      {tCommon('srAfter', { text: t(`severity.${flag.severity}`) })}
+                    </span>
                   </p>
                   {flag.rules.map((rule) => (
                     <p key={rule.id} className="text-xs text-muted-foreground">

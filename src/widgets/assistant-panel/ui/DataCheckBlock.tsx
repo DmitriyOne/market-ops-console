@@ -41,7 +41,8 @@ function LineRow({ line }: { line: Line }) {
   const t = useTranslations('dataCheck');
   const f = useKpiFormat();
   let status: ReactNode;
-  if (line.status === 'none') status = <span className="text-muted-foreground">—</span>;
+  if (line.status === 'none')
+    status = <span className="text-muted-foreground">{t('noStatus')}</span>;
   else if (line.status === 'latestOnly')
     status = <span className="text-muted-foreground">{t('latestOnly')}</span>;
   else status = <StatusChip status={line.status} />;

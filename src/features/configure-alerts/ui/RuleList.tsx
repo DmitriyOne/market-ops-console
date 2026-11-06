@@ -48,6 +48,7 @@ export function RuleList({
   onDismiss,
 }: RuleListProps) {
   const t = useTranslations('alerts');
+  const tCommon = useTranslations('common');
   const text = useRuleText(ds);
   const root = useRef<HTMLDivElement>(null);
   // A ref, not state: Retry and Dismiss change the list, which renders anyway.
@@ -136,7 +137,7 @@ export function RuleList({
                         labelled={false}
                       />
                       {t(`severity.${rule.severity}`)}
-                      <span aria-hidden>·</span>
+                      <span aria-hidden>{tCommon('separatorMark')}</span>
                       {rule.enabled ? t('list.flagsNow', { count: flagged }) : t('list.off')}
                     </p>
                   </div>

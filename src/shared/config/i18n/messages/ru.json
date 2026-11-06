@@ -5,7 +5,10 @@
     "description": "Продажи по рынкам, продуктам и периодам и ИИ-ассистент, который показывает источники.",
     "close": "Закрыть",
     "titleTemplate": "{page} · {appName}",
-    "separator": " · "
+    "separator": " · ",
+    "after": "· {text}",
+    "srAfter": ", {text}",
+    "separatorMark": "·"
   },
   "meta": {
     "dashboard": "Панель",
@@ -415,7 +418,9 @@
     "anomalyMarket": "аномалия по рынку в целом: {note}",
     "anomalies": "Аномалии",
     "anomalyMark": "аномалия",
-    "readout": "{metric} {value}"
+    "readout": "{metric} {value}",
+    "anomalyItem": "{month}: {note}",
+    "cellWithNote": "{value}, {note}"
   },
   "radar": {
     "title": "Сравнение",
@@ -584,7 +589,8 @@
         "regionRequired": "Выберите регион.",
         "marketsRequired": "Выберите хотя бы один рынок."
       },
-      "back": "Назад"
+      "back": "Назад",
+      "thresholdWithUnit": "Порог, {unit}"
     },
     "preview": {
       "label": "Предпросмотр",

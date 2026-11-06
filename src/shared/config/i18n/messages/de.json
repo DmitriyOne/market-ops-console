@@ -5,7 +5,10 @@
     "description": "Vertriebsleistung nach Markt, Produkt und Zeitraum, mit einem KI-Assistenten, der seine Quellen zeigt.",
     "close": "Schließen",
     "titleTemplate": "{page} · {appName}",
-    "separator": " · "
+    "separator": " · ",
+    "after": "· {text}",
+    "srAfter": ", {text}",
+    "separatorMark": "·"
   },
   "meta": {
     "dashboard": "Dashboard",
@@ -415,7 +418,9 @@
     "anomalyMarket": "Auffälligkeit im ganzen Markt: {note}",
     "anomalies": "Auffälligkeiten",
     "anomalyMark": "Auffälligkeit",
-    "readout": "{metric} {value}"
+    "readout": "{metric} {value}",
+    "anomalyItem": "{month}: {note}",
+    "cellWithNote": "{value}, {note}"
   },
   "radar": {
     "title": "Vergleich",
@@ -584,7 +589,8 @@
         "regionRequired": "Wählen Sie eine Region.",
         "marketsRequired": "Wählen Sie mindestens einen Markt."
       },
-      "back": "Zurück"
+      "back": "Zurück",
+      "thresholdWithUnit": "Schwelle, {unit}"
     },
     "preview": {
       "label": "Vorschau",

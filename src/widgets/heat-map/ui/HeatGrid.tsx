@@ -50,6 +50,7 @@ const clamp = (n: number, max: number) => Math.min(Math.max(n, 0), max);
  */
 export function HeatGrid({ view, period, label, onOpen, onToggle }: Props) {
   const t = useTranslations('heatMap');
+  const tCommon = useTranslations('common');
   const h = useHeatFormat(view.metric, view.marketNotes);
   const { rows, periods } = view;
   const lastCol = periods.length - 1;
@@ -215,7 +216,9 @@ export function HeatGrid({ view, period, label, onOpen, onToggle }: Props) {
                         as it is the only place a cell's month is said. */}
                     <span aria-hidden>{h.monthShort(p)}</span>
                     <span className="sr-only">{h.month(p)}</span>
-                    {inWindow ? <span className="sr-only">{`, ${t('inWindow')}`}</span> : null}
+                    {inWindow ? (
+                      <span className="sr-only">{tCommon('srAfter', { text: t('inWindow') })}</span>
+                    ) : null}
                   </th>
                 );
               })}
@@ -278,6 +281,7 @@ export function HeatGrid({ view, period, label, onOpen, onToggle }: Props) {
 
 function RowHeader({ row }: { row: HeatRow }) {
   const t = useTranslations('heatMap');
+  const tCommon = useTranslations('common');
   return (
     <th
       scope="row"
@@ -289,8 +293,12 @@ function RowHeader({ row }: { row: HeatRow }) {
       <span className="flex items-center gap-1">
         {row.selected ? <CircleDotIcon aria-hidden className="size-3.5 shrink-0" /> : null}
         {row.name}
-        {row.selected ? <span className="sr-only">{`, ${t('selected')}`}</span> : null}
-        {row.current ? <span className="text-muted-foreground">{`· ${t('current')}`}</span> : null}
+        {row.selected ? (
+          <span className="sr-only">{tCommon('srAfter', { text: t('selected') })}</span>
+        ) : null}
+        {row.current ? (
+          <span className="text-muted-foreground">{tCommon('after', { text: t('current') })}</span>
+        ) : null}
       </span>
     </th>
   );
