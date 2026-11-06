@@ -1,5 +1,6 @@
 import { QueryClient } from '@tanstack/react-query';
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
+import { http, HttpResponse } from 'msw';
 import { Suspense } from 'react';
 import { renderToString } from 'react-dom/server';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -32,6 +33,35 @@ describe('MarketStatus', () => {
   beforeEach(() => {
     localStorage.clear();
     server.use(datasetHandler(), ...alertsApi([]).handlers);
+  });
+
+  it('says nothing about alerts until the rules arrive: no "None" that turns into a bell', async () => {
+    const gate: { requested: boolean; open: () => void } = {
+      requested: false,
+      open: () => undefined,
+    };
+    server.use(
+      http.get('*/api/v1/alerts', async () => {
+        gate.requested = true;
+        await new Promise<void>((resolve) => {
+          gate.open = resolve;
+        });
+        return HttpResponse.json({ rules: [] });
+      }),
+    );
+    const { user } = setup();
+    await user.click(await screen.findByRole('radio', { name: 'Table' }));
+    const table = screen.getByRole('table');
+    await waitFor(() => {
+      expect(gate.requested).toBe(true);
+    });
+    expect(table).toHaveAttribute('aria-busy', 'true');
+    expect(within(table).queryByText(t.noAlerts)).not.toBeInTheDocument();
+    gate.open();
+    await waitFor(() => {
+      expect(table).not.toHaveAttribute('aria-busy');
+    });
+    expect(within(table).getAllByText(t.noAlerts).length).toBeGreaterThan(0);
   });
 
   it('the map table has an Alerts column naming the rules that flag each market', async () => {

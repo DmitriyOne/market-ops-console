@@ -632,5 +632,56 @@
       "dismiss": "Dismiss",
       "dismissRule": "Dismiss: {name}"
     }
+  },
+  "sentryTest": {
+    "meta": "Sentry test",
+    "title": "Sentry test page",
+    "intro": "Each button sends one kind of error or signal to Sentry. The page exists only where ENABLE_SENTRY_TEST_PAGE is set; everywhere else it is a 404.",
+    "off": "Sentry is off here: NEXT_PUBLIC_SENTRY_DSN is not set. The buttons still fail, but nothing is sent.",
+    "sent": "Done: {label}. Look in Sentry under {place}.",
+    "apiResult": "The test API answered {status}. Look in Sentry under Issues.",
+    "sending": "Sending…",
+    "items": {
+      "clientError": {
+        "label": "Client error",
+        "hint": "Throws in a click handler; the SDK catches it.",
+        "place": "Issues"
+      },
+      "renderError": {
+        "label": "Render error",
+        "hint": "A component throws while rendering; the error screen logs it.",
+        "place": "Issues"
+      },
+      "handled": {
+        "label": "Handled error",
+        "hint": "Logged through logError; the page stays as it is.",
+        "place": "Issues"
+      },
+      "rejection": {
+        "label": "Unhandled rejection",
+        "hint": "A promise rejects and nothing catches it.",
+        "place": "Issues"
+      },
+      "warning": {
+        "label": "Warning",
+        "hint": "logWarning: a message at level warning.",
+        "place": "Issues"
+      },
+      "apiError": {
+        "label": "API error",
+        "hint": "The test API throws on the server and answers 500.",
+        "place": "Issues"
+      },
+      "serverError": {
+        "label": "Server render error",
+        "hint": "Opens a page whose Server Component throws.",
+        "place": "Issues"
+      },
+      "trace": {
+        "label": "Trace",
+        "hint": "A 300 ms span through traceSpan.",
+        "place": "Traces"
+      }
+    }
   }
 }

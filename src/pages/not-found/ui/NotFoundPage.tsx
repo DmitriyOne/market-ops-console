@@ -2,14 +2,20 @@
 
 import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { useEffect } from 'react';
 
 import { Link } from '@/shared/config';
+import { logEvent } from '@/shared/lib';
 import { Button, StatusScreen } from '@/shared/ui';
 
 /** The 404 inside a locale: `notFound()` and unknown paths (the `[...rest]` route). */
 export function NotFoundPage() {
   const t = useTranslations();
   const path = usePathname() ?? '';
+  // A breadcrumb, not an issue: a mistyped or old address is normal (ADR 0019).
+  useEffect(() => {
+    logEvent('not_found', { path });
+  }, [path]);
   const appName = t('common.appName');
   const title = t('notFound.title');
   return (

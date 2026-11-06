@@ -33,7 +33,7 @@ The brief (`.docx`) is kept outside the repo on purpose. Its "What your build mu
 | Component/integration tests + one E2E happy path | §12 |
 | Deployed link, README sections a–k, screenshots | outside this spec |
 
-Owner additions beyond the brief: four locales with translated UI, dark mode, phone tab bar, cookie-backed alert API.
+Owner additions beyond the brief: four locales with translated UI, dark mode, phone tab bar, cookie-backed alert API, currency picker (0.12.0), error monitoring with Sentry (0.14.0, ADR 0019).
 
 ## 1. Intent
 
@@ -108,6 +108,7 @@ Verified by script on 2026-11-03.
 | `/api/v1/data` | serves validated `data.json` [call] |
 | `/api/v1/alerts` | mock alert rules API (cookie-backed) |
 | `not-found`, `error`, `global-error` | localised 404 and error pages (see §11a) |
+| `/[locale]/sentry-test`, `/api/v1/sentry-test` | Sentry test page and its API, a 404 unless `ENABLE_SENTRY_TEST_PAGE` is set (local only; ADR 0019) **[owner, 2026-11-06]** |
 
 Locale prefix `as-needed`: `/dashboard` is `en-GB`; `/de-DE/dashboard`, `/en-US/dashboard`, `/ru-RU/dashboard` (ADR 0010).
 
@@ -206,7 +207,7 @@ Four suggested questions (buttons) taken from the brief: risks this quarter, Ger
 
 ### States
 
-- Skeletons while loading; widgets that depend on URL state render inside `Suspense` with a skeleton (static HTML has no search params; ADR 0010). An Analyst link marks `<html>` before the first paint (`data-mode`, ADR 0015), so the static skeletons already hold the markets table, the map card's Analyst controls, the radar and the heat map (0.8.0) and the page does not grow on load (0.7.0 **[owner, 2026-11-04]**).
+- Skeletons while loading; widgets that depend on URL state render inside `Suspense` with a skeleton (static HTML has no search params; ADR 0010). An Analyst link marks `<html>` before the first paint (`data-mode`, ADR 0015), so the static skeletons already hold the markets table, the map card's Analyst controls, the radar and the heat map (0.8.0) and the page does not grow on load (0.7.0 **[owner, 2026-11-04]**). What depends on the alert rules (loaded after the page) waits for them without moving: the status table's Alerts column keeps a set width with a placeholder instead of "None", Top risks shows its skeleton (its order and bells depend on the rules), the Analyst table keeps the bell's place (0.14.0 **[owner, 2026-11-06]**).
 - Popups (menus, popovers, tooltips) opened in the dashboard stay within its scroll area and hide when their trigger scrolls under the header (0.7.0).
 - Each widget has its own error boundary with Retry naming the widget; one failing widget does not break the page. A failed dataset (every widget would fail together) is one page message with one Retry (0.5.0).
 - Empty states (e.g. no markets match filter) with a reset action.
@@ -220,14 +221,14 @@ Four suggested questions (buttons) taken from the brief: risks this quarter, Ger
 - Rules judge **the latest month** (stored `markets[].kpis`, spec §5), whatever month the dashboard shows; market level only (a product does not change them).
 - Live preview: "Would flag N markets now (May 2026): …", or why there is none.
 - First visit (no cookie): two example rules, "Attainment below 95%" (critical) and "Share below 10%" (warning), named in the page's language; stored on the first write.
-- Save: `/api/v1/alerts` (GET/POST/PATCH ?id/DELETE ?id) keeps the list in one deflated httpOnly cookie (Vercel has no shared memory between requests). ~1200 ms latency (`MOCK_ALERTS_DELAY_MS`, so "Saving…" can be seen) **[owner, 2026-11-05]**. Writes must be same-origin and JSON; errors `400 invalid_request`, `403 forbidden`, `404 not_found`, `409 duplicate_name` / `too_many`, mapped to messages.
+- Save: `/api/v1/alerts` (GET/POST/PATCH ?id/DELETE ?id) keeps the list in one deflated httpOnly cookie (Vercel has no shared memory between requests). ~1200 ms latency on writes (`MOCK_ALERTS_DELAY_MS`, so "Saving…" can be seen) **[owner, 2026-11-05]**; reads answer at once, and widgets show a placeholder, not "None", until the rules arrive (0.14.0, owner: no layout shift). Writes must be same-origin and JSON; errors `400 invalid_request`, `403 forbidden`, `404 not_found`, `409 duplicate_name` / `too_many`, mapped to messages.
 - Optimistic update via TanStack Query (not Server Actions + `useOptimistic`, ADR 0016): a new rule appears at once with a spinner and "Saving…" (the row dimmed, `aria-busy`), a toggle or an edit changes at once, a delete (after a confirmation) goes at once; on failure exactly that write is undone (a write made meanwhile stays) and a toast says "Couldn't save — restored previous state" with the reason and Retry; the same Retry (and Dismiss) shows in the rule's row, where the keyboard can reach it inside the modal sheet; the two Retry buttons are one action and the row's close the toast **[owner, 2026-11-05, 0.11.0]**. When the server confirms a new or edited rule, a toast says how many markets it flags now, with "Show" (focus to the firing list) **[owner, 2026-11-05]**. A "Fail the next save (demo)" switch makes the next write answer 503 once. Writes reach the server one at a time (the mock keeps the whole list in one cookie) and name the page's locale, so the first write keeps the examples in its language **[agent review, 2026-11-05]**.
 - Effects: flagged markets get a bell (ringing = critical) with the rule names as text in Top risks (on-track markets added), the markets table and the map's tooltip and table view (no icon drawn on the map); the header and the Alerts tab count them. Not on the tiles or the heat map **[owner, 2026-11-05]**.
 
 ## 10. Data loading and state [call]
 
 - Dataset: `/api/v1/data` returns `data.json` validated by zod; fetched with TanStack Query; prefetched in the server component at build time and hydrated, so static HTML already contains the data. `staleTime: Infinity` (static data).
-- Alert rules: TanStack Query against `/api/v1/alerts` (`entities/alert-rule`, never suspends: a failed list hides only the bells); writes in `features/configure-alerts`.
+- Alert rules: TanStack Query against `/api/v1/alerts` (`entities/alert-rule`, never suspends: while it loads `useAlertFlags` says `pending` and widgets show placeholders; a failed list hides only the bells); writes in `features/configure-alerts`.
 - Selectors (pure functions in `entities/*/model`) compute every aggregate from the validated dataset; no component computes KPIs inline.
 - Market ↔ map join: `iso3 → numeric ISO` table in `entities/performance` (`ISO3_TO_NUMERIC`).
 
@@ -247,6 +248,8 @@ Four suggested questions (buttons) taken from the brief: risks this quarter, Ger
 - `/api/v1/chat` (stream): 10 s to the first event, then 15 s maximum gap between events (idle timeout); no total limit, so long answers are not cut. A timed-out stream ends in the error state with Retry; partial text is kept and labelled incomplete.
 - TanStack Query: queries retry once on network/timeout errors, never on 4xx or parse errors; mutations never retry (rollback instead).
 
+**Error monitoring** (0.14.0, owner, ADR 0019). Every error the app logs goes to Sentry through `logError` / `logWarning` / `logEvent`; expected failures stay breadcrumbs; no IP, cookies, headers, bodies or question text; events go through our own `/monitoring` path. Every `console.log` / `warn` / `error` line goes to Sentry Logs (owner), so nothing personal is printed.
+
 **Offline guard.** `features/network-status`: `navigator.onLine` + `online`/`offline` events via `useSyncExternalStore`. When offline, a full-screen guard ("You're offline — we'll reconnect automatically", Retry button) covers the app; the app stays mounted underneath so chat history, form drafts and URL state survive [call: overlay, not unmount]. It disappears on the `online` event. Caveat noted in README: `navigator.onLine` only reports the network interface, so a request can still fail while "online"; that case is handled by the timeouts/errors above.
 
 **Error and status pages** (all localised, same visual system):
@@ -265,6 +268,7 @@ Unit: SSE parsing, schemas, selectors, formatters, chat reducer, discrepancy rul
 - `world-atlas` (`countries-110m.json`, served locally, no CDN) for map shapes; `topojson-client` comes with `react-simple-maps`.
 - `exceljs` (0.7.0) for the Excel export of the markets table, loaded only when a file is made (its own ~256 KB gzip chunk, not in the first load) **[owner, 2026-11-04]**.
 - `sonner` (shadcn toast) for the rollback message, answer-feedback thanks and a failed copy **[2026-11-04]**.
+- `@sentry/nextjs` (0.14.0) for error monitoring, traces and logs (every console line), off without a DSN, no personal data (ADR 0019) **[owner, 2026-11-06]**.
 
 ## 14. Cut line if time runs short **[owner]**
 

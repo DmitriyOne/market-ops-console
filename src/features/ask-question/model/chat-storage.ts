@@ -6,6 +6,7 @@ import {
   confidenceSchema,
   type ErrorMessageKey,
 } from '@/shared/api';
+import { logWarning } from '@/shared/lib';
 
 import type { ChatMessage } from './chat-reducer';
 
@@ -48,11 +49,28 @@ export function loadChat(): ChatMessage[] {
   try {
     const raw = sessionStorage.getItem(CHAT_STORAGE_KEY);
     if (raw === null) return [];
-    const parsed = storedSchema.safeParse(JSON.parse(raw));
+    const parsed = storedSchema.safeParse(parseStored(raw));
+    if (!parsed.success) {
+      // A format change after a deploy would wipe every open conversation: say
+      // so once, and drop the value so the next load does not say it again (ADR 0019).
+      sessionStorage.removeItem(CHAT_STORAGE_KEY);
+      logWarning('chat_dropped', { scope: 'chat' });
+      return [];
+    }
     // Nothing streams after a reload; an edited or future "streaming" would lock the composer.
-    return parsed.success ? parsed.data.messages.map(asSettled) : [];
+    return parsed.data.messages.map(asSettled);
   } catch {
+    // Storage blocked (a private window, site data off): expected, nothing to report.
     return [];
+  }
+}
+
+// Not JSON fails the schema too.
+function parseStored(raw: string): unknown {
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return undefined;
   }
 }
 
@@ -61,7 +79,11 @@ export function saveChat(messages: ChatMessage[]): void {
   try {
     const kept = messages.slice(-MAX_STORED_MESSAGES).map(asSettled);
     sessionStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify({ v: 1, messages: kept }));
-  } catch {
-    // Blocked or full storage: the chat still works, it just won't survive a reload.
+  } catch (error) {
+    // The chat still works, it just won't survive a reload. Blocked storage is
+    // the user's setting; a full one is worth knowing (ADR 0019).
+    if (error instanceof DOMException && error.name === 'QuotaExceededError') {
+      logWarning('chat_not_saved', { scope: 'chat', messages: messages.length });
+    }
   }
 }

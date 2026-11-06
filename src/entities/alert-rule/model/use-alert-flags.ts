@@ -25,10 +25,17 @@ export function useAlertRules() {
   return useQuery({ ...alertsQueryOptions(useLocale()), select });
 }
 
-/** What the rules flag now in `ds` (the chosen currency); nothing until they load or when they fail. */
-export function useAlertFlags(ds: Dataset): AlertFlags {
-  const { data } = useAlertRules();
-  return useMemo(() => (data ? evaluateRules(ds, data) : NO_FLAGS), [ds, data]);
+/**
+ * What the rules flag now in `ds` (the chosen currency); nothing when they
+ * fail. `pending` until the first answer: a widget shows a placeholder then,
+ * not a "None" that turns into a bell a moment later (layout shift).
+ */
+export function useAlertFlags(ds: Dataset): AlertFlags & { pending: boolean } {
+  const { data, isPending } = useAlertRules();
+  return useMemo(
+    () => ({ ...(data ? evaluateRules(ds, data) : NO_FLAGS), pending: isPending }),
+    [ds, data, isPending],
+  );
 }
 
 export type { AlertRule };

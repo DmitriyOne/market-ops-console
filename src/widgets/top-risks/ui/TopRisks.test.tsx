@@ -1,4 +1,5 @@
 import { screen, waitFor, within } from '@testing-library/react';
+import { http, HttpResponse } from 'msw';
 import { Suspense } from 'react';
 import { beforeEach, describe, expect, it } from 'vitest';
 
@@ -17,6 +18,24 @@ function setup(searchParams = '') {
     </Suspense>,
     { searchParams },
   );
+}
+
+/** Holds the rules request until the test opens it. */
+function heldRules() {
+  const gate: { requested: boolean; open: () => void } = {
+    requested: false,
+    open: () => undefined,
+  };
+  server.use(
+    http.get('*/api/v1/alerts', async () => {
+      gate.requested = true;
+      await new Promise<void>((resolve) => {
+        gate.open = resolve;
+      });
+      return HttpResponse.json({ rules: [] });
+    }),
+  );
+  return gate;
 }
 
 describe('TopRisks', () => {
@@ -107,5 +126,16 @@ describe('TopRisks', () => {
   it('a product has no status of its own', async () => {
     setup('?region=eu&market=de&product=veltrix');
     expect(await screen.findByText(en.kpi.perProduct)).toBeInTheDocument();
+  });
+
+  it('waits for the alert rules before drawing the list (its order and bells depend on them)', async () => {
+    const gate = heldRules();
+    setup();
+    await waitFor(() => {
+      expect(gate.requested).toBe(true);
+    });
+    expect(screen.queryByRole('region', { name: t.title })).not.toBeInTheDocument();
+    gate.open();
+    expect(await screen.findByRole('region', { name: t.title })).toBeInTheDocument();
   });
 });

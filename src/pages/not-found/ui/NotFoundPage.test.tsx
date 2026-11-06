@@ -36,6 +36,13 @@ describe('NotFoundPage', () => {
     expect(document.title).toBe('Page not found · Market Ops Console');
   });
 
+  it('leaves a breadcrumb with the address, not an issue', () => {
+    const info = vi.spyOn(console, 'info').mockImplementation(() => undefined);
+    renderIn('en-GB', en);
+    expect(info).toHaveBeenCalledWith('[event] not_found', { path: '/de-DE/dashbord' });
+    info.mockRestore();
+  });
+
   it('speaks the page language', () => {
     renderIn('de-DE', de);
     expect(screen.getByRole('heading', { level: 1, name: de.notFound.title })).toBeInTheDocument();

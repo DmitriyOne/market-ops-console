@@ -2,6 +2,22 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/). The top version must match `package.json` and the `release/X.Y.Z` branch.
 
+## [0.14.0] - Unreleased
+
+### Added
+- Error monitoring with Sentry (ADR 0019): errors from the browser and the server, 10 % of traces in production, with the screen's language, mode, currency and tab on every event. Off without `NEXT_PUBLIC_SENTRY_DSN`. E2E runs it on with a DSN that points nowhere and checks what the browser would send.
+- No personal data: no IP address, user id, cookies, headers, request bodies or question text; events go through the app's own `/monitoring` path, which forwards only the event body. The browser copy of a server fault the server already reported is not sent twice; the demo save failure and expected answers are breadcrumbs.
+- Warnings when data is lost without an exception (an unreadable alerts cookie, a stored chat that no longer fits, a full storage) and when an answer cites what the dataset lacks; breadcrumbs for a repaired link and a 404; the chat answer (time to the first token and to the end) and the Excel export are timed.
+- Sentry Logs: every `console.log`, `console.warn` and `console.error` line, in the browser and on the server.
+- A Sentry test page (`/sentry-test`, every language) that fires each kind of error. It exists only where `ENABLE_SENTRY_TEST_PAGE` is set (`.env.local`); everywhere else it and its API are a 404.
+- README: what is stored and sent, and what a production launch for UK/EU users needs (a consent banner, a privacy notice, Sentry's DPA, an EU data region).
+
+### Changed
+- Expected failures (a name already taken, a user's 4xx) are breadcrumbs, offline and timeouts warnings, everything else an error: one rule, `reportLevel`.
+- Lint: Sentry is imported only by the logging and monitoring helpers.
+- Sentry's experimental Next.js flag (`clientTraceMetadata`) is removed: nothing experimental in production (ADR 0018).
+- No layout shift when the alert rules arrive: the status table's Alerts column keeps its width and shows a placeholder instead of "None" while they load, Top risks waits for them, and the mock API answers reads at once (writes still wait, to show "Saving…").
+
 ## [0.13.1] - Unreleased
 
 ### Changed
@@ -13,7 +29,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 ### Added
 - A title per page in its language ("Dashboard · Market Ops Console", "Page not found · …"), the description and a link preview (Open Graph, Twitter) in the page language (ADR 0018).
 - Favicon: the M logo, light or dark with the browser's scheme; an iPhone icon and `favicon.ico`.
-- A link preview image, one per language (logo, name, description). It resolves once the site is deployed (0.14.0).
+- A link preview image, one per language (logo, name, description). It resolves once the site is deployed (0.15.0).
 - `robots.txt`: the console stays closed to search engines (no crawling, `noindex` on every page), so there is no sitemap.
 
 ### Changed

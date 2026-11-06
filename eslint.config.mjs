@@ -7,6 +7,44 @@ import playwright from 'eslint-plugin-playwright';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import tseslint from 'typescript-eslint';
 
+// The bare dataset query gives dollars; useDataset() and useDashboard()
+// convert to the chosen currency (ADR 0017).
+const RAW_DATASET = {
+  group: ['@/entities/performance', '**/dataset-query'],
+  importNames: ['datasetQueryOptions'],
+  message:
+    'datasetQueryOptions gives dollars: read the dataset with useDataset() or useDashboard() (ADR 0017).',
+};
+const RAW_DATASET_READERS = [
+  'src/entities/performance/api/dataset-query.ts',
+  'src/entities/performance/index.ts',
+  'src/entities/performance/model/use-dataset.ts',
+  'src/entities/performance/model/use-dashboard.ts',
+  'src/entities/performance/ui/DatasetGate.tsx',
+  'src/features/export-markets/ui/ExportMenu.tsx',
+  'app/[[]locale]/dashboard/page.tsx',
+];
+
+// Errors, events, context and spans go through the helpers in shared/lib, so
+// what reaches Sentry is decided in one place (ADR 0019).
+const SENTRY = {
+  group: ['@sentry/*'],
+  message:
+    'Report through logError / logWarning / logEvent, or the monitoring helpers in @/shared/lib (ADR 0019).',
+};
+const SENTRY_CALLERS = [
+  'instrumentation.ts',
+  'instrumentation-client.ts',
+  'sentry.server.config.ts',
+  'sentry.edge.config.ts',
+  'next.config.ts',
+  'app/sentry-tunnel/route.ts',
+  'src/shared/lib/errors/log-error.ts',
+  'src/shared/lib/events/log-event.ts',
+  'src/shared/lib/monitoring/monitoring.ts',
+  'src/shared/config/sentry.ts',
+];
+
 export default defineConfig([
   ...nextVitals,
   ...nextTs,
@@ -100,6 +138,11 @@ export default defineConfig([
       'no-restricted-syntax': [
         'error',
         {
+          // no-restricted-imports does not see a dynamic import.
+          selector: 'ImportExpression[source.value=/^@sentry\\//]',
+          message: SENTRY.message,
+        },
+        {
           selector:
             "CallExpression[callee.property.name='join'] > Literal.arguments[value=/(\\S.*\\s|\\s.*\\S|[^\\x00-\\x7F])/]",
           message:
@@ -151,35 +194,27 @@ export default defineConfig([
       ],
     },
   },
+  // Restricted imports (one rule, so the blocks below set the whole list
+  // each: a later block replaces the rule for its files, it does not add).
   {
-    // The bare dataset query gives dollars; useDataset() and useDashboard()
-    // convert to the chosen currency. Only the files listed below may read it
-    // raw, each for its own reason (ADR 0017).
-    files: ['src/**/*.{ts,tsx}', 'app/**/*.{ts,tsx}'],
-    ignores: [
-      'src/entities/performance/api/dataset-query.ts',
-      'src/entities/performance/index.ts',
-      'src/entities/performance/model/use-dataset.ts',
-      'src/entities/performance/model/use-dashboard.ts',
-      'src/entities/performance/ui/DatasetGate.tsx',
-      'src/features/export-markets/ui/ExportMenu.tsx',
-      'app/[[]locale]/dashboard/page.tsx',
-    ],
-    rules: {
-      'no-restricted-imports': [
-        'error',
-        {
-          patterns: [
-            {
-              group: ['@/entities/performance', '**/dataset-query'],
-              importNames: ['datasetQueryOptions'],
-              message:
-                'datasetQueryOptions gives dollars: read the dataset with useDataset() or useDashboard() (ADR 0017).',
-            },
-          ],
-        },
-      ],
-    },
+    // Root files too (proxy, next.config, the Sentry start-up files).
+    files: ['src/**/*.{ts,tsx}', 'app/**/*.{ts,tsx}', '*.{ts,mts}'],
+    rules: { 'no-restricted-imports': ['error', { patterns: [RAW_DATASET, SENTRY] }] },
+  },
+  {
+    // Tests may mock the Sentry SDK; the dataset rule still applies to them.
+    files: ['**/*.test.{ts,tsx}'],
+    rules: { 'no-restricted-imports': ['error', { patterns: [RAW_DATASET] }] },
+  },
+  {
+    // The files that may read the dataset raw, each for its own reason (ADR 0017).
+    files: RAW_DATASET_READERS,
+    rules: { 'no-restricted-imports': ['error', { patterns: [SENTRY] }] },
+  },
+  {
+    // The files that may talk to Sentry (ADR 0019).
+    files: SENTRY_CALLERS,
+    rules: { 'no-restricted-imports': ['error', { patterns: [RAW_DATASET] }] },
   },
   {
     // End-to-end tests (ADR 0008): Playwright's own rules on top of the above.
