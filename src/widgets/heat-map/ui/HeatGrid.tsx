@@ -40,13 +40,18 @@ type Props = {
 
 const keyOf = (p: Position) => `${p.id}|${String(p.col)}`;
 const clamp = (n: number, max: number) => Math.min(Math.max(n, 0), max);
+/** A mouse is the main pointer (the line's buttons are hidden): a tap opens too, as a click. */
+const mouseFirst = () =>
+  typeof window.matchMedia === 'function' && window.matchMedia('(pointer: fine)').matches;
 
 /**
  * The heat map's grid: one Tab stop (roving tabindex), arrows move, Home /
  * End within a row, Ctrl+Home / Ctrl+End to the corners. Enter opens the
  * market at that month, Shift+Enter or Shift+click selects it. A tap on a
  * touch screen only shows the cell: the line under the grid has Open and
- * Select, as the map's touch tooltip does.
+ * Select, as the map's touch tooltip does. With a mouse a click opens, so the
+ * line only reads the cell out: buttons there would change under the mouse on
+ * its way down to them (owner, 2026-11-06).
  */
 export function HeatGrid({ view, period, label, onOpen, onToggle }: Props) {
   const t = useTranslations('heatMap');
@@ -256,7 +261,7 @@ export function HeatGrid({ view, period, label, onOpen, onToggle }: Props) {
                           setActive(pos);
                           setPinned(pos);
                           if (shift) onToggle(row.id);
-                          else if (!touch) onOpen(row.id, c.period);
+                          else if (!touch || mouseFirst()) onOpen(row.id, c.period);
                         }}
                       />
                     </td>
@@ -401,8 +406,9 @@ function CellDetail({
           </span>
         ) : null}
       </p>
-      {/* Long market names: the buttons wrap, and so do their labels, on a phone. */}
-      <div className="flex min-w-0 flex-wrap gap-2">
+      {/* Long market names: the buttons wrap, and so do their labels, on a phone.
+          Touch only: with a mouse the cell itself opens (Shift+click selects). */}
+      <div className="flex min-w-0 flex-wrap gap-2 pointer-fine:hidden">
         <Button
           type="button"
           variant="outline"

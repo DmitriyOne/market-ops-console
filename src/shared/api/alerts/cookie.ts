@@ -2,6 +2,7 @@ import { deflateRawSync, inflateRawSync } from 'node:zlib';
 
 import { logWarning } from '@/shared/lib';
 
+import { restorePresets } from './examples';
 import { type AlertRule, alertRulesSchema } from './schema';
 
 /** One cookie holds the list (Vercel keeps no memory between requests). */
@@ -36,7 +37,7 @@ export function decodeRules(value: string | undefined): AlertRule[] | null {
       maxOutputLength: MAX_INFLATED_BYTES,
     });
     const parsed = alertRulesSchema.safeParse(JSON.parse(inflated.toString('utf8')));
-    return parsed.success ? parsed.data : unreadable('schema');
+    return parsed.success ? restorePresets(parsed.data) : unreadable('schema');
   } catch {
     // Not deflated base64, too large once inflated, or not JSON: treated as no list, the next write replaces it.
     return unreadable('format');

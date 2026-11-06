@@ -201,6 +201,11 @@
       "3m": "3 months",
       "12m": "12 months"
     },
+    "rangeShort": {
+      "1m": "1 mo",
+      "3m": "3 mo",
+      "12m": "12 mo"
+    },
     "rangeLabel": "Months ending in {period}"
   },
   "mode": {
@@ -627,8 +632,11 @@
       "create": "“{name}” wasn't saved. {reason}",
       "update": "Not saved. {reason}",
       "remove": "Not deleted. {reason}",
+      "removeNamed": "“{name}” wasn't deleted. {reason}",
       "retry": "Retry",
       "retryRule": "Retry: {name}",
+      "fix": "Edit",
+      "fixRule": "Edit: {name}",
       "dismiss": "Dismiss",
       "dismissRule": "Dismiss: {name}"
     }
@@ -688,5 +696,28 @@
     "button": "Share link",
     "copied": "Link copied",
     "failed": "Couldn't copy the link. Copy it from the address bar."
+  },
+  "places": {
+    "regions": {
+      "na": "North America",
+      "eu": "Europe",
+      "apac": "APAC",
+      "latam": "LATAM"
+    },
+    "markets": {
+      "us": "United States",
+      "ca": "Canada",
+      "de": "Germany",
+      "gb": "United Kingdom",
+      "fr": "France",
+      "it": "Italy",
+      "es": "Spain",
+      "jp": "Japan",
+      "cn": "China",
+      "in": "India",
+      "au": "Australia",
+      "br": "Brazil",
+      "mx": "Mexico"
+    }
   }
 }

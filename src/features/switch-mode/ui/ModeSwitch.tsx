@@ -35,7 +35,7 @@ export function ModeSwitch({ className }: { className?: string }) {
         <ToggleGroupItem
           key={m}
           value={m}
-          className="min-h-11 flex-1 px-4 hover:bg-card/60 data-[state=on]:bg-card data-[state=on]:shadow-sm"
+          className="min-h-11 flex-1 px-4 hover:bg-card/60 data-[state=on]:bg-card data-[state=on]:shadow-sm max-sm:px-3 max-sm:text-xs"
         >
           {t(m)}
         </ToggleGroupItem>

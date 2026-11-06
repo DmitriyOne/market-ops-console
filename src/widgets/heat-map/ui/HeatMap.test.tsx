@@ -1,6 +1,6 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import { Suspense } from 'react';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { enMessages as en } from '@/shared/config';
 import { datasetHandler, renderWithProviders, server } from '@/shared/lib/test';
@@ -134,6 +134,49 @@ describe('HeatMap', () => {
     await user.click(screen.getByRole('button', { name: 'Add Spain to selection' }));
     await waitFor(() => {
       expect(query(lastUpdate())).toMatchObject({ markets: 'es' });
+    });
+  });
+
+  describe('a tap', () => {
+    const pointer = (fine: boolean) => {
+      vi.stubGlobal(
+        'matchMedia',
+        vi.fn((q: string) => ({
+          matches: q === '(pointer: fine)' ? fine : false,
+          addEventListener: vi.fn(),
+          removeEventListener: vi.fn(),
+        })),
+      );
+    };
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
+
+    it('on a phone only shows the cell; Open under the grid opens it', async () => {
+      pointer(false);
+      const { user, lastUpdate } = setup();
+      await grid();
+      await user.pointer({ keys: '[TouchA]', target: cell('Germany', 'Mar 26') });
+      expect(screen.getByText(/Germany · Mar 2026/)).toBeInTheDocument();
+      expect(query(lastUpdate())).not.toHaveProperty('market');
+      await user.click(
+        screen.getByRole('button', {
+          name: t.open.replace('{market}', 'Germany').replace('{month}', 'Mar 2026'),
+        }),
+      );
+      await waitFor(() => {
+        expect(query(lastUpdate())).toMatchObject({ market: 'de', period: '2026-03' });
+      });
+    });
+
+    it('where a mouse is the main pointer opens the cell, as a click does', async () => {
+      pointer(true);
+      const { user, lastUpdate } = setup();
+      await grid();
+      await user.pointer({ keys: '[TouchA]', target: cell('Germany', 'Mar 26') });
+      await waitFor(() => {
+        expect(query(lastUpdate())).toMatchObject({ market: 'de', period: '2026-03' });
+      });
     });
   });
 

@@ -9,6 +9,12 @@ const tabParser = parseAsStringLiteral(SECTIONS).withDefault('overview').withOpt
   history: 'push',
 });
 
+/**
+ * Marks the button that opens the alerts sheet (the header's bell), so the
+ * sheet can hand focus back to it on close even when it opened from a link.
+ */
+export const ALERTS_TRIGGER_ATTR = 'data-alerts-trigger';
+
 export type SetSection = (s: Section, options?: { history?: 'push' | 'replace' }) => void;
 
 /**

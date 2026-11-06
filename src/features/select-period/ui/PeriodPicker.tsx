@@ -2,7 +2,7 @@
 
 import { CalendarIcon } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { periodToDate, RANGES, useDashboard } from '@/entities/performance';
 import { cn } from '@/shared/lib';
@@ -16,6 +16,7 @@ import {
   ToggleGroupItem,
 } from '@/shared/ui';
 
+import { useOverflows } from '../model/use-overflows';
 import { useSelectPeriod } from '../model/use-select-period';
 
 const isRange = (v: string): v is (typeof RANGES)[number] => RANGES.some((r) => r === v);
@@ -23,6 +24,7 @@ const isRange = (v: string): v is (typeof RANGES)[number] => RANGES.some((r) => 
 /** "May 2026 · 1 month": the month and the window that ends in it. */
 export function PeriodPicker({ className }: { className?: string }) {
   const t = useTranslations('period');
+  const tCommon = useTranslations('common');
   const format = useFormatter();
   const { ds, state } = useDashboard();
   const { setPeriod, setRange } = useSelectPeriod();
@@ -30,26 +32,54 @@ export function PeriodPicker({ className }: { className?: string }) {
 
   const period = format.dateTime(periodToDate(state.period), 'period');
   const range = t(`range.${state.range}`);
+  const rangeShort = t(`rangeShort.${state.range}`);
+  const label = t('label', { period, range });
+  // Phones: the full label when it fits next to the mode switch, else the
+  // month over "12 mo" (owner, 2026-11-06). Desktop always has the room.
+  const room = useRef<HTMLSpanElement>(null);
+  const probe = useRef<HTMLSpanElement>(null);
+  const compact = useOverflows(room, probe, label);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button
-          type="button"
-          variant="outline"
-          className={cn('min-h-11 justify-start', className)}
-          aria-label={t('trigger', { period, range })}
-        >
-          <CalendarIcon aria-hidden />
-          <span className="font-mono tabular-nums">{t('label', { period, range })}</span>
+        <Button type="button" variant="outline" className={cn('min-h-11 justify-start', className)}>
+          {/* The name is the full sentence; what shows may be its short form
+              ("12 mo"), which a screen reader would read badly. Text, not
+              aria-label: a visible label must be part of an aria-label. */}
+          {/* The short form, when shown, is in the name too (WCAG 2.5.3: say "12 mo"). */}
+          <span className="sr-only">
+            {t('trigger', { period, range })}
+            {compact ? tCommon('srAfter', { text: rangeShort }) : null}
+          </span>
+          <CalendarIcon aria-hidden className="max-sm:hidden" />
+          <span ref={room} aria-hidden className="relative min-w-0 flex-1 text-left">
+            <span
+              ref={probe}
+              className="invisible absolute font-mono whitespace-nowrap tabular-nums"
+            >
+              {label}
+            </span>
+            <span
+              className={cn('block truncate font-mono tabular-nums', compact && 'max-sm:hidden')}
+            >
+              {label}
+            </span>
+            <span
+              className={cn(
+                'flex-col items-start font-mono text-xs leading-tight tabular-nums',
+                compact ? 'flex sm:hidden' : 'hidden',
+              )}
+            >
+              <span className="max-w-full truncate">{period}</span>
+              <span className="max-w-full truncate text-muted-foreground">{rangeShort}</span>
+            </span>
+          </span>
         </Button>
       </PopoverTrigger>
-      {/* Phone: as wide as the full-width button above it. */}
-      <PopoverContent
-        align="end"
-        collisionPadding={15}
-        className="w-80 gap-3 max-sm:w-(--radix-popover-trigger-width)"
-      >
+      {/* Phone: the button is narrow now (it shares a row with the mode
+          switch); the card keeps its own width, kept on screen by the padding. */}
+      <PopoverContent align="end" collisionPadding={15} className="w-80 gap-3">
         <MonthPicker
           value={state.period}
           periods={ds.meta.periods}

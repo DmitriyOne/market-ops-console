@@ -2,6 +2,39 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/). The top version must match `package.json` and the `release/X.Y.Z` branch.
 
+## [0.16.0] - Unreleased
+
+### Added
+- `POST /api/chat`, the path the starter pack's contract names, answers like `/api/v1/chat` (a rewrite; ADR 0012).
+
+### Changed
+- Region and market names follow the page's language (`Deutschland`, `Германия`; regions `Europa`, `АТР`): the names are in the messages (`places`), generated once from `Intl.DisplayNames` so server and browser agree. Product names are brands and stay. The CSV export keeps the dataset's names, like its USD columns.
+- German and Russian name the forecast one way: Plan / План everywhere (the table said Prognose / Прогноз, the map Zielerreichung).
+- Share link shows "Link copied" under the button for 2 s (seen on a phone, where the button is only an icon); the screen reader's announcement is unchanged.
+- The drill-down path moved from the header to the page, above the title, on every screen: the phone header is two rows (≈120 px, was ≈225), the desktop header keeps name, period, mode and the switches.
+- Phone header: period and mode share one row, half the width each (the full period when it fits, measured; else the month over "12 mo"; no calendar icon): the header is a row shorter. A version that slid the row away while scrolling was tried and dropped: menus picked in it flickered (owner, 2026-11-06).
+- Analyst on wide screens: the map stays in view while Top risks and the radar next to it scroll, so a pick on the map and the radar it changes are seen together.
+
+### Fixed
+- Period button: when it shows the short form ("12 мес."), that text is in its name too, so it can be said to press it (WCAG 2.5.3).
+- Alerts: a failed delete of a rule already deleted elsewhere names the rule above the list.
+- Alerts: lists stored before 0.16.0 get their examples' presets back (named in the page's language again, their names taken in every language); an example the user renamed stays theirs.
+- Alerts: the server keeps presets to the examples: a new rule cannot claim one, a change keeps only the rule's own.
+- Alerts: Edit after a refused rule shows it in the currency chosen now, also after a switch while the form is open (it kept the old currency's numbers and saved them at the new rate).
+- Alerts: Edit is offered only where the form can fix the refusal (a taken name, an invalid value); a refused toggle, ten rules or a rule deleted elsewhere offer Dismiss; a failure whose rule is gone shows above the list, by name, instead of nowhere.
+- Period label: measured again when the web font arrives, not only when the room changes.
+- No hydration error on the bell: its count is shown from after hydration. The alert rules could arrive before the bell's part of the page hydrated (seen in development), and the static HTML has no count.
+- Phone settings: picking a currency no longer flashes its menu 190 px away: the menus in the bottom sheet open upward, so the sheet sliding down after a pick no longer flips them mid-fade.
+- Sentry no longer receives this machine's errors and console lines: a DSN in `.env.local` alone sends nothing; `NEXT_PUBLIC_SENTRY_LOCAL=true` sends, as environment `local`. Deployments report Vercel's environment (`production`, `preview`) instead of `NODE_ENV`, under which a local build or a preview counted as production (ADR 0019).
+- Heat map with a mouse: the line under the grid only reads the cell out; its Open and Select buttons, which changed under the mouse on the way down to them, are for touch screens, where a tap shows the cell. A tap where a mouse is the main pointer opens, as a click does.
+- A hand-typed currency in another case (`?currency=eur`) is written as `EUR`, not dropped to USD; the repair is logged once per link, not once per widget.
+- The radar's axis names (Momentum, Attainment, Выполнение плана) are no longer cut off in a narrow card.
+- Alerts: the example rules are named in the page's language in every language, also after a switch (they carry a preset; an edit from the form makes the name the user's). Before, they kept the language of the first visit, and the first save after a switch could clash with an example's name in another language.
+- Alerts: a save the API refuses (a name already taken) no longer offers a Retry that cannot pass: Edit opens the form again with what was typed and the error on the name. A refused delete offers only Dismiss.
+- Alerts: Escape (or Close) gives focus back to the bell, also when a link opened the sheet.
+- Assistant: Try again after a failed answer asks again in its place; the failed turn no longer stays above the new one. A stopped answer stays (it holds what had arrived).
+- Assistant: on a window as narrow as a phone, a source picked with the mouse no longer leaves its card over the header.
+
 ## [0.15.0] - Unreleased
 
 ### Added

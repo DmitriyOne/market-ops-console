@@ -28,6 +28,8 @@ type RuleListProps = {
   failed: readonly FailedWrite[];
   onRetry: (failed: FailedWrite) => void;
   onDismiss: (failed: FailedWrite) => void;
+  /** A refused write (a taken name): back to the form with what it asked for. */
+  onFix: (failed: FailedWrite) => void;
 };
 
 /** Where focus goes once a Retry or a Dismiss has removed the button it was on. */
@@ -46,6 +48,7 @@ export function RuleList({
   failed,
   onRetry,
   onDismiss,
+  onFix,
 }: RuleListProps) {
   const t = useTranslations('alerts');
   const tCommon = useTranslations('common');
@@ -75,16 +78,22 @@ export function RuleList({
   };
   const dismiss = (f: FailedWrite) => {
     onDismiss(f);
-    focusTo.current = f.kind === 'create' ? LIST : f.target;
+    focusTo.current = above.includes(f) ? LIST : f.target;
   };
   const failedFor = new Map(failed.filter((f) => f.kind !== 'create').map((f) => [f.target, f]));
-  const created = failed.filter((f) => f.kind === 'create');
+  // Above the list: a new rule's failure (it has no row), and one whose rule
+  // is gone (deleted elsewhere: `not_found`), else it would show nowhere.
+  const above = failed.filter((f) => f.kind === 'create' || !rules.some((r) => r.id === f.target));
 
   return (
     <div ref={root} className="flex flex-col gap-3">
-      {created.map((f) => (
-        <FailedLine key={f.id} failed={f} onRetry={retry} onDismiss={dismiss}>
-          {t('failed.create', { name: f.name, reason: f.reason })}
+      {above.map((f) => (
+        <FailedLine key={f.id} failed={f} onRetry={retry} onDismiss={dismiss} onFix={onFix}>
+          {/* No row to stand by: the line names the rule. */}
+          {t(f.kind === 'remove' ? 'failed.removeNamed' : 'failed.create', {
+            name: f.name,
+            reason: f.reason,
+          })}
         </FailedLine>
       ))}
       {rules.length === 0 ? (
@@ -159,7 +168,7 @@ export function RuleList({
                 </div>
                 {/* After the switch, so Tab from a failed toggle lands on Retry. */}
                 {failure ? (
-                  <FailedLine failed={failure} onRetry={retry} onDismiss={dismiss}>
+                  <FailedLine failed={failure} onRetry={retry} onDismiss={dismiss} onFix={onFix}>
                     {t(failure.kind === 'remove' ? 'failed.remove' : 'failed.update', {
                       reason: failure.reason,
                     })}
@@ -206,32 +215,50 @@ type FailedLineProps = {
   failed: FailedWrite;
   onRetry: (failed: FailedWrite) => void;
   onDismiss: (failed: FailedWrite) => void;
+  onFix: (failed: FailedWrite) => void;
   children: ReactNode;
 };
 
 /**
- * What failed, with Retry and Dismiss. Not a live region: the toast already
+ * What failed, with Retry and Dismiss; when the API refused the write
+ * (Retry would get the same answer), Edit for a new or edited rule and
+ * no Retry for a delete. Not a live region: the toast already
  * announced it; this is the same choice where the keyboard can reach it.
  */
-function FailedLine({ failed, onRetry, onDismiss, children }: FailedLineProps) {
+function FailedLine({ failed, onRetry, onDismiss, onFix, children }: FailedLineProps) {
   const t = useTranslations('alerts.failed');
   return (
     <div className="flex flex-wrap items-center gap-x-2 gap-y-1 rounded-lg border border-destructive/40 px-3 py-1 text-sm">
       <CircleAlertIcon aria-hidden className="size-4 shrink-0 text-destructive" />
       <p className="min-w-0 flex-1 break-words">{children}</p>
       <div className="flex gap-1">
-        <Button
-          type="button"
-          variant="outline"
-          className="h-11"
-          aria-label={t('retryRule', { name: failed.name })}
-          onClick={() => {
-            onRetry(failed);
-          }}
-        >
-          <RotateCcwIcon aria-hidden />
-          {t('retry')}
-        </Button>
+        {failed.fix ? (
+          <Button
+            type="button"
+            variant="outline"
+            className="h-11"
+            aria-label={t('fixRule', { name: failed.name })}
+            onClick={() => {
+              onFix(failed);
+            }}
+          >
+            <PencilIcon aria-hidden />
+            {t('fix')}
+          </Button>
+        ) : failed.retryable ? (
+          <Button
+            type="button"
+            variant="outline"
+            className="h-11"
+            aria-label={t('retryRule', { name: failed.name })}
+            onClick={() => {
+              onRetry(failed);
+            }}
+          >
+            <RotateCcwIcon aria-hidden />
+            {t('retry')}
+          </Button>
+        ) : null}
         <Button
           type="button"
           variant="ghost"

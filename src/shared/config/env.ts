@@ -26,6 +26,10 @@ export const env = createEnv({
     NEXT_PUBLIC_SITE_URL: z.url().optional(),
     /** Sentry project key (public by design). Unset, Sentry stays off; E2E sets a fake local one (ADR 0019). */
     NEXT_PUBLIC_SENTRY_DSN: z.url().optional(),
+    /** Set by Vercel (production, preview, development); unset on this machine: Sentry's environment (ADR 0019). */
+    NEXT_PUBLIC_VERCEL_ENV: z.enum(['production', 'preview', 'development']).optional(),
+    /** Sends to Sentry from this machine (`next dev`, a local build): off unless true; for /sentry-test and E2E (ADR 0019). */
+    NEXT_PUBLIC_SENTRY_LOCAL: z.stringbool().default(false),
   },
   runtimeEnv: {
     MOCK_TOKEN_DELAY_MS: process.env.MOCK_TOKEN_DELAY_MS,
@@ -38,6 +42,8 @@ export const env = createEnv({
     NODE_ENV: process.env.NODE_ENV,
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
     NEXT_PUBLIC_SENTRY_DSN: process.env.NEXT_PUBLIC_SENTRY_DSN,
+    NEXT_PUBLIC_VERCEL_ENV: process.env.NEXT_PUBLIC_VERCEL_ENV,
+    NEXT_PUBLIC_SENTRY_LOCAL: process.env.NEXT_PUBLIC_SENTRY_LOCAL,
   },
   emptyStringAsUndefined: true,
 });

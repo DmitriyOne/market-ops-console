@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useFormatter, useTranslations } from 'next-intl';
-import { useId, useMemo } from 'react';
+import { useEffect, useId, useMemo } from 'react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 
 import {
@@ -58,6 +58,8 @@ type RuleFormProps = {
   /** The other rules: their names are taken. */
   others: readonly AlertRule[];
   editing: boolean;
+  /** The server refused the name (taken in another language or tab): shown at once. */
+  nameTaken?: boolean;
   onSubmit: (input: AlertRuleInput) => void;
   onCancel: () => void;
 };
@@ -67,7 +69,15 @@ type RuleFormProps = {
  * Same checks as the server, translated, shown after a field is left or on
  * save; the preview follows every change.
  */
-export function RuleForm({ ds, initial, others, editing, onSubmit, onCancel }: RuleFormProps) {
+export function RuleForm({
+  ds,
+  initial,
+  others,
+  editing,
+  nameTaken = false,
+  onSubmit,
+  onCancel,
+}: RuleFormProps) {
   const t = useTranslations('alerts');
   const format = useFormatter();
   const base = useId();
@@ -79,7 +89,10 @@ export function RuleForm({ ds, initial, others, editing, onSubmit, onCancel }: R
     defaultValues: initial,
     mode: 'onTouched',
   });
-  const { control, register, formState } = form;
+  const { control, register, formState, setError } = form;
+  useEffect(() => {
+    if (nameTaken) setError('name', { message: 'duplicateName' }, { shouldFocus: true });
+  }, [nameTaken, setError]);
   const [metric, operator, threshold, scopeKind, regionId, marketIds] = useWatch({
     control,
     name: ['metric', 'operator', 'threshold', 'scopeKind', 'regionId', 'marketIds'],

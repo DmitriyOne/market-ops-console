@@ -1,9 +1,11 @@
 import { screen, waitFor, within } from '@testing-library/react';
+import { http, HttpResponse } from 'msw';
+import { NextIntlClientProvider } from 'next-intl';
 import { Suspense, useState } from 'react';
 import { Toaster } from 'sonner';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { enMessages } from '@/shared/config';
+import { enMessages, formats, ruMessages } from '@/shared/config';
 import { useCurrencyChoice } from '@/shared/lib';
 import { alertsApi, datasetHandler, renderWithProviders, server } from '@/shared/lib/test';
 
@@ -387,6 +389,204 @@ describe('AlertsPanel', () => {
     });
     await waitFor(() => {
       expect(api.rules()).toHaveLength(3);
+    });
+  });
+
+  it('a name the server refuses: no Retry, Edit reopens the form with the error', async () => {
+    const { user, api } = setup();
+    await rulesList();
+    // Taken where this page can't see it (another tab, an example in another language).
+    server.use(
+      http.post(
+        '*/api/v1/alerts',
+        () =>
+          HttpResponse.json(
+            { error: { code: 'duplicate_name', message: 'taken' } },
+            { status: 409 },
+          ),
+        { once: true },
+      ),
+    );
+    await user.click(screen.getByRole('button', { name: t.list.new }));
+    await user.type(screen.getByRole('textbox', { name: t.form.name }), 'Taken elsewhere');
+    await user.click(screen.getByRole('button', { name: t.form.save }));
+    expect(await screen.findByText(/^“Taken elsewhere” wasn't saved\./)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Retry: Taken elsewhere' })).toBeNull();
+
+    await user.click(screen.getByRole('button', { name: 'Edit: Taken elsewhere' }));
+    const name = screen.getByRole('textbox', { name: t.form.name });
+    expect(name).toHaveValue('Taken elsewhere');
+    expect(name).toHaveAccessibleDescription(t.form.errors.duplicateName);
+    await waitFor(() => {
+      expect(name).toHaveFocus();
+    });
+
+    await user.clear(name);
+    await user.type(name, 'Free name');
+    await user.click(screen.getByRole('button', { name: t.form.save }));
+    expect(await within(await rulesList()).findByText('Free name')).toBeInTheDocument();
+    expect(screen.queryByText(/wasn't saved/)).toBeNull();
+    await waitFor(() => {
+      expect(api.rules().map((r) => r.name)).toContain('Free name');
+    });
+  });
+
+  it('Edit after a refused rule, then a currency change: the form shows it in the new currency', async () => {
+    const { user, api } = setup('?currency=EUR');
+    await rulesList();
+    server.use(
+      http.post(
+        '*/api/v1/alerts',
+        () =>
+          HttpResponse.json(
+            { error: { code: 'duplicate_name', message: 'taken' } },
+            { status: 409 },
+          ),
+        { once: true },
+      ),
+    );
+    await user.click(screen.getByRole('button', { name: t.list.new }));
+    await user.type(screen.getByRole('textbox', { name: t.form.name }), 'Under a million');
+    await choose(user, t.form.metric, 'Revenue');
+    const threshold = screen.getByRole('textbox', { name: 'Threshold, M€' });
+    await user.clear(threshold);
+    await user.type(threshold, '1');
+    await user.click(screen.getByRole('button', { name: t.form.save }));
+    await user.click(await screen.findByRole('button', { name: 'Edit: Under a million' }));
+    expect(screen.getByRole('textbox', { name: 'Threshold, M€' })).toHaveValue('1');
+
+    await user.click(screen.getByRole('button', { name: 'To pounds' }));
+    // 1,000,000 € = 1,122,397 $ (stored) × 0.74299 = 833,930 £
+    expect(await screen.findByRole('textbox', { name: 'Threshold, M£' })).toHaveValue('0.83393');
+    const name = screen.getByRole('textbox', { name: t.form.name });
+    await user.clear(name);
+    await user.type(name, 'Under a million 2');
+    await user.click(screen.getByRole('button', { name: t.form.save }));
+    await waitFor(() => {
+      expect(api.rules().find((r) => r.name === 'Under a million 2')?.threshold).toBeCloseTo(
+        1_122_397,
+        -1,
+      );
+    });
+  });
+
+  it('a refused toggle offers no Edit: the form cannot fix it; Dismiss only', async () => {
+    const { user } = setup();
+    await rulesList();
+    server.use(
+      http.patch(
+        '*/api/v1/alerts',
+        () =>
+          HttpResponse.json(
+            { error: { code: 'duplicate_name', message: 'taken' } },
+            { status: 409 },
+          ),
+        { once: true },
+      ),
+    );
+    await user.click(screen.getByRole('switch', { name: 'Rule on: Share below 10%' }));
+    const row = await ruleRow('Share below 10%');
+    expect(await within(row).findByText(/^Not saved\./)).toBeInTheDocument();
+    expect(within(row).queryByRole('button', { name: 'Edit: Share below 10%' })).toBeNull();
+    expect(within(row).queryByRole('button', { name: 'Retry: Share below 10%' })).toBeNull();
+    expect(within(row).getByRole('button', { name: 'Dismiss: Share below 10%' })).toBeVisible();
+  });
+
+  it('ten rules already (too_many): no Edit for the refused new rule, Dismiss only', async () => {
+    const { user } = setup();
+    await rulesList();
+    server.use(
+      http.post(
+        '*/api/v1/alerts',
+        () => HttpResponse.json({ error: { code: 'too_many', message: 'full' } }, { status: 409 }),
+        { once: true },
+      ),
+    );
+    await user.click(screen.getByRole('button', { name: t.list.new }));
+    await user.type(screen.getByRole('textbox', { name: t.form.name }), 'One more');
+    await user.click(screen.getByRole('button', { name: t.form.save }));
+    expect(
+      await screen.findByText(/^“One more” wasn't saved\. You can keep up to 10/),
+    ).toBeVisible();
+    expect(screen.queryByRole('button', { name: 'Edit: One more' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Dismiss: One more' })).toBeVisible();
+  });
+
+  it('a rule deleted elsewhere: the failed change still shows, above the list, by name', async () => {
+    const { user, api } = setup();
+    await rulesList();
+    server.use(
+      http.patch(
+        '*/api/v1/alerts',
+        () => {
+          // Another tab deleted it in the meantime.
+          api.remove('example-share');
+          return HttpResponse.json(
+            { error: { code: 'not_found', message: 'gone' } },
+            { status: 404 },
+          );
+        },
+        { once: true },
+      ),
+    );
+    await user.click(screen.getByRole('switch', { name: 'Rule on: Share below 10%' }));
+    expect(
+      await screen.findByText("“Share below 10%” wasn't saved. This rule no longer exists."),
+    ).toBeVisible();
+    await waitFor(() => {
+      expect(
+        within(screen.getByRole('list', { name: t.list.label })).queryByText('Share below 10%'),
+      ).toBeNull();
+    });
+    expect(screen.getByText(/^“Share below 10%” wasn't saved/)).toBeVisible();
+    expect(screen.queryByRole('button', { name: 'Edit: Share below 10%' })).toBeNull();
+  });
+
+  it('a delete of a rule already deleted elsewhere: the line above the list names it', async () => {
+    const { user, api } = setup();
+    await rulesList();
+    server.use(
+      http.delete(
+        '*/api/v1/alerts',
+        () => {
+          api.remove('example-share');
+          return HttpResponse.json(
+            { error: { code: 'not_found', message: 'gone' } },
+            { status: 404 },
+          );
+        },
+        { once: true },
+      ),
+    );
+    await user.click(screen.getByRole('button', { name: 'Delete Share below 10%' }));
+    await user.click(await screen.findByRole('button', { name: t.delete.confirm }));
+    expect(
+      await screen.findByText("“Share below 10%” wasn't deleted. This rule no longer exists."),
+    ).toBeVisible();
+  });
+
+  it("the examples are named in the page's language; the stored list stays the same", async () => {
+    const api = alertsApi();
+    server.use(datasetHandler(), ...api.handlers);
+    const { user } = renderWithProviders(
+      <NextIntlClientProvider locale="ru-RU" messages={ruMessages} formats={formats} timeZone="UTC">
+        <Suspense>
+          <Panel />
+        </Suspense>
+      </NextIntlClientProvider>,
+    );
+    const list = await screen.findByRole('list', { name: ruMessages.alerts.list.label });
+    expect(within(list).getByText(ruMessages.alerts.examples.attainment)).toBeInTheDocument();
+    expect(within(list).getByText(ruMessages.alerts.examples.share)).toBeInTheDocument();
+
+    // A toggle keeps the example; the API still has it as a preset.
+    await user.click(
+      within(list).getByRole('switch', {
+        name: ruMessages.alerts.list.enabled.replace('{name}', ruMessages.alerts.examples.share),
+      }),
+    );
+    await waitFor(() => {
+      expect(api.rules()[1]).toMatchObject({ preset: 'share', enabled: false });
     });
   });
 

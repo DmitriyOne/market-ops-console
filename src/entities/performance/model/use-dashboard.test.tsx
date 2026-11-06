@@ -46,6 +46,25 @@ describe('useDashboard', () => {
     info.mockRestore();
   });
 
+  it('many widgets reading one broken link: the repair is logged once', async () => {
+    const info = vi.spyOn(console, 'info').mockImplementation(() => undefined);
+    const onUrlUpdate = vi.fn<(event: UrlUpdateEvent) => void>();
+    const wrapper = ({ children }: { children: ReactNode }) => (
+      <TestProviders searchParams="?currency=eur&range=9m" onUrlUpdate={onUrlUpdate}>
+        <Suspense>{children}</Suspense>
+      </TestProviders>
+    );
+    // Four readers, like the widgets of one page.
+    renderHook(() => [useDashboard(), useDashboard(), useDashboard(), useDashboard()], { wrapper });
+    await waitFor(() => {
+      expect(onUrlUpdate).toHaveBeenCalled();
+    });
+    expect(onUrlUpdate.mock.calls.at(-1)?.[0].queryString).toBe('?currency=EUR');
+    const logged = info.mock.calls.filter(([message]) => message === '[event] url_fixed');
+    expect(logged).toEqual([['[event] url_fixed', { params: ['range', 'currency'] }]]);
+    info.mockRestore();
+  });
+
   it('reads repeated markets keys, the form a shared link and the locale switch keep', async () => {
     const { result } = setup('?markets=de&markets=es');
     await waitFor(() => {
