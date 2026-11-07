@@ -1,6 +1,6 @@
 # 0014. Design direction: dashboard D, assistant A, fallback to dashboard A
 
-**Context.** The design pass (spec §15) produced four directions on the Claude Design canvas (A soft cards, B ruled ledger, C attention queue, D map console), each in light and dark. The owner compared them on 2026-11-03.
+**Context.** The design pass (spec §15) produced four directions on a Claude Design canvas (A soft cards, B ruled ledger, C attention queue, D map console), each in light and dark. The canvas is in the author's own account and is private; what it decided is written down here and in `DESIGN.md`. The owner compared them on 2026-11-03.
 
 **Decision** (owner decision, 2026-11-03):
 - **Assistant: variant A.** Chat panel on the right; AI answers on a separate violet "AI surface", user messages and source data on neutral surfaces; the six message states from the A "Assistant" board (empty, streaming, done, error, stopped, discrepancy) are the reference.
