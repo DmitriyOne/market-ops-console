@@ -27,9 +27,10 @@ Take-home assignment for the Frontend Engineer role at NewPage Solutions.
 <p>
   <img src="docs/screenshots/phone-overview.jpg" width="260" alt="Phone: the Europe overview with the tab bar">
   <img src="docs/screenshots/phone-assistant-abstain.jpg" width="260" alt="Phone: the assistant says it cannot answer from the data">
+  <img src="docs/screenshots/phone-assistant-suggestions.jpg" width="260" alt="Phone: after a second refusal in a row, the assistant offers four questions to tap">
 </p>
 
-Phone: the Europe overview, and the assistant refusing a question the data cannot answer.
+Phone: the Europe overview; the assistant refusing a question the data cannot answer; and, after two refusals in a row, questions to tap instead. The pencil at the top starts a new chat.
 
 ## Contents
 
