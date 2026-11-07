@@ -196,6 +196,10 @@ GitHub Actions, on pull requests only, one check per job ([ADR 0007](docs/decisi
 
 Vercel builds previews and deploys `master` to production. Branches go `feature/X.Y.Z/name` → `release/X.Y.Z` → `develop` → `master`.
 
+<img src="docs/screenshots/ci-checks.png" width="640" alt="A pull request: all 8 checks passed (branch and version, format, lint, types, unit tests, E2E, the Vercel deployment and preview comments)">
+
+Every pull request, into `release`, `develop` or `master`, runs its checks, and is merged only when they all pass.
+
 ## Accessibility
 
 *My view:*

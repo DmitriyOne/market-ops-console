@@ -13,6 +13,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 
 
 ### Added
+- A screenshot of a pull request with all 8 checks passed, in the README's CI/CD section.
 - `docs/plans/README.md`: what the plans are.
 - Two alert screenshots in the README: the new-rule form with its live preview, and the dashboard after saving (the toast, the bell's count, the rule named in Top risks).
 
