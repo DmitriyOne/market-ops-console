@@ -6,7 +6,7 @@ What is known and not done, after 1.0. Each item says what it is, where it lives
 
 ### Performance
 
-- **Mobile LCP 5.1 s in Lighthouse (Performance 75; desktop 99).** The LCP element is the line under the title. It depends on the URL, so it renders only after hydration; the static HTML shows a skeleton there. 88 % of the time is render delay on a 4× slower CPU. Fix: render the default view's text in the static HTML and replace it only when the URL differs; split the dashboard's client JS further (the main chunk boots in ~1.2 s on 4× CPU). Numbers: `docs/requirements-map.md`.
+- **Mobile LCP 4.7 s in Lighthouse (Performance 81; desktop 99).** The LCP element is the line under the title. It depends on the URL, so it renders only after hydration; the static HTML shows a skeleton there. 88 % of the time is render delay on a 4× slower CPU. Fix: render the default view's text in the static HTML and replace it only when the URL differs; split the dashboard's client JS further (the main chunk boots in ~1.2 s on 4× CPU). Numbers: `docs/requirements-map.md`.
 - **A stored "Tiles" view shifts the layout once on load.** Before hydration the market card shows a map-shaped skeleton. The mode already avoids this with a before-paint script (ADR 0015); the stored view can do the same, since `localStorage` is readable in the head script.
 
 ### Accessibility

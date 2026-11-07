@@ -5,7 +5,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 ## [1.0.1] - 2026-11-08
 
 ### Changed
-- Lighthouse measured again on production 1.0.0, the median of three runs: desktop 99, mobile 75 (was 68 on 0.15.0). The README shows both reports as screenshots and says why SEO is 63. The same numbers in `docs/requirements-map.md` and the backlog.
+- Lighthouse measured again on production 1.0.0, in Chrome: desktop 99, mobile 81 (was 68 on 0.15.0). The README shows both reports as screenshots and says why SEO is 63. The same numbers in `docs/requirements-map.md` and the backlog.
 - The agent skills are no longer copied into the repo: `docs/agent-skills.md` lists each with a link to its source and what it was used for. The lint and Prettier exceptions for `.claude/skills/` are gone with the folder.
 - The backlog is rewritten for a reader: what is next, the trade-offs kept on purpose and why, and what is being watched; internal notes and closed items removed.
 - README, Accessibility: says plainly that no real screen reader has been run yet, and what was checked instead (axe in every E2E run against WCAG 2.1 AA, Google's Lighthouse accessibility audit, the keyboard by hand).

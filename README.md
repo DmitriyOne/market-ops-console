@@ -155,18 +155,18 @@ Every choice, with what was rejected: [ADR 0002](docs/decisions/0002-stack.md).
 
 ## Productionising it
 
-**Performance.** Pages are pre-rendered per language and served from Vercel's CDN. Heavy parts load only when needed: the map (~71 KB gz), the charts, and ExcelJS (~250 KB gz, only when Export is clicked). **Streaming without jank.** The chat's state lives in the assistant panel, so tokens re-render only the answer being written, never the dashboard. The list follows the answer only while the reader is at the bottom; if they scrolled up, a "New content" button appears instead of the page jumping. "What the data shows" is worked out once, when the answer ends. Lighthouse on production (1.0.0, the median of three runs, 7 November 2026):
+**Performance.** Pages are pre-rendered per language and served from Vercel's CDN. Heavy parts load only when needed: the map (~71 KB gz), the charts, and ExcelJS (~250 KB gz, only when Export is clicked). **Streaming without jank.** The chat's state lives in the assistant panel, so tokens re-render only the answer being written, never the dashboard. The list follows the answer only while the reader is at the bottom; if they scrolled up, a "New content" button appears instead of the page jumping. "What the data shows" is worked out once, when the answer ends. Lighthouse on production (1.0.0, run in Chrome, 7 November 2026):
 
 | | Performance | Accessibility | Best practices | LCP | TBT | CLS |
 |---|---|---|---|---|---|---|
-| Desktop | 99 | 100 | 100 | 1.0 s | 10 ms | 0.01 |
-| Mobile (slow 4G, 4× CPU) | 75 | 100 | 100 | 5.1 s | 270 ms | 0 |
+| Desktop | 99 | 100 | 100 | 0.9 s | 0 ms | 0 |
+| Mobile (slow 4G, 4× CPU) | 81 | 100 | 100 | 4.7 s | 150 ms | 0 |
 
 Mobile LCP is the weak spot: most of it is JavaScript parsing on a slow CPU. What would fix it is in the [backlog](docs/plans/backlog.md). SEO (63) is left out on purpose: the console is an internal tool, so `robots.txt` and `noindex` keep it out of search, and that is the only SEO check that fails.
 
 | Desktop | Mobile |
 |---|---|
-| ![Lighthouse, desktop: Performance 99, Accessibility 100, Best practices 100, SEO 63; LCP 1.0 s, TBT 10 ms, CLS 0.014](docs/screenshots/lighthouse-desktop.jpg) | ![Lighthouse, mobile: Performance 75, Accessibility 100, Best practices 100, SEO 63; LCP 5.1 s, TBT 270 ms, CLS 0](docs/screenshots/lighthouse-mobile.jpg) |
+| ![Lighthouse, desktop: Performance 99, Accessibility 100, Best practices 100, SEO 63; LCP 0.9 s, TBT 0 ms, CLS 0](docs/screenshots/lighthouse-desktop.jpg) | ![Lighthouse, mobile: Performance 81, Accessibility 100, Best practices 100, SEO 63; LCP 4.7 s, TBT 150 ms, CLS 0](docs/screenshots/lighthouse-mobile.jpg) |
 
 ### Observability
 
