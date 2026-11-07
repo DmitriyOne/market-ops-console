@@ -2,7 +2,15 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/). The top version must match `package.json` and the `release/X.Y.Z` branch.
 
-## [1.0.1] - 2026-11-08
+## [1.0.2] - 2026-11-07
+
+### Changed
+- Release dates of 1.0.0 and 1.0.1 are the days they were merged into `master` (2026-11-06 and 2026-11-07), not a planned date.
+- README, Lighthouse: says that a command-line run gives mobile 75 and LCP 5.1 s, next to the Chrome run's 81, and that both are in the requirements map.
+- README, i18n: three languages, four locales (en-GB, en-US, de-DE, ru-RU), so it matches `docs/features.md` and `AGENTS.md`.
+- `DESIGN.md` and ADR 0014: the Claude Design canvas with the reference boards is private, in the author's own account, so it is not linked; what it decided is written down in the ADR and in `DESIGN.md`.
+
+## [1.0.1] - 2026-11-07
 
 ### Changed
 - The phone screenshots in the README are now in English (were German), with a third one: the questions offered after two refusals in a row. The caption says the pencil at the top starts a new chat.
@@ -18,7 +26,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 - `docs/plans/README.md`: what the plans are.
 - Two alert screenshots in the README: the new-rule form with its live preview, and the dashboard after saving (the toast, the bell's count, the rule named in Top risks).
 
-## [1.0.0] - 2026-11-08
+## [1.0.0] - 2026-11-06
 
 ### Changed
 - README rewritten for reviewers, one block per section the brief asks for: try it in three minutes, quick start, architecture (layers, data flow diagram, server vs client state), decisions with what was considered, trust in AI output, productionising (performance, observability, resilience, CI/CD), accessibility, testing, key decisions, standards, AI workflow, what I'd do next. Screenshots in `docs/screenshots`.
