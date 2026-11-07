@@ -328,6 +328,6 @@ docs/
   CONTRACT.md          the streaming contract from the starter pack
 DESIGN.md              tokens, type, spacing, components
 CHANGELOG.md           every release
-LICENSE                MIT
+LICENSE                evaluation only: read, run and assess; anything else needs the author's written consent
 CLAUDE.md, AGENTS.md, .claude/rules/   instructions for AI agents
 ```
