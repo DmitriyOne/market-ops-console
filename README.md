@@ -1,6 +1,6 @@
 # Market Ops Console
 
-> **From the author.** Although this project was made with the help of AI, a person put a lot into it: effort, time, experience and research. Everything was done clearly to the brief, the way it was meant to be. But even if you suddenly find something, a small bug, or something you would like done differently, that is a normal stage of development. I still tried to make everything perfectly good. But I hope that, in any case, you and I will talk. *(In my own words, said in Ukrainian and translated into English.)*
+> **From the author.** Built with Claude Code as the coding agent; the decisions, the reviews and the browser checks are mine. Every brief requirement and how to check it: [requirements map](docs/requirements-map.md). What is not done and why: [What I'd do differently](#what-id-do-differently-with-more-time).
 
 A console for a commercial operations team. Two surfaces over one dataset:
 
@@ -13,9 +13,9 @@ Take-home assignment for the Frontend Engineer role at NewPage Solutions.
 
 ## A few words from me
 
-> **About the language.** English is not my first language, and I am not fluent yet. The parts of this README marked *In my own words* I said in Ukrainian, and they were translated into English with an AI tool, as close to word for word as possible. The AI only translated what I said; it did not write it for me. These are my thoughts and my feelings.
+> **About the language.** English is not my first language. The parts marked *My view* are my thoughts: I said them in Ukrainian, an AI tool translated and shortened them, and I checked every line.
 >
-> It was a very interesting product. Very, well, yes, of course, a big one. But I managed to really enjoy building it, and to be completely taken in by it. And it is very pleasant that there was such an opportunity. And I hope we will manage to meet and talk more. And if there is any feedback at all, I will be glad to hear it, because I really did put a lot of effort and time into this.
+> It was a big and interesting task, and I really enjoyed building it. I put a lot of time and effort into it, and I would be glad to hear any feedback and to talk.
 
 | | |
 |---|---|
@@ -45,9 +45,8 @@ Phone, in German: the Europe overview, and the assistant refusing a question the
 10. [Key technical decisions](#key-technical-decisions)
 11. [Engineering standards](#engineering-standards)
 12. [How I used AI tools](#how-i-used-ai-tools)
-13. [What I like in it](#what-i-like-in-it)
-14. [What I'd do differently with more time](#what-id-do-differently-with-more-time)
-15. [Repository map](#repository-map)
+13. [What I'd do differently with more time](#what-id-do-differently-with-more-time)
+14. [Repository map](#repository-map)
 
 ## Try it in three minutes
 
@@ -199,11 +198,9 @@ Vercel builds previews and deploys `master` to production. Branches go `feature/
 
 ## Accessibility
 
-*In my own words:*
+*My view:*
 
-> About people, I thought like this: the most important thing I put in was that it is convenient for them. I applied the best practices, both for those who have different needs and for everyone else, but overall so that it all works, and works conveniently. For the users I added different languages, different currencies, different themes, so that it is convenient for them to work, and also different hints and so on, so that all of this makes the work better and helps them find their way faster in what is there.
->
-> I checked the whole site: the map, the assistant, the menus, the dashboard. For accessibility, I have not turned on voice reading (a screen reader) yet; I am going to do it now and check that it all works well for people. But overall I checked it, because I would really like it to be well supported, and for everyone to be able to use this product comfortably, at any time, in any place, and whatever a person's abilities are.
+> My main goal was that the console is comfortable for everyone, including people with different needs. That is why it has three languages, several currencies, light and dark themes, and hints along the way. I checked the whole site by hand: the map, the assistant, the menus and the dashboard. I want anyone to be able to use it, at any time and in any place, whatever their abilities.
 
 Target: WCAG 2.1 AA, checked against 2.2 where it was cheap.
 
@@ -255,32 +252,23 @@ A new test for a bug has to fail on the code before the fix; it is run against t
 
 ## How I used AI tools
 
-*In my own words:*
-
-> Why through an agent? Well, because it seems to me that this is a new era now. It is the same as before, when people changed how they count. I don't know how it was in Britain, but in Ukraine, in Russia, well, in the countries of the USSR, people counted on an abacus, and then they moved to calculators, and that was a new era. Here it is the same: just something new. The same as, well, there was plain JavaScript, and then we moved to frameworks like React, Angular, Vue. It is just a new step. That is why I did it through an agent: because it is a new step in development, and nothing more.
->
-> Where does it save time? In writing code. Well, simply in the routine, what you do all the time, regularly, step by step.
->
-> I stopped it and corrected it because, well, I have experience, I know what happens behind the scenes, and I see the situation with clear eyes: what is needed, what was there, what needs to be fixed, where there is a bug. Sometimes, of course, it suggests things, and that is very good, it is even better than me in some things. But sometimes experience matters, and then the result is good: this way you find a solution better and faster.
->
-> Where is AI output fine, and where do I need to think myself? Well, I would rather say it like this. It is fine somewhere on routine work, somewhere on the things that used to take days, and weeks, and months, hours, and now take a few minutes, or, well, maybe a few hours to build this feature, this task. But a review is needed where it can affect the business, where it can be critical for the business, some business losses, or where it can affect the user, their problems, their losses, and everything in this spirit. So, of course, it knows a lot and can do a lot, but checking one more time will not hurt. There is a saying in Russian, I don't know how it sounds in English: "лучше перебдеть, чем недобдеть", word for word "better to over-watch than to under-watch" (I think in English it is "better safe than sorry"). So, yes, it is better to check one more time, because these are real, living people and real, living money. And this is exactly why you need Playwright, and exactly why you need experience in development: the experience of understanding what to look at.
-
 I built this with Claude Code. I made the decisions; the agent wrote most of the code, and I reviewed it.
 
 **Workflow**
-1. A written spec ([`docs/specs`](docs/specs)) before any code.
-2. A plan per milestone ([`docs/plans`](docs/plans)), approved before work started.
-3. The agent implements on a feature branch.
-4. A separate reviewer agent reads the whole branch.
+1. A written spec ([`docs/specs`](docs/specs)) from the brief, before any code.
+2. A plan per milestone ([`docs/plans`](docs/plans)), split into small tasks. I read it and approve it, or ask for changes, before work starts.
+3. The agent builds on a feature branch, step by step: a failing test first, then the code.
+4. A second agent reviews the whole branch.
 5. I check it in the browser, on desktop and on my phone.
-6. Findings are fixed or written to the backlog.
+6. Findings are fixed, or written to the [backlog](docs/plans/backlog.md) with the reason.
+7. GitHub Actions check every pull request; the branch goes to production only through Git Flow (see CI/CD).
 
 **What keeps it repeatable**
 - `CLAUDE.md` holds the working agreement: git flow, code rules, what needs my approval.
 - `.claude/rules/*.md` are scoped rules (FSD, UI, tests, CI) that load only when the agent touches matching files.
+- Agent skills act as templates for each step (spec, plan, test first, review). The list, with links to their sources: [`docs/agent-skills.md`](docs/agent-skills.md).
 - Every decision is an ADR, so the next session doesn't argue it again.
 - Library docs are checked through Context7, not taken from memory.
-- The agent skills used, with links to their sources and what each was used for: [`docs/agent-skills.md`](docs/agent-skills.md).
 
 **Do's**
 - Make the agent reproduce a bug before fixing it, and prove a new test fails on the old code.
@@ -292,25 +280,15 @@ I built this with Claude Code. I made the decisions; the agent wrote most of the
 - Don't accept "fixed" without a test or a browser check.
 - Don't let it write the reasoning in this README for me.
 
-## What I like in it
+*My view:*
 
-*In my own words:*
-
-> I like the solution with different themes, and the two modes, one for one audience and one for the other. Because sometimes, when you open it at night, it is so bright, if there is only one theme. So this is very convenient.
->
-> I also like that you can export everything to Excel or CSV. Then you can feed it to this same code, or to ChatGPT, and ask for its solution, its thoughts: what can be changed, what can be improved, what is wrong, and all that.
->
-> I also like that you can leave a plus or a minus on an answer. Sometimes that is handy: maybe, I hope so, someone will see your comment and fix something on the site.
->
-> What I really like in the AI assistant: if you asked several times and it said it does not know what to answer, then next time it offers a set of questions, so you can just press one button and it already works. Handy. Of course, sometimes it is annoying, you would want a real person, but we have what we have for now.
->
-> I also really like the zoom on the map, how it works, on mobile too. On mobile the map is small, of course, but overall, yes, it is very interesting, and I like how it all works.
+> I see coding agents as the next step, like the move from plain JavaScript to frameworks. The agent saves the most time on routine work: what took days now takes hours. My experience is what lets me stop it and correct it when it goes the wrong way. Where a mistake can cost the business or a user money or trust, I review it myself, and that is why the Playwright tests matter. Better safe than sorry: these are real people and real money.
 
 ## What I'd do differently with more time
 
-*In my own words:*
+*My view:*
 
-> Most likely, I would first make the backend itself, with Swagger, just so the contracts are easier to understand. I would also put zod on everything. And honestly, I don't really like that we have no short links: when you copy a link, it is the whole URL. That is not very OK, and I would like to change it.
+> I would start with the backend contract: an OpenAPI (Swagger) description first, so the API is clear before the screens. I would put zod on every boundary. And I would add short links: today a shared view is the whole URL.
 
 Also on the list:
 

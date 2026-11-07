@@ -1,7 +1,5 @@
 # CLAUDE.md
 
-> **From the author.** Although this project was made with the help of AI, a person put a lot into it: effort, time, experience and research. *(In my own words, said in Ukrainian and translated into English.)*
-
 Instructions for AI coding agents working in this repo. Humans: see `README.md`. UI work: read `DESIGN.md` first (tokens, inventory, checklist).
 
 ## Project
@@ -92,7 +90,7 @@ Run `format`, `lint`, `typecheck` and `test` before every commit (and `e2e` when
 
 ## Do not
 
-- Write the owner's own reasoning in the README. The parts marked *In my own words* are the owner's, said in Ukrainian or Russian and translated close to word for word (owner, 2026-11-06); translate what the owner says, never add to it or polish it into your own words.
+- Write the owner's own reasoning in the README. The parts marked *My view* are the owner's thoughts, said in Ukrainian or Russian, translated and shortened into a few written sentences; never add a thought the owner did not say, and change those parts only with the owner's approval.
 - Add Storybook, Redux/Zustand, Vercel AI SDK, husky, or a real backend.
 - Turn on an experimental Next.js feature (`experimental.*` in `next.config.ts`, or a file convention that needs one, such as `global-not-found`): nothing experimental goes to production (owner, 2026-11-06; ADR 0018).
 - Switch off or relax a lint rule (ESLint, Steiger, TypeScript) on your own. Fix the code, or ask the owner; approved exceptions are listed in the ADR.
