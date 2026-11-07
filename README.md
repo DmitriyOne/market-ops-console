@@ -138,6 +138,13 @@ No Redux or Zustand: these tools cover every case.
 
 Every choice, with what was rejected: [ADR 0002](docs/decisions/0002-stack.md).
 
+**The alert form.** A new rule is checked by the same zod schema in the form and in the API route. While you type, a preview says which markets it would flag now. Saved, it shows at once: the bell counts it, and Top risks names it next to each market it flags.
+
+| | |
+|---|---|
+| ![New alert rule "Growth below zero": metric, condition, threshold, severity, and a preview that would flag Germany and Spain](docs/screenshots/alert-new-rule.jpg) | ![After saving: a toast says the rule flags 2 markets, the bell shows 6, and Top risks lists "Critical alert: Growth below zero" under Germany and Spain](docs/screenshots/alert-on-dashboard.jpg) |
+| The form, with the live preview. | Saved: the toast, the bell's count, and the rule named in Top risks. |
+
 ## Making the AI output trustworthy
 
 - **AI looks different.** AI text sits on its own violet surface, labelled "AI answer · may be incomplete". Numbers from the dataset never use that surface.
@@ -149,14 +156,18 @@ Every choice, with what was rejected: [ADR 0002](docs/decisions/0002-stack.md).
 
 ## Productionising it
 
-**Performance.** Pages are pre-rendered per language and served from Vercel's CDN. Heavy parts load only when needed: the map (~71 KB gz), the charts, and ExcelJS (~250 KB gz, only when Export is clicked). **Streaming without jank.** The chat's state lives in the assistant panel, so tokens re-render only the answer being written, never the dashboard. The list follows the answer only while the reader is at the bottom; if they scrolled up, a "New content" button appears instead of the page jumping. "What the data shows" is worked out once, when the answer ends. Lighthouse on production (0.15.0):
+**Performance.** Pages are pre-rendered per language and served from Vercel's CDN. Heavy parts load only when needed: the map (~71 KB gz), the charts, and ExcelJS (~250 KB gz, only when Export is clicked). **Streaming without jank.** The chat's state lives in the assistant panel, so tokens re-render only the answer being written, never the dashboard. The list follows the answer only while the reader is at the bottom; if they scrolled up, a "New content" button appears instead of the page jumping. "What the data shows" is worked out once, when the answer ends. Lighthouse on production (1.0.0, the median of three runs, 7 November 2026):
 
 | | Performance | Accessibility | Best practices | LCP | TBT | CLS |
 |---|---|---|---|---|---|---|
-| Desktop | 99 | 100 | 100 | 1.0 s | 0 ms | 0.02 |
-| Mobile (slow 4G, 4× CPU) | 68 | 100 | 100 | 5.5 s | 450 ms | 0 |
+| Desktop | 99 | 100 | 100 | 1.0 s | 10 ms | 0.01 |
+| Mobile (slow 4G, 4× CPU) | 75 | 100 | 100 | 5.1 s | 270 ms | 0 |
 
-Mobile LCP is the weak spot: most of it is JavaScript parsing on a slow CPU. What would fix it is in the [backlog](docs/plans/backlog.md).
+Mobile LCP is the weak spot: most of it is JavaScript parsing on a slow CPU. What would fix it is in the [backlog](docs/plans/backlog.md). SEO (63) is left out on purpose: the console is an internal tool, so `robots.txt` and `noindex` keep it out of search, and that is the only SEO check that fails.
+
+| Desktop | Mobile |
+|---|---|
+| ![Lighthouse, desktop: Performance 99, Accessibility 100, Best practices 100, SEO 63; LCP 1.0 s, TBT 10 ms, CLS 0.014](docs/screenshots/lighthouse-desktop.jpg) | ![Lighthouse, mobile: Performance 75, Accessibility 100, Best practices 100, SEO 63; LCP 5.1 s, TBT 270 ms, CLS 0](docs/screenshots/lighthouse-mobile.jpg) |
 
 ### Observability
 

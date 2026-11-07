@@ -6,6 +6,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 
 ### Changed
 - README, the author's words, translated closer to how they were said: the note at the top says the work follows the brief and that a small bug or a wish to change something is a normal stage of development; the few words before the screenshots keep the author's own feelings and rhythm.
+- Lighthouse measured again on production 1.0.0, the median of three runs: desktop 99, mobile 75 (was 68 on 0.15.0). The README shows both reports as screenshots and says why SEO is 63. The same numbers in `docs/requirements-map.md` and the backlog.
+
+### Added
+- Two alert screenshots in the README: the new-rule form with its live preview, and the dashboard after saving (the toast, the bell's count, the rule named in Top risks).
 
 ## [1.0.0] - 2026-11-08
 
