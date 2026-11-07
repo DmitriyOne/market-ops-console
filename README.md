@@ -251,7 +251,7 @@ A new test for a bug has to fail on the code before the fix; it is run against t
 
 **Skipped**
 - Git hooks (husky): CI does the checking.
-- Branch protection: not available on a free private repo.
+- ~~Branch protection~~: since the repo went public (1.0.3), `master` and `develop` are protected: changes come only through a pull request with the "Branch & version" check green, no force pushes or deletions, admins included.
 - Storybook and visual regression (above).
 - Rate limiting: it belongs on the server, per user or IP. The mock API caps neither request size nor frequency.
 
