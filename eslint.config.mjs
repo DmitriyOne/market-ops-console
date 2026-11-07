@@ -229,8 +229,6 @@ export default defineConfig([
     'coverage/**',
     'next-env.d.ts',
     'reference/**',
-    // Agent skills used to build the app, copied as published (third-party, like reference/)
-    '.claude/skills/**',
     'playwright-report/**',
     'test-results/**',
   ]),

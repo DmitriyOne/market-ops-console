@@ -212,8 +212,8 @@ Target: WCAG 2.1 AA, checked against 2.2 where it was cheap.
 - **Not colour alone.** Status has a colour, a shape and a pattern (dotted, hatched). Chart colours were checked with a colour-blindness and contrast validator.
 - **Screen readers.** A streaming answer is marked busy, so it is read when it ends, not word by word. The visible text of a button is part of its name.
 - **Reduced motion** stops the chart animations, the pulsing skeletons and smooth scrolling.
-- **Checked by** axe in E2E (WCAG 2.1 A/AA, desktop and phone, no exclusions), and by hand with the keyboard.
-- **Would add:** a real screen-reader pass (VoiceOver, NVDA) and a 200 % zoom check on every screen.
+- **Checked by** axe in every E2E run (WCAG 2.1 A and AA, desktop and phone, no exclusions), Google's Lighthouse accessibility audit (100 on desktop and mobile), and by hand with the keyboard across the whole site.
+- **Not checked yet: a real screen reader.** I have not run VoiceOver or NVDA. Names, roles and live regions are checked by the tools above, not by listening. That comes first next, with a 200 % zoom check on every screen.
 
 ## Testing
 
@@ -280,7 +280,7 @@ I built this with Claude Code. I made the decisions; the agent wrote most of the
 - `.claude/rules/*.md` are scoped rules (FSD, UI, tests, CI) that load only when the agent touches matching files.
 - Every decision is an ADR, so the next session doesn't argue it again.
 - Library docs are checked through Context7, not taken from memory.
-- The agent skills used are in [`.claude/skills`](.claude/skills/README.md), copied as published, with what each was used for.
+- The agent skills used, with links to their sources and what each was used for: [`docs/agent-skills.md`](docs/agent-skills.md).
 
 **Do's**
 - Make the agent reproduce a bug before fixing it, and prove a new test fails on the old code.

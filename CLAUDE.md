@@ -68,7 +68,7 @@ Flow: `feature/X.Y.Z/NAME` (or `fix/X.Y.Z/NAME`) → `release/X.Y.Z` → `develo
 | Brief requirement → code → how to check | `docs/requirements-map.md` |
 | Full feature list (README keeps the short version) | `docs/features.md` |
 | Scoped rules, loaded by path | `.claude/rules/` |
-| Agent skills used on this project (third-party, kept as published) | `.claude/skills/` |
+| Agent skills used on this project, with links to their sources | `docs/agent-skills.md` |
 | Change history | `CHANGELOG.md` |
 
 Update the relevant doc in the same commit as the change. A new decision gets a new ADR.
