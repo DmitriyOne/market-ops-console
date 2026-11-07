@@ -2,6 +2,12 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/). The top version must match `package.json` and the `release/X.Y.Z` branch.
 
+## [1.0.3] - 2026-11-07
+
+### Added
+- `LICENSE`: the code is under the MIT licence, so it can be read, run and shared without asking.
+- Branch protection on `master` and `develop` (the repo is public now): a pull request with the "Branch & version" check green, no force pushes or deletions, admins included. README, ADR 0007 and the CI rule say so.
+
 ## [1.0.2] - 2026-11-07
 
 ### Changed

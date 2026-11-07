@@ -14,3 +14,5 @@
 **Alternatives.** Full CI on every PR (burns minutes); one job per workflow (the fewest minutes, but every check in one log; used until 0.11.0); one workflow file per check (the branch and version gate repeated in each); husky hooks (rejected by owner); making the repo public (unlimited minutes + real branch protection) — possible later.
 
 **Consequences.** Auto-close is the only enforcement; a red check does not block the Merge button (no required checks on this plan); the owner can still push directly to `master`/`develop`. A title or body edit starts a run whose jobs are all skipped; the PR may then list the checks as skipped rather than an earlier red (not yet seen; the same was true of the one job, now it is six lines).
+
+**Update, 1.0.3 (2026-11-07).** The repo is public now. Actions minutes are unlimited and branch protection is available: `master` and `develop` require a pull request with the "Branch & version" check green, forbid force pushes and deletions, and the rule applies to the admin too. Approving reviews are not required: one maintainer cannot approve their own pull request. The rest of the flow is unchanged.

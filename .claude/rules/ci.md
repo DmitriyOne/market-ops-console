@@ -3,7 +3,7 @@ paths:
   - ".github/**"
 ---
 
-# CI rules (GitHub Free, private repo: 2,000 min/month, no branch protection)
+# CI rules (GitHub Free; public since 1.0.3: unlimited minutes, master and develop protected)
 
 - Workflows run only on PRs into `release/*`, `develop` and `master`. Nothing on push.
 - One job per check (owner, 2026-11-05, 0.11.1): each is its own line and log in the PR, and they run in parallel. Each job is billed rounded up to a minute and installs on its own (`.github/actions/setup`: pnpm, Node from `.nvmrc`, pnpm cache, frozen install), so a run costs more minutes than one job did; keep the list short. Every job has `timeout-minutes`; `concurrency` with `cancel-in-progress` per workflow.
