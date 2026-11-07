@@ -51,13 +51,16 @@ Phone: the Europe overview; the assistant refusing a question the data cannot an
 
 ## Try it in three minutes
 
-1. **Ask.** In the assistant, pick "Why did Germany dip?". The answer streams word by word. Ask "Give me a full summary of the portfolio" and press Stop to cut a long one.
-2. **Check it.** Hover a source button: the card shows the real numbers. Click it: the dashboard opens Germany in that month. Open "What the data shows" under the answer: the same facts from the dataset, with no AI involved.
-3. **Hit the edges.** "What will sales be next year?" is refused. "Compare APAC and Europe" comes back with medium confidence. "force error" fails and offers Try again.
-4. **Drill and share.** Click Germany on the map, then pick a product in the path above the title. Press Back and Forward. Press Share link and open the link in another browser: the same view opens.
-5. **Analyst.** Switch to Analyst. Shift+click Spain and France on the map: the radar and the markets table follow. Find Germany's March 2026 cell in the heat map.
-6. **Alerts.** Open the bell. Add a rule "Growth below 0 %" and watch the preview list the markets it would flag. Tick "Fail the next save (demo)", switch a rule off, and watch it come back with the reason and Retry.
-7. **Settings.** Switch the currency to EUR (every amount converts, percentages stay), the language to Deutsch, the theme to dark.
+1. **Ask.** In the assistant, pick "Why did Germany dip?". The answer streams word by word. Ask "Give me a full summary of the portfolio" and press "Stop answer" while it is still writing: the answer is cut and marked as incomplete.
+2. **Check it.** Hover a source button, such as "Germany, Mar 2026 (largest dip)": the card shows the real numbers. Click it: the dashboard opens Germany in that month. Open "What the data shows" under the answer: the same facts from the dataset, with no AI involved.
+3. **Hit the edges.** "What will sales be next year?" is refused with "I can't answer this from the data". "Compare APAC and Europe" comes back with medium confidence. "force error" fails and offers Try again.
+4. **Drill and share.** Click Germany on the map, then pick a product in "Choose a product" above the title. Press Back and Forward. Press Share link and open the copied link in another browser: the same view opens.
+5. **Analyst.** Switch to Analyst. Shift+click Spain and France on the map (or tick them in the Tiles view): the radar and the markets table follow. Find Germany's March 2026 cell in the heat map: −31 %, marked as an anomaly.
+6. **Export.** Still in Analyst, press Export above the markets table and pick "Excel (.xlsx)": the file `markets-2026-05-1m.xlsx` downloads with the rows as shown, formatted, with filters and a totals row; it has three sheets: markets, months and about. CSV gives the raw numbers in USD.
+7. **Alerts.** Open the bell, press New rule. Set "Applies to" to All markets, metric Growth, condition Below, threshold 0 (the field is prefilled with 95): the preview says it would flag Germany and Spain. Save: a toast, and the bell counts it. Tick "Fail the next save (demo)", switch a rule off, and watch it come back with the reason and Retry. Delete the rule when done; it asks once to confirm.
+8. **Settings.** Switch the currency to EUR (every amount converts, percentages stay), the language to Deutsch, the theme to Light or Dark.
+
+Every step above was walked through on production with Playwright on 7 November 2026, desktop 1440 × 900.
 
 ## Quick start
 

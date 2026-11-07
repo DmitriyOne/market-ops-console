@@ -2,6 +2,11 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/). The top version must match `package.json` and the `release/X.Y.Z` branch.
 
+## [1.0.4] - 2026-11-07
+
+### Changed
+- README, "Try it in three minutes": a step for the Excel and CSV export; button names as they are on screen ("Stop answer", "Choose a product", "Applies to: All markets", the prefilled threshold, the delete confirmation); the heat-map value named (−31 %). Every step walked through on production with Playwright.
+
 ## [1.0.3] - 2026-11-07
 
 ### Added
