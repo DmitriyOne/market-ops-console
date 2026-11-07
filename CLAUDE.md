@@ -62,7 +62,7 @@ Flow: `feature/X.Y.Z/NAME` (or `fix/X.Y.Z/NAME`) → `release/X.Y.Z` → `develo
 | Decisions and their reasons (ADR) | `docs/decisions/` |
 | Specs (what we build) | `docs/specs/` |
 | Implementation plans | `docs/plans/` |
-| Deferred review findings | `docs/plans/backlog.md` |
+| What is known and not done (backlog) | `docs/plans/backlog.md` |
 | Brief requirement → code → how to check | `docs/requirements-map.md` |
 | Full feature list (README keeps the short version) | `docs/features.md` |
 | Scoped rules, loaded by path | `.claude/rules/` |
@@ -71,7 +71,7 @@ Flow: `feature/X.Y.Z/NAME` (or `fix/X.Y.Z/NAME`) → `release/X.Y.Z` → `develo
 
 Update the relevant doc in the same commit as the change. A new decision gets a new ADR.
 
-A review finding that is not fixed in its branch goes into `docs/plans/backlog.md` in the same branch, with the plan that picks it up. Never leave it only in a chat report.
+A review finding that is not fixed in its branch goes into `docs/plans/backlog.md` in the same branch: under Next, Accepted trade-offs or Watching, with where it is in the code and why it waits. Never leave it only in a chat report.
 
 ## Commands
 

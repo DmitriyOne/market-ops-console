@@ -12,8 +12,11 @@ Where things live: tokens in `src/app/styles/globals.css` (contrast-checked
 in `src/app/styles/tokens.test.ts`), components in `src/shared/ui/`, the
 reasoning in `docs/decisions/0009-theming-dark-mode.md` (tokens and themes)
 and `docs/decisions/0014-design-direction.md` (assistant A, dashboard D,
-fonts). The reference boards are on the Claude Design canvas linked from
-ADR 0014: "A · Assistant", "D + A · Design system", "D + A · States".
+fonts). The reference boards ("A · Assistant", "D + A · Design system",
+"D + A · States") were drawn on a Claude Design canvas in the author's own
+account. It is private, so it is not linked: what the boards decided is
+written down in ADR 0014 and in this file, and the tokens in `globals.css`
+are the source of truth.
 
 ---
 
