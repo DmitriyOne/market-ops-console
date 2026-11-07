@@ -325,5 +325,6 @@ docs/
   CONTRACT.md          the streaming contract from the starter pack
 DESIGN.md              tokens, type, spacing, components
 CHANGELOG.md           every release
+LICENSE                MIT
 CLAUDE.md, AGENTS.md, .claude/rules/   instructions for AI agents
 ```
