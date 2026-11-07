@@ -134,7 +134,7 @@ No Redux or Zustand: these tools cover every case.
 | URL state | hand-written `useSearchParams` | **nuqs** | Typed parameters that behave like `useState` |
 | Coordinated views | React context or a global store for the selection | **The URL as the only source** of path, period, selection and mode | Every view reads it, every click writes it: a selection on the map narrows the table and the radar, and the same view comes back on Back, Forward or a shared link ([ADR 0006](docs/decisions/0006-state-and-url.md)) |
 | Forms | Formik | **react-hook-form + zod** | One zod schema checks both the form and the API route |
-| i18n | `Intl` only, react-i18next | **next-intl** | Typed keys and one formatter for server and browser, so pages stay static ([ADR 0010](docs/decisions/0010-i18n-and-locale.md)) |
+| i18n | `Intl` only, react-i18next | **next-intl**: three languages, four locales (en-GB, en-US, de-DE, ru-RU) | Typed keys and one formatter for server and browser, so pages stay static ([ADR 0010](docs/decisions/0010-i18n-and-locale.md)) |
 
 Every choice, with what was rejected: [ADR 0002](docs/decisions/0002-stack.md).
 
@@ -156,7 +156,7 @@ Every choice, with what was rejected: [ADR 0002](docs/decisions/0002-stack.md).
 
 ## Productionising it
 
-**Performance.** Pages are pre-rendered per language and served from Vercel's CDN. Heavy parts load only when needed: the map (~71 KB gz), the charts, and ExcelJS (~250 KB gz, only when Export is clicked). **Streaming without jank.** The chat's state lives in the assistant panel, so tokens re-render only the answer being written, never the dashboard. The list follows the answer only while the reader is at the bottom; if they scrolled up, a "New content" button appears instead of the page jumping. "What the data shows" is worked out once, when the answer ends. Lighthouse on production (1.0.0, run in Chrome, 7 November 2026):
+**Performance.** Pages are pre-rendered per language and served from Vercel's CDN. Heavy parts load only when needed: the map (~71 KB gz), the charts, and ExcelJS (~250 KB gz, only when Export is clicked). **Streaming without jank.** The chat's state lives in the assistant panel, so tokens re-render only the answer being written, never the dashboard. The list follows the answer only while the reader is at the bottom; if they scrolled up, a "New content" button appears instead of the page jumping. "What the data shows" is worked out once, when the answer ends. Lighthouse on production (1.0.0, run in Chrome, 7 November 2026; a command-line run gives mobile 75 and LCP 5.1 s, both runs are in the [requirements map](docs/requirements-map.md#measured-2026-11-07-production-100)):
 
 | | Performance | Accessibility | Best practices | LCP | TBT | CLS |
 |---|---|---|---|---|---|---|
@@ -308,15 +308,20 @@ Also on the list:
 ## Repository map
 
 ```
-app/                   Next.js routes only; app/api/v1 holds the mock chat and alerts APIs
+app/                   Next.js routes only; app/api/v1 holds the mock chat, data and alerts APIs
 src/                   the app, by FSD layer (see Architecture)
+pages/                 empty on purpose, so Next does not treat src/pages as the Pages Router
 data/                  data.json and fixtures.json from the starter pack
+reference/             the starter pack's reference files, unchanged
 e2e/                   Playwright tests
+scripts/               the version check CI runs, and the script that renders the app icons
 docs/
   requirements-map.md  every brief requirement → code → how to check it
   features.md          the full feature list
   decisions/           architecture decision records
-  specs/, plans/       what was built and in what steps; plans/backlog.md for deferred findings
+  specs/, plans/       what was built and in what steps; plans/backlog.md for what is known and not done
+  agent-skills.md      the agent skills used, with links to their sources
+  screenshots/         the images in this README
   CONTRACT.md          the streaming contract from the starter pack
 DESIGN.md              tokens, type, spacing, components
 CHANGELOG.md           every release
