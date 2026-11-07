@@ -308,15 +308,20 @@ Also on the list:
 ## Repository map
 
 ```
-app/                   Next.js routes only; app/api/v1 holds the mock chat and alerts APIs
+app/                   Next.js routes only; app/api/v1 holds the mock chat, data and alerts APIs
 src/                   the app, by FSD layer (see Architecture)
+pages/                 empty on purpose, so Next does not treat src/pages as the Pages Router
 data/                  data.json and fixtures.json from the starter pack
+reference/             the starter pack's reference files, unchanged
 e2e/                   Playwright tests
+scripts/               the version check CI runs, and the script that renders the app icons
 docs/
   requirements-map.md  every brief requirement → code → how to check it
   features.md          the full feature list
   decisions/           architecture decision records
-  specs/, plans/       what was built and in what steps; plans/backlog.md for deferred findings
+  specs/, plans/       what was built and in what steps; plans/backlog.md for what is known and not done
+  agent-skills.md      the agent skills used, with links to their sources
+  screenshots/         the images in this README
   CONTRACT.md          the streaming contract from the starter pack
 DESIGN.md              tokens, type, spacing, components
 CHANGELOG.md           every release

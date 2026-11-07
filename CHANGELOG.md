@@ -8,6 +8,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [S
 - Release dates of 1.0.0 and 1.0.1 are the days they were merged into `master` (2026-11-06 and 2026-11-07), not a planned date.
 - README, Lighthouse: says that a command-line run gives mobile 75 and LCP 5.1 s, next to the Chrome run's 81, and that both are in the requirements map.
 - README, i18n: three languages, four locales (en-GB, en-US, de-DE, ru-RU), so it matches `docs/features.md` and `AGENTS.md`.
+- Docs brought in line with 1.0.1: the README's repository map lists `pages/`, `reference/`, `scripts/`, `docs/agent-skills.md` and the screenshots; `CLAUDE.md` describes the backlog as it is now (Next, Accepted trade-offs, Watching); the CI rule points to the skills list.
 - `DESIGN.md` and ADR 0014: the Claude Design canvas with the reference boards is private, in the author's own account, so it is not linked; what it decided is written down in the ADR and in `DESIGN.md`.
 
 ## [1.0.1] - 2026-11-07
