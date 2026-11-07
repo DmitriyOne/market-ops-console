@@ -25,11 +25,11 @@ Take-home assignment for the Frontend Engineer role at NewPage Solutions.
 | Heat map, markets × months. Germany's March 2026 dip (−31 %) is marked with a warning sign. | Alerts: what fires now, the rules, and a switch that fails the next save to show the rollback. |
 
 <p>
-  <img src="docs/screenshots/phone-overview-de.jpg" width="260" alt="Phone, German: Europe overview with the tab bar">
-  <img src="docs/screenshots/phone-assistant-abstain.jpg" width="260" alt="Phone, German: the assistant says it cannot answer from the data">
+  <img src="docs/screenshots/phone-overview.jpg" width="260" alt="Phone: the Europe overview with the tab bar">
+  <img src="docs/screenshots/phone-assistant-abstain.jpg" width="260" alt="Phone: the assistant says it cannot answer from the data">
 </p>
 
-Phone, in German: the Europe overview, and the assistant refusing a question the data cannot answer.
+Phone: the Europe overview, and the assistant refusing a question the data cannot answer.
 
 ## Contents
 
