@@ -1,6 +1,6 @@
 # Market Ops Console
 
-> **From the author.** Although this project was made with the help of AI, a person put a lot into it: effort, time, experience and research. Even if something you wanted was not implemented, it is no problem at all to add it. I would just really like to talk and to hear your feedback personally. *(In my own words, said in Ukrainian and translated into English.)*
+> **From the author.** Although this project was made with the help of AI, a person put a lot into it: effort, time, experience and research. Everything was done clearly to the brief, the way it was meant to be. But even if you suddenly find something, a small bug, or something you would like done differently, that is a normal stage of development. I still tried to make everything perfectly good. But I hope that, in any case, you and I will talk. *(In my own words, said in Ukrainian and translated into English.)*
 
 A console for a commercial operations team. Two surfaces over one dataset:
 
@@ -15,7 +15,7 @@ Take-home assignment for the Frontend Engineer role at NewPage Solutions.
 
 > **About the language.** English is not my first language, and I am not fluent yet. The parts of this README marked *In my own words* I said in Ukrainian, and they were translated into English with an AI tool, as close to word for word as possible. The AI only translated what I said; it did not write it for me. These are my thoughts and my feelings.
 >
-> It was a very interesting product. Of course, quite a big one. But I really enjoyed building it, and I got carried away by it. It was very nice to have this opportunity. I hope we get to meet and talk more. If you have any feedback at all, I will be glad to hear it, because I really put a lot of effort and time into this.
+> It was a very interesting product. Very, well, yes, of course, a big one. But I managed to really enjoy building it, and to be completely taken in by it. And it is very pleasant that there was such an opportunity. And I hope we will manage to meet and talk more. And if there is any feedback at all, I will be glad to hear it, because I really did put a lot of effort and time into this.
 
 | | |
 |---|---|

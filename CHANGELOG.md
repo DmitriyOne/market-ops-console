@@ -2,6 +2,11 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/). The top version must match `package.json` and the `release/X.Y.Z` branch.
 
+## [1.0.1] - 2026-11-08
+
+### Changed
+- README, the author's words, translated closer to how they were said: the note at the top says the work follows the brief and that a small bug or a wish to change something is a normal stage of development; the few words before the screenshots keep the author's own feelings and rhythm.
+
 ## [1.0.0] - 2026-11-08
 
 ### Changed
