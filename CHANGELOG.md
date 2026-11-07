@@ -2,6 +2,11 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning: [SemVer](https://semver.org/). The top version must match `package.json` and the `release/X.Y.Z` branch.
 
+## [1.0.5] - 2026-11-07
+
+### Changed
+- `LICENSE`: MIT replaced with an evaluation-only licence. The code may be read, built, run and used to assess the author; any other use (in a product, redistribution, sublicensing) needs the author's written consent. Versions up to 1.0.4 stay under MIT, as a licence is not withdrawn after the fact. README's repository map says so.
+
 ## [1.0.4] - 2026-11-07
 
 ### Changed
