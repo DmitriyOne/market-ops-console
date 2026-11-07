@@ -45,15 +45,17 @@ Every requirement of the brief, where the code is, and a link or test that shows
 | Observability | Sentry: errors, traces, web vitals from the browser, logs; body-only tunnel `/monitoring`; environment from Vercel (`production`, `preview`), off locally unless asked (ADR 0019) | `e2e/sentry.spec.ts` |
 | CI/CD, deployed | `.github/workflows/` (format, lint, types, unit, E2E on pull requests); Vercel | https://df-market-ops-console.vercel.app |
 
-## Measured (2026-11-06, production 0.15.0)
+## Measured (2026-11-07, production 1.0.0)
 
-Lighthouse 12.8.2, https://df-market-ops-console.vercel.app/dashboard, Chrome headless; mobile = Lighthouse's default throttling (slow 4G, 4× CPU).
+Lighthouse on https://df-market-ops-console.vercel.app/dashboard; mobile = Lighthouse's default throttling (slow 4G, 4× CPU). Two runs: in Chrome (the screenshots in the README), and from the command line (Lighthouse 12.8.2, Chrome headless, the median of three). Scores move a few points between runs and machines.
 
-| | Performance | Accessibility | Best practices | SEO | LCP | FCP | TBT | CLS | JS transferred |
+| Run | Performance | Accessibility | Best practices | SEO | LCP | FCP | TBT | CLS | JS transferred |
 |---|---|---|---|---|---|---|---|---|---|
-| Desktop | 99 | 100 | 100 | 63 | 1.0 s | 0.3 s | 0 ms | 0.019 | 698 KB, 28 files |
-| Mobile | 68 | 100 | 100 | 63 | 5.5 s | 1.1 s | 450 ms | 0 | 625 KB, 27 files |
+| Desktop, Chrome | 99 | 100 | 100 | 63 | 0.9 s | 0.3 s | 0 ms | 0 | |
+| Mobile, Chrome | 81 | 100 | 100 | 63 | 4.7 s | 1.1 s | 150 ms | 0 | |
+| Desktop, CLI | 99 | 100 | 100 | 63 | 1.0 s | 0.4 s | 10 ms | 0.014 | 700 KB, 28 files |
+| Mobile, CLI | 75 | 100 | 100 | 63 | 5.1 s | 1.1 s | 270 ms | 0 | 627 KB, 27 files |
 
 - SEO 63 is on purpose: `robots.txt` disallows everything and pages are `noindex` (a demo, ADR 0018); every other SEO check passes.
-- Mobile LCP: the largest element is the line under the title, which is drawn once the URL is read on the client (the static page shows a skeleton in its place, so a shared link never flashes the default view, ADR 0010). 89 % of the 5.5 s is render delay on a 4× slower CPU: JavaScript parse and hydration. What would bring it down is in `docs/plans/backlog.md`.
+- Mobile LCP: the largest element is the line under the title, which is drawn once the URL is read on the client (the static page shows a skeleton in its place, so a shared link never flashes the default view, ADR 0010). Most of it (88 % in the CLI run) is render delay on a 4× slower CPU: JavaScript parse and hydration. What would bring it down is in `docs/plans/backlog.md`.
 - All JS chunks of the build: 34 files, 980 KB gzip, of which the largest (250 KB) is ExcelJS, loaded only when Excel export is clicked.
