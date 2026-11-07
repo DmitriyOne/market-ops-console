@@ -245,13 +245,13 @@ A new test for a bug has to fail on the code before the fix; it is run against t
 - Every visible word comes from the dictionaries (English, German, Russian); lint fails on a literal string in the UI.
 - Design tokens only; a test fails on a raw colour.
 - Architecture boundaries enforced by Steiger.
+- `master` and `develop` protected (since the repo went public in 1.0.3): changes come only through a pull request with the "Branch & version" check green, no force pushes or deletions, admins included.
 - Environment variables only through one validated module.
 - No experimental Next.js flags.
 - One record per decision ([`docs/decisions`](docs/decisions)); deferred review findings in [`docs/plans/backlog.md`](docs/plans/backlog.md).
 
 **Skipped**
 - Git hooks (husky): CI does the checking.
-- ~~Branch protection~~: since the repo went public (1.0.3), `master` and `develop` are protected: changes come only through a pull request with the "Branch & version" check green, no force pushes or deletions, admins included.
 - Storybook and visual regression (above).
 - Rate limiting: it belongs on the server, per user or IP. The mock API caps neither request size nor frequency.
 
